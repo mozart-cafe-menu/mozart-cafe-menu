@@ -1,0 +1,35 @@
+{
+  "name": "Mozart Café — Interface Serveur",
+  "gcm_sender_id": "YOUR_MESSAGING_SENDER_ID",
+  "short_name": "Mozart Serveur",
+  "description": "Application de notification pour le personnel du Mozart Café",
+  "start_url": "/app.html",
+  "scope": "/app.html",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#09080f",
+  "theme_color": "#c9a84c",
+  "lang": "fr",
+  "categories": ["food", "utilities"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Voir les appels",
+      "url": "app.html#calls",
+      "description": "Ouvrir l'historique des appels"
+    }
+  ]
+}

@@ -1,0 +1,1777 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mozart Café — Administration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant:wght@300;400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #0c0a08;
+      --bg2:    #111009;
+      --bg3:    #181612;
+      --card:   rgba(255,255,255,0.04);
+      --gold:   #c8a44e;
+      --gold-l: #e2c278;
+      --gold-d: #9a7a35;
+      --cream:  #f4ead2;
+      --muted:  rgba(244,234,210,0.50);
+      --border: rgba(200,164,78,0.16);
+      --bord2:  rgba(200,164,78,0.34);
+      --green:  #7ebd6a;
+      --red:    #e05252;
+      --tr:     0.25s cubic-bezier(0.4,0,0.2,1);
+      --r:      16px;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { overflow-x:hidden; }
+    body { background:var(--bg); color:var(--cream); font-family:'Outfit',sans-serif; font-weight:300; min-height:100vh; }
+    button { font-family:inherit; cursor:pointer; border:none; background:none; }
+    input, textarea, select { font-family:inherit; }
+    ::-webkit-scrollbar { width:3px; }
+    ::-webkit-scrollbar-thumb { background:var(--gold); border-radius:2px; }
+
+    /* ── LOGIN ── */
+    #login-screen {
+      position:fixed; inset:0; background:var(--bg);
+      display:flex; align-items:center; justify-content:center;
+      z-index:9999; padding:24px;
+    }
+    #login-screen.hidden { display:none; }
+    .login-box {
+      width:100%; max-width:360px;
+      background:var(--bg3); border:1px solid var(--bord2); border-radius:24px;
+      padding:36px 28px; text-align:center;
+    }
+    .login-logo { font-family:'Cormorant',serif; font-size:1.8rem; color:var(--gold); letter-spacing:0.12em; margin-bottom:4px; }
+    .login-sub  { font-size:0.75rem; color:var(--muted); letter-spacing:0.2em; text-transform:uppercase; margin-bottom:28px; }
+    .login-input {
+      width:100%; background:var(--card); border:1px solid var(--bord2); border-radius:12px;
+      padding:13px 16px; color:var(--cream); font-size:1rem; outline:none; transition:border-color 0.2s;
+      margin-bottom:14px; letter-spacing:0.1em;
+    }
+    .login-input:focus { border-color:var(--gold); }
+    .login-btn {
+      width:100%; padding:14px;
+      background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));
+      border-radius:12px; color:#0c0a08; font-size:0.9rem; font-weight:600; letter-spacing:0.06em;
+      transition:all 0.28s;
+    }
+    .login-btn:hover { transform:translateY(-1px); box-shadow:0 8px 24px rgba(200,164,78,0.38); }
+    .login-err { font-size:0.78rem; color:var(--red); margin-top:10px; min-height:18px; }
+
+    /* ── HEADER ── */
+    .adm-header {
+      background:rgba(12,10,8,0.95); backdrop-filter:blur(20px);
+      border-bottom:1px solid var(--border);
+      padding:8px 16px; position:sticky; top:0; z-index:100;
+      display:flex; align-items:center; justify-content:space-between; gap:8px;
+      flex-wrap:wrap;
+    }
+    .adm-logo { font-family:'Cormorant',serif; font-size:1.1rem; color:var(--gold); letter-spacing:0.1em; }
+    .adm-sub  { font-size:0.62rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--muted); }
+    .adm-center {
+      display:flex; align-items:center; gap:8px; flex:1;
+      justify-content:center; flex-wrap:wrap;
+    }
+    .adm-right { display:flex; gap:6px; align-items:center; flex-shrink:0; }
+    .btn-preview {
+      padding:7px 12px; border:1px solid var(--bord2); border-radius:10px;
+      color:var(--muted); font-size:0.75rem; transition:var(--tr); white-space:nowrap;
+      min-height:34px;
+    }
+    .btn-preview:hover { border-color:var(--gold); color:var(--gold); }
+    .btn-logout {
+      padding:7px 12px; border:1px solid rgba(224,82,82,0.3); border-radius:10px;
+      color:var(--red); font-size:0.75rem; opacity:0.7; transition:var(--tr); white-space:nowrap;
+      min-height:34px;
+    }
+    .btn-logout:hover { opacity:1; border-color:var(--red); }
+    @media(max-width:600px) {
+      .adm-sub { display:none; }
+      .btn-preview { padding:7px 8px; font-size:0.9rem; }
+      .adm-center { order:3; width:100%; justify-content:flex-start; }
+    }
+
+    /* ── SAVED TOAST ── */
+    #toast {
+      position:fixed; bottom:110px; left:50%;
+      transform:translateX(-50%) translateY(0);
+      background:var(--bg3); border:1px solid var(--bord2); border-radius:12px;
+      padding:12px 22px; font-size:0.84rem; color:var(--green);
+      box-shadow:0 8px 32px rgba(0,0,0,0.5); z-index:8000;
+      display:flex; align-items:center; gap:8px; white-space:nowrap;
+      max-width:calc(100vw - 32px);
+      opacity:0; pointer-events:none;
+      transition:opacity 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    #toast.show { opacity:1; pointer-events:none; transform:translateX(-50%) translateY(-8px); }
+
+    /* ── MAIN LAYOUT ── */
+    .adm-wrap { max-width:900px; margin:0 auto; padding:20px 16px 90px; }
+    @media(min-width:900px) { .adm-wrap { padding:28px 24px 90px; } }
+
+    /* ── SECTION ── */
+    .adm-section { margin-bottom:32px; }
+    .sec-hd {
+      font-family:'Cormorant',serif; font-size:1.2rem; font-weight:600;
+      color:var(--cream); padding-bottom:12px; margin-bottom:16px;
+      border-bottom:1px solid var(--border);
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    }
+    .sec-badge {
+      font-family:'Outfit',sans-serif; font-size:0.66rem; font-weight:500;
+      padding:4px 11px; border-radius:10px; letter-spacing:0.06em;
+      background:rgba(200,164,78,0.1); color:var(--gold); border:1px solid var(--bord2);
+    }
+
+    /* ── INFO CARD (WiFi, Horaires, Adresse) ── */
+    .info-card {
+      background:var(--card); border:1px solid var(--border); border-radius:var(--r);
+      overflow:hidden;
+    }
+    .info-row {
+      display:grid; grid-template-columns:140px 1fr;
+      border-bottom:1px solid var(--border);
+    }
+    .info-row:last-child { border-bottom:none; }
+    .info-lbl {
+      padding:14px 16px; font-size:0.78rem; color:var(--muted);
+      border-right:1px solid var(--border); display:flex; align-items:center;
+    }
+    .info-inputs { padding:8px 12px; display:flex; flex-direction:column; gap:6px; }
+    .info-input {
+      background:transparent; border:none; border-bottom:1px solid transparent;
+      color:var(--cream); font-size:0.84rem; padding:8px 4px; outline:none;
+      transition:border-color 0.2s; width:100%; min-height:38px;
+    }
+    .info-input:focus { border-color:var(--gold); }
+    @media(max-width:560px) {
+      .info-row { grid-template-columns:1fr; }
+      .info-lbl { border-right:none; border-bottom:1px solid var(--border); padding:10px 14px 8px; font-size:0.72rem; }
+      .info-inputs { padding:6px 14px 10px; }
+    }
+
+    /* ── CATEGORIES ── */
+    .cats-list { display:flex; flex-direction:column; gap:8px; }
+    .cat-row {
+      background:var(--card); border:1px solid var(--border); border-radius:14px;
+      padding:12px 14px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    }
+    .cat-row-ico { color:var(--gold); flex-shrink:0; }
+    .cat-row-ico svg { width:18px; height:18px; }
+    .inline-input {
+      flex:1; min-width:100px; background:transparent; border:none; border-bottom:1px solid transparent;
+      color:var(--cream); font-size:0.88rem; padding:6px 2px; outline:none; transition:border-color 0.2s;
+    }
+    .inline-input:focus { border-color:var(--gold); }
+    .icon-select {
+      background:var(--bg3); border:1px solid var(--bord2); border-radius:8px;
+      color:var(--cream); font-size:0.76rem; padding:7px 8px; outline:none;
+      min-height:36px;
+    }
+    .btn-del {
+      width:36px; height:36px; flex-shrink:0;
+      border:1px solid rgba(224,82,82,0.3); border-radius:8px;
+      color:var(--red); opacity:0.6; font-size:1.1rem; font-weight:300;
+      display:flex; align-items:center; justify-content:center; transition:var(--tr);
+    }
+    .btn-del:hover { opacity:1; border-color:var(--red); background:rgba(224,82,82,0.06); }
+    .btn-add {
+      width:100%; padding:14px; margin-top:8px;
+      border:1px dashed var(--bord2); border-radius:14px;
+      color:var(--gold); font-size:0.84rem; letter-spacing:0.04em;
+      display:flex; align-items:center; justify-content:center; gap:6px;
+      transition:var(--tr); min-height:48px;
+    }
+    .btn-add:hover { background:rgba(200,164,78,0.04); border-color:var(--gold); }
+
+    /* ── PRODUCTS ── */
+    .cat-products { margin-bottom:28px; }
+    .cat-products-hd {
+      display:flex; align-items:center; gap:10px; padding:16px 0 10px;
+    }
+    .cat-products-name {
+      font-family:'Cormorant',serif; font-size:1.05rem; font-weight:600; color:var(--cream);
+    }
+    .products-list { display:flex; flex-direction:column; gap:10px; }
+
+    /* Product card in admin */
+    .prod-card {
+      background:var(--card); border:1px solid var(--border); border-radius:14px;
+      overflow:hidden;
+    }
+    .prod-card-top {
+      display:flex; align-items:center; gap:12px; padding:14px;
+      cursor:pointer; user-select:none; min-height:70px;
+    }
+    .prod-thumb {
+      width:56px; height:56px; border-radius:10px; object-fit:cover; flex-shrink:0;
+      background:var(--bg3);
+    }
+    .prod-top-info { flex:1; min-width:0; }
+    .prod-top-name { font-size:0.92rem; font-weight:400; color:var(--cream); }
+    .prod-top-price { font-size:0.78rem; color:var(--gold); margin-top:3px; }
+    .prod-expand-ico { color:var(--muted); transition:transform 0.3s; flex-shrink:0; }
+    .prod-expand-ico svg { width:18px; height:18px; }
+    .prod-card.open .prod-expand-ico { transform:rotate(180deg); }
+    .prod-card-body {
+      display:none; padding:0 14px 18px;
+      border-top:1px solid var(--border);
+    }
+    .prod-card.open .prod-card-body { display:block; }
+
+    /* Form grid */
+    .form-grid { display:grid; gap:14px; padding-top:14px; }
+    .form-grid-2 { grid-template-columns:1fr 1fr; gap:12px; }
+    @media(max-width:480px) { .form-grid-2 { grid-template-columns:1fr; } }
+    .form-group { display:flex; flex-direction:column; gap:6px; }
+    .form-lbl { font-size:0.71rem; color:var(--muted); letter-spacing:0.08em; text-transform:uppercase; }
+    .form-input, .form-textarea, .form-select {
+      background:rgba(255,255,255,0.05); border:1px solid var(--bord2); border-radius:10px;
+      color:var(--cream); font-size:0.9rem; padding:12px 14px; outline:none; transition:border-color 0.2s; width:100%;
+    }
+    .form-input:focus, .form-textarea:focus, .form-select:focus { border-color:var(--gold); }
+    .form-textarea { resize:vertical; min-height:86px; line-height:1.6; }
+    .form-select option { background:#181612; }
+
+    /* Photo preview */
+    .photo-preview {
+      width:100%; height:160px; border-radius:12px; object-fit:cover;
+      border:1px solid var(--bord2); background:var(--bg3); margin-top:6px;
+    }
+    .photo-help { font-size:0.72rem; color:var(--muted); margin-top:6px; line-height:1.55; }
+    .photo-help a { color:var(--gold); }
+
+    /* Photo upload button */
+    .photo-upload-row { display:flex; gap:8px; margin-top:8px; }
+    .btn-upload-photo {
+      flex:1; padding:10px 14px; border-radius:10px;
+      border:1px solid var(--bord2); background:rgba(255,255,255,0.04);
+      color:var(--muted); font-size:0.82rem;
+      display:flex; align-items:center; justify-content:center; gap:7px;
+      transition:var(--tr); cursor:pointer; min-height:42px;
+    }
+    .btn-upload-photo:hover { border-color:var(--gold); color:var(--gold); background:rgba(200,164,78,0.05); }
+    .btn-clear-photo {
+      width:42px; height:42px; border-radius:10px;
+      border:1px solid rgba(224,82,82,0.3); background:none;
+      color:var(--red); font-size:1rem; opacity:0.7;
+      display:flex; align-items:center; justify-content:center;
+      transition:var(--tr); cursor:pointer; flex-shrink:0;
+    }
+    .btn-clear-photo:hover { opacity:1; border-color:var(--red); background:rgba(224,82,82,0.06); }
+    input.photo-file-input { display:none; }
+
+    /* Badges checkboxes */
+    .badges-wrap { display:flex; flex-wrap:wrap; gap:8px; }
+    .badge-chk { display:flex; align-items:center; gap:5px; cursor:pointer; }
+    .badge-chk input { display:none; }
+    .badge-pill {
+      font-size:0.74rem; font-weight:500; padding:7px 14px; border-radius:20px;
+      border:1px solid var(--border); color:var(--muted); transition:var(--tr);
+      min-height:34px; display:flex; align-items:center;
+    }
+    .badge-chk input:checked + .badge-pill { border-color:var(--gold); color:var(--gold); background:rgba(200,164,78,0.1); }
+
+    /* Product action buttons */
+    .prod-actions { display:flex; gap:8px; margin-top:16px; }
+    .btn-save-prod {
+      flex:1; padding:10px;
+      background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));
+      border-radius:10px; color:#0c0a08; font-size:0.84rem; font-weight:600;
+      transition:all 0.25s;
+    }
+    .btn-save-prod:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(200,164,78,0.35); }
+    .btn-del-prod {
+      padding:10px 16px;
+      border:1px solid rgba(224,82,82,0.35); border-radius:10px;
+      color:var(--red); font-size:0.84rem; opacity:0.75; transition:var(--tr);
+    }
+    .btn-del-prod:hover { opacity:1; border-color:var(--red); background:rgba(224,82,82,0.05); }
+
+    /* Add product */
+    .btn-add-prod {
+      width:100%; padding:11px; margin-top:8px;
+      border:1px dashed var(--bord2); border-radius:12px;
+      color:var(--gold); font-size:0.82rem;
+      display:flex; align-items:center; justify-content:center; gap:6px;
+      transition:var(--tr);
+    }
+    .btn-add-prod:hover { background:rgba(200,164,78,0.04); border-color:var(--gold); }
+
+    /* ── SAVE FAB (remplace save-bar) ── */
+    .save-bar { display:none; } /* gardé pour compatibilité JS, masqué visuellement */
+    #fab-save {
+      position:fixed; bottom:28px; right:20px;
+      width:60px; height:60px; border-radius:50%;
+      background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));
+      color:#0c0a08;
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 6px 24px rgba(200,164,78,0.45), 0 2px 8px rgba(0,0,0,0.4);
+      z-index:200; border:none; cursor:pointer;
+      transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s;
+    }
+    #fab-save:hover { transform:translateY(-3px) scale(1.06); box-shadow:0 12px 32px rgba(200,164,78,0.55); }
+    #fab-save:active { transform:scale(0.93); }
+    #fab-save svg { width:26px; height:26px; }
+    /* Pulse quand il y a des modifs non sauvegardées */
+    #fab-save.unsaved { animation:fab-pulse 2s ease-in-out infinite; }
+    @keyframes fab-pulse {
+      0%,100%{ box-shadow:0 6px 24px rgba(200,164,78,0.45); }
+      50%{ box-shadow:0 6px 32px rgba(200,164,78,0.8), 0 0 0 8px rgba(200,164,78,0.12); }
+    }
+    /* Tooltip au survol */
+    #fab-save::before {
+      content:attr(title);
+      position:absolute; right:68px; top:50%; transform:translateY(-50%);
+      background:var(--bg3); border:1px solid var(--bord2); border-radius:8px;
+      padding:6px 12px; font-size:0.76rem; color:var(--cream); white-space:nowrap;
+      opacity:0; pointer-events:none; transition:opacity 0.2s;
+    }
+    #fab-save:hover::before { opacity:1; }
+
+    /* ── BOUTON SAUVEGARDE CATÉGORIES ── */
+    .btn-save-cats {
+      width:100%; padding:13px; margin-top:10px;
+      background:rgba(200,164,78,0.08); border:1px solid var(--bord2); border-radius:14px;
+      color:var(--gold); font-size:0.86rem; font-weight:500; letter-spacing:0.04em;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      transition:var(--tr); min-height:48px;
+    }
+    .btn-save-cats:hover { background:rgba(200,164,78,0.14); border-color:var(--gold); }
+    .btn-save-cats:active { transform:scale(0.97); }
+
+    /* ── GLOBAL TRANSLATE BAR ── */
+    .global-src-sel {
+      background:var(--bg3); border:1px solid rgba(126,189,106,0.3); border-radius:8px;
+      color:var(--green); font-size:0.76rem; padding:6px 10px; outline:none; cursor:pointer;
+      min-height:32px;
+    }
+    .global-src-sel option { background:#181612; color:var(--cream); }
+    .btn-translate-global {
+      padding:7px 14px; border-radius:10px;
+      border:1px solid rgba(126,189,106,0.4);
+      color:var(--green); background:rgba(126,189,106,0.08);
+      font-size:0.76rem; font-weight:500;
+      display:flex; align-items:center; gap:6px;
+      transition:var(--tr); white-space:nowrap; min-height:32px;
+    }
+    .btn-translate-global:hover:not(:disabled) { background:rgba(126,189,106,0.15); border-color:var(--green); }
+    .btn-translate-global:disabled { opacity:0.4; cursor:not-allowed; }
+    .btn-translate-global.loading { animation:tl-pulse 1s ease-in-out infinite; }
+    .global-progress {
+      padding:4px 16px 0; font-size:0.74rem; color:var(--green);
+      min-height:0; width:100%; transition:opacity 0.3s;
+    }
+
+    /* Lang tabs */
+    .lang-tabs {
+      display:flex; gap:4px; margin-bottom:12px;
+      overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none;
+      padding-bottom:2px;
+    }
+    .lang-tabs::-webkit-scrollbar { display:none; }
+    .lang-tab {
+      padding:7px 13px; border-radius:8px; border:1px solid var(--border);
+      color:var(--muted); font-size:0.74rem; transition:var(--tr);
+      white-space:nowrap; flex-shrink:0; min-height:34px;
+    }
+    .lang-tab.on { border-color:var(--gold); color:var(--gold); background:rgba(200,164,78,0.08); }
+
+    @keyframes tl-pulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
+
+    .lang-fields { display:none; }
+    .lang-fields.on { display:block; }
+
+    /* Divider */
+    .form-divider { height:1px; background:var(--border); margin:14px 0; }
+
+    /* Form inputs larger touch targets */
+    .form-input, .form-textarea, .form-select { padding:12px 14px; }
+    .form-input { min-height:44px; }
+
+    /* Product actions larger */
+    .btn-save-prod { padding:13px; min-height:46px; }
+    .btn-del-prod { padding:13px 18px; min-height:46px; }
+    .btn-add-prod { min-height:46px; padding:13px; }
+  </style>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+  <!-- ✅ Configuration centralisée — modifier uniquement firebase-config.js -->
+  <script src="firebase-config.js"></script>
+  <script>
+    firebase.initializeApp(FIREBASE_CONFIG);
+    const _db = firebase.database();
+  </script>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     LOGIN SCREEN
+══════════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">Mozart Café</div>
+    <div class="login-sub">Administration</div>
+    <input type="password" class="login-input" id="pwd-input"
+           placeholder="Mot de passe" autocomplete="current-password">
+    <button class="login-btn" id="login-btn">Connexion</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     ADMIN INTERFACE
+══════════════════════════════════════ -->
+<header class="adm-header" id="adm-header" style="display:none">
+  <div>
+    <div class="adm-logo">Mozart Café</div>
+    <div class="adm-sub">Administration du menu</div>
+  </div>
+  <div class="adm-center">
+    <select class="global-src-sel" id="global-src-lang">
+      <option value="fr">🇫🇷 Français</option>
+      <option value="en">🇬🇧 English</option>
+      <option value="el">🇬🇷 Ελληνικά</option>
+      <option value="ar">🇸🇦 العربية</option>
+      <option value="de">🇩🇪 Deutsch</option>
+    </select>
+    <button class="btn-translate-global" id="btn-translate-all">
+      🌐 Traduire toutes les autres langues
+    </button>
+  </div>
+  <div class="adm-right">
+    <button class="btn-preview" onclick="window.open('index.html','_blank')">👁 Voir le menu</button>
+    <button class="btn-logout" id="logout-btn">Déconnexion</button>
+  </div>
+</header>
+
+<div class="adm-wrap" id="adm-wrap" style="display:none">
+
+  <!-- ── PROGRESSION TRADUCTION ── -->
+  <div class="global-progress" id="global-progress"></div>
+
+  <!-- ── INFORMATIONS DU CAFÉ ── -->
+  <div class="adm-section">
+    <div class="sec-hd">Informations du café <span class="sec-badge">Footer</span></div>
+    <div class="info-card" id="info-card">
+      <!-- Rempli par JS -->
+    </div>
+  </div>
+
+  <!-- ── CATÉGORIES ── -->
+  <div class="adm-section">
+    <div class="sec-hd">Catégories <span class="sec-badge" id="cat-count">0</span></div>
+    <div class="cats-list" id="cats-list"></div>
+    <button class="btn-add" id="btn-add-cat">＋ Ajouter une catégorie</button>
+    <button class="btn-save-cats" id="btn-save-cats" style="display:none">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+        <polyline points="17,21 17,13 7,13 7,21"/>
+        <polyline points="7,3 7,8 15,8"/>
+      </svg>
+      Sauvegarder les catégories
+    </button>
+  </div>
+
+  <!-- ── PRODUITS PAR CATÉGORIE ── -->
+  <div class="adm-section">
+    <div class="sec-hd">Produits</div>
+    <div id="products-area"></div>
+  </div>
+
+</div>
+
+<!-- Save bar (caché, gardé pour compatibilité) -->
+<div class="save-bar" id="save-bar" style="display:none">
+  <button class="btn-save-all" id="btn-save-all">Sauvegarder</button>
+</div>
+
+<!-- FAB Enregistrer tout -->
+<button id="fab-save" style="display:none" title="Enregistrer tout">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+    <polyline points="17,21 17,13 7,13 7,21"/>
+    <polyline points="7,3 7,8 15,8"/>
+  </svg>
+</button>
+
+<!-- Toast -->
+<div id="toast">✓ Modifications sauvegardées avec succès</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   CONFIGURATION — CHANGER LE MOT DE PASSE ICI
+═══════════════════════════════════════════ */
+const ADMIN_PASSWORD = 'mozart2026';  // ← Changez ce mot de passe !
+const STORE_KEY = 'mc_admin_data_v1';
+
+/* ═══════════════════════════════════════════
+   LANGUES DISPONIBLES
+═══════════════════════════════════════════ */
+const LANGS = ['fr', 'en', 'el', 'ar', 'de'];
+const LANG_LABELS = { fr:'🇫🇷', en:'🇬🇧', el:'🇬🇷', ar:'🇸🇦', de:'🇩🇪' };
+
+/* ═══════════════════════════════════════════
+   DONNÉES PAR DÉFAUT (chargées depuis index.html)
+═══════════════════════════════════════════ */
+const DEFAULT_CATS = [
+  { key:'hot',  ico:'ico-coffee', names:{ fr:'Cafés Chauds', en:'Hot Coffees', el:'Ζεστοί Καφέδες', ar:'قهوة ساخنة', de:'Heiße Kaffeespezialitäten' } },
+  { key:'cold', ico:'ico-cold',   names:{ fr:'Boissons Froides', en:'Cold Drinks', el:'Κρύα Ροφήματα', ar:'مشروبات باردة', de:'Kalte Getränke' } },
+  { key:'food', ico:'ico-food',   names:{ fr:'Snacks & Food', en:'Snacks & Food', el:'Σνακ & Φαγητό', ar:'وجبات خفيفة', de:'Snacks & Food' } },
+  { key:'spec', ico:'ico-star',   names:{ fr:'Spéciaux Maison', en:'House Specials', el:'Σπεσιαλιτέ Σπιτιού', ar:'تخصصات البيت', de:'Hauskreationen' } },
+];
+
+const DEFAULT_INFO = {
+  wifi_name:  { fr:'WiFi', en:'WiFi', el:'WiFi', ar:'واي فاي', de:'WLAN' },
+  wifi_val:   { fr:'MozartCafe_Guest · Mozart2026', en:'MozartCafe_Guest · Mozart2026', el:'MozartCafe_Guest · Mozart2026', ar:'MozartCafe_Guest · Mozart2026', de:'MozartCafe_Guest · Mozart2026' },
+  hours_name: { fr:'Horaires', en:'Hours', el:'Ωράριο', ar:'مواعيد العمل', de:'Öffnungszeiten' },
+  hours_val:  { fr:'Lun–Sam 7h00–22h00  ·  Dim 8h00–21h00', en:'Mon–Sat 7:00–22:00  ·  Sun 8:00–21:00', el:'Δευ–Σαβ 7:00–22:00  ·  Κυρ 8:00–21:00', ar:'الإثنين–السبت 7:00–22:00  ·  الأحد 8:00–21:00', de:'Mo–Sa 7:00–22:00  ·  So 8:00–21:00' },
+  addr_name:  { fr:'Adresse', en:'Address', el:'Διεύθυνση', ar:'العنوان', de:'Adresse' },
+  addr_val:   { fr:'12, Rue Hermès · Kolonaki, Athènes', en:'12, Hermès Street · Kolonaki, Athens', el:'12, Οδός Ερμού · Κολωνάκι, Αθήνα', ar:'12، شارع هيرميس · كولوناكي، أثينا', de:'12, Hermès-Straße · Kolonaki, Athen' },
+};
+
+/* ═══════════════════════════════════════════
+   TRADUCTIONS UI ADMIN
+═══════════════════════════════════════════ */
+const ADMIN_UI = {
+  fr: {
+    admSub:        'Administration du menu',
+    btnPreview:    '👁 Voir le menu',
+    btnLogout:     'Déconnexion',
+    btnTranslate:  '🌐 Traduire toutes les autres langues',
+    secInfo:       'Informations du café',
+    secCats:       'Catégories',
+    secProds:      'Produits',
+    btnAddCat:     '＋ Ajouter une catégorie',
+    btnSaveCats:   'Sauvegarder les catégories',
+    btnAddProd:    '＋ Ajouter un produit',
+    btnSaveProd:   'Enregistrer ce produit',
+    btnDelProd:    'Supprimer',
+    lblCatName:    'Nom',
+    lblPrice:      'Prix',
+    lblBadges:     'Badges',
+    lblPhoto:      'Photo',
+    lblFromDevice: 'Depuis l\'appareil',
+    lblOrUnsplash: 'Ou ID / URL Unsplash',
+    lblPhotoHelp:  'ID depuis <a href="https://unsplash.com" target="_blank">unsplash.com</a> (ex: <em>photo-1234567890</em>) ou upload direct depuis votre téléphone/ordinateur.',
+    lblName:       'Nom',
+    lblShortDesc:  'Description courte',
+    lblFullDesc:   'Description complète / Détails',
+    lblAllergens:  'Allergènes — séparés par des virgules',
+    phName:        'Nom du produit',
+    phShortDesc:   'Description courte affichée dans la liste',
+    phFullDesc:    'Texte complet affiché quand on clique sur le produit',
+    phAllergens:   'ex: Lait, Gluten, Œufs',
+    phPrice:       '€4.50',
+    produits:      'produit(s)',
+    toastSaved:    '✓ Modifications sauvegardées avec succès',
+    toastProd:     '✓ Produit mis à jour',
+    fabTitle:      'Enregistrer tout',
+    fabTooltip:    'Enregistrer tout',
+    infoWifiName:  'WiFi — Nom',
+    infoWifiVal:   'WiFi — Mot de passe',
+    infoHoursName: 'Horaires — Titre',
+    infoHoursVal:  'Horaires — Valeur',
+    infoAddrName:  'Adresse — Titre',
+    infoAddrVal:   'Adresse — Valeur',
+    badgePopular:  '🔥 Populaire',
+    badgeNew:      '✨ Nouveau',
+    badgeVegan:    '🌱 Vegan',
+    badgeSel:      '⭐ Sélection du jour',
+  },
+  en: {
+    admSub:        'Menu administration',
+    btnPreview:    '👁 View menu',
+    btnLogout:     'Logout',
+    btnTranslate:  '🌐 Translate all other languages',
+    secInfo:       'Café information',
+    secCats:       'Categories',
+    secProds:      'Products',
+    btnAddCat:     '＋ Add a category',
+    btnSaveCats:   'Save categories',
+    btnAddProd:    '＋ Add a product',
+    btnSaveProd:   'Save this product',
+    btnDelProd:    'Delete',
+    lblCatName:    'Name',
+    lblPrice:      'Price',
+    lblBadges:     'Badges',
+    lblPhoto:      'Photo',
+    lblFromDevice: 'From device',
+    lblOrUnsplash: 'Or Unsplash ID / URL',
+    lblPhotoHelp:  'ID from <a href="https://unsplash.com" target="_blank">unsplash.com</a> (e.g. <em>photo-1234567890</em>) or upload directly from your phone/computer.',
+    lblName:       'Name',
+    lblShortDesc:  'Short description',
+    lblFullDesc:   'Full description / Details',
+    lblAllergens:  'Allergens — comma separated',
+    phName:        'Product name',
+    phShortDesc:   'Short description shown in the list',
+    phFullDesc:    'Full text shown when the product is clicked',
+    phAllergens:   'e.g. Milk, Gluten, Eggs',
+    phPrice:       '€4.50',
+    produits:      'product(s)',
+    toastSaved:    '✓ Changes saved successfully',
+    toastProd:     '✓ Product updated',
+    fabTitle:      'Save all',
+    fabTooltip:    'Save all',
+    infoWifiName:  'WiFi — Name',
+    infoWifiVal:   'WiFi — Password',
+    infoHoursName: 'Hours — Title',
+    infoHoursVal:  'Hours — Value',
+    infoAddrName:  'Address — Title',
+    infoAddrVal:   'Address — Value',
+    badgePopular:  '🔥 Popular',
+    badgeNew:      '✨ New',
+    badgeVegan:    '🌱 Vegan',
+    badgeSel:      '⭐ Daily selection',
+  },
+  el: {
+    admSub:        'Διαχείριση μενού',
+    btnPreview:    '👁 Προβολή μενού',
+    btnLogout:     'Αποσύνδεση',
+    btnTranslate:  '🌐 Μετάφραση όλων των άλλων γλωσσών',
+    secInfo:       'Πληροφορίες καφέ',
+    secCats:       'Κατηγορίες',
+    secProds:      'Προϊόντα',
+    btnAddCat:     '＋ Προσθήκη κατηγορίας',
+    btnSaveCats:   'Αποθήκευση κατηγοριών',
+    btnAddProd:    '＋ Προσθήκη προϊόντος',
+    btnSaveProd:   'Αποθήκευση προϊόντος',
+    btnDelProd:    'Διαγραφή',
+    lblCatName:    'Όνομα',
+    lblPrice:      'Τιμή',
+    lblBadges:     'Ετικέτες',
+    lblPhoto:      'Φωτογραφία',
+    lblFromDevice: 'Από τη συσκευή',
+    lblOrUnsplash: 'Ή ID / URL Unsplash',
+    lblPhotoHelp:  'ID από <a href="https://unsplash.com" target="_blank">unsplash.com</a> (π.χ. <em>photo-1234567890</em>) ή απευθείας μεταφόρτωση.',
+    lblName:       'Όνομα',
+    lblShortDesc:  'Σύντομη περιγραφή',
+    lblFullDesc:   'Πλήρης περιγραφή / Λεπτομέρειες',
+    lblAllergens:  'Αλλεργιογόνα — χωρισμένα με κόμμα',
+    phName:        'Όνομα προϊόντος',
+    phShortDesc:   'Σύντομη περιγραφή στη λίστα',
+    phFullDesc:    'Πλήρες κείμενο κατά το κλικ',
+    phAllergens:   'π.χ. Γάλα, Γλουτένη, Αυγά',
+    phPrice:       '€4.50',
+    produits:      'προϊόν(τα)',
+    toastSaved:    '✓ Οι αλλαγές αποθηκεύτηκαν',
+    toastProd:     '✓ Το προϊόν ενημερώθηκε',
+    fabTitle:      'Αποθήκευση όλων',
+    fabTooltip:    'Αποθήκευση όλων',
+    infoWifiName:  'WiFi — Όνομα',
+    infoWifiVal:   'WiFi — Κωδικός',
+    infoHoursName: 'Ωράριο — Τίτλος',
+    infoHoursVal:  'Ωράριο — Τιμή',
+    infoAddrName:  'Διεύθυνση — Τίτλος',
+    infoAddrVal:   'Διεύθυνση — Τιμή',
+    badgePopular:  '🔥 Δημοφιλές',
+    badgeNew:      '✨ Νέο',
+    badgeVegan:    '🌱 Vegan',
+    badgeSel:      '⭐ Επιλογή ημέρας',
+  },
+  ar: {
+    admSub:        'إدارة القائمة',
+    btnPreview:    '👁 عرض القائمة',
+    btnLogout:     'تسجيل الخروج',
+    btnTranslate:  '🌐 ترجمة جميع اللغات الأخرى',
+    secInfo:       'معلومات المقهى',
+    secCats:       'الفئات',
+    secProds:      'المنتجات',
+    btnAddCat:     '＋ إضافة فئة',
+    btnSaveCats:   'حفظ الفئات',
+    btnAddProd:    '＋ إضافة منتج',
+    btnSaveProd:   'حفظ هذا المنتج',
+    btnDelProd:    'حذف',
+    lblCatName:    'الاسم',
+    lblPrice:      'السعر',
+    lblBadges:     'الشارات',
+    lblPhoto:      'الصورة',
+    lblFromDevice: 'من الجهاز',
+    lblOrUnsplash: 'أو معرف / رابط Unsplash',
+    lblPhotoHelp:  'المعرف من <a href="https://unsplash.com" target="_blank">unsplash.com</a> أو رفع مباشر من جهازك.',
+    lblName:       'الاسم',
+    lblShortDesc:  'وصف مختصر',
+    lblFullDesc:   'الوصف الكامل / التفاصيل',
+    lblAllergens:  'المواد المسببة للحساسية — مفصولة بفواصل',
+    phName:        'اسم المنتج',
+    phShortDesc:   'وصف مختصر يظهر في القائمة',
+    phFullDesc:    'النص الكامل عند النقر على المنتج',
+    phAllergens:   'مثال: حليب، غلوتين، بيض',
+    phPrice:       '€4.50',
+    produits:      'منتج(ات)',
+    toastSaved:    '✓ تم حفظ التغييرات بنجاح',
+    toastProd:     '✓ تم تحديث المنتج',
+    fabTitle:      'حفظ الكل',
+    fabTooltip:    'حفظ الكل',
+    infoWifiName:  'واي فاي — الاسم',
+    infoWifiVal:   'واي فاي — كلمة المرور',
+    infoHoursName: 'المواعيد — العنوان',
+    infoHoursVal:  'المواعيد — القيمة',
+    infoAddrName:  'العنوان — العنوان',
+    infoAddrVal:   'العنوان — القيمة',
+    badgePopular:  '🔥 الأكثر طلباً',
+    badgeNew:      '✨ جديد',
+    badgeVegan:    '🌱 نباتي',
+    badgeSel:      '⭐ اختيار اليوم',
+  },
+  de: {
+    admSub:        'Menüverwaltung',
+    btnPreview:    '👁 Menü anzeigen',
+    btnLogout:     'Abmelden',
+    btnTranslate:  '🌐 Alle anderen Sprachen übersetzen',
+    secInfo:       'Café-Informationen',
+    secCats:       'Kategorien',
+    secProds:      'Produkte',
+    btnAddCat:     '＋ Kategorie hinzufügen',
+    btnSaveCats:   'Kategorien speichern',
+    btnAddProd:    '＋ Produkt hinzufügen',
+    btnSaveProd:   'Dieses Produkt speichern',
+    btnDelProd:    'Löschen',
+    lblCatName:    'Name',
+    lblPrice:      'Preis',
+    lblBadges:     'Badges',
+    lblPhoto:      'Foto',
+    lblFromDevice: 'Vom Gerät',
+    lblOrUnsplash: 'Oder Unsplash-ID / URL',
+    lblPhotoHelp:  'ID von <a href="https://unsplash.com" target="_blank">unsplash.com</a> (z.B. <em>photo-1234567890</em>) oder direkt hochladen.',
+    lblName:       'Name',
+    lblShortDesc:  'Kurzbeschreibung',
+    lblFullDesc:   'Vollständige Beschreibung / Details',
+    lblAllergens:  'Allergene — kommagetrennt',
+    phName:        'Produktname',
+    phShortDesc:   'Kurzbeschreibung in der Liste',
+    phFullDesc:    'Volltext beim Klick auf das Produkt',
+    phAllergens:   'z.B. Milch, Gluten, Eier',
+    phPrice:       '€4.50',
+    produits:      'Produkt(e)',
+    toastSaved:    '✓ Änderungen erfolgreich gespeichert',
+    toastProd:     '✓ Produkt aktualisiert',
+    fabTitle:      'Alles speichern',
+    fabTooltip:    'Alles speichern',
+    infoWifiName:  'WLAN — Name',
+    infoWifiVal:   'WLAN — Passwort',
+    infoHoursName: 'Öffnungszeiten — Titel',
+    infoHoursVal:  'Öffnungszeiten — Wert',
+    infoAddrName:  'Adresse — Titel',
+    infoAddrVal:   'Adresse — Wert',
+    badgePopular:  '🔥 Beliebt',
+    badgeNew:      '✨ Neu',
+    badgeVegan:    '🌱 Vegan',
+    badgeSel:      '⭐ Tagesempfehlung',
+  },
+};
+
+/* ═══════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════ */
+let adminData = null;  // { cats, items, info }
+let currentLang = localStorage.getItem('mc_admin_lang') || 'el';
+let unsaved = false;
+
+/* ═══════════════════════════════════════════
+   LOGIN
+═══════════════════════════════════════════ */
+function checkLogin() {
+  const saved = sessionStorage.getItem('mc_admin_auth');
+  if (saved === 'ok') showAdmin();
+}
+
+document.getElementById('login-btn').addEventListener('click', doLogin);
+document.getElementById('pwd-input').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('logout-btn').addEventListener('click', () => {
+  sessionStorage.removeItem('mc_admin_auth');
+  location.reload();
+});
+
+function doLogin() {
+  const val = document.getElementById('pwd-input').value;
+  if (val === ADMIN_PASSWORD) {
+    sessionStorage.setItem('mc_admin_auth', 'ok');
+    showAdmin();
+  } else {
+    document.getElementById('login-err').textContent = 'Mot de passe incorrect.';
+    document.getElementById('pwd-input').value = '';
+    document.getElementById('pwd-input').focus();
+  }
+}
+
+function showAdmin() {
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('adm-header').style.display = '';
+  document.getElementById('adm-wrap').style.display   = '';
+  document.getElementById('fab-save').style.display   = '';
+  // Sync dropdown avec la langue mémorisée
+  const sel = document.getElementById('global-src-lang');
+  if (sel) sel.value = currentLang;
+  // Brancher le sélecteur de langue global (dans le header)
+  sel.addEventListener('change', e => {
+    setGlobalLang(e.target.value);
+  });
+  // loadData() est async — renderAll() et applyAdminUI() sont appelés à l'intérieur
+  loadData();
+}
+
+/* ═══════════════════════════════════════════
+   DONNÉES
+═══════════════════════════════════════════ */
+function loadData() {
+  _db.ref('menu').once('value')
+    .then(snapshot => {
+      const data = snapshot.val();
+      if (data && data.cats && data.cats.length > 0) {
+        adminData = data;
+        if (!adminData.info)  adminData.info  = JSON.parse(JSON.stringify(DEFAULT_INFO));
+        if (!adminData.items) adminData.items = getDefaultItems();
+      } else {
+        adminData = {
+          cats:  JSON.parse(JSON.stringify(DEFAULT_CATS)),
+          info:  JSON.parse(JSON.stringify(DEFAULT_INFO)),
+          items: getDefaultItems()
+        };
+      }
+      renderAll();
+      applyAdminUI(currentLang);
+    })
+    .catch(() => {
+      try {
+        const raw = localStorage.getItem(STORE_KEY);
+        if (raw) adminData = JSON.parse(raw);
+      } catch(_) {}
+      if (!adminData.cats) adminData = {
+        cats:  JSON.parse(JSON.stringify(DEFAULT_CATS)),
+        info:  JSON.parse(JSON.stringify(DEFAULT_INFO)),
+        items: getDefaultItems()
+      };
+      renderAll();
+      applyAdminUI(currentLang);
+    });
+}
+
+function sanitizeItems(items) {
+  return (items || []).map(item => ({
+    id:        item.id ?? 0,
+    cat:       item.cat ?? 0,
+    price:     item.price ?? '',
+    photo:     item.photo ?? '',
+    badges:    Array.isArray(item.badges) ? item.badges : [],
+    name:      item.name      || { fr:'', en:'', el:'', ar:'', de:'' },
+    desc:      item.desc      || { fr:'', en:'', el:'', ar:'', de:'' },
+    full:      item.full      || { fr:'', en:'', el:'', ar:'', de:'' },
+    allergens: item.allergens || { fr:[], en:[], el:[], ar:[], de:[] },
+  }));
+}
+
+function saveData() {
+  adminData.items = sanitizeItems(adminData.items);
+  _db.ref('menu').set(adminData)
+    .then(() => {
+      localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
+      unsaved = false;
+      document.getElementById('fab-save').classList.remove('unsaved');
+      showToast((ADMIN_UI[currentLang]||ADMIN_UI.fr).toastSaved);
+    })
+    .catch(() => {
+      localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
+      unsaved = false;
+      document.getElementById('fab-save').classList.remove('unsaved');
+      showToast('⚠️ Sauvegarde locale uniquement (pas de connexion)');
+    });
+}
+
+function markUnsaved() {
+  unsaved = true;
+  document.getElementById('fab-save').classList.add('unsaved');
+}
+
+/* ═══════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════ */
+let _toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ═══════════════════════════════════════════
+   RENDER ALL
+═══════════════════════════════════════════ */
+function renderAll() {
+  renderInfoSection();
+  renderCatsSection();
+  renderProductsSection();
+}
+
+/* ─── SECTION INFO ─── */
+function renderInfoSection() {
+  const card = document.getElementById('info-card');
+  const fields = [
+    { key:'wifi_name',  label:'WiFi — Nom' },
+    { key:'wifi_val',   label:'WiFi — Mot de passe' },
+    { key:'hours_name', label:'Horaires — Titre' },
+    { key:'hours_val',  label:'Horaires — Valeur' },
+    { key:'addr_name',  label:'Adresse — Titre' },
+    { key:'addr_val',   label:'Adresse — Valeur' },
+  ];
+
+  let html = `<div></div>`;
+
+  fields.forEach(f => {
+    html += `<div class="info-row">
+      <div class="info-lbl">${f.label}</div>
+      <div class="info-inputs">`;
+    LANGS.forEach(l => {
+      html += `<input class="info-input info-field-${l}${l===currentLang?'':' hide'}"
+        style="${l!==currentLang?'display:none':''}"
+        data-field="${f.key}" data-lang="${l}"
+        value="${esc(adminData.info[f.key]?.[l] || '')}"
+        placeholder="${f.label} (${l.toUpperCase()})">`;
+    });
+    html += `</div></div>`;
+  });
+
+  card.innerHTML = html;
+
+  card.querySelectorAll('.info-input').forEach(inp => {
+    inp.addEventListener('input', e => {
+      const { field, lang } = e.target.dataset;
+      if (!adminData.info[field]) adminData.info[field] = {};
+      adminData.info[field][lang] = e.target.value;
+      markUnsaved();
+    });
+  });
+
+}
+
+/* ─── APPLIQUER LES TEXTES UI DANS LA LANGUE CHOISIE ─── */
+function applyAdminUI(l) {
+  const t = ADMIN_UI[l] || ADMIN_UI.fr;
+  const $ = id => document.getElementById(id);
+
+  // Header
+  const sub = document.querySelector('.adm-sub');
+  if (sub) sub.textContent = t.admSub;
+  const preview = document.querySelector('.btn-preview');
+  if (preview) preview.innerHTML = t.btnPreview;
+  const logout = $('logout-btn');
+  if (logout) logout.textContent = t.btnLogout;
+  const translateBtn = $('btn-translate-all');
+  if (translateBtn && !translateBtn.disabled) translateBtn.innerHTML = t.btnTranslate;
+
+  // Section titres
+  const secHds = document.querySelectorAll('.sec-hd');
+  secHds.forEach(hd => {
+    const badge = hd.querySelector('.sec-badge');
+    const txt = hd.childNodes[0]?.textContent?.trim();
+    // Identifier par mots-clés indépendants de la langue
+    if (hd.id === 'sec-info' || hd.querySelector('[id="sec-info"]') || (!badge?.id && badge?.textContent === 'Footer')) {
+      hd.childNodes[0].textContent = t.secInfo + ' ';
+    }
+  });
+  // Cibler par id pour fiabilité
+  const secInfoHd = document.querySelector('#info-card')?.closest('.adm-section')?.querySelector('.sec-hd');
+  if (secInfoHd) {
+    const badge = secInfoHd.querySelector('.sec-badge');
+    secInfoHd.firstChild.textContent = t.secInfo + ' ';
+  }
+  const secCatsHd = document.querySelector('#cats-list')?.closest('.adm-section')?.querySelector('.sec-hd');
+  if (secCatsHd) secCatsHd.firstChild.textContent = t.secCats + ' ';
+  const secProdsHd = document.querySelector('#products-area')?.closest('.adm-section')?.querySelector('.sec-hd');
+  if (secProdsHd) secProdsHd.textContent = t.secProds;
+
+  // Boutons statiques
+  const addCat = $('btn-add-cat');
+  if (addCat) addCat.textContent = t.btnAddCat;
+  const saveCats = $('btn-save-cats');
+  if (saveCats) {
+    const svg = saveCats.querySelector('svg');
+    saveCats.innerHTML = '';
+    if (svg) saveCats.appendChild(svg);
+    saveCats.appendChild(document.createTextNode(' ' + t.btnSaveCats));
+  }
+
+  // FAB tooltip
+  const fab = $('fab-save');
+  if (fab) fab.title = t.fabTitle;
+
+  // Info section labels
+  const infoKeys = ['wifi_name','wifi_val','hours_name','hours_val','addr_name','addr_val'];
+  const infoLblMap = {
+    wifi_name:  t.infoWifiName,
+    wifi_val:   t.infoWifiVal,
+    hours_name: t.infoHoursName,
+    hours_val:  t.infoHoursVal,
+    addr_name:  t.infoAddrName,
+    addr_val:   t.infoAddrVal,
+  };
+  document.querySelectorAll('.info-row').forEach(row => {
+    const inp = row.querySelector('.info-input');
+    if (!inp) return;
+    const field = inp.dataset.field;
+    const lbl = row.querySelector('.info-lbl');
+    if (lbl && infoLblMap[field]) lbl.textContent = infoLblMap[field];
+  });
+
+  // Placeholders info inputs
+  document.querySelectorAll('.info-input').forEach(inp => {
+    const field = inp.dataset.field;
+    const lang  = inp.dataset.lang;
+    if (infoLblMap[field]) inp.placeholder = infoLblMap[field] + ' (' + lang.toUpperCase() + ')';
+  });
+
+  // Produits : boutons add + labels dans les cartes déjà rendues
+  document.querySelectorAll('.btn-add-prod').forEach(b => b.textContent = t.btnAddProd);
+  document.querySelectorAll('.btn-save-prod').forEach(b => b.textContent = t.btnSaveProd);
+  document.querySelectorAll('.btn-del-prod').forEach(b => b.textContent = t.btnDelProd);
+
+  // Labels de formulaire produit
+  document.querySelectorAll('.form-lbl').forEach(lbl => {
+    const txt = lbl.dataset.uitxt;
+    if (txt && t[txt]) lbl.textContent = t[txt];
+  });
+  document.querySelectorAll('.form-input, .form-textarea').forEach(inp => {
+    const ph = inp.dataset.uiph;
+    if (ph && t[ph]) inp.placeholder = t[ph];
+  });
+  document.querySelectorAll('.photo-help').forEach(el => { el.innerHTML = t.lblPhotoHelp; });
+  document.querySelectorAll('.btn-upload-photo').forEach(btn => {
+    // Keep the file input inside
+    const fi = btn.querySelector('input');
+    const svg = btn.querySelector('svg');
+    btn.innerHTML = '';
+    if (svg) btn.appendChild(svg);
+    btn.appendChild(document.createTextNode(' ' + t.lblFromDevice));
+    if (fi) btn.appendChild(fi);
+  });
+  document.querySelectorAll('[data-orlbl]').forEach(el => { el.textContent = t.lblOrUnsplash; });
+
+  // Labels catégories
+  document.querySelectorAll('.inline-input[data-ci]').forEach(inp => {
+    inp.placeholder = t.lblCatName + ' (' + l.toUpperCase() + ')';
+  });
+
+  // Badges labels
+  const badgeMap = { popular: t.badgePopular, new: t.badgeNew, vegan: t.badgeVegan, selection: t.badgeSel };
+  document.querySelectorAll('.badge-chk').forEach(chk => {
+    const inp = chk.querySelector('input');
+    const pill = chk.querySelector('.badge-pill');
+    if (inp && pill && badgeMap[inp.dataset.badge]) pill.textContent = badgeMap[inp.dataset.badge];
+  });
+}
+
+/* ─── LANGUE GLOBALE : contrôle toute la page admin ─── */
+function setGlobalLang(l) {
+  currentLang = l;
+  localStorage.setItem('mc_admin_lang', l);
+  // Sync header select
+  const sel = document.getElementById('global-src-lang');
+  if (sel && sel.value !== l) sel.value = l;
+  // Re-render complet dans la nouvelle langue
+  renderAll();
+  applyAdminUI(l);
+}
+
+function switchInfoLang(l) {
+  setGlobalLang(l);
+}
+
+/* ─── SECTION CATÉGORIES ─── */
+const ICONS = ['ico-coffee','ico-cold','ico-food','ico-star','ico-bell','ico-clock','ico-diamond','ico-wifi','ico-pin'];
+const ICON_LABELS = {
+  fr: { 'ico-coffee':'☕ Café',    'ico-cold':'🧊 Froid',   'ico-food':'🍽 Food',    'ico-star':'⭐ Spécial',  'ico-bell':'🔔 Bell', 'ico-clock':'🕐 Clock', 'ico-diamond':'💎 Diamond', 'ico-wifi':'📶 WiFi', 'ico-pin':'📍 Pin' },
+  en: { 'ico-coffee':'☕ Coffee',  'ico-cold':'🧊 Cold',    'ico-food':'🍽 Food',    'ico-star':'⭐ Special',  'ico-bell':'🔔 Bell', 'ico-clock':'🕐 Clock', 'ico-diamond':'💎 Diamond', 'ico-wifi':'📶 WiFi', 'ico-pin':'📍 Pin' },
+  el: { 'ico-coffee':'☕ Καφές',   'ico-cold':'🧊 Κρύο',    'ico-food':'🍽 Φαγητό', 'ico-star':'⭐ Ειδικό',  'ico-bell':'🔔 Bell', 'ico-clock':'🕐 Clock', 'ico-diamond':'💎 Diamond', 'ico-wifi':'📶 WiFi', 'ico-pin':'📍 Pin' },
+  ar: { 'ico-coffee':'☕ قهوة',    'ico-cold':'🧊 بارد',    'ico-food':'🍽 طعام',   'ico-star':'⭐ مميز',    'ico-bell':'🔔 Bell', 'ico-clock':'🕐 Clock', 'ico-diamond':'💎 Diamond', 'ico-wifi':'📶 WiFi', 'ico-pin':'📍 Pin' },
+  de: { 'ico-coffee':'☕ Kaffee',  'ico-cold':'🧊 Kalt',    'ico-food':'🍽 Essen',  'ico-star':'⭐ Spezial', 'ico-bell':'🔔 Bell', 'ico-clock':'🕐 Clock', 'ico-diamond':'💎 Diamond', 'ico-wifi':'📶 WiFi', 'ico-pin':'📍 Pin' },
+};
+function getIconLabel(ico) { return (ICON_LABELS[currentLang]||ICON_LABELS.fr)[ico]||ico; }
+
+function renderCatsSection() {
+  const list = document.getElementById('cats-list');
+  document.getElementById('cat-count').textContent = adminData.cats.length;
+  list.innerHTML = '';
+
+  // Lignes de catégories
+  adminData.cats.forEach((cat, ci) => {
+    const row = document.createElement('div');
+    row.className = 'cat-row';
+    row.dataset.ci = ci;
+
+    const iconOptions = ICONS.map(ic =>
+      `<option value="${ic}"${cat.ico===ic?' selected':''}>${getIconLabel(ic)}</option>`
+    ).join('');
+
+    row.innerHTML = `
+      <div class="cat-row-ico">
+        <svg width="18" height="18"><use href="#${cat.ico}"/></svg>
+      </div>
+      <input class="inline-input" value="${esc(cat.names?.[currentLang] || cat.names?.fr || '')}"
+        placeholder="Nom (${currentLang.toUpperCase()})"
+        data-ci="${ci}">
+      <select class="icon-select" data-ci="${ci}">${iconOptions}</select>
+      <button class="btn-del" data-ci="${ci}" title="Supprimer">✕</button>
+    `;
+    list.appendChild(row);
+
+    // Mise à jour du nom dans la langue active
+    row.querySelector('.inline-input').addEventListener('input', e => {
+      const i = parseInt(e.target.dataset.ci);
+      if (!adminData.cats[i].names) adminData.cats[i].names = {};
+      adminData.cats[i].names[currentLang] = e.target.value;
+      markUnsaved();
+      renderProductsSection();
+    });
+
+    row.querySelector('.icon-select').addEventListener('change', e => {
+      const i = parseInt(e.target.dataset.ci);
+      adminData.cats[i].ico = e.target.value;
+      // Mettre à jour l'icône affichée
+      row.querySelector('.cat-row-ico svg use').setAttribute('href', '#' + e.target.value);
+      markUnsaved();
+    });
+
+    row.querySelector('.btn-del').addEventListener('click', e => {
+      const i = parseInt(e.target.dataset.ci);
+      if (!confirm(`Supprimer la catégorie "${adminData.cats[i].names?.fr || i}" et tous ses produits ?`)) return;
+      adminData.items = adminData.items.filter(it => it.cat !== i);
+      adminData.items.forEach(it => { if (it.cat > i) it.cat--; });
+      adminData.cats.splice(i, 1);
+      markUnsaved();
+      renderCatsSection();
+      renderProductsSection();
+    });
+  });
+}
+
+document.getElementById('btn-add-cat').addEventListener('click', () => {
+  const names = {};
+  LANGS.forEach(l => { names[l] = 'Nouvelle catégorie'; });
+  names.fr = 'Nouvelle catégorie';
+  adminData.cats.push({ key: 'cat_' + Date.now(), ico: 'ico-star', names });
+  markUnsaved();
+  renderCatsSection();
+  renderProductsSection();
+});
+
+document.getElementById('btn-save-cats').addEventListener('click', () => {
+  saveData();
+});
+
+/* ─── SECTION PRODUITS ─── */
+function renderProductsSection() {
+  const area = document.getElementById('products-area');
+  area.innerHTML = '';
+
+  adminData.cats.forEach((cat, ci) => {
+    const catItems = adminData.items.filter(it => it.cat === ci);
+    const sec = document.createElement('div');
+    sec.className = 'cat-products';
+
+    sec.innerHTML = `
+      <div class="cat-products-hd">
+        <svg width="16" height="16" style="color:var(--gold)"><use href="#${cat.ico}"/></svg>
+        <div class="cat-products-name">${esc(cat.names[currentLang] || cat.names.fr || 'Catégorie ' + ci)}</div>
+        <span style="font-size:0.72rem;color:var(--muted);margin-left:4px">${catItems.length} ${(ADMIN_UI[currentLang]||ADMIN_UI.fr).produits}</span>
+      </div>
+      <div class="products-list" id="prod-list-${ci}"></div>
+      <button class="btn-add-prod" data-ci="${ci}">${(ADMIN_UI[currentLang]||ADMIN_UI.fr).btnAddProd}</button>
+    `;
+    area.appendChild(sec);
+
+    const list = sec.querySelector(`#prod-list-${ci}`);
+    catItems.forEach(item => renderProdCard(list, item, ci));
+
+    sec.querySelector('.btn-add-prod').addEventListener('click', e => {
+      const cIdx = parseInt(e.target.dataset.ci);
+      addProduct(cIdx);
+    });
+  });
+
+  // Inject SVG icons if needed
+  injectSVG();
+}
+
+function renderProdCard(container, item, ci) {
+  const card = document.createElement('div');
+  card.className = 'prod-card';
+  card.dataset.id = item.id;
+
+  const imgSrc = item.photo
+    ? (item.photo.startsWith('data:') ? item.photo : `https://images.unsplash.com/${item.photo}?w=200&h=200&fit=crop`)
+    : 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=200&h=200&fit=crop';
+
+  card.innerHTML = `
+    <div class="prod-card-top">
+      <img class="prod-thumb" src="${imgSrc}" alt="">
+      <div class="prod-top-info">
+        <div class="prod-top-name">${esc(item.name?.[currentLang] || item.name?.fr || 'Produit')}</div>
+        <div class="prod-top-price">${esc(item.price || '')}</div>
+      </div>
+      <div class="prod-expand-ico"><svg><use href="#ico-up"/></svg></div>
+    </div>
+    <div class="prod-card-body">
+      ${buildProdForm(item)}
+    </div>
+  `;
+  container.appendChild(card);
+
+  // Toggle expand
+  card.querySelector('.prod-card-top').addEventListener('click', () => {
+    card.classList.toggle('open');
+  });
+
+  // Lang tabs inside product
+  card.querySelectorAll('.prod-lang-tab').forEach(tab => {
+    tab.addEventListener('click', e => {
+      const l = e.target.dataset.l;
+      card.querySelectorAll('.prod-lang-tab').forEach(t => t.classList.toggle('on', t.dataset.l === l));
+      card.querySelectorAll('.prod-lang-fields').forEach(f => f.classList.toggle('on', f.dataset.lang === l));
+    });
+  });
+
+  // Photo ID/URL input → update preview (Unsplash only)
+  card.querySelector('.photo-id-input').addEventListener('input', e => {
+    const val = e.target.value.trim();
+    if (!val) { card.querySelector('.photo-preview').style.display = 'none'; return; }
+    const id = val.replace('https://images.unsplash.com/','').split('?')[0];
+    const src = `https://images.unsplash.com/${id}?w=600&h=400&fit=crop`;
+    const prev = card.querySelector('.photo-preview');
+    prev.src = src; prev.style.display = '';
+    card.querySelector('.prod-thumb').src = `https://images.unsplash.com/${id}?w=200&h=200&fit=crop`;
+    // Clear any stored base64 when user types an Unsplash ID
+    item._photoBase64 = null;
+  });
+
+  // Upload depuis l'appareil → base64
+  card.querySelector('.photo-file-input').addEventListener('change', e => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const b64 = ev.target.result;
+      item._photoBase64 = b64;
+      const prev = card.querySelector('.photo-preview');
+      prev.src = b64; prev.style.display = '';
+      card.querySelector('.prod-thumb').src = b64;
+      card.querySelector('.photo-id-input').value = '';
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Clear photo
+  card.querySelector('.btn-clear-photo').addEventListener('click', () => {
+    item._photoBase64 = null;
+    card.querySelector('.photo-id-input').value = '';
+    const prev = card.querySelector('.photo-preview');
+    prev.src = ''; prev.style.display = 'none';
+    card.querySelector('.prod-thumb').src = 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=200&h=200&fit=crop';
+  });
+
+  // Delete product
+  card.querySelector('.btn-del-prod').addEventListener('click', () => {
+    if (!confirm('Supprimer ce produit ?')) return;
+    const idx = adminData.items.findIndex(it => it.id === item.id);
+    if (idx > -1) adminData.items.splice(idx, 1);
+    card.remove();
+    // Update count
+    renderCatsSection();
+    renderProductsSection();
+    markUnsaved();
+  });
+}
+
+function buildProdForm(item) {
+  const firstLang = currentLang;
+  const langTabs = LANGS.map(l =>
+    `<button class="lang-tab prod-lang-tab${l===firstLang?' on':''}" data-l="${l}">${LANG_LABELS[l]}</button>`
+  ).join('');
+
+  const srcOptions = LANGS.map(l =>
+    `<option value="${l}"${l===currentLang?' selected':''}>${LANG_LABELS[l]}</option>`
+  ).join('');
+
+  const t0 = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+  const langFields = LANGS.map(l => `
+    <div class="prod-lang-fields lang-fields${l===firstLang?' on':''}" data-lang="${l}">
+      <div class="form-group">
+        <div class="form-lbl" data-uitxt="lblName">${t0.lblName} (${l.toUpperCase()})</div>
+        <input class="form-input" data-field="name" data-lang="${l}" data-uiph="phName"
+          value="${esc(item.name?.[l] || '')}" placeholder="${t0.phName}">
+      </div>
+      <div class="form-group">
+        <div class="form-lbl" data-uitxt="lblShortDesc">${t0.lblShortDesc} (${l.toUpperCase()})</div>
+        <textarea class="form-textarea" data-field="desc" data-lang="${l}" data-uiph="phShortDesc"
+          placeholder="${t0.phShortDesc}">${esc(item.desc?.[l] || '')}</textarea>
+      </div>
+      <div class="form-group">
+        <div class="form-lbl" data-uitxt="lblFullDesc">${t0.lblFullDesc} (${l.toUpperCase()})</div>
+        <textarea class="form-textarea" data-field="full" data-lang="${l}" style="min-height:110px" data-uiph="phFullDesc"
+          placeholder="${t0.phFullDesc}">${esc(item.full?.[l] || '')}</textarea>
+      </div>
+      <div class="form-group">
+        <div class="form-lbl" data-uitxt="lblAllergens">${t0.lblAllergens} (${l.toUpperCase()})</div>
+        <input class="form-input" data-field="allergens" data-lang="${l}" data-uiph="phAllergens"
+          value="${esc((item.allergens?.[l] || []).join(', '))}" placeholder="${t0.phAllergens}">
+      </div>
+    </div>
+  `).join('');
+
+  // Badges
+  const allBadges = ['popular','new','vegan','selection'];
+  const t1 = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+  const badgeLabels = { popular: t1.badgePopular, new: t1.badgeNew, vegan: t1.badgeVegan, selection: t1.badgeSel };
+  const badgesHtml = allBadges.map(b => `
+    <label class="badge-chk">
+      <input type="checkbox" data-badge="${b}" ${(item.badges||[]).includes(b)?'checked':''}>
+      <span class="badge-pill">${badgeLabels[b]}</span>
+    </label>
+  `).join('');
+
+  const photoId = item.photo || '';
+  const photoSrc = photoId
+    ? (photoId.startsWith('data:') ? photoId : `https://images.unsplash.com/${photoId}?w=600&h=300&fit=crop`)
+    : '';
+
+  return `
+    <div class="form-grid">
+      <div class="form-grid-2">
+        <div class="form-group">
+          <div class="form-lbl" data-uitxt="lblPrice">${t1.lblPrice}</div>
+          <input class="form-input" data-field="price" value="${esc(item.price||'')}" data-uiph="phPrice" placeholder="${t1.phPrice}">
+        </div>
+        <div class="form-group">
+          <div class="form-lbl" data-uitxt="lblBadges">${t1.lblBadges}</div>
+          <div class="badges-wrap">${badgesHtml}</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-lbl" data-uitxt="lblPhoto">${t1.lblPhoto}</div>
+        <div class="photo-upload-row">
+          <label class="btn-upload-photo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            ${t1.lblFromDevice}
+            <input type="file" class="photo-file-input" accept="image/*">
+          </label>
+          <button type="button" class="btn-clear-photo" title="✕">✕</button>
+        </div>
+        <div class="form-lbl" style="margin-top:10px;" data-orlbl="">${t1.lblOrUnsplash}</div>
+        <input class="form-input photo-id-input" value="${photoId.startsWith('data:') ? '' : esc(photoId)}"
+          placeholder="photo-1509042239860-f550ce710b93">
+        <img class="photo-preview" src="${photoSrc}" alt="Aperçu de la photo"
+          onerror="this.style.display='none'" ${photoSrc?'':'style="display:none"'}>
+        <div class="photo-help">${t1.lblPhotoHelp}</div>
+      </div>
+
+      <div class="form-divider"></div>
+
+      <div>
+        ${langFields}
+      </div>
+    </div>
+
+    <div class="prod-actions">
+      <button class="btn-del-prod">${t1.btnDelProd}</button>
+    </div>
+  `;
+}
+
+function collectProdForm(card, item) {
+  // Price
+  const priceEl = card.querySelector('[data-field="price"]');
+  if (priceEl) item.price = priceEl.value.trim();
+
+  // Photo : priorité au base64 uploadé, sinon ID Unsplash
+  if (item._photoBase64) {
+    item.photo = item._photoBase64;
+    item._photoBase64 = null;
+  } else {
+    const photoEl = card.querySelector('.photo-id-input');
+    if (photoEl) {
+      let val = photoEl.value.trim();
+      val = val.replace('https://images.unsplash.com/','').split('?')[0];
+      item.photo = val;
+    }
+  }
+
+  // Badges
+  item.badges = [];
+  card.querySelectorAll('[data-badge]').forEach(chk => {
+    if (chk.checked) item.badges.push(chk.dataset.badge);
+  });
+
+  // Multilang fields
+  if (!item.name) item.name = {};
+  if (!item.desc) item.desc = {};
+  if (!item.full) item.full = {};
+  if (!item.allergens) item.allergens = {};
+
+  card.querySelectorAll('[data-field][data-lang]').forEach(el => {
+    const { field, lang } = el.dataset;
+    if (field === 'allergens') {
+      item.allergens[lang] = el.value.split(',').map(s => s.trim()).filter(Boolean);
+    } else {
+      if (!item[field]) item[field] = {};
+      item[field][lang] = el.value;
+    }
+  });
+}
+
+function addProduct(ci) {
+  const id = Date.now();
+  const newItem = {
+    id, cat: ci,
+    price: '€0.00',
+    photo: 'photo-1509042239860-f550ce710b93',
+    badges: [],
+    name: {}, desc: {}, full: {}, allergens: {}
+  };
+  LANGS.forEach(l => {
+    newItem.name[l]      = 'Nouveau produit';
+    newItem.desc[l]      = '';
+    newItem.full[l]      = '';
+    newItem.allergens[l] = [];
+  });
+  adminData.items.push(newItem);
+  markUnsaved();
+  renderProductsSection();
+  // Scroll to new card and open it
+  setTimeout(() => {
+    const card = document.querySelector(`[data-id="${id}"]`);
+    if (card) { card.classList.add('open'); card.scrollIntoView({ behavior:'smooth', block:'center' }); }
+  }, 100);
+}
+
+/* ═══════════════════════════════════════════
+   SAVE ALL
+═══════════════════════════════════════════ */
+function collectAllForms() {
+  document.querySelectorAll('.prod-card.open').forEach(card => {
+    const itemId = parseInt(card.dataset.id);
+    const item = adminData.items.find(it => it.id === itemId);
+    if (item) collectProdForm(card, item);
+  });
+}
+
+document.getElementById('btn-save-all').addEventListener('click', () => {
+  collectAllForms(); saveData(); renderAll();
+});
+document.getElementById('fab-save').addEventListener('click', () => {
+  collectAllForms(); saveData(); renderAll();
+});
+
+/* ═══════════════════════════════════════════
+   GLOBAL TRANSLATE — traduit TOUT en une fois
+   Catégories + tous les produits + infos café
+═══════════════════════════════════════════ */
+document.getElementById('btn-translate-all').addEventListener('click', async () => {
+  const srcLang  = document.getElementById('global-src-lang').value;
+  const targets  = LANGS.filter(l => l !== srcLang);
+  const btn      = document.getElementById('btn-translate-all');
+  const progress = document.getElementById('global-progress');
+
+  // Vérifier qu'il y a du contenu à traduire
+  const hasContent =
+    adminData.cats.some(c => (c.names?.[srcLang] || '').trim()) ||
+    adminData.items.some(it => (it.name?.[srcLang] || '').trim());
+
+  if (!hasContent) {
+    showToast('⚠ Remplissez d\'abord les champs dans la langue source ' + LANG_LABELS[srcLang]);
+    return;
+  }
+
+  btn.disabled = true;
+  btn.classList.add('loading');
+  btn.textContent = '⏳ Traduction en cours…';
+
+  const infoFields = ['wifi_name','wifi_val','hours_name','hours_val','addr_name','addr_val'];
+  const prodFields = ['name','desc','full'];
+  let totalDone = 0;
+  const totalTargets = targets.length;
+
+  for (const toLang of targets) {
+    totalDone++;
+    progress.textContent = `→ ${LANG_LABELS[toLang]} (${totalDone}/${totalTargets}) — Catégories…`;
+
+    // 1. Traduire les catégories
+    for (const cat of adminData.cats) {
+      const srcName = (cat.names?.[srcLang] || '').trim();
+      if (!srcName) continue;
+      try {
+        const translated = await translateText(srcName, srcLang, toLang);
+        if (translated) {
+          if (!cat.names) cat.names = {};
+          cat.names[toLang] = translated;
+        }
+      } catch(_) {}
+      await sleep(150);
+    }
+
+    progress.textContent = `→ ${LANG_LABELS[toLang]} (${totalDone}/${totalTargets}) — Produits…`;
+
+    // 2. Traduire les produits
+    for (const item of adminData.items) {
+      for (const field of prodFields) {
+        const srcText = (item[field]?.[srcLang] || '').trim();
+        if (!srcText) continue;
+        try {
+          const translated = await translateText(srcText, srcLang, toLang);
+          if (translated) {
+            if (!item[field]) item[field] = {};
+            item[field][toLang] = translated;
+          }
+        } catch(_) {}
+        await sleep(200);
+      }
+      // Allergènes (tableau → string → traduit → retableau)
+      const srcAl = (item.allergens?.[srcLang] || []).join(', ');
+      if (srcAl.trim()) {
+        try {
+          const translated = await translateText(srcAl, srcLang, toLang);
+          if (translated) {
+            if (!item.allergens) item.allergens = {};
+            item.allergens[toLang] = translated.split(',').map(s => s.trim()).filter(Boolean);
+          }
+        } catch(_) {}
+        await sleep(150);
+      }
+    }
+
+    progress.textContent = `→ ${LANG_LABELS[toLang]} (${totalDone}/${totalTargets}) — Infos café…`;
+
+    // 3. Traduire les infos café
+    for (const field of infoFields) {
+      const srcText = (adminData.info[field]?.[srcLang] || '').trim();
+      if (!srcText) continue;
+      try {
+        const translated = await translateText(srcText, srcLang, toLang);
+        if (translated) {
+          if (!adminData.info[field]) adminData.info[field] = {};
+          adminData.info[field][toLang] = translated;
+        }
+      } catch(_) {}
+      await sleep(150);
+    }
+  }
+
+  btn.disabled = false;
+  btn.classList.remove('loading');
+  btn.innerHTML = '🌐 Traduire toutes les autres langues';
+  progress.textContent = '✓ Traduction terminée — pensez à sauvegarder !';
+  setTimeout(() => { progress.textContent = ''; }, 6000);
+  markUnsaved();
+  renderAll();
+});
+
+/* ═══════════════════════════════════════════
+   SVG ICONS (copié depuis index.html pour les aperçus)
+═══════════════════════════════════════════ */
+function injectSVG() {
+  if (document.getElementById('svg-sprite')) return;
+  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.id = 'svg-sprite';
+  svg.style.display = 'none';
+  svg.innerHTML = `
+    <symbol id="ico-coffee" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 010 8h-1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" stroke="currentColor" stroke-width="1.8" fill="none"/><line x1="6" y1="1" x2="6" y2="4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="10" y1="1" x2="10" y2="4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="14" y1="1" x2="14" y2="4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="ico-cold" viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="19.07" y1="4.93" x2="4.93" y2="19.07" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="ico-food" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2" stroke="currentColor" stroke-width="1.8" fill="none"/><line x1="7" y1="2" x2="7" y2="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M21 15V2a5 5 0 00-5 5v6c0 1.1.9 2 2 2h3zm0 0v7" stroke="currentColor" stroke-width="1.8" fill="none"/></symbol>
+    <symbol id="ico-star" viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" stroke="currentColor" stroke-width="1.8" fill="none"/></symbol>
+    <symbol id="ico-bell" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" stroke-width="1.8" fill="none"/></symbol>
+    <symbol id="ico-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8" fill="none"/><polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="1.8" fill="none"/></symbol>
+    <symbol id="ico-diamond" viewBox="0 0 24 24"><path d="M12 2L2 9l10 13L22 9z" stroke="currentColor" stroke-width="1.8" fill="none"/><line x1="2" y1="9" x2="22" y2="9" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="ico-wifi" viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0114.08 0" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M1.42 9a16 16 0 0121.16 0" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M8.53 16.11a6 6 0 016.95 0" stroke="currentColor" stroke-width="1.8" fill="none"/><line x1="12" y1="20" x2="12.01" y2="20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></symbol>
+    <symbol id="ico-pin" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z" stroke="currentColor" stroke-width="1.8" fill="none"/><circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="1.8" fill="none"/></symbol>
+    <symbol id="ico-up" viewBox="0 0 24 24"><polyline points="18,15 12,9 6,15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></symbol>
+  `;
+  document.body.appendChild(svg);
+}
+
+/* ═══════════════════════════════════════════
+   DONNÉES PAR DÉFAUT (produits)
+═══════════════════════════════════════════ */
+function getDefaultItems() {
+  return [
+  {id:1,cat:0,price:'€4.50',photo:'photo-1509042239860-f550ce710b93',badges:['popular'],
+   name:{fr:'Espresso Double',en:'Double Espresso',el:'Διπλό Εσπρέσο',ar:'إسبريسو مزدوج',de:'Doppelter Espresso'},
+   desc:{fr:'Deux shots d\'arabica de Yirgacheffe, Éthiopie — notes intenses de fruits noirs et fève de cacao.',en:'Two shots of Yirgacheffe arabica, Ethiopia — intense notes of dark fruit and cacao bean.',el:'Δύο σφηνάκια αραβικής Yirgacheffe Αιθιοπίας — έντονες νότες μαύρων φρούτων.',ar:'جرعتان من أرابيكا يرغاشيف الإثيوبية — نكهات مكثفة من الفاكهة الداكنة.',de:'Zwei Shots Yirgacheffe-Arabica aus Äthiopien — intensive Noten dunkler Früchte.'},
+   full:{fr:'Issu d\'une sélection rigoureuse parmi les meilleurs lots de Yirgacheffe en Éthiopie, notre espresso double est torréfié artisanalement pendant 14 minutes. L\'extraction à 9 bars révèle une crème dense avec des arômes de myrtille, chocolat noir de Madagascar et jasmin. Servi dans une tasse en porcelaine de Limoges préchauffée à 40°C.',en:'From a rigorous selection in Ethiopia\'s Yirgacheffe region, our double espresso is roasted 14 minutes. Extraction at 9 bars reveals a dense crema with aromas of blueberry, Madagascar dark chocolate and jasmine. Served in a preheated Limoges porcelain cup.',el:'Από αυστηρή επιλογή Yirgacheffe Αιθιοπίας, καβουρδισμένο 14 λεπτά. Κρέμα με αρώματα βατόμουρου, σοκολάτας Μαδαγασκάρης και γιασεμιού.',ar:'من انتقاء دقيق في يرغاشيف، يُحمَّص 14 دقيقة. قشدة كثيفة بروائح التوت الداكن والشوكولاتة والياسمين.',de:'Aus Yirgacheffe-Selektion, 14 Minuten geröstet. Crema mit Blaubeeren, Madagaskar-Schokolade und Jasmin.'},
+   allergens:{fr:['Lait'],en:['Milk'],el:['Γάλα'],ar:['الحليب'],de:['Milch']}},
+  {id:2,cat:0,price:'€5.50',photo:'photo-1572442388796-11668a67e53d',badges:['popular','selection'],
+   name:{fr:'Cappuccino Classique',en:'Classic Cappuccino',el:'Κλασικό Καπουτσίνο',ar:'كابتشينو كلاسيكي',de:'Klassischer Cappuccino'},
+   desc:{fr:'Équilibre parfait entre espresso de Colombie, mousse de lait crémeuse et art latte en cœur doré.',en:'Perfect balance of Colombian espresso, creamy milk foam and golden heart latte art.',el:'Τέλεια ισορροπία εσπρέσο Κολομβίας, κρεμώδης αφρός και latte art καρδιά.',ar:'توازن مثالي بين إسبريسو كولومبي ورغوة حليب وفن لاتيه.',de:'Perfekte Balance aus kolumbianischem Espresso, cremigem Milchschaum und goldenem Herz.'},
+   full:{fr:'Notre cappuccino utilise un arabica grand cru de Huila, Colombie. Lait jersey chauffé à 65°C pour une mousse soyeuse. Art latte en cœur dessiné à la main par nos baristas certifiés SCA.',en:'Our cappuccino uses grand cru arabica from Huila, Colombia. Jersey milk steamed to 65°C for silky foam. Heart latte art hand-drawn by our SCA-certified baristas.',el:'Arabica grand cru από Huila Κολομβίας. Γάλα Jersey 65°C. Χειροποίητο latte art από SCA baristas.',ar:'أرابيكا grand cru من هويلا الكولومبية. حليب جيرسي 65°C. فن لاتيه من بارستا SCA.',de:'Grand-Cru-Arabica aus Huila. Jersey-Milch 65°C. Handgezeichnetes Herz von SCA-Baristas.'},
+   allergens:{fr:['Lait'],en:['Milk'],el:['Γάλα'],ar:['الحليب'],de:['Milch']}},
+  {id:3,cat:0,price:'€5.00',photo:'photo-1561882468-9110e03e0f78',badges:[],
+   name:{fr:'Flat White',en:'Flat White',el:'Flat White',ar:'فلات وايت',de:'Flat White'},
+   desc:{fr:'Double ristretto australien sur lait velouté en micro-mousse — concentration et douceur en harmonie.',en:'Australian double ristretto over velvety micro-foam milk — concentration and softness in harmony.',el:'Αυστραλιανό διπλό ristretto με βελούδινο micro-foam — συγκέντρωση και απαλότητα.',ar:'ريستريتو مزدوج أسترالي على حليب مخملي — تركيز وحلاوة.',de:'Australischer Doppel-Ristretto über samtiger Micro-Foam-Milch.'},
+   full:{fr:'Né à Melbourne dans les années 80, notre Flat White utilise un double ristretto d\'arabica Éthiopie-Brésil (Cerrado Mineiro). Lait bio texturé en micro-mousse soyeuse à 62°C pour une boisson concentrée, ronde et sans amertume.',en:'Born in Melbourne in the 1980s, our Flat White uses a double ristretto from an Ethiopia-Brazil Cerrado Mineiro arabica blend. Organic milk textured at 62°C for a concentrated, rounded, bitterness-free drink.',el:'Γεννημένο στη Μελβούρνη, ristretto Αιθιοπίας-Βραζιλίας. Βιολογικό γάλα micro-foam στους 62°C.',ar:'وُلد في ملبورن، ريستريتو من إثيوبيا والبرازيل. حليب عضوي 62°C.',de:'In Melbourne geboren, Doppel-Ristretto Äthiopien-Brasilien. Bio-Milch bei 62°C Micro-Foam.'},
+   allergens:{fr:['Lait'],en:['Milk'],el:['Γάλα'],ar:['الحليب'],de:['Milch']}},
+  {id:4,cat:0,price:'€6.00',photo:'photo-1534778101976-62847782c213',badges:['new'],
+   name:{fr:'Latte Noisette',en:'Hazelnut Latte',el:'Λάτε Φουντούκι',ar:'لاتيه البندق',de:'Haselnuss-Latte'},
+   desc:{fr:'Espresso velouté sur sirop de noisette du Piémont et lait d\'avoine — douceur automnale envoûtante.',en:'Velvety espresso over Piedmont hazelnut syrup and oat milk — enchanting autumnal sweetness.',el:'Βελούδινο espresso με σιρόπι φουντουκιού Πιεμόντε και γάλα βρώμης.',ar:'إسبريسو مخملي مع شراب البندق البيدموني وحليب الشوفان.',de:'Espresso über Piemonteser Haselnusssirup und Hafermilch.'},
+   full:{fr:'Notre sirop de noisette est élaboré à partir de noisettes IGP du Piémont grillées à sec. L\'espresso kenyan AA de Nyeri révèle une acidité lumineuse contrastant avec la rondeur de la noisette. Complété de lait d\'avoine biologique. Création de saison.',en:'Our hazelnut syrup is crafted from IGP Piedmont hazelnuts, dry-roasted. Kenyan AA arabica delivers bright acidity contrasting with hazelnut roundness. With organic oat milk. Seasonal creation.',el:'Σιρόπι από ΠΓΕ φουντούκια Πιεμόντε. Κενυανό AA arabica. Βιολογικό γάλα βρώμης.',ar:'شراب من بندق بيدمونت. أرابيكا كيني AA. حليب الشوفان العضوي.',de:'Haselnusssirup aus IGP-Piemonthaselnüssen. Kenyanischer AA-Arabica. Bio-Hafermilch.'},
+   allergens:{fr:['Lait','Fruits à coque'],en:['Milk','Tree nuts'],el:['Γάλα','Ξηροί καρποί'],ar:['الحليب','المكسرات'],de:['Milch','Schalenfrüchte']}},
+  {id:5,cat:0,price:'€5.50',photo:'photo-1536256263959-770b48d82b0a',badges:['vegan'],
+   name:{fr:'Matcha Latte Végétal',en:'Vegan Matcha Latte',el:'Βίγκαν Λάτε Ματσά',ar:'لاتيه ماتشا نباتي',de:'Veganes Matcha-Latte'},
+   desc:{fr:'Poudre de matcha cérémonial d\'Uji au Japon, fouettée avec lait de coco — vert, crémeux, apaisant.',en:'Ceremonial matcha powder from Uji, Japan, whisked with coconut milk — green, creamy, calming.',el:'Τελετουργική σκόνη matcha από Uji Ιαπωνίας, χτυπημένη με γάλα καρύδας.',ar:'مسحوق ماتشا احتفالي من أوجي اليابانية، مخفوق مع حليب جوز الهند.',de:'Zeremonielles Matcha-Pulver aus Uji, Japan, mit Kokosmilch.'},
+   full:{fr:'Matcha cérémonial de Marukyu-Koyamaen à Uji, Kyoto, cultivé à l\'ombre 3 semaines. Fouetté chasen-style à 75°C. Mélangé au lait de coco de Thaïlande pour une boisson 100% végétale riche en antioxydants.',en:'Ceremonial matcha from Marukyu-Koyamaen in Uji, Kyoto, shade-grown 3 weeks. Whisked chasen-style at 75°C. Blended with Thai coconut milk for a 100% plant-based antioxidant-rich drink.',el:'Matcha από Marukyu-Koyamaen, Uji. Χτυπιέται chasen 75°C. Γάλα καρύδας Ταϊλάνδης.',ar:'ماتشا من ماروكيو-كوياماين. يُخفق على 75°C. حليب جوز هند تايلاندي.',de:'Matcha aus Marukyu-Koyamaen, Uji. Bei 75°C aufgeschlagen. Thai-Kokosmilch.'},
+   allergens:{fr:['Avoine'],en:['Oats'],el:['Βρώμη'],ar:['الشوفان'],de:['Hafer']}},
+  {id:6,cat:1,price:'€6.50',photo:'photo-1461023058943-07fcbe16d735',badges:['popular'],
+   name:{fr:'Cold Brew 18h',en:'Cold Brew 18h',el:'Cold Brew 18ω',ar:'كولد برو 18 ساعة',de:'Cold Brew 18h'},
+   desc:{fr:'Café d\'Éthiopie extrait à froid 18 heures — douceur naturelle, zéro amertume, notes de caramel liquide.',en:'Ethiopian coffee cold-extracted for 18 hours — natural sweetness, zero bitterness, liquid caramel notes.',el:'Αιθιοπιακός καφές cold-extracted 18 ώρες — φυσική γλύκα, μηδέν πικράδα.',ar:'قهوة إثيوبية مستخلصة بارداً لـ18 ساعة — حلاوة طبيعية، صفر مرارة.',de:'Äthiopischer Kaffee 18h kaltextrahiert — natürliche Süße, null Bitterkeit.'},
+   full:{fr:'Notre cold brew est préparé par immersion à froid de 18 heures avec un arabica single-origin de Sidama, Éthiopie. La basse température préserve les sucres naturels pour une boisson 67% moins acide qu\'un espresso, avec des notes de caramel beurre, pêche et vanille de Madagascar.',en:'Our cold brew is 18h cold immersion with single-origin arabica from Sidama, Ethiopia. Low temperatures preserve natural sugars for a drink 67% less acidic than espresso, with butterscotch, peach and Madagascar vanilla notes.',el:'18ωρη ψυχρή εμβάπτιση arabica Sidama. 67% λιγότερο ξινό, με νότες καραμέλας, ροδάκινου, βανίλιας.',ar:'نقع بارد 18 ساعة من أرابيكا سيداما. 67% أقل حموضة، بنكهات الكراميل والخوخ.',de:'18h Kaltextraktion mit Sidama-Single-Origin. 67% weniger sauer, Butterscotch, Pfirsich, Vanille.'},
+   allergens:{fr:[],en:[],el:[],ar:[],de:[]}},
+  {id:7,cat:1,price:'€7.00',photo:'photo-1559056199-641a0ac8b55e',badges:['new','selection'],
+   name:{fr:'Frappé Grec Authentique',en:'Authentic Greek Frappé',el:'Αυθεντικό Ελληνικό Φραπέ',ar:'فرابيه يوناني أصيل',de:'Authentischer Griechischer Frappé'},
+   desc:{fr:'L\'icone du café grec — mousse dense, café instantané Nescafé, glaçons et lait condensé.',en:'The icon of Greek coffee — dense foam, Nescafé instant coffee, ice cubes and condensed milk.',el:'Το εμβληματικό ελληνικό ποτό — πυκνός αφρός, Nescafé, παγάκια και γάλα.',ar:'رمز القهوة اليونانية — رغوة كثيفة، نسكافيه، مكعبات ثلج وحليب مكثف.',de:'Die Ikone des griechischen Kaffees — dichter Schaum, Nescafé, Eiswürfel und Kondensmilch.'},
+   full:{fr:'Né à Thessalonique en 1957, notre frappé grec est un hommage à la culture hellénique. Nescafé Original battu électriquement pour une mousse dense de 4 cm. Servi en grand verre avec glaçons à l\'eau de source de l\'Olympe et filet de lait condensé Nestlé.',en:'Born in Thessaloniki in 1957, our Greek frappé is a tribute to Hellenic coffee culture. Nescafé electric-shaken for 4cm dense foam. Tall glass with Olympus spring water ice cubes and Nestlé condensed milk.',el:'Γεννημένο στη Θεσσαλονίκη το 1957. Nescafé ηλεκτρικά για αφρό 4 εκ. Παγάκια νερό Ολύμπου, γάλα Nestlé.',ar:'وُلد في ثيسالونيكي 1957. نسكافيه مخفوق كهربياً لرغوة 4 سم. مكعبات ثلج وحليب مكثف.',de:'In Thessaloniki 1957 geboren. Nescafé elektrisch für 4cm Schaum. Olymp-Quellwasser-Eiswürfel, Kondensmilch.'},
+   allergens:{fr:['Lait'],en:['Milk'],el:['Γάλα'],ar:['الحليب'],de:['Milch']}},
+  {id:8,cat:1,price:'€7.50',photo:'photo-1553530979-7ee42e081808',badges:[],
+   name:{fr:'Smoothie Tropical Doré',en:'Golden Tropical Smoothie',el:'Χρυσή Τροπική Σμούθι',ar:'عصير استوائي ذهبي',de:'Goldener Tropischer Smoothie'},
+   desc:{fr:'Mangue Alphonso, ananas Victoria, banane et curcuma frais — éclat tropical et bien-être dans un verre.',en:'Alphonso mango, Victoria pineapple, banana and fresh turmeric — tropical radiance and wellness.',el:'Μάνγκο Alphonso, ανανάς Victoria, μπανάνα και φρέσκος κουρκουμάς.',ar:'مانجو ألفونسو وأناناس فيكتوريا وموز وكركم طازج.',de:'Alphonso-Mango, Victoria-Ananas, Banane und frischer Kurkuma.'},
+   full:{fr:'Mangue Alphonso de Ratnagiri — reine des mangues — avec ananas Victoria de La Réunion. Curcuma frais bio de Ceylan pour ses propriétés anti-inflammatoires. Mixé à froid avec glaçons de lait de coco. Zéro sucre ajouté.',en:'Alphonso mango from Ratnagiri, India — queen of mangoes — with Victoria pineapple from Réunion. Fresh organic Ceylon turmeric for anti-inflammatory benefits. Cold-blended with coconut milk ice cubes. No added sugar.',el:'Mango Alphonso από Ratnagiri. Ανανάς Victoria από Réunion. Κουρκουμάς Κεϋλάνης. Παγάκια γάλακτος καρύδας.',ar:'مانجو ألفونسو من راتناغيري. أناناس فيكتوريا من ريونيون. كركم سيلاني. مكعبات جوز الهند.',de:'Alphonso-Mango aus Ratnagiri. Victoria-Ananas aus Réunion. Bio-Kurkuma aus Ceylon. Kokosmilch-Eiswürfel.'},
+   allergens:{fr:['Fruits à coque'],en:['Tree nuts'],el:['Ξηροί καρποί'],ar:['المكسرات'],de:['Schalenfrüchte']}},
+  {id:9,cat:1,price:'€6.00',photo:'photo-1499638673689-79a0b5115d87',badges:['vegan'],
+   name:{fr:'Limonade Lavande',en:'Lavender Lemonade',el:'Λεμονάδα Λεβάντα',ar:'ليمونادة اللافندر',de:'Lavendel-Limonade'},
+   desc:{fr:'Citrons de Menton pressés à la main, sirop de lavande de Provence et eau pétillante — romance botanique.',en:'Hand-pressed Menton lemons, Provence lavender syrup and sparkling water — a botanical romance.',el:'Χειροστυμμένα λεμόνια Μεντόν, σιρόπι λεβάντας Προβηγκίας και ανθρακούχο νερό.',ar:'ليمون منتون معصور يدوياً وشراب لافندر وماء فوار.',de:'Handgepresste Menton-Zitronen, Provence-Lavendelsirup und Sprudelwasser.'},
+   full:{fr:'Citrons de Menton IGP pressés à la minute. Sirop de lavande fine de Haute-Provence AOP, macéré à froid 48h. Avec eau gazeuse minérale, menthe fraîche et fleurs de lavande comestibles. Aucun arôme artificiel.',en:'IGP Menton lemons pressed to order. Fine lavender from Haute-Provence AOP, cold macerated 48h. With mineral sparkling water, fresh mint and edible lavender flowers. No artificial flavours.',el:'ΠΓΕ λεμόνια Μεντόν. Λεβάντα Haute-Provence AOP, 48ωρη μακεράρισμα. Ανθρακούχο νερό, μέντα.',ar:'ليمون منتون. لافندر هوت-بروفانس، نقع بارد 48 ساعة. ماء فوار ونعناع.',de:'IGP-Menton-Zitronen. Haute-Provence AOP Lavendel, 48h kalt mazeriert. Sprudelwasser, Minze.'},
+   allergens:{fr:[],en:[],el:[],ar:[],de:[]}},
+  {id:10,cat:1,price:'€8.00',photo:'photo-1568901346375-23c9450c58cd',badges:['new'],
+   name:{fr:'Affogato al Cioccolato',en:'Affogato al Cioccolato',el:'Αφφογκάτο αλ Τσοκολάτο',ar:'أفوغاتو بالشوكولاتة',de:'Affogato al Cioccolato'},
+   desc:{fr:'Glace vanille artisanale noyée dans un espresso chaud et chocolat noir 72% — rencontre italienne légendaire.',en:'Artisan vanilla ice cream drowned in hot espresso and 72% dark chocolate — a legendary Italian encounter.',el:'Χειροποίητο παγωτό βανίλιας πνιγμένο σε espresso και σοκολάτα 72%.',ar:'آيس كريم فانيليا يدوي مغرق في إسبريسو وشوكولاتة 72%.',de:'Handgemachtes Vanilleeis in Espresso und 72% Zartbitterschokolade.'},
+   full:{fr:'L\'affogato — "noyé" en italien — avec deux scoops de glace vanille Bourbon de Madagascar sans conservateurs, préparée le matin même. Un espresso double bouillant coulé au dernier moment, suivi de ganache Valrhona 72% Grand Cru de São Tomé.',en:'The affogato — "drowned" in Italian — with two scoops of preservative-free Madagascar Bourbon vanilla ice cream, prepared fresh each morning. A boiling double espresso poured last, then Valrhona 72% Grand Cru ganache from São Tomé.',el:'Δύο μπάλες παγωτό Bourbon βανίλιας Μαδαγασκάρης. Καυτό espresso και ganache Valrhona 72% São Tomé.',ar:'كرتا آيس كريم فانيليا بوربون مدغشقر. إسبريسو مغلي وغاناش فالرهونا 72%.',de:'Bourbon-Vanilleeis aus Madagaskar. Kochender Espresso und Valrhona 72% Ganache São Tomé.'},
+   allergens:{fr:['Lait'],en:['Milk'],el:['Γάλα'],ar:['الحليب'],de:['Milch']}},
+  {id:11,cat:2,price:'€9.50',photo:'photo-1555507036-ab1f4038024a',badges:['popular'],
+   name:{fr:'Croissant Beurre AOP',en:'AOP Butter Croissant',el:'Κρουασάν Βουτύρου AOP',ar:'كرواسان زبدة AOP',de:'AOP-Butter-Croissant'},
+   desc:{fr:'Feuilletage délicat en 27 couches, beurre Charentes-Poitou AOP, doré à la perfection chaque matin.',en:'Delicate 27-layer puff pastry, Charentes-Poitou AOP butter, gilded to perfection each morning.',el:'Λεπτή 27-στρώματη ζύμη, βούτυρο Charentes-Poitou AOP, χρυσαφένιο κάθε πρωί.',ar:'معجنة بـ27 طبقة، زبدة شارونت-بواتو AOP، مذهّبة كل صباح.',de:'27-schichtiges Blätterteig, Charentes-Poitou AOP-Butter, täglich goldgebacken.'},
+   full:{fr:'Notre croissant est livré chaque matin à 5h30 par la Maison Picard d\'Athènes formée à Paris. Feuilletage à la main en 3 tours doubles pour 27 couches, beurre Charentes-Poitou AOP — le plus riche en acide butyrique.',en:'Our croissant is delivered daily at 5:30 AM by Maison Picard, an Athenian bakery trained in Paris. Hand-laminated in 3 double turns for 27 layers, Charentes-Poitou AOP butter — richest in butyric acid.',el:'Παραδίδεται 5:30 από Maison Picard Αθήνας. Χειροποίητο 27 στρώματα, βούτυρο AOP.',ar:'يُسلَّم 5:30 من مخبز ماييزون بيكار. ملفوف 27 طبقة بزبدة AOP.',de:'Täglich 5:30 von Maison Picard. Hand-laminiert 27 Schichten, AOP-Butter.'},
+   allergens:{fr:['Gluten','Lait','Œufs'],en:['Gluten','Milk','Eggs'],el:['Γλουτένη','Γάλα','Αυγά'],ar:['الغلوتين','الحليب','البيض'],de:['Gluten','Milch','Eier']}},
+  {id:12,cat:2,price:'€12.00',photo:'photo-1546069901-ba9599a7e63c',badges:[],
+   name:{fr:'Tartine Avocat & Feta',en:'Avocado & Feta Toast',el:'Τοστ Αβοκάντο & Φέτα',ar:'خبزة الأفوكادو والفيتا',de:'Avocado-Feta-Toast'},
+   desc:{fr:'Avocat Hass d\'Espagne, feta AOP d\'Égine, pain de seigle au levain — fraîcheur méditerranéenne absolue.',en:'Hass avocado from Spain, AOP feta from Aegina, sourdough rye bread — absolute Mediterranean freshness.',el:'Αβοκάντο Hass Ισπανίας, φέτα ΠΟΠ Αίγινας, ψωμί σίκαλης με προζύμι.',ar:'أفوكادو هاس إسباني وجبن فيتا AOP من إيجينا وخبز الجاودار.',de:'Hass-Avocado aus Spanien, AOP-Feta aus Ägina, Sauerteig-Roggenbrot.'},
+   full:{fr:'Avocat Hass de Málaga écrasé avec huile d\'olive extra-vierge du Péloponnèse, fleur de sel de Guerande et zeste de citron de Menton. Sur pain de seigle au levain de la Maison Picard. Coiffé de feta AOP d\'Égine, sésame noir torréfié et piment d\'Espelette.',en:'Málaga Hass avocado mashed with Peloponnese extra-virgin olive oil, Guérande fleur de sel and Menton lemon zest. On Maison Picard sourdough rye. Topped with Aegina AOP feta, black sesame and Espelette pepper.',el:'Αβοκάντο Hass Μάλαγα, ελαιόλαδο Πελοποννήσου. Ψωμί σίκαλης Maison Picard. Φέτα ΠΟΠ Αίγινας, σουσάμι.',ar:'أفوكادو هاس من مالاغا مع زيت زيتون. على خبز جاودار. فيتا AOP من إيجينا وسمسم أسود.',de:'Málaga-Avocado mit Peloponnes-Olivenöl. Auf Roggenbrot. Aegina-AOP-Feta, schwarzer Sesam.'},
+   allergens:{fr:['Gluten','Lait'],en:['Gluten','Milk'],el:['Γλουτένη','Γάλα'],ar:['الغلوتين','الحليب'],de:['Gluten','Milch']}},
+  {id:13,cat:2,price:'€8.50',photo:'photo-1590301157890-4810ed352733',badges:['vegan'],
+   name:{fr:'Energy Bowl Açaí',en:'Açaí Energy Bowl',el:'Μπολ Ενέργειας Açaí',ar:'وعاء طاقة الأساي',de:'Açaí Energy Bowl'},
+   desc:{fr:'Base açaí de Pará au Brésil, granola maison, fruits frais de saison et coulis de fruits rouges.',en:'Açaí base from Pará, Brazil, house granola, seasonal fresh fruits and red berry coulis.',el:'Βάση açaí από Pará Βραζιλίας, σπιτική granola, φρέσκα φρούτα εποχής.',ar:'قاعدة أساي من بارا البرازيلية، غرانولا منزلية، فواكه طازجة موسمية.',de:'Açaí-Basis aus Pará Brasilien, hausgemachtes Granola, saisonale Früchte.'},
+   full:{fr:'L\'açaí vient de coopératives de l\'État de Pará, Amazonie brésilienne. Pulpe surgelée mixée à la minute avec banane et lait de coco. Garnie de granola maison (avoine, chia, amandes du Chili, miel de l\'Hymette) et fruits de saison. 100% végétale.',en:'Açaí from cooperatives in Pará, Brazilian Amazon. Frozen pulp blended to order with banana and coconut milk. Topped with house granola (oats, chia, Chilean almonds, Hymettus honey) and seasonal fruits. 100% plant-based.',el:'Açaí από Pará. Πολτός με μπανάνα και γάλα καρύδας. Granola (βρώμη, chia, αμύγδαλα, μέλι Υμηττού).',ar:'أساي من بارا. لب مع موز وجوز الهند. غرانولا (شوفان وشيا ولوز وعسل أثيني).',de:'Açaí aus Pará. Fruchtfleisch mit Banane und Kokosmilch. Granola (Hafer, Chia, Mandeln, Hymettus-Honig).'},
+   allergens:{fr:['Fruits à coque'],en:['Tree nuts'],el:['Ξηροί καρποί'],ar:['المكسرات'],de:['Schalenfrüchte']}},
+  {id:14,cat:2,price:'€11.00',photo:'photo-1528735602780-2552fd46c7af',badges:['popular'],
+   name:{fr:'Club Sandwich Poulet',en:'Chicken Club Sandwich',el:'Club Σάντουιτς Κοτόπουλο',ar:'ساندوتش كلوب الدجاج',de:'Hähnchen-Club-Sandwich'},
+   desc:{fr:'Poulet rôti aux herbes de Provence, bacon fumé, tomate cerise, avocat et mayo maison au citron.',en:'Herb-roasted chicken, smoked bacon, cherry tomatoes, avocado and house lemon mayo.',el:'Κοτόπουλο ψητό με βότανα, καπνιστό μπέικον, ντοματάκια, αβοκάντο και mayo λεμονιού.',ar:'دجاج مشوي بأعشاب ولحم مقدد وطماطم وأفوكادو ومايونيز ليمون.',de:'Kräuterhähnchen, Speck, Kirschtomaten, Avocado und Zitronen-Mayonnaise.'},
+   full:{fr:'Poulet Label Rouge hellénique élevé en plein air, mariné 24h aux herbes de Provence et rôti à 70°C pendant 3 heures. Assemblé sur pain brioche toasté avec laitue romaine croquante, tomates cerise de Crète, bacon ibérique fumé au hêtre et avocat. Mayonnaise maison au citron de Menton.',en:'Hellenic free-range Label Rouge chicken, marinated 24h in Provence herbs and slow-roasted at 70°C for 3 hours. On toasted brioche with romaine, Cretan cherry tomatoes, beech-smoked Iberian bacon and avocado. House-made Menton lemon mayo.',el:'Κοτόπουλο Label Rouge, μαρινάτο 24ω, ψημένο 70°C. Brioche, ρόμεην, ντοματάκια Κρήτης, μπέικον ιβηρικό.',ar:'دجاج لابيل روج، متبَّل 24 ساعة، مشوي 70°C. برييوش وخس وطماطم ومقدد إيبيري.',de:'Freiland-Hähnchen Label Rouge, 24h mariniert, bei 70°C. Brioche, Romana, kretische Tomaten, iberischer Speck.'},
+   allergens:{fr:['Gluten','Lait','Œufs'],en:['Gluten','Milk','Eggs'],el:['Γλουτένη','Γάλα','Αυγά'],ar:['الغلوتين','الحليب','البيض'],de:['Gluten','Milch','Eier']}},
+  {id:15,cat:2,price:'€7.00',photo:'photo-1585937421612-70a008356fbe',badges:['vegan','new'],
+   name:{fr:'Houmous Trio',en:'Hummus Trio',el:'Τρίο Χούμους',ar:'ثلاثي الحمص',de:'Hummus-Trio'},
+   desc:{fr:'Trois hummus signature : classique, betterave-cumin et poivron rôti, avec pain pita chaud maison.',en:'Three signature hummus: classic, beetroot-cumin and roasted pepper, with warm house pita bread.',el:'Τρία signature hummus: κλασικό, παντζάρι-κύμινο και ψητή πιπεριά, με σπιτική πίτα.',ar:'ثلاثة حمص: كلاسيكي وشمندر-كمون وفلفل مشوي مع خبز بيتا منزلي.',de:'Drei Hummus-Varianten: klassisch, Rote-Bete-Kreuzkümmel und Paprika, mit Haus-Pita.'},
+   full:{fr:'Notre trio de houmous est préparé chaque matin avec des pois chiches bio de Farsala (Thessalie), trempés 12h. Tahin d\'un moulin artisanal de Jérusalem. Classique : citron de Menton. Betterave : betteraves macédoniennes rôties. Poivron : poivrons au four à bois, paprika fumé de La Vera. Pita sortie du four toutes les 30 minutes.',en:'Our hummus trio is prepared each morning with organic chickpeas from Farsala, Thessaly, soaked 12h. Tahini from a Jerusalem artisan mill. Classic: Menton lemon. Beetroot: roasted Macedonian beets. Pepper: wood-oven roasted peppers, La Vera smoked paprika. House pita every 30 minutes.',el:'Βιολογικά ρεβίθια Φαρσάλων, 12 ώρες. Ταχίνι Ιερουσαλήμ. Κλασικό: λεμόνι. Παντζάρι: ψητό. Πιπεριά: ξυλόφουρνος.',ar:'حمص عضوي من فارسالا، نقع 12 ساعة. طحينة أورشليم. كلاسيكي: ليمون. شمندر: مشوي. فلفل: فرن خشبي.',de:'Bio-Kichererbsen aus Farsala, 12h. Jerusalem-Tahini. Klassisch: Menton-Zitrone. Rübe: geröstete Bete. Paprika: Holzofen.'},
+   allergens:{fr:['Sésame'],en:['Sesame'],el:['Σουσάμι'],ar:['السمسم'],de:['Sesam']}},
+  {id:16,cat:3,price:'€8.50',photo:'photo-1563227812-0ea4c22e6cc8',badges:['new'],
+   name:{fr:'Latte Pistache & Rose',en:'Pistachio Rose Latte',el:'Λάτε Φιστίκι & Τριαντάφυλλο',ar:'لاتيه الفستق والورد',de:'Pistazien-Rosen-Latte'},
+   desc:{fr:'Pistaches d\'Égine et eau de rose de Damas — une création florale et gourmande unique au Mozart Café.',en:'Aegina pistachios and Damascus rose water — a floral, indulgent creation unique to Mozart Café.',el:'Φιστίκια Αίγινας και ροδόνερο Δαμασκού — ανθική δημιουργία μοναδική στο Mozart Café.',ar:'فستق إيجينا وماء ورد دمشقي — إبداع زهري حصري لإليزيه.',de:'Ägina-Pistazien und Damaszener Rosenwasser — florale Kreation, einzigartig im Mozart Café.'},
+   full:{fr:'Cette création de notre Chef Barista s\'inspire des traditions perses de café parfumé. Sirop de pistache DOP d\'Égine grillées à sec et mixées en pâte pure. Une touche d\'eau de rose de Damas bio. Espresso Guji Éthiopie en micro-mousse jersey, pétales de rose séchés et éclats de pistache.',en:'Our Head Barista\'s creation inspired by Persian perfumed coffee traditions. DOP pistachio syrup from Aegina Island — finest in the Mediterranean — dry-roasted into pure paste. A touch of organic Damascus rose water. Ethiopian Guji espresso with jersey micro-foam, dried rose petals and pistachio shards.',el:'Σιρόπι ΠΟΠ φιστικιού Αίγινας. Ροδόνερο Δαμασκού. Espresso Guji Αιθιοπίας, micro-foam jersey.',ar:'شراب فستق DOP من إيجينا. ماء ورد دمشقي. إسبريسو غوجي مع micro-foam وبتلات ورد.',de:'DOP-Pistaziensirup von Aegina. Damaszener Rosenwasser. Guji-Espresso, Jersey-Micro-Foam.'},
+   allergens:{fr:['Pistaches','Lait'],en:['Pistachios','Milk'],el:['Φιστίκια','Γάλα'],ar:['الفستق','الحليب'],de:['Pistazien','Milch']}},
+  {id:17,cat:3,price:'€9.00',photo:'photo-1530373239216-42518e6b4063',badges:['popular','selection'],
+   name:{fr:'Mozart Café Signature',en:'Mozart Café Signature',el:'Mozart Café Signature',ar:'قهوة موزارت سيجنيتشر',de:'Mozart Café Signature'},
+   desc:{fr:'Notre blend maison exclusif — arabica d\'Éthiopie et de Colombie — la quintessence du Mozart Café.',en:'Our exclusive house blend — Ethiopian and Colombian arabica — the quintessence of Mozart Café.',el:'Το αποκλειστικό house blend μας — Αιθιοπία και Κολομβία — η ουσία του Mozart Café.',ar:'مزيجنا المنزلي الحصري — أرابيكا إثيوبية وكولومبية — جوهر موزارت كافيه.',de:'Unsere exklusive Hausmischung — äthiopische und kolumbianische Arabica.'},
+   full:{fr:'Le Mozart Café Signature est le fruit de deux ans de sélection par nos sommeliers. Blend 60/40 : arabica Yirgacheffe Éthiopie (floral, fruits exotiques) et Huila Colombie (caramel, amandes). Torréfié en 16 minutes dans notre brûlerie partenaire de Kifissia. Servi en lungo dans une tasse chauffée avec twist d\'orange Moro de Sicile. Carré de chocolat Valrhona offert.',en:'The Mozart Café Signature is the result of two years of selection by our coffee sommeliers. 60/40 blend: Yirgacheffe Ethiopia (floral, exotic fruits) and Huila Colombia (caramel, almonds). Slow-roasted 16 minutes. Served as a lungo in a heated cup with Sicilian Moro orange twist. Complimentary Valrhona chocolate square.',el:'Δύο χρόνια επιλογής. Blend 60/40 Yirgacheffe Αιθιοπίας και Huila Κολομβίας. Lungo με twist πορτοκαλιού, Valrhona.',ar:'نتيجة عامين من الاختيار. مزيج 60/40 يرغاشيف وهويلا. لونغو مع قشر برتقال وشوكولاتة فالرهونا.',de:'Ergebnis zweijähriger Selektion. 60/40 Yirgacheffe und Huila. Lungo mit Orangen-Twist und Valrhona.'},
+   allergens:{fr:['Lait'],en:['Milk'],el:['Γάλα'],ar:['الحليب'],de:['Milch']}},
+  {id:18,cat:3,price:'€7.50',photo:'photo-1558857563-b371033873b8',badges:['vegan'],
+   name:{fr:'Golden Milk Curcuma',en:'Turmeric Golden Milk',el:'Χρυσό Γάλα Κουρκουμά',ar:'حليب ذهبي بالكركم',de:'Kurkuma Golden Milk'},
+   desc:{fr:'Lait de coco de Thaïlande, curcuma de Ceylan, gingembre frais, poivre noir et miel de l\'Hymette.',en:'Thai coconut milk, Ceylon turmeric, fresh ginger, black pepper and Hymettus honey.',el:'Γάλα καρύδας Ταϊλάνδης, κουρκουμάς Κεϋλάνης, φρέσκος τζίντζερ, πιπέρι και μέλι Υμηττού.',ar:'حليب جوز هند تايلاندي وكركم سيلاني وزنجبيل طازج وفلفل أسود وعسل أثيني.',de:'Thailändische Kokosmilch, Ceylon-Kurkuma, frischer Ingwer, schwarzer Pfeffer, Hymettus-Honig.'},
+   full:{fr:'Le Golden Milk ayurvédique est préparé avec curcuma bio Grade A de Ceylan. Notre recette : lait de coco entier de Thaïlande (sans émulsifiant), gingembre frais bio râpé, poivre noir du Kerala (×20 absorption de curcumine), cardamome de Guatemala et miel de thym brut de l\'Hymette — le miel le plus précieux de Grèce. Chauffé à 72°C.',en:'Ayurvedic Golden Milk prepared with Grade A organic Ceylon turmeric. Our recipe: whole Thai coconut milk, freshly grated organic ginger, Kerala black pepper (×20 curcumin absorption), Guatemalan cardamom and raw Hymettus thyme honey — Greece\'s most precious honey. Heated to 72°C.',el:'Βιολογικός κουρκουμάς Grade A Κεϋλάνης. Γάλα καρύδας Ταϊλάνδης, τζίντζερ, πιπέρι Kerala (×20), κάρδαμο, μέλι Υμηττού.',ar:'كركم عضوي Grade A من سيلان. حليب جوز هند تايلاندي، زنجبيل، فلفل كيرالا (×20)، هيل، عسل أثيني.',de:'Bio-Kurkuma Grade A aus Ceylon. Thai-Kokosmilch, Bio-Ingwer, Kerala-Pfeffer (×20), Kardamom, Hymettus-Rohhonig.'},
+   allergens:{fr:['Noix de coco'],en:['Coconut'],el:['Καρύδα'],ar:['جوز الهند'],de:['Kokosnuss']}},
+  {id:19,cat:3,price:'€14.00',photo:'photo-1504674900247-0877df9cc836',badges:['popular','new'],
+   name:{fr:'Brunch Board Mozart',en:'Mozart Brunch Board',el:'Brunch Board Mozart',ar:'طبق برنش موزارت',de:'Mozart Brunch Board'},
+   desc:{fr:'Un plateau royal : œuf parfait, saumon fumé d\'Écosse, avocat, feta d\'Égine et tartines grillées.',en:'A royal board: perfect egg, Scottish smoked salmon, avocado, Aegina feta and grilled toasts.',el:'Βασιλικό πλατό: τέλειο αυγό, καπνιστός σολομός Σκωτίας, αβοκάντο, φέτα Αίγινας.',ar:'طبق ملكي: بيضة مثالية وسلمون مدخن اسكتلندي وأفوكادو وفيتا إيجينا.',de:'Königliches Board: perfektes Ei, schottischer Räucherlachs, Avocado, Aegina-Feta.'},
+   full:{fr:'Le Brunch Board Mozart est notre pièce maîtresse du week-end. Œuf poché à 63°C en sous-vide 45 min, saumon fumé à froid 24h d\'Écosse (AOC), avocat Hass tranché, feta AOP d\'Égine émiettée, tartines de pain de seigle au levain grillées, quenelle de fromage de chèvre de Macédoine avec compotée de figues de Kalamata. Jus d\'agrumes pressés et café Mozart inclus.',en:'The Mozart Brunch Board is our weekend showpiece. 63°C sous-vide egg 45 min, Scottish 24h cold-smoked salmon (AOC), sliced Hass avocado, crumbled Aegina AOP feta, grilled sourdough rye toasts, quenelle of Macedonian goat cheese with Kalamata fig compote. Freshly pressed citrus juice and Mozart coffee included.',el:'Αυγό sous-vide 63°C 45 λεπτά. Σολομός Σκωτίας, αβοκάντο Hass, φέτα Αίγινας, ψωμί σίκαλης, κατσικίσιο τυρί Μακεδονίας με σύκο Καλαμάτας.',ar:'بيضة سوس-فيد 63°C لـ45 دقيقة. سلمون اسكتلندي، أفوكادو هاس، فيتا إيجينا، خبز جاودار، جبن ماعز مقدوني مع تين.',de:'63°C Sous-Vide-Ei 45 Min. Schottischer Räucherlachs, Hass-Avocado, Aegina-Feta, Roggenbrot, mazedonischer Ziegenkäse.'},
+   allergens:{fr:['Gluten','Lait','Œufs'],en:['Gluten','Milk','Eggs'],el:['Γλουτένη','Γάλα','Αυγά'],ar:['الغلوتين','الحليب','البيض'],de:['Gluten','Milch','Eier']}},
+  {id:20,cat:3,price:'€6.50',photo:'photo-1551024506-0bccd828d307',badges:[],
+   name:{fr:'Tiramisu Maison',en:'House Tiramisu',el:'Σπιτικό Τιραμισού',ar:'تيراميسو البيت',de:'Hausgemachtes Tiramisu'},
+   desc:{fr:'Mascarpone de Lombardie, biscuits de Savoie trempés dans notre espresso Signature, cacao de Madagascar.',en:'Lombard mascarpone, Savoy biscuits soaked in our Signature espresso, Madagascar cocoa.',el:'Μασκαρπόνε Λομβαρδίας, μπισκότα Savoie στο Signature espresso, κακάο Μαδαγασκάρης.',ar:'ماسكاربوني لومباردي وبسكويت سافوا منقوع في إسبريسو سيجنيتشر وكاكاو مدغشقر.',de:'Lombardisches Mascarpone, Savoiardi in Signature-Espresso getränkt, Madagaskar-Kakao.'},
+   full:{fr:'Notre tiramisu maison suit scrupuleusement la recette vénitienne du XVIIe siècle. Mascarpone bio de Lombardie (50% MG) battu avec des œufs fermiers de Béotie et sucre de canne non raffiné. Savoiardi trempés dans notre espresso Mozart Signature refroidi et un trait de marsala sicilien Florio. Monté en couches et reposé 12h au frais. Finition au cacao pur Valrhona Madagascar tamisé avant service.',en:'Our house tiramisu strictly follows the 17th-century Venetian recipe. Organic Lombard mascarpone (50% fat) beaten with Boeotian free-range eggs and unrefined cane sugar. Savoiardi soaked in chilled Mozart Signature espresso and Florio Sicilian marsala. Assembled in layers, rested 12 hours. Finished with pure Valrhona Madagascar cocoa powder sifted before serving.',el:'Βιολογικό μασκαρπόνε Λομβαρδίας με αυγά Βοιωτίας. Savoiardi στο Signature espresso και Florio Marsala. 12 ώρες. Κακάο Valrhona Μαδαγασκάρης.',ar:'ماسكاربوني لومبارد عضوي مع بيض بيوطي. بسكويت في إسبريسو سيجنيتشر ومارسالا. 12 ساعة. كاكاو فالرهونا مدغشقر.',de:'Bio-Lombard-Mascarpone mit boeotischen Eiern. Savoiardi in Signature-Espresso und Florio-Marsala. 12h Ruhezeit. Valrhona-Madagaskar-Kakao.'},
+   allergens:{fr:['Lait','Gluten','Œufs'],en:['Milk','Gluten','Eggs'],el:['Γάλα','Γλουτένη','Αυγά'],ar:['الحليب','الغلوتين','البيض'],de:['Milch','Gluten','Eier']}}
+  ];
+}
+
+/* ═══════════════════════════════════════════
+   TRADUCTION AUTOMATIQUE — MyMemory API (gratuite)
+   Limite : ~5000 mots/jour par adresse IP.
+   Pour un usage professionnel intensif, ajoutez
+   votre email en paramètre de-a pour 10x plus.
+═══════════════════════════════════════════ */
+
+// Codes langue pour MyMemory
+const MYMEMORY_CODES = { fr:'fr-FR', en:'en-GB', el:'el-GR', ar:'ar-SA', de:'de-DE' };
+
+async function translateText(text, fromLang, toLang) {
+  if (!text || !text.trim()) return '';
+  if (fromLang === toLang) return text;
+
+  const src = MYMEMORY_CODES[fromLang] || fromLang;
+  const tgt = MYMEMORY_CODES[toLang]   || toLang;
+
+  // MyMemory a une limite de 500 chars par requête — on découpe si nécessaire
+  if (text.length <= 500) {
+    return await myMemoryCall(text, src, tgt);
+  }
+
+  // Découper par phrases pour les textes longs
+  const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+  const chunks = [];
+  let current = '';
+  for (const s of sentences) {
+    if ((current + s).length > 480) {
+      if (current) chunks.push(current.trim());
+      current = s;
+    } else {
+      current += s;
+    }
+  }
+  if (current.trim()) chunks.push(current.trim());
+
+  const results = [];
+  for (const chunk of chunks) {
+    const translated = await myMemoryCall(chunk, src, tgt);
+    results.push(translated || chunk);
+    await sleep(150);
+  }
+  return results.join(' ');
+}
+
+async function myMemoryCall(text, src, tgt) {
+  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${src}|${tgt}`;
+  const res  = await fetch(url);
+  if (!res.ok) throw new Error('API error ' + res.status);
+  const data = await res.json();
+  if (data.responseStatus === 200 && data.responseData?.translatedText) {
+    return data.responseData.translatedText;
+  }
+  throw new Error('Translation failed: ' + (data.responseDetails || 'unknown'));
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+/* ═══════════════════════════════════════════
+   UTILS
+═══════════════════════════════════════════ */
+function esc(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+checkLogin();
+</script>
+</body>
+</html>

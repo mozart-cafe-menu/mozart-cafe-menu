@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guide Déploiement — Mozart Café</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f0e18;
+      color: #e8e0d0;
+      line-height: 1.6;
+      padding: 24px 16px 80px;
+    }
+    .container { max-width: 800px; margin: 0 auto; }
+
+    /* Header */
+    .guide-header {
+      text-align: center;
+      padding: 40px 0 32px;
+      border-bottom: 1px solid rgba(201,168,76,0.2);
+      margin-bottom: 40px;
+    }
+    .guide-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #c9a84c;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+    .guide-sub {
+      font-size: 0.95rem;
+      color: rgba(232,224,208,0.6);
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    /* Progress bar */
+    .progress-bar {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 32px 0;
+      flex-wrap: wrap;
+    }
+    .prog-step {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      color: rgba(232,224,208,0.4);
+    }
+    .prog-num {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(201,168,76,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem; font-weight: 600;
+      color: rgba(201,168,76,0.5);
+    }
+    .prog-step.done .prog-num { background: #c9a84c; border-color: #c9a84c; color: #0f0e18; }
+    .prog-arrow { color: rgba(201,168,76,0.2); font-size: 0.7rem; }
+
+    /* Step card */
+    .step {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(201,168,76,0.12);
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .step::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #c9a84c, rgba(201,168,76,0.2), transparent);
+    }
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .step-num {
+      width: 42px; height: 42px;
+      background: rgba(201,168,76,0.12);
+      border: 1.5px solid rgba(201,168,76,0.3);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; font-weight: 700;
+      color: #c9a84c;
+      flex-shrink: 0;
+    }
+    .step-title {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #f0e8d0;
+    }
+    .step-badge {
+      font-size: 0.7rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .badge-you { background: rgba(232,133,74,0.15); color: #e8854a; border: 1px solid rgba(232,133,74,0.3); }
+    .badge-me  { background: rgba(126,189,106,0.12); color: #7ebd6a; border: 1px solid rgba(126,189,106,0.25); }
+    .badge-done{ background: rgba(201,168,76,0.12); color: #c9a84c; border: 1px solid rgba(201,168,76,0.25); }
+
+    /* Task list */
+    .task-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .task {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.025);
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .task-ico {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 0.9rem;
+    }
+    .task-ico.action { background: rgba(232,133,74,0.15); }
+    .task-ico.info   { background: rgba(201,168,76,0.1); }
+    .task-ico.copy   { background: rgba(100,180,255,0.1); }
+    .task-body { flex: 1; }
+    .task-label { font-size: 0.88rem; color: #e8e0d0; font-weight: 500; margin-bottom: 2px; }
+    .task-sub   { font-size: 0.78rem; color: rgba(232,224,208,0.5); }
+
+    /* Code block */
+    .code-box {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin: 14px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.83rem;
+      color: #e8d8a0;
+      overflow-x: auto;
+      position: relative;
+    }
+    .code-box .code-label {
+      font-family: -apple-system, sans-serif;
+      font-size: 0.7rem;
+      color: rgba(201,168,76,0.6);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .code-box code { color: #e8d8a0; }
+    .hl { color: #ffdd60; font-weight: 700; }
+    .hl-blue { color: #60ccff; }
+    .hl-green { color: #7ebd6a; }
+
+    /* Screenshot placeholder */
+    .screen-hint {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: rgba(100,180,255,0.06);
+      border: 1px dashed rgba(100,180,255,0.2);
+      border-radius: 10px;
+      margin: 10px 0;
+      font-size: 0.8rem;
+      color: rgba(232,224,208,0.55);
+    }
+
+    /* Warning */
+    .warn-box {
+      display: flex;
+      gap: 12px;
+      padding: 14px 16px;
+      background: rgba(232,133,74,0.08);
+      border: 1px solid rgba(232,133,74,0.25);
+      border-radius: 12px;
+      margin: 14px 0;
+      font-size: 0.83rem;
+      color: rgba(232,224,208,0.75);
+    }
+    .warn-ico { font-size: 1.1rem; flex-shrink: 0; }
+
+    /* Success */
+    .success-box {
+      display: flex;
+      gap: 12px;
+      padding: 14px 16px;
+      background: rgba(126,189,106,0.08);
+      border: 1px solid rgba(126,189,106,0.25);
+      border-radius: 12px;
+      margin: 14px 0;
+      font-size: 0.83rem;
+      color: rgba(232,224,208,0.75);
+    }
+
+    /* Highlight box */
+    .highlight-box {
+      background: rgba(201,168,76,0.07);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin: 14px 0;
+      font-size: 0.85rem;
+    }
+    .highlight-box strong { color: #c9a84c; }
+
+    /* Link button */
+    .link-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 18px;
+      background: rgba(201,168,76,0.1);
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 10px;
+      color: #c9a84c;
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 500;
+      margin: 6px 6px 6px 0;
+      transition: all 0.2s;
+    }
+    .link-btn:hover { background: rgba(201,168,76,0.18); }
+
+    /* File highlight */
+    .file-ref {
+      display: inline-block;
+      background: rgba(100,180,255,0.1);
+      border: 1px solid rgba(100,180,255,0.2);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-family: monospace;
+      font-size: 0.82rem;
+      color: #60ccff;
+    }
+
+    /* Final summary */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    @media(max-width:540px){ .summary-grid { grid-template-columns: 1fr; } }
+    .summary-card {
+      padding: 16px;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(201,168,76,0.12);
+      border-radius: 14px;
+    }
+    .sc-title { font-size: 0.78rem; color: rgba(201,168,76,0.7); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; font-weight: 600; }
+    .sc-val   { font-size: 0.88rem; color: #e8e0d0; }
+    .sc-val.mono { font-family: monospace; color: #e8d8a0; }
+
+    hr.divider { border: none; border-top: 1px solid rgba(201,168,76,0.1); margin: 32px 0; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ═══ HEADER ═══ -->
+  <div class="guide-header">
+    <div class="guide-title">🎵 Guide de Déploiement</div>
+    <div style="font-size:1.3rem; color:#c9a84c; margin-bottom:8px;">Mozart Café</div>
+    <div class="guide-sub">Suis les étapes dans l'ordre. Tout ce qui est marqué <span style="color:#e8854a">À FAIRE</span> nécessite ton action.</div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-bar">
+    <div class="prog-step"><div class="prog-num">1</div><span>GitHub</span></div>
+    <div class="prog-arrow">→</div>
+    <div class="prog-step"><div class="prog-num">2</div><span>Firebase</span></div>
+    <div class="prog-arrow">→</div>
+    <div class="prog-step"><div class="prog-num">3</div><span>Config</span></div>
+    <div class="prog-arrow">→</div>
+    <div class="prog-step"><div class="prog-num">4</div><span>Vercel</span></div>
+    <div class="prog-arrow">→</div>
+    <div class="prog-step"><div class="prog-num">5</div><span>App Android</span></div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ═══ ÉTAPE 1 — GitHub ═══ -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Créer un compte GitHub et uploader les fichiers</div>
+        <span class="step-badge badge-you">À faire toi-même</span>
+      </div>
+    </div>
+
+    <ul class="task-list">
+      <li class="task">
+        <div class="task-ico action">1️⃣</div>
+        <div class="task-body">
+          <div class="task-label">Aller sur github.com et créer un compte</div>
+          <div class="task-sub">Utiliser ton nouveau compte Gmail</div>
+        </div>
+      </li>
+      <li class="task">
+        <div class="task-ico action">2️⃣</div>
+        <div class="task-body">
+          <div class="task-label">Cliquer sur "New repository" (bouton vert)</div>
+          <div class="task-sub">Nom suggéré : <code>mozart-cafe-menu</code> — choisir "Public"</div>
+        </div>
+      </li>
+      <li class="task">
+        <div class="task-ico action">3️⃣</div>
+        <div class="task-body">
+          <div class="task-label">Uploader TOUS les fichiers du dossier Menu Mozart Café</div>
+          <div class="task-sub">Cliquer "uploading an existing file" puis glisser-déposer tout le dossier</div>
+        </div>
+      </li>
+    </ul>
+
+    <div class="screen-hint">
+      💡 <span>Sur GitHub, après avoir créé le repo, clique sur <strong>"uploading an existing file"</strong> dans la page du repo vide</span>
+    </div>
+
+    <div class="warn-box">
+      <div class="warn-ico">⚠️</div>
+      <div>Upload <strong>tous les fichiers</strong> incluant le dossier <span class="file-ref">api/notify.js</span> — GitHub comprend les sous-dossiers automatiquement</div>
+    </div>
+  </div>
+
+  <!-- ═══ ÉTAPE 2 — Firebase ═══ -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">Créer le projet Firebase et récupérer les clés</div>
+        <span class="step-badge badge-you">À faire toi-même</span>
+      </div>
+    </div>
+
+    <a class="link-btn" href="https://console.firebase.google.com" target="_blank">🔥 Ouvrir Firebase Console</a>
+
+    <ul class="task-list" style="margin-top:14px">
+      <li class="task">
+        <div class="task-ico action">1️⃣</div>
+        <div class="task-body">
+          <div class="task-label">Cliquer "Ajouter un projet" / "Add project"</div>
+          <div class="task-sub">Nom : <code>mozart-cafe</code> (ou ce que tu veux)</div>
+        </div>
+      </li>
+      <li class="task">
+        <div class="task-ico action">2️⃣</div>
+        <div class="task-body">
+          <div class="task-label">Dans le projet → cliquer l'icône "&lt;/&gt;" (Web app)</div>
+          <div class="task-sub">Donner un nom : "Mozart Café Menu", puis cliquer "Enregistrer"</div>
+        </div>
+      </li>
+      <li class="task">
+        <div class="task-ico copy">3️⃣</div>
+        <div class="task-body">
+          <div class="task-label">Copier les valeurs de configuration affichées</div>
+          <div class="task-sub">Tu verras un bloc de code avec apiKey, projectId, etc. — garder cette page ouverte</div>
+        </div>
+      </li>
+    </ul>
+
+    <div class="code-box">
+      <div class="code-label">📋 Ce que tu verras sur Firebase (exemple)</div>
+<code>const firebaseConfig = {
+  apiKey: <span class="hl">"AIzaSyXXXXXXXXXXXXXXXXXXXXXXX"</span>,
+  authDomain: <span class="hl">"mozart-cafe-xxxxx.firebaseapp.com"</span>,
+  projectId: <span class="hl">"mozart-cafe-xxxxx"</span>,
+  storageBucket: <span class="hl">"mozart-cafe-xxxxx.firebasestorage.app"</span>,
+  messagingSenderId: <span class="hl">"123456789012"</span>,
+  appId: <span class="hl">"1:123456789012:web:abcdef123456"</span>
+};</code>
+    </div>
+
+    <ul class="task-list">
+      <li class="task">
+        <div class="task-ico action">4️⃣</div>
+        <div class="task-body">
+          <div class="task-label">Activer Realtime Database</div>
+          <div class="task-sub">Menu gauche → "Build" → "Realtime Database" → "Create Database" → choisir europe-west1 → "Start in test mode"</div>
+        </div>
+      </li>
+      <li class="task">
+        <div class="task-ico copy">5️⃣</div>
+        <div class="task-body">
+          <div class="task-label">Copier l'URL de la base de données</div>
+          <div class="task-sub">Ressemble à : <code>https://mozart-cafe-xxxxx-default-rtdb.europe-west1.firebasedatabase.app</code></div>
+        </div>
+      </li>
+      <li class="task">
+        <div class="task-ico action">6️⃣</div>
+        <div class="task-body">
+          <div class="task-label">Obtenir la clé VAPID (pour les notifications)</div>
+          <div class="task-sub">Icône roue dentée → "Project Settings" → onglet "Cloud Messaging" → "Web Push certificates" → "Generate key pair" → Copier</div>
+        </div>
+      </li>
+      <li class="task">
+        <div class="task-ico action">7️⃣</div>
+        <div class="task-body">
+          <div class="task-label">Télécharger le fichier compte de service</div>
+          <div class="task-sub">Project Settings → onglet "Service accounts" → "Generate new private key" → Télécharger le fichier JSON</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- ═══ ÉTAPE 3 — Modifier firebase-config.js ═══ -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">Remplir le fichier de configuration</div>
+        <span class="step-badge badge-you">À faire toi-même</span>
+        <span class="step-badge badge-done" style="margin-left:6px">1 seul fichier !</span>
+      </div>
+    </div>
+
+    <div class="success-box">
+      <div>✅</div>
+      <div><strong>Bonne nouvelle :</strong> Tu n'as qu'<strong>un seul fichier</strong> à modifier : <span class="file-ref">firebase-config.js</span></div>
+    </div>
+
+    <ul class="task-list">
+      <li class="task">
+        <div class="task-ico action">1️⃣</div>
+        <div class="task-body">
+          <div class="task-label">Ouvrir le fichier <span class="file-ref">firebase-config.js</span></div>
+          <div class="task-sub">Il est dans le dossier "Menu Mozart Café". Ouvrir avec Notepad ou VS Code.</div>
+        </div>
+      </li>
+      <li class="task">
+        <div class="task-ico action">2️⃣</div>
+        <div class="task-body">
+          <div class="task-label">Remplacer chaque valeur par tes vraies clés Firebase</div>
+          <div class="task-sub">Copier-coller depuis la page Firebase ouverte à l'étape 2</div>
+        </div>
+      </li>
+    </ul>
+
+    <div class="code-box">
+      <div class="code-label">📝 firebase-config.js — Avant</div>
+<code>const FIREBASE_CONFIG = {
+  apiKey:            <span style="color:#ff8080">"VOTRE_API_KEY"</span>,
+  authDomain:        <span style="color:#ff8080">"VOTRE_PROJECT_ID.firebaseapp.com"</span>,
+  projectId:         <span style="color:#ff8080">"VOTRE_PROJECT_ID"</span>,
+  storageBucket:     <span style="color:#ff8080">"VOTRE_PROJECT_ID.firebasestorage.app"</span>,
+  messagingSenderId: <span style="color:#ff8080">"VOTRE_SENDER_ID"</span>,
+  appId:             <span style="color:#ff8080">"VOTRE_APP_ID"</span>,
+  databaseURL:       <span style="color:#ff8080">"https://VOTRE_PROJECT_ID-default-rtdb..."</span>
+};
+const VAPID_KEY = <span style="color:#ff8080">"VOTRE_VAPID_KEY"</span>;</code>
+    </div>
+
+    <div class="code-box">
+      <div class="code-label">✅ firebase-config.js — Après (exemple)</div>
+<code>const FIREBASE_CONFIG = {
+  apiKey:            <span class="hl">"AIzaSyXXXXXXXXXXXXXXXXXX"</span>,
+  authDomain:        <span class="hl">"mozart-cafe-xxxxx.firebaseapp.com"</span>,
+  projectId:         <span class="hl">"mozart-cafe-xxxxx"</span>,
+  storageBucket:     <span class="hl">"mozart-cafe-xxxxx.firebasestorage.app"</span>,
+  messagingSenderId: <span class="hl">"123456789012"</span>,
+  appId:             <span class="hl">"1:123456789012:web:abcdef"</span>,
+  databaseURL:       <span class="hl">"https://mozart-cafe-xxxxx-default-rtdb.europe-west1.firebasedatabase.app"</span>
+};
+const VAPID_KEY = <span class="hl">"BxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxVAPIDKEY"</span>;</code>
+    </div>
+
+    <ul class="task-list">
+      <li class="task">
+        <div class="task-ico action">3️⃣</div>
+        <div class="task-body">
+          <div class="task-label">Mettre à jour le fichier <span class="file-ref">manifest.json</span></div>
+          <div class="task-sub">Remplacer <code>"gcm_sender_id": "YOUR_MESSAGING_SENDER_ID"</code> par ton vrai messagingSenderId</div>
+        </div>
+      </li>
+      <li class="task">
+        <div class="task-ico action">4️⃣</div>
+        <div class="task-body">
+          <div class="task-label">Ré-uploader ces 2 fichiers modifiés sur GitHub</div>
+          <div class="task-sub">Aller sur ton repo GitHub → cliquer sur le fichier → icône crayon → coller → "Commit changes"</div>
+        </div>
+      </li>
+    </ul>
+
+    <div class="highlight-box">
+      <strong>💡 Astuce :</strong> Pour modifier un fichier sur GitHub, va sur le fichier, clique le crayon ✏️ en haut à droite, modifie, puis clique "Commit changes" en bas.
+    </div>
+  </div>
+
+  <!-- ═══ ÉTAPE 4 — Vercel ═══ -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-title">Déployer sur Vercel (hébergement gratuit)</div>
+        <span class="step-badge badge-you">À faire toi-même</span>
+      </div>
+    </div>
+
+    <a class="link-btn" href="https://vercel.com" target="_blank">▲ Ouvrir Vercel</a>
+
+    <ul class="task-list" style="margin-top:14px">
+      <li class="task">
+        <div class="task-ico action">1️⃣</div>
+        <div class="task-body">
+          <div class="task-label">S'inscrire sur vercel.com avec ton compte GitHub</div>
+          <div class="task-sub">Cliquer "Sign Up" → "Continue with GitHub"</div>
+        </div>
+      </li>
+      <li class="task">
+        <div class="task-ico action">2️⃣</div>
+        <div class="task-body">
+          <div class="task-label">Cliquer "New Project" → Importer ton repo GitHub</div>
+          <div class="task-sub">Chercher "mozart-cafe-menu" dans la liste et cliquer "Import"</div>
+        </div>
+      </li>
+      <li class="task">
+        <div class="task-ico action">3️⃣</div>
+        <div class="task-body">
+          <div class="task-label">AVANT de déployer : ajouter la variable d'environnement</div>
+          <div class="task-sub">Cliquer "Environment Variables" et ajouter :</div>
+        </div>
+      </li>
+    </ul>
+
+    <div class="code-box">
+      <div class="code-label">🔑 Variable d'environnement à ajouter sur Vercel</div>
+<code>Name  : <span class="hl">FIREBASE_SERVICE_ACCOUNT</span>
+Value : <span class="hl-blue">[Coller ICI tout le contenu du fichier JSON téléchargé à l'étape 2.7]</span>
+
+Le contenu JSON ressemble à :
+{
+  "type": "service_account",
+  "project_id": "mozart-cafe-xxxxx",
+  "private_key_id": "...",
+  "private_key": "-----BEGIN RSA PRIVATE KEY-----\n...",
+  "client_email": "firebase-adminsdk-xxxxx@mozart-cafe-xxxxx.iam.gserviceaccount.com",
+  ...
+}</code>
+    </div>
+
+    <ul class="task-list">
+      <li class="task">
+        <div class="task-ico action">4️⃣</div>
+        <div class="task-body">
+          <div class="task-label">Cliquer "Deploy" et attendre ~1 minute</div>
+          <div class="task-sub">Vercel va construire et déployer automatiquement</div>
+        </div>
+      </li>
+      <li class="task">
+        <div class="task-ico copy">5️⃣</div>
+        <div class="task-body">
+          <div class="task-label">Copier l'URL de ton site (ex: mozart-cafe-menu.vercel.app)</div>
+          <div class="task-sub">C'est l'URL que tu donneras aux clients et aux serveurs !</div>
+        </div>
+      </li>
+    </ul>
+
+    <div class="warn-box">
+      <div class="warn-ico">⚠️</div>
+      <div>Le fichier JSON du compte de service est <strong>secret</strong> — ne le partage jamais et ne le mets pas sur GitHub. Il va uniquement dans la variable Vercel.</div>
+    </div>
+  </div>
+
+  <!-- ═══ ÉTAPE 5 — App Android ═══ -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <div>
+        <div class="step-title">Installer l'app sur les téléphones des serveurs</div>
+        <span class="step-badge badge-you">À faire toi-même</span>
+      </div>
+    </div>
+
+    <ul class="task-list">
+      <li class="task">
+        <div class="task-ico action">1️⃣</div>
+        <div class="task-body">
+          <div class="task-label">Sur le téléphone Android du serveur : ouvrir Chrome</div>
+          <div class="task-sub">Aller sur <code>https://ton-site.vercel.app/app.html</code></div>
+        </div>
+      </li>
+      <li class="task">
+        <div class="task-ico action">2️⃣</div>
+        <div class="task-body">
+          <div class="task-label">Menu Chrome (3 points) → "Ajouter à l'écran d'accueil"</div>
+          <div class="task-sub">L'app s'installe comme une vraie application</div>
+        </div>
+      </li>
+      <li class="task">
+        <div class="task-ico action">3️⃣</div>
+        <div class="task-body">
+          <div class="task-label">Accepter les notifications quand demandé</div>
+          <div class="task-sub">Obligatoire pour recevoir les alertes quand l'app est fermée</div>
+        </div>
+      </li>
+    </ul>
+
+    <div class="success-box">
+      <div>✅</div>
+      <div><strong>C'est tout !</strong> Le serveur recevra une notification avec le numéro de table à chaque appel client.</div>
+    </div>
+
+    <hr class="divider" style="margin:20px 0">
+
+    <div style="font-size:0.9rem; color:rgba(232,224,208,0.6); margin-bottom:10px; font-weight:600;">🤖 Option APK (si tu veux un vrai fichier .apk à installer)</div>
+    <a class="link-btn" href="https://www.pwabuilder.com" target="_blank">📱 Ouvrir PWABuilder</a>
+    <div style="font-size:0.78rem; color:rgba(232,224,208,0.45); margin-top:8px;">Entrer l'URL de ton site Vercel → "Start" → "Android" → Télécharger le .apk</div>
+  </div>
+
+  <!-- ═══ RÉCAPITULATIF ═══ -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">✓</div>
+      <div>
+        <div class="step-title">Récapitulatif des accès importants</div>
+        <span class="step-badge badge-done">À conserver précieusement</span>
+      </div>
+    </div>
+
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="sc-title">Menu clients (URL)</div>
+        <div class="sc-val mono">ton-site.vercel.app/index.html</div>
+      </div>
+      <div class="summary-card">
+        <div class="sc-title">App serveurs (URL)</div>
+        <div class="sc-val mono">ton-site.vercel.app/app.html</div>
+      </div>
+      <div class="summary-card">
+        <div class="sc-title">Panel admin (URL)</div>
+        <div class="sc-val mono">ton-site.vercel.app/admin.html</div>
+      </div>
+      <div class="summary-card">
+        <div class="sc-title">Mot de passe admin</div>
+        <div class="sc-val mono" style="color:#e8854a">mozart2026 ← CHANGER !</div>
+      </div>
+    </div>
+
+    <div class="warn-box" style="margin-top:16px">
+      <div class="warn-ico">🔐</div>
+      <div>Pour changer le mot de passe admin : ouvrir <span class="file-ref">admin.html</span> sur GitHub, chercher <code>mozart2026</code>, le remplacer par ton mot de passe, puis "Commit changes".</div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div style="text-align:center; padding:40px 0 0; font-size:0.75rem; color:rgba(232,224,208,0.25)">
+    Guide de déploiement — Mozart Café © 2026
+  </div>
+
+</div>
+</body>
+</html>
