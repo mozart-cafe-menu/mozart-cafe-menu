@@ -1,0 +1,15 @@
+# Dépendances Node (ne jamais uploader sur GitHub)
+node_modules/
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+
+# Fichiers d'environnement sensibles
+.env
+.env.local
