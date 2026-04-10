@@ -573,9 +573,9 @@ function registerFCM() {
 
   const deviceId = getDeviceId();
 
-  // Rafraîchir le token max 1 fois par heure (pas par 24h)
+  // Rafraîchir le token max 1 fois par 6h
   const lastReg = parseInt(localStorage.getItem('mc_fcm_last_reg') || '0');
-  const TOKEN_TTL = 60 * 60 * 1000; // 1 heure
+  const TOKEN_TTL = 6 * 60 * 60 * 1000;
   if (Date.now() - lastReg < TOKEN_TTL) return;
 
   navigator.serviceWorker.ready.then(swReg => {
