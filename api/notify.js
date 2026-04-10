@@ -65,42 +65,36 @@ async function getAccessToken(sa) {
 }
 
 async function getFCMTokens(projectId, accessToken) {
-  // Essai 1: lecture sans auth (règles .read:true)
-  const url = `https://${projectId}-default-rtdb.europe-west1.firebasedatabase.app/fcm_tokens.json`;
+  const url = `https://${projectId}-default-rtdb.europe-west1.firebasedatabase.app/fcm_tokens.json?access_token=${accessToken}`;
   const res = await httpsRequest(url, { method: 'GET' });
   console.log('Firebase status:', res.status);
-  console.log('Firebase raw body:', JSON.stringify(res.body));
-
-  if (res.status !== 200 || !res.body || typeof res.body !== 'object') {
-    // Essai 2: avec access_token
-    const url2 = `https://${projectId}-default-rtdb.europe-west1.firebasedatabase.app/fcm_tokens.json?access_token=${accessToken}`;
-    const res2 = await httpsRequest(url2, { method: 'GET' });
-    console.log('Firebase auth status:', res2.status);
-    console.log('Firebase auth body:', JSON.stringify(res2.body));
-    if (!res2.body || typeof res2.body !== 'object') return [];
-    return Object.values(res2.body).filter(v => v && v.token).map(v => v.token);
-  }
-
-  return Object.values(res.body).filter(v => v && v.token).map(v => v.token);
+  if (res.status !== 200 || !res.body || typeof res.body !== 'object') return [];
+  // Retourner { deviceId, token } pour pouvoir supprimer les invalides
+  return Object.entries(res.body)
+    .filter(([, v]) => v && v.token)
+    .map(([deviceId, v]) => ({ deviceId, token: v.token }));
 }
 
-async function sendFCM(projectId, accessToken, tokens, table, lang) {
+async function deleteToken(projectId, accessToken, deviceId) {
+  const url = `https://${projectId}-default-rtdb.europe-west1.firebasedatabase.app/fcm_tokens/${deviceId}.json?access_token=${accessToken}`;
+  await httpsRequest(url, { method: 'DELETE' }).catch(() => {});
+  console.log('Deleted invalid token for:', deviceId);
+}
+
+async function sendFCM(projectId, accessToken, tokenObjs, table, lang) {
   const MESSAGES = {
     fr: `Table ${table} demande un serveur`,
     en: `Table ${table} needs a waiter`,
-    el: `Τραπέζι ${table} ζητά σερβιτόρο`,
     ar: `الطاولة ${table} تطلب نادلاً`,
-    de: `Tisch ${table} braucht einen Kellner`
   };
   const body_text = MESSAGES[lang] || MESSAGES.fr;
 
   let sent = 0;
-  for (const token of tokens) {
-    // data-only → toujours traité par le service worker (foreground + background)
-    // notification field omis intentionnellement pour éviter les doublons système
+  for (const { deviceId, token } of tokenObjs) {
     const payload = JSON.stringify({
       message: {
         token,
+        notification: { title: '🔔 Mozart Café', body: body_text },
         data: {
           table: String(table),
           lang:  lang || 'fr',
@@ -110,7 +104,7 @@ async function sendFCM(projectId, accessToken, tokens, table, lang) {
         android: { priority: 'high' },
         apns: {
           headers: { 'apns-priority': '10' },
-          payload: { aps: { contentAvailable: true } }
+          payload: { aps: { sound: 'default' } }
         }
       }
     });
@@ -128,12 +122,17 @@ async function sendFCM(projectId, accessToken, tokens, table, lang) {
         payload
       );
       console.log('FCM result:', res.status, JSON.stringify(res.body));
-      if (res.status === 200) sent++;
+      if (res.status === 200) {
+        sent++;
+      } else if (res.status === 404 || res.body?.error?.status === 'NOT_FOUND') {
+        // Token invalide → supprimer de Firebase
+        await deleteToken(projectId, accessToken, deviceId);
+      }
     } catch(e) {
       console.error('FCM error:', e.message);
     }
   }
-  return { sent, total: tokens.length };
+  return { sent, total: tokenObjs.length };
 }
 
 module.exports = async (req, res) => {
