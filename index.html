@@ -53,7 +53,7 @@
        RESET & BASE
     ================================================ */
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-    html { scroll-behavior:smooth; overflow-x:clip; }
+    html { scroll-behavior:smooth; overflow-x:hidden; }
     body {
       background:var(--bg);
       color:var(--cream);
@@ -61,7 +61,7 @@
       font-weight:300;
       line-height:1.6;
       overflow-x:hidden;
-      min-height:100vh;
+      min-height:100svh; min-height:100vh;
       transition:background 0.4s ease,color 0.4s ease;
     }
     html[dir="rtl"] body { font-family:'Noto Sans Arabic',sans-serif; }
@@ -149,15 +149,19 @@
        HERO
     ================================================ */
     #hero {
-      position:relative; height:100vh; min-height:580px;
+      position:relative;
+      height:100vh; height:100svh; /* 100svh = viewport sans barre navigateur mobile */
+      min-height:580px;
       display:flex; flex-direction:column;
       align-items:center; justify-content:center;
       overflow:hidden;
+      /* Fond pendant le chargement de la vidéo */
+      background:#09080f;
     }
     .hero-vid {
       position:absolute; inset:0;
       width:100%; height:100%;
-      object-fit:cover;
+      object-fit:cover; object-position:center;
       transform:scale(1.06);
       animation:kenBurns 8s cubic-bezier(0.4,0,0.2,1) 0.5s forwards;
       will-change:transform;
@@ -199,7 +203,7 @@
 
     /* Logo nav */
     .nav-logo-img {
-      height:4rem; width:auto;
+      height:3rem; width:auto;
       object-fit:contain;
       filter:drop-shadow(0 1px 4px rgba(0,0,0,0.3));
       vertical-align:middle;
@@ -256,12 +260,17 @@
       opacity:0; animation:heroIn 0.2s ease 0.3s forwards;
     }
     .hero-sub {
-      display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap;
+      display:flex; align-items:center; justify-content:center; gap:0; flex-wrap:wrap;
       font-family:'Cormorant',serif;
-      font-size:clamp(0.7rem,2.2vw,0.88rem);
+      font-size:clamp(0.68rem,2.2vw,0.85rem);
       color:rgba(244,234,210,0.55);
       letter-spacing:0.12em; text-transform:uppercase;
       opacity:0; animation:heroIn 0.2s ease 0.38s forwards;
+    }
+    /* Chaque groupe texte+dot reste solidaire — pas de coupure entre le texte et son séparateur */
+    .hero-sub-group {
+      display:inline-flex; align-items:center; gap:10px;
+      white-space:nowrap; padding:2px 4px;
     }
     .hero-sub-dot {
       display:inline-block; width:4px; height:4px;
@@ -801,19 +810,51 @@
     /* Safe area: iPhone notch / Android chin */
     body { padding-bottom:env(safe-area-inset-bottom, 0px); }
 
-    /* Prevent double-tap zoom on buttons */
-    button, .card, .cat-pill, .lang-btn { touch-action:manipulation; }
+    /* Prevent double-tap zoom on ALL interactive elements */
+    button, a, .card, .cat-pill, .lang-btn, .social-link, .ft-social-btn {
+      touch-action:manipulation;
+      -webkit-tap-highlight-color:transparent;
+    }
 
-    /* Active feedback on tap for all interactive elements */
+    /* Active feedback on tap */
     .cat-pill:active { transform:scale(0.95); }
     .lang-btn:active { transform:scale(0.92); }
+    .card:active { transform:scale(0.98); }
 
-    /* Improve category heading on small screens */
-    @media(max-width:380px) {
-      .cat-name { font-size:1.35rem; }
-      .nav-logo { font-size:0.95rem; }
+    /* ── Mobile portrait (téléphone) ── */
+    @media(max-width:430px) {
+      /* Hero : sous-titres sur une ligne */
+      .hero-sub { gap:6px; }
+      /* Hero : logo et boutons sociaux */
+      .hero-logo { height:clamp(8rem,38vw,12rem); }
+      .social-bar { gap:8px; }
+      .social-link { padding:8px 13px; font-size:0.74rem; }
+      /* Nav : logo + texte légèrement plus petit */
+      .nav-logo { font-size:0.92rem; }
+      .nav-logo-img { height:3.2rem; }
       .lang-btn { padding:5px 6px; font-size:0.64rem; }
-      .c-name { font-size:1.08rem; }
+      /* Cards */
+      .c-name { font-size:1.05rem; }
+      .cat-name { font-size:1.3rem; }
+      /* Bottom sheet */
+      #sheet { border-radius:24px 24px 0 0; }
+      /* Footer logo : taille réduite sur mobile */
+      .ft-logo-img { height:140px; }
+      .ft-social-bar { gap:8px; }
+      .ft-social-btn { padding:8px 14px; font-size:0.74rem; }
+      /* FABs : légèrement plus petit */
+      #fab { width:40px; height:40px; }
+      #call-fab { width:48px; height:48px; }
+      #call-fab .cfab-ico { width:20px; height:20px; }
+    }
+
+    /* ── Très petits écrans ── */
+    @media(max-width:360px) {
+      .hero-title { font-size:clamp(2.4rem,10vw,3rem); }
+      .hero-logo { height:clamp(7rem,36vw,10rem); }
+      .nav-logo-img { height:2.8rem; }
+      .ft-logo-img { height:110px; }
+      .social-link { padding:7px 10px; font-size:0.7rem; }
     }
 
     /* Tablets: 2-column card grid */
@@ -966,7 +1007,7 @@
      HERO
 ================================================ -->
 <section id="hero">
-  <video class="hero-vid" autoplay muted loop playsinline preload="auto">
+  <video class="hero-vid" id="hero-vid" autoplay muted loop playsinline preload="auto" disablepictureinpicture>
     <source src="hero.mp4" type="video/mp4">
   </video>
   <div class="hero-overlay"></div>
@@ -979,7 +1020,11 @@
     </div>
     <h1 class="hero-title">Café &amp; Restaurant</h1>
     <p class="hero-tagline" id="hero-tag">Une expérience culinaire raffinée</p>
-    <p class="hero-sub" id="hero-sub"><span id="hero-sub-1">Cafés d'exception</span><span class="hero-sub-dot"></span><span id="hero-sub-2">Plats gourmets</span><span class="hero-sub-dot"></span><span id="hero-sub-3">Ambiance élégante</span></p>
+    <p class="hero-sub" id="hero-sub">
+      <span class="hero-sub-group"><span id="hero-sub-1">Cafés d'exception</span><span class="hero-sub-dot"></span></span>
+      <span class="hero-sub-group"><span id="hero-sub-2">Plats gourmets</span><span class="hero-sub-dot"></span></span>
+      <span class="hero-sub-group"><span id="hero-sub-3">Ambiance élégante</span></span>
+    </p>
     <div class="social-bar">
       <a href="https://www.facebook.com/share/1NpzadYrN2/" class="social-link" target="_blank" rel="noopener noreferrer">
         <svg><use href="#ico-facebook"/></svg>Facebook
@@ -1688,6 +1733,14 @@ function buildSubFromNames(names) {
    INIT
 ================================================ */
 function init() {
+  // Forcer la lecture de la vidéo sur mobile (certains navigateurs bloquent autoplay)
+  const vid = document.getElementById('hero-vid');
+  if (vid) {
+    vid.play().catch(() => {
+      // Si bloqué, réessayer sur le premier geste utilisateur
+      document.addEventListener('touchstart', () => vid.play().catch(()=>{}), { once: true });
+    });
+  }
   // Initialiser l'UI de base immédiatement
   buildLangBtns();
   setupPreloader();
@@ -2068,7 +2121,8 @@ function setupStickyNav() {
 
   function update() {
     const heroH = hero.offsetHeight;
-    if (window.scrollY >= heroH) {
+    // heroH must be > 0 (layout computed) — prevents false-positive on init
+    if (heroH > 0 && window.scrollY >= heroH) {
       const navH = nav.getBoundingClientRect().height;
       nav.classList.add('nav-fixed');
       spacer.style.height = navH + 'px';
@@ -2080,7 +2134,8 @@ function setupStickyNav() {
 
   window.addEventListener('scroll', update, { passive: true });
   window.addEventListener('resize', update, { passive: true });
-  update();
+  // Attendre que le layout soit calculé avant le premier appel
+  requestAnimationFrame(() => requestAnimationFrame(update));
 }
 
 /* ================================================
