@@ -174,46 +174,76 @@
     /* ── HERO IMAGE SECTION ── */
     .hero-img-card {
       background:var(--bg2); border:1px solid var(--border);
-      border-radius:16px; padding:16px; display:flex; flex-direction:column; gap:14px;
+      border-radius:16px; padding:16px; display:flex; flex-direction:column; gap:20px;
     }
-    .hero-preview-wrap {
-      position:relative; width:100%;
-      /* Ratio 9:19.5 ≈ écran mobile portrait */
-      aspect-ratio:9/19.5; max-height:340px;
-      border-radius:12px; overflow:hidden;
-      background:var(--bg3); border:1px dashed var(--border);
-      display:flex; align-items:center; justify-content:center;
+
+    /* ── Mockup téléphone ── */
+    .phone-mockup-wrap { display:flex; justify-content:center; }
+    .phone-mockup {
+      position:relative; width:200px; flex-shrink:0;
+      background:#111; border-radius:34px;
+      border:3px solid #2a2a2a;
+      box-shadow:0 0 0 1px #000, 0 20px 60px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,255,255,0.05);
+      overflow:hidden;
     }
-    @media(min-width:600px) {
-      /* Sur grand écran admin, montrer en format tablette paysage */
-      .hero-preview-wrap { aspect-ratio:4/3; max-height:280px; }
+    .phone-notch {
+      position:absolute; top:0; left:50%; transform:translateX(-50%);
+      width:56px; height:16px; background:#111; border-radius:0 0 12px 12px; z-index:10;
     }
+    .phone-screen {
+      width:100%; aspect-ratio:9/19.5; overflow:hidden; position:relative;
+      background:radial-gradient(ellipse at 60% 40%, #2a1208 0%, #160d08 45%, #0f0906 100%);
+    }
+    .phone-hero-bg {
+      position:absolute; inset:0;
+      background-size:cover; background-position:42% 30%;
+      opacity:0; transition:opacity 1s ease;
+    }
+    .phone-hero-bg.flow {
+      opacity:1;
+      animation:phoneBgFlow 24s ease-in-out infinite;
+    }
+    @keyframes phoneBgFlow {
+      0%,100% { transform:scale(1.10) translate(0%,0%); }
+      50%      { transform:scale(1.13) translate(-1%,-0.8%); }
+    }
+    .phone-overlay {
+      position:absolute; inset:0; z-index:1;
+      background:linear-gradient(to bottom,
+        rgba(10,6,4,0.25) 0%, rgba(10,6,4,0.50) 38%,
+        rgba(10,6,4,0.85) 68%, rgba(10,6,4,1) 100%);
+    }
+    .phone-content {
+      position:absolute; inset:0; z-index:2;
+      display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
+      padding:0 10px 14px;
+    }
+    .phone-logo {
+      width:52%; filter:grayscale(1) brightness(6) drop-shadow(0 2px 8px rgba(0,0,0,0.8));
+      margin-bottom:5px;
+    }
+    .phone-tagline {
+      font-family:'Cormorant',serif; font-size:0.5rem; font-weight:300;
+      color:rgba(245,232,212,0.65); letter-spacing:0.2em; text-transform:uppercase;
+      margin-bottom:5px; text-align:center;
+    }
+    .phone-menu-lbl {
+      font-size:0.4rem; font-weight:500; letter-spacing:0.18em; text-transform:uppercase;
+      color:rgba(245,232,212,0.5); border:1px solid rgba(212,149,107,0.3);
+      border-radius:20px; padding:3px 10px; margin-bottom:7px;
+    }
+    .phone-socials { display:flex; gap:4px; }
+    .phone-social-btn {
+      font-size:0.36rem; padding:3px 7px; border-radius:8px;
+      background:rgba(0,0,0,0.35); border:1px solid rgba(212,149,107,0.28);
+      color:rgba(245,232,212,0.65);
+    }
+    /* Contrôles */
     .hero-preview-empty {
       display:flex; flex-direction:column; align-items:center; gap:10px;
-      color:var(--muted); font-size:0.82rem; letter-spacing:0.04em;
+      color:var(--muted); font-size:0.82rem; letter-spacing:0.04em; padding:10px 0;
     }
-    .hero-preview-img {
-      width:100%; height:100%; object-fit:cover;
-      /* Même cadrage que le vrai hero mobile */
-      object-position:42% 30%;
-      display:block;
-    }
-    @keyframes flowPreview {
-      0%,100% { transform:scale(1.07) translate(0%,   0%);   }
-      50%      { transform:scale(1.10) translate(-1%, -0.8%); }
-    }
-    .flow-preview { animation:flowPreview 12s ease-in-out infinite; }
-    .hero-del-btn {
-      position:absolute; top:8px; right:8px;
-      width:28px; height:28px; border-radius:50%;
-      background:rgba(0,0,0,0.55); border:1px solid rgba(255,255,255,0.15);
-      color:#fff; display:flex; align-items:center; justify-content:center;
-      cursor:pointer; transition:background 0.2s;
-    }
-    .hero-del-btn:hover { background:rgba(200,60,60,0.75); }
-    .hero-controls {
-      display:flex; align-items:center; gap:8px; flex-wrap:wrap;
-    }
+    .hero-controls { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
     .hero-upload-btn {
       display:flex; align-items:center; gap:6px; cursor:pointer;
       background:var(--gold); color:#0c0a08;
@@ -224,24 +254,99 @@
     .hero-upload-btn:hover { opacity:0.85; }
     .hero-or { color:var(--muted); font-size:0.78rem; flex-shrink:0; }
     .hero-url-input {
-      flex:1; min-width:160px;
-      background:var(--bg3); border:1px solid var(--border);
-      border-radius:9px; padding:8px 12px;
-      color:var(--cream); font-size:0.82rem; font-family:inherit;
-      outline:none; transition:border-color 0.2s;
+      flex:1; min-width:160px; background:var(--bg3); border:1px solid var(--border);
+      border-radius:9px; padding:8px 12px; color:var(--cream);
+      font-size:0.82rem; font-family:inherit; outline:none; transition:border-color 0.2s;
     }
     .hero-url-input:focus { border-color:var(--gold); }
     .hero-url-btn {
-      background:none; border:1px solid var(--border);
-      color:var(--gold); font-size:0.8rem; padding:8px 14px;
-      border-radius:9px; cursor:pointer; transition:border-color 0.2s, background 0.2s;
-      white-space:nowrap;
+      background:none; border:1px solid var(--border); color:var(--gold);
+      font-size:0.8rem; padding:8px 14px; border-radius:9px; cursor:pointer;
+      transition:border-color 0.2s, background 0.2s; white-space:nowrap;
     }
     .hero-url-btn:hover { border-color:var(--gold); background:rgba(212,149,107,0.08); }
+    .hero-del-btn {
+      display:flex; align-items:center; gap:5px;
+      background:rgba(224,82,82,0.08); border:1px solid rgba(224,82,82,0.25);
+      color:var(--red); font-size:0.78rem; padding:7px 12px; border-radius:9px;
+      cursor:pointer; transition:background 0.2s;
+    }
+    .hero-del-btn:hover { background:rgba(224,82,82,0.15); }
     .hero-hint { font-size:0.72rem; color:var(--muted); letter-spacing:0.03em; }
     html.light .hero-img-card { background:var(--bg3); }
     html.light .hero-url-input { color:var(--cream); background:rgba(255,255,255,0.7); }
-    html.light .hero-preview-wrap { background:rgba(0,0,0,0.04); }
+    html.light .phone-mockup { border-color:#bbb; box-shadow:0 0 0 1px #aaa, 0 16px 40px rgba(0,0,0,0.15); }
+    html.light .phone-notch { background:#ddd; }
+
+    /* ── FAB NOTIFICATION ── */
+    #fab-notif {
+      position:fixed; bottom:100px; right:20px;
+      width:52px; height:52px; border-radius:50%;
+      background:linear-gradient(135deg,#5a9e4a,#7ebd6a);
+      color:#fff; display:flex; align-items:center; justify-content:center;
+      box-shadow:0 4px 18px rgba(126,189,106,0.5), 0 2px 8px rgba(0,0,0,0.3);
+      z-index:200; cursor:pointer;
+      transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s;
+    }
+    #fab-notif:hover { transform:translateY(-3px) scale(1.06); box-shadow:0 8px 28px rgba(126,189,106,0.65); }
+    #fab-notif:active { transform:scale(0.93); }
+    #fab-notif svg { width:22px; height:22px; }
+    #fab-notif::before {
+      content:'Envoyer une notification';
+      position:absolute; right:60px; top:50%; transform:translateY(-50%);
+      background:var(--bg3); border:1px solid var(--bord2); border-radius:8px;
+      padding:6px 12px; font-size:0.76rem; color:var(--cream); white-space:nowrap;
+      opacity:0; pointer-events:none; transition:opacity 0.2s;
+    }
+    #fab-notif:hover::before { opacity:1; }
+
+    /* ── MODAL NOTIFICATION ── */
+    #notif-modal {
+      position:fixed; inset:0; background:rgba(0,0,0,0.65);
+      display:flex; align-items:center; justify-content:center;
+      z-index:500; padding:20px; opacity:0; pointer-events:none;
+      transition:opacity 0.25s ease;
+    }
+    #notif-modal.on { opacity:1; pointer-events:auto; }
+    .notif-box {
+      background:var(--bg3); border:1px solid var(--bord2); border-radius:22px;
+      padding:28px 24px; width:100%; max-width:420px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.6);
+      transform:translateY(20px); transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    #notif-modal.on .notif-box { transform:translateY(0); }
+    .notif-title {
+      font-family:'Cormorant',serif; font-size:1.3rem; font-weight:600;
+      color:var(--cream); margin-bottom:6px;
+    }
+    .notif-sub { font-size:0.78rem; color:var(--muted); margin-bottom:18px; }
+    .notif-textarea {
+      width:100%; min-height:90px; resize:vertical;
+      background:var(--bg2); border:1px solid var(--border); border-radius:12px;
+      padding:12px 14px; color:var(--cream); font-size:0.9rem; font-family:inherit;
+      outline:none; transition:border-color 0.2s; line-height:1.55;
+    }
+    .notif-textarea:focus { border-color:var(--gold); }
+    .notif-textarea::placeholder { color:var(--muted); }
+    .notif-actions { display:flex; gap:10px; margin-top:14px; justify-content:flex-end; }
+    .notif-cancel {
+      padding:10px 18px; border-radius:12px; font-size:0.85rem;
+      border:1px solid var(--border); color:var(--muted);
+      cursor:pointer; transition:border-color 0.2s, color 0.2s;
+    }
+    .notif-cancel:hover { border-color:var(--bord2); color:var(--cream); }
+    .notif-send {
+      padding:10px 22px; border-radius:12px; font-size:0.85rem; font-weight:500;
+      background:linear-gradient(135deg,#5a9e4a,#7ebd6a); color:#fff;
+      cursor:pointer; transition:opacity 0.2s, transform 0.15s;
+      display:flex; align-items:center; gap:7px;
+    }
+    .notif-send:hover { opacity:0.9; }
+    .notif-send:active { transform:scale(0.96); }
+    .notif-send svg { width:15px; height:15px; }
+    .notif-send:disabled { opacity:0.5; cursor:not-allowed; }
+    html.light .notif-box { background:var(--bg3); }
+    html.light .notif-textarea { background:rgba(255,255,255,0.7); color:var(--cream); }
 
     /* ── SECTION ── */
     .adm-section { margin-bottom:32px; }
@@ -633,16 +738,24 @@
     <div class="sec-hd">Photo d'accueil <span class="sec-badge">Hero</span></div>
     <div class="hero-img-card" id="hero-img-card">
 
-      <!-- Aperçu -->
-      <div class="hero-preview-wrap" id="hero-preview-wrap">
-        <div class="hero-preview-empty" id="hero-preview-empty">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-          <span>Aucune photo</span>
+      <!-- Mockup téléphone -->
+      <div class="phone-mockup-wrap">
+        <div class="phone-mockup">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="phone-hero-bg" id="phone-hero-bg"></div>
+            <div class="phone-overlay"></div>
+            <div class="phone-content">
+              <img src="logo.png" class="phone-logo" alt="Mozart">
+              <div class="phone-tagline">Une expérience culinaire raffinée</div>
+              <div class="phone-menu-lbl">MENU</div>
+              <div class="phone-socials">
+                <span class="phone-social-btn">f Facebook</span>
+                <span class="phone-social-btn">◎ Instagram</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <img class="hero-preview-img flow-preview" id="hero-preview-img" src="" alt="" style="display:none">
-        <button class="hero-del-btn" id="hero-del-btn" style="display:none" title="Supprimer">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
       </div>
 
       <!-- Contrôles -->
@@ -655,8 +768,12 @@
         <span class="hero-or">ou</span>
         <input type="url" class="hero-url-input" id="hero-url-input" placeholder="Coller une URL d'image…">
         <button class="hero-url-btn" id="hero-url-btn">Appliquer</button>
+        <button class="hero-del-btn" id="hero-del-btn" style="display:none">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Supprimer
+        </button>
       </div>
-      <div class="hero-hint">Photo recommandée : format paysage, min. 1200×800 px</div>
+      <div class="hero-hint">Photo recommandée : format portrait, min. 900×1600 px</div>
     </div>
   </div>
 
@@ -706,6 +823,31 @@
     <polyline points="7,3 7,8 15,8"/>
   </svg>
 </button>
+
+<!-- FAB Notification serveurs -->
+<button id="fab-notif" style="display:none" title="Envoyer une notification">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+    <path d="M13.73 21a2 2 0 01-3.46 0"/>
+    <line x1="12" y1="3" x2="12" y2="1"/>
+  </svg>
+</button>
+
+<!-- Modal notification -->
+<div id="notif-modal">
+  <div class="notif-box">
+    <div class="notif-title">Notifier les serveurs</div>
+    <div class="notif-sub">Le message sera envoyé en notification push à tous les appareils connectés.</div>
+    <textarea class="notif-textarea" id="notif-textarea" placeholder="Ex: Nouveau plat du jour disponible — Burger Truffe Noire…" maxlength="200"></textarea>
+    <div class="notif-actions">
+      <button class="notif-cancel" id="notif-cancel">Annuler</button>
+      <button class="notif-send" id="notif-send">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Envoyer
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- Toast -->
 <div id="toast">✓ Modifications sauvegardées avec succès</div>
@@ -941,6 +1083,7 @@ function showAdmin() {
   document.getElementById('adm-header').style.display = '';
   document.getElementById('adm-wrap').style.display   = '';
   document.getElementById('fab-save').style.display   = '';
+  document.getElementById('fab-notif').style.display  = '';
   // Sync dropdown avec la langue mémorisée
   const sel = document.getElementById('global-src-lang');
   if (sel) sel.value = currentLang;
@@ -950,6 +1093,7 @@ function showAdmin() {
   });
   // loadData() est async — renderAll() et applyAdminUI() sont appelés à l'intérieur
   loadData();
+  setupNotifFab();
 }
 
 /* ═══════════════════════════════════════════
@@ -1051,29 +1195,26 @@ function renderAll() {
 
 /* ─── SECTION HERO IMAGE ─── */
 function renderHeroImageSection() {
-  const previewImg   = document.getElementById('hero-preview-img');
-  const previewEmpty = document.getElementById('hero-preview-empty');
-  const delBtn       = document.getElementById('hero-del-btn');
-  const fileInput    = document.getElementById('hero-file-input');
-  const urlInput     = document.getElementById('hero-url-input');
-  const urlBtn       = document.getElementById('hero-url-btn');
+  const delBtn    = document.getElementById('hero-del-btn');
+  const fileInput = document.getElementById('hero-file-input');
+  const urlInput  = document.getElementById('hero-url-input');
+  const urlBtn    = document.getElementById('hero-url-btn');
+  const phoneBg   = document.getElementById('phone-hero-bg');
 
-  function setPreview(src) {
+  function setPhoneBg(src) {
     if (src) {
-      previewImg.src = src;
-      previewImg.style.display = 'block';
-      previewEmpty.style.display = 'none';
+      phoneBg.style.backgroundImage = `url('${src}')`;
+      requestAnimationFrame(() => requestAnimationFrame(() => phoneBg.classList.add('flow')));
       delBtn.style.display = 'flex';
     } else {
-      previewImg.src = '';
-      previewImg.style.display = 'none';
-      previewEmpty.style.display = 'flex';
+      phoneBg.style.backgroundImage = '';
+      phoneBg.classList.remove('flow');
       delBtn.style.display = 'none';
     }
   }
 
-  // Afficher l'image actuelle
-  setPreview(adminData.heroImage || '');
+  // Afficher l'image actuelle dans le mockup
+  setPhoneBg(adminData.heroImage || '');
 
   // Upload fichier → compression canvas → base64
   fileInput.addEventListener('change', () => {
@@ -1091,7 +1232,7 @@ function renderHeroImageSection() {
         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
         const compressed = canvas.toDataURL('image/jpeg', 0.82);
         adminData.heroImage = compressed;
-        setPreview(compressed);
+        setPhoneBg(compressed);
         markUnsaved();
       };
       img.src = e.target.result;
@@ -1105,7 +1246,7 @@ function renderHeroImageSection() {
     const url = urlInput.value.trim();
     if (!url) return;
     adminData.heroImage = url;
-    setPreview(url);
+    setPhoneBg(url);
     urlInput.value = '';
     markUnsaved();
   });
@@ -1114,9 +1255,65 @@ function renderHeroImageSection() {
   // Supprimer
   delBtn.addEventListener('click', () => {
     adminData.heroImage = '';
-    setPreview('');
+    setPhoneBg('');
     markUnsaved();
   });
+}
+
+/* ─── FAB NOTIFICATION SERVEURS ─── */
+function setupNotifFab() {
+  const fab      = document.getElementById('fab-notif');
+  const modal    = document.getElementById('notif-modal');
+  const textarea = document.getElementById('notif-textarea');
+  const sendBtn  = document.getElementById('notif-send');
+  const cancelBtn= document.getElementById('notif-cancel');
+
+  fab.addEventListener('click', () => {
+    textarea.value = '';
+    modal.classList.add('on');
+    setTimeout(() => textarea.focus(), 300);
+  });
+
+  function closeModal() { modal.classList.remove('on'); }
+  cancelBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+  sendBtn.addEventListener('click', async () => {
+    const msg = textarea.value.trim();
+    if (!msg) { textarea.focus(); return; }
+
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="15" height="15"><circle cx="12" cy="12" r="10"/></svg> Envoi…';
+
+    try {
+      const res = await fetch('/api/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ table: 'info', message: msg, lang: currentLang || 'fr' })
+      });
+      const data = await res.json();
+
+      if (data.sent > 0) {
+        closeModal();
+        showToastMsg('✓ Notification envoyée à ' + data.sent + ' appareil(s)');
+      } else {
+        showToastMsg('⚠ Aucun appareil connecté', true);
+      }
+    } catch(e) {
+      showToastMsg('✗ Erreur d\'envoi', true);
+    }
+
+    sendBtn.disabled = false;
+    sendBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="15" height="15"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Envoyer';
+  });
+}
+
+function showToastMsg(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.style.borderColor = isError ? 'rgba(224,82,82,0.4)' : '';
+  t.style.color       = isError ? '#e05252' : '';
+  showToast(msg);
+  if (!isError) { t.style.borderColor = ''; t.style.color = ''; }
 }
 
 /* ─── SECTION INFO ─── */
