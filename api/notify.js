@@ -81,6 +81,7 @@ async function getFCMTokens(projectId, accessToken) {
     if (r2.status === 200 && r2.body && typeof r2.body === 'object') body = r2.body;
   }
 
+  console.log('Firebase body:', JSON.stringify(body));
   if (!body) return [];
   return Object.entries(body)
     .filter(([, v]) => v && v.token)
