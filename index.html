@@ -2243,25 +2243,25 @@ function setupFAB() {
   const fab     = document.getElementById('fab');
   const callFab = document.getElementById('call-fab');
 
-  // Call FAB : apparaît dès que le premier produit entre dans le viewport
-  const firstCardObs = new IntersectionObserver(entries => {
-    if (entries[0].isIntersecting) {
-      callFab.classList.add('show');
-      firstCardObs.disconnect();
-    }
-  }, { threshold: 0.15 });
-
-  function observeFirstCard() {
+  function checkCallFab() {
+    if (callFab.classList.contains('show')) return;
     const first = document.querySelector('.card');
-    if (first) firstCardObs.observe(first);
+    if (!first) return;
+    const rect = first.getBoundingClientRect();
+    // Apparaît dès que le haut de la première card est dans l'écran
+    if (rect.top < window.innerHeight) callFab.classList.add('show');
   }
-  // Les cards peuvent ne pas exister encore (chargement Firebase) → réessayer
-  observeFirstCard();
-  document.addEventListener('menuRendered', observeFirstCard, { once: true });
 
+  // Vérifier au scroll
   window.addEventListener('scroll', () => {
     fab.classList.toggle('show', window.scrollY > 400);
+    checkCallFab();
   }, { passive: true });
+
+  // Vérifier après chaque rendu du menu (layout terminé au prochain frame)
+  document.addEventListener('menuRendered', () => {
+    requestAnimationFrame(() => requestAnimationFrame(checkCallFab));
+  });
 
   fab.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 }
