@@ -30,21 +30,51 @@
       --bg:     #f0e4d2;
       --bg2:    #e5d4bc;
       --bg3:    #fdf6ed;
-      --card:   rgba(255,255,255,0.88);
+      --card:   rgba(255,255,255,0.92);
       --gold:   #8b5e3c;
       --gold-l: #b07a52;
       --gold-d: #6b4428;
       --cream:  #1c1007;
-      --muted:  rgba(28,16,7,0.50);
-      --border: rgba(139,94,60,0.18);
-      --bord2:  rgba(139,94,60,0.38);
-      --border2: rgba(139,94,60,0.38);
+      --muted:  rgba(28,16,7,0.72);
+      --border: rgba(139,94,60,0.22);
+      --bord2:  rgba(139,94,60,0.42);
+      --border2: rgba(139,94,60,0.42);
     }
     html.light body { background:var(--bg); color:var(--cream); }
-    html.light .adm-header { background:rgba(240,228,210,0.97) !important; }
-    html.light .ico-picker-popup { background:var(--bg3); }
+    html.light .adm-header { background:rgba(240,228,210,0.98) !important; }
+    /* Textes et inputs */
+    html.light .inline-input,
+    html.light .info-input,
+    html.light .login-input { color:var(--cream); background:transparent; }
+    html.light .inline-input::placeholder,
+    html.light .info-input::placeholder { color:rgba(28,16,7,0.40); }
+    html.light .ico-pb-label { color:var(--cream) !important; }
+    html.light .ico-picker-btn { background:var(--bg3); border-color:var(--bord2); color:var(--cream); }
+    /* Popups et cards */
+    html.light .ico-picker-popup {
+      background:var(--bg3);
+      box-shadow:0 8px 32px rgba(0,0,0,0.15), 0 0 0 1px rgba(139,94,60,0.12);
+    }
+    html.light .ico-picker-item { color:var(--cream); }
+    html.light .ico-picker-item svg { color:var(--cream); }
+    html.light .ico-picker-item.selected { background:rgba(139,94,60,0.12); border-color:var(--gold); }
+    html.light .ico-picker-none { color:var(--red); background:rgba(224,82,82,0.06); border-color:rgba(224,82,82,0.25); }
     html.light .login-box { background:var(--bg3); }
-    html.light .adm-section { background:var(--bg2); }
+    html.light .cat-row { background:rgba(255,255,255,0.95); }
+    /* Produit cards */
+    html.light .prod-card { background:rgba(255,255,255,0.95); }
+    html.light .prod-name,
+    html.light .prod-price,
+    html.light .prod-desc-input,
+    html.light .prod-full-input { color:var(--cream); }
+    html.light .prod-name::placeholder,
+    html.light .prod-price::placeholder,
+    html.light .prod-desc-input::placeholder,
+    html.light .prod-full-input::placeholder { color:rgba(28,16,7,0.38); }
+    /* Toast */
+    html.light #toast { background:var(--bg3); color:#2a7a2a; border-color:rgba(80,160,80,0.4); }
+    /* Save FAB */
+    html.light .save-fab { box-shadow:0 4px 20px rgba(139,94,60,0.35); }
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     html { overflow-x:hidden; }
     body { background:var(--bg); color:var(--cream); font-family:'Outfit',sans-serif; font-weight:300; min-height:100vh; }
