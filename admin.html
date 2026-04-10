@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="el">
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,17 +9,18 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant:wght@300;400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:     #0c0a08;
-      --bg2:    #111009;
-      --bg3:    #181612;
-      --card:   rgba(255,255,255,0.04);
-      --gold:   #c8a44e;
-      --gold-l: #e2c278;
-      --gold-d: #9a7a35;
-      --cream:  #f4ead2;
-      --muted:  rgba(244,234,210,0.50);
-      --border: rgba(200,164,78,0.16);
-      --bord2:  rgba(200,164,78,0.34);
+      --bg:     #0f0906;
+      --bg2:    #160d08;
+      --bg3:    #1e1009;
+      --card:   rgba(255,255,255,0.05);
+      --gold:   #d4956b;
+      --gold-l: #e8b48a;
+      --gold-d: #a86840;
+      --cream:  #f5e8d4;
+      --muted:  rgba(245,232,212,0.50);
+      --border: rgba(212,149,107,0.18);
+      --bord2:  rgba(212,149,107,0.36);
+      --border2: rgba(212,149,107,0.36);
       --green:  #7ebd6a;
       --red:    #e05252;
       --tr:     0.25s cubic-bezier(0.4,0,0.2,1);
@@ -64,7 +65,7 @@
 
     /* ── HEADER ── */
     .adm-header {
-      background:rgba(12,10,8,0.95); backdrop-filter:blur(20px);
+      background:rgba(15,9,6,0.96); backdrop-filter:blur(20px);
       border-bottom:1px solid var(--border);
       padding:8px 16px; position:sticky; top:0; z-index:100;
       display:flex; align-items:center; justify-content:space-between; gap:8px;
@@ -184,9 +185,9 @@
 
     .ico-picker-popup {
       display:none; position:absolute; z-index:500;
-      background:var(--card); border:1px solid var(--border2);
+      background:var(--bg3); border:1px solid var(--bord2);
       border-radius:14px; padding:12px;
-      box-shadow:0 8px 32px rgba(0,0,0,0.5);
+      box-shadow:0 12px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(212,149,107,0.08);
       width:260px;
     }
     .ico-picker-popup.open { display:block; }
