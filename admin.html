@@ -26,6 +26,25 @@
       --tr:     0.25s cubic-bezier(0.4,0,0.2,1);
       --r:      16px;
     }
+    html.light {
+      --bg:     #f0e4d2;
+      --bg2:    #e5d4bc;
+      --bg3:    #fdf6ed;
+      --card:   rgba(255,255,255,0.88);
+      --gold:   #8b5e3c;
+      --gold-l: #b07a52;
+      --gold-d: #6b4428;
+      --cream:  #1c1007;
+      --muted:  rgba(28,16,7,0.50);
+      --border: rgba(139,94,60,0.18);
+      --bord2:  rgba(139,94,60,0.38);
+      --border2: rgba(139,94,60,0.38);
+    }
+    html.light body { background:var(--bg); color:var(--cream); }
+    html.light .adm-header { background:rgba(240,228,210,0.97) !important; }
+    html.light .ico-picker-popup { background:var(--bg3); }
+    html.light .login-box { background:var(--bg3); }
+    html.light .adm-section { background:var(--bg2); }
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     html { overflow-x:hidden; }
     body { background:var(--bg); color:var(--cream); font-family:'Outfit',sans-serif; font-weight:300; min-height:100vh; }
@@ -90,6 +109,14 @@
       min-height:34px;
     }
     .btn-logout:hover { opacity:1; border-color:var(--red); }
+    .btn-theme {
+      width:34px; height:34px;
+      border:1px solid var(--border); border-radius:8px;
+      color:var(--muted); display:flex; align-items:center; justify-content:center;
+      transition:var(--tr); flex-shrink:0;
+    }
+    .btn-theme:hover { border-color:var(--gold); color:var(--gold); }
+    .btn-theme svg { width:15px; height:15px; pointer-events:none; }
     @media(max-width:600px) {
       .adm-sub { display:none; }
       .btn-preview { padding:7px 8px; font-size:0.9rem; }
@@ -484,6 +511,11 @@
     </button>
   </div>
   <div class="adm-right">
+    <button class="btn-theme" id="adm-theme-btn" title="Changer le thème">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <path id="adm-theme-ico-path" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+      </svg>
+    </button>
     <button class="btn-preview" onclick="window.open('index.html','_blank')">👁 Voir le menu</button>
     <button class="btn-logout" id="logout-btn">Déconnexion</button>
   </div>
@@ -733,6 +765,23 @@ function checkLogin() {
   const saved = sessionStorage.getItem('mc_admin_auth');
   if (saved === 'ok') showAdmin();
 }
+
+/* ── THÈME ── */
+(function() {
+  const saved = localStorage.getItem('mc_admin_theme');
+  if (saved === 'light') document.documentElement.classList.add('light');
+})();
+document.getElementById('adm-theme-btn').addEventListener('click', () => {
+  const isLight = document.documentElement.classList.toggle('light');
+  localStorage.setItem('mc_admin_theme', isLight ? 'light' : 'dark');
+  const path = document.getElementById('adm-theme-ico-path');
+  if (isLight) {
+    path.setAttribute('d','M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42');
+    path.setAttribute('stroke-linecap','round');
+  } else {
+    path.setAttribute('d','M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z');
+  }
+});
 
 document.getElementById('login-btn').addEventListener('click', doLogin);
 document.getElementById('pwd-input').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
@@ -1059,22 +1108,23 @@ function renderCatsSection() {
     row.dataset.ci = ci;
 
     const currentIco = cat.ico || '';
-    const icoLabel = currentIco ? getIconLabel(currentIco) : '— Aucune —';
-    const icoSvg   = currentIco
-      ? `<svg><use href="#${currentIco}"/></svg>`
-      : `<svg viewBox="0 0 24 24" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="1.8"/></svg>`;
+    // Nom propre sans emoji (ex: "☕ Boissons Chaudes" → "Boissons Chaudes")
+    const icoLabelFull = currentIco ? getIconLabel(currentIco) : '';
+    const parts = icoLabelFull.split(' ');
+    const icoNameClean = currentIco
+      ? (parts.length > 1 ? parts.slice(1).join(' ') : icoLabelFull)
+      : '— Aucune —';
 
     row.innerHTML = `
       <div class="cat-row-ico" id="cat-ico-preview-${ci}">
-        ${currentIco ? `<svg width="18" height="18"><use href="#${currentIco}"/></svg>` : ''}
+        ${currentIco ? `<svg width="18" height="18"><use href="#${currentIco}"/></svg>` : '<span style="width:18px;height:18px;display:inline-block;opacity:0.3">—</span>'}
       </div>
       <input class="inline-input" value="${esc(cat.names?.[currentLang] || cat.names?.fr || '')}"
         placeholder="Nom (${currentLang.toUpperCase()})"
         data-ci="${ci}">
       <div style="position:relative">
         <button class="ico-picker-btn" data-ci="${ci}" title="Changer l'icône">
-          ${icoSvg}
-          <span class="ico-pb-label">${icoLabel}</span>
+          <span class="ico-pb-label">${currentIco ? icoNameClean : '— Aucune —'}</span>
           <span>▾</span>
         </button>
         <div class="ico-picker-popup" id="ico-popup-${ci}">
