@@ -65,12 +65,24 @@ async function getAccessToken(sa) {
 }
 
 async function getFCMTokens(projectId, accessToken) {
-  const url = `https://${projectId}-default-rtdb.europe-west1.firebasedatabase.app/fcm_tokens.json?access_token=${accessToken}`;
-  const res = await httpsRequest(url, { method: 'GET' });
-  console.log('Firebase status:', res.status);
-  if (res.status !== 200 || !res.body || typeof res.body !== 'object') return [];
-  // Retourner { deviceId, token } pour pouvoir supprimer les invalides
-  return Object.entries(res.body)
+  // Essai 1 : sans auth (règles .read:true)
+  const urlPublic = `https://${projectId}-default-rtdb.europe-west1.firebasedatabase.app/fcm_tokens.json`;
+  const r1 = await httpsRequest(urlPublic, { method: 'GET' });
+  console.log('Firebase public status:', r1.status);
+
+  let body = null;
+  if (r1.status === 200 && r1.body && typeof r1.body === 'object') {
+    body = r1.body;
+  } else {
+    // Essai 2 : avec access_token
+    const urlAuth = urlPublic + '?access_token=' + accessToken;
+    const r2 = await httpsRequest(urlAuth, { method: 'GET' });
+    console.log('Firebase auth status:', r2.status);
+    if (r2.status === 200 && r2.body && typeof r2.body === 'object') body = r2.body;
+  }
+
+  if (!body) return [];
+  return Object.entries(body)
     .filter(([, v]) => v && v.token)
     .map(([deviceId, v]) => ({ deviceId, token: v.token }));
 }
