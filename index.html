@@ -174,10 +174,11 @@
       position:absolute; inset:0;
       width:100%; height:100%;
       object-fit:cover; object-position:center;
-      /* Pas de filter CSS — trop coûteux sur mobile (saccades).
-         L'assombrissement est géré par .hero-overlay ci-dessous. */
       transform:translateZ(0);
+      will-change:transform;
+      opacity:0; transition:opacity 0.8s ease;
     }
+    .hero-vid.ready { opacity:1; }
 
     /* Logo dans le hero */
     .hero-logo {
@@ -220,6 +221,47 @@
     .social-link:hover { border-color:var(--gold); color:var(--gold); background:rgba(201,168,76,0.08); }
     .social-link svg { width:16px; height:16px; flex-shrink:0; }
     html.light .social-link { color:var(--cream); }
+
+    /* ── Light mode : flow effect — boutons prix + sociaux ── */
+    @keyframes lightFlow {
+      0%,100% { background-position: 0% 50%; }
+      50%      { background-position: 100% 50%; }
+    }
+    html.light .c-price {
+      background: linear-gradient(135deg, #d4a47a, #a86840, #cc9060, #b87448);
+      background-size: 250% 250%;
+      animation: lightFlow 5s ease infinite;
+      color: #fdf6ed;
+      box-shadow: 0 2px 12px rgba(168,104,64,0.25);
+    }
+    html.light .social-link {
+      background: linear-gradient(135deg, #d4a47a, #a86840, #cc9060, #b87448);
+      background-size: 250% 250%;
+      animation: lightFlow 5s ease infinite;
+      border-color: transparent;
+      color: #fdf6ed;
+      box-shadow: 0 3px 16px rgba(168,104,64,0.28);
+      backdrop-filter: none;
+    }
+    html.light .social-link:hover {
+      box-shadow: 0 5px 22px rgba(168,104,64,0.45);
+      color: #fff;
+      border-color: transparent;
+      background: linear-gradient(135deg, #d4a47a, #a86840, #cc9060, #b87448);
+    }
+    html.light .ft-social-btn {
+      background: linear-gradient(135deg, #d4a47a, #a86840, #cc9060, #b87448);
+      background-size: 250% 250%;
+      animation: lightFlow 5s ease infinite;
+      border-color: transparent;
+      color: #fdf6ed;
+      box-shadow: 0 3px 14px rgba(168,104,64,0.25);
+    }
+    html.light .ft-social-btn:hover {
+      box-shadow: 0 5px 22px rgba(168,104,64,0.42);
+      color: #fff;
+      background: linear-gradient(135deg, #d4a47a, #a86840, #cc9060, #b87448);
+    }
 
     /* Logo nav */
     .nav-logo-img {
@@ -1025,9 +1067,7 @@
      HERO
 ================================================ -->
 <section id="hero">
-  <video class="hero-vid" id="hero-vid" autoplay muted loop playsinline preload="auto" disablepictureinpicture>
-    <source src="hero.mp4" type="video/mp4">
-  </video>
+  <video class="hero-vid" id="hero-vid" muted loop playsinline webkit-playsinline preload="none" disablepictureinpicture></video>
   <div class="hero-overlay"></div>
   <div class="hero-content">
     <img src="logo.png" class="hero-logo" alt="Mozart Coffee Lounge">
@@ -1750,16 +1790,8 @@ function buildSubFromNames(names) {
    INIT
 ================================================ */
 function init() {
-  // Forcer la lecture vidéo — vitesse de lecture normale (1x) + retry sur geste
-  const vid = document.getElementById('hero-vid');
-  if (vid) {
-    vid.playbackRate = 1.0;
-    vid.play().catch(() => {
-      document.addEventListener('touchstart', () => {
-        vid.play().catch(()=>{});
-      }, { once: true });
-    });
-  }
+  // Vidéo hero — chargement intelligent mobile
+  setupHeroVideo();
   // Initialiser l'UI de base immédiatement
   buildLangBtns();
   setupPreloader();
@@ -1777,6 +1809,66 @@ function init_after_data() {
   buildCatPills();
   renderMenu();
   applyTranslations();
+}
+
+/* ================================================
+   HERO VIDEO — chargement intelligent mobile
+================================================ */
+function setupHeroVideo() {
+  const vid = document.getElementById('hero-vid');
+  if (!vid) return;
+
+  // Détecter connexion lente → pas de vidéo
+  const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  const slowNet = conn && (conn.effectiveType === '2g' || conn.effectiveType === 'slow-2g' || conn.saveData);
+  if (slowNet) return; // garde le dégradé de fond
+
+  // Timeout de sécurité : si la vidéo ne démarre pas en 5s → on l'abandonne
+  let videoStarted = false;
+  const giveUpTimer = setTimeout(() => {
+    if (!videoStarted) {
+      vid.src = '';
+      vid.load();
+    }
+  }, 5000);
+
+  // Charger la source après que la page soit prête (ne pas bloquer le reste)
+  function loadVideo() {
+    const src = document.createElement('source');
+    src.src  = 'hero.mp4';
+    src.type = 'video/mp4';
+    vid.appendChild(src);
+    vid.load();
+
+    vid.addEventListener('canplay', () => {
+      videoStarted = true;
+      clearTimeout(giveUpTimer);
+      vid.playbackRate = 1.0;
+      vid.play().then(() => {
+        vid.classList.add('ready');
+      }).catch(() => {
+        // Autoplay bloqué → attendre un geste
+        const startOnGesture = () => {
+          vid.play().then(() => vid.classList.add('ready')).catch(()=>{});
+          document.removeEventListener('touchstart', startOnGesture);
+          document.removeEventListener('click', startOnGesture);
+        };
+        document.addEventListener('touchstart', startOnGesture, { once: true });
+        document.addEventListener('click',      startOnGesture, { once: true });
+      });
+    }, { once: true });
+
+    // Si la vidéo est suspendue / mise en pause par le navigateur mobile → relancer
+    vid.addEventListener('suspend', () => { if (!vid.paused) return; vid.play().catch(()=>{}); });
+    vid.addEventListener('stalled', () => { vid.load(); vid.play().catch(()=>{}); });
+  }
+
+  // Attendre que la page soit chargée pour ne pas concurrencer les ressources critiques
+  if (document.readyState === 'complete') {
+    loadVideo();
+  } else {
+    window.addEventListener('load', loadVideo, { once: true });
+  }
 }
 
 /* ================================================
