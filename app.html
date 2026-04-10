@@ -91,14 +91,14 @@
     .header-right { display:flex; align-items:center; gap:8px; }
 
     /* Lang buttons */
-    .lang-wrap { display:flex; gap:3px; }
+    .lang-wrap { display:flex; gap:2px; }
     .lang-btn {
       background:none; border:1px solid transparent;
-      color:var(--muted); font-family:'Outfit',sans-serif;
-      font-size:0.66rem; font-weight:500;
-      padding:4px 6px; border-radius:6px; transition:var(--tr);
+      font-size:1.15rem; line-height:1;
+      padding:4px 5px; border-radius:6px; min-height:30px;
+      transition:var(--tr); opacity:0.55;
     }
-    .lang-btn.on { border-color:var(--bord2); color:var(--gold); background:rgba(212,149,107,0.08); }
+    .lang-btn.on { border-color:var(--bord2); background:rgba(212,149,107,0.10); opacity:1; }
     .theme-btn-app {
       width:32px; height:32px;
       border:1px solid var(--border); border-radius:8px;
@@ -200,6 +200,39 @@
       background:rgba(126,189,106,0.1); color:var(--green); border:1px solid rgba(126,189,106,0.25);
     }
 
+    /* ── INSTALL BANNER ── */
+    #install-banner {
+      display:none;
+      margin:16px 14px 0;
+      background:var(--bg3); border:1px solid var(--bord2);
+      border-radius:16px; padding:14px 16px;
+      align-items:center; gap:12px;
+    }
+    #install-banner.visible { display:flex; }
+    .install-ico {
+      width:40px; height:40px; flex-shrink:0; border-radius:10px;
+      background:linear-gradient(135deg,var(--gold-d),var(--gold));
+      display:flex; align-items:center; justify-content:center; color:#fff;
+    }
+    .install-ico svg { width:20px; height:20px; }
+    .install-text { flex:1; }
+    .install-title { font-size:0.88rem; font-weight:500; color:var(--cream); }
+    .install-sub   { font-size:0.72rem; color:var(--muted); margin-top:2px; }
+    .install-btn {
+      background:var(--gold); color:#0c0a08;
+      font-size:0.78rem; font-weight:600; letter-spacing:0.03em;
+      padding:8px 14px; border-radius:10px; white-space:nowrap;
+      flex-shrink:0; transition:opacity 0.2s;
+    }
+    .install-btn:hover { opacity:0.85; }
+    .install-dismiss {
+      width:24px; height:24px; flex-shrink:0;
+      color:var(--muted); display:flex; align-items:center; justify-content:center;
+      border-radius:50%; transition:color 0.2s;
+    }
+    .install-dismiss:hover { color:var(--cream); }
+    .install-dismiss svg { width:14px; height:14px; }
+
     /* ── FOOTER ── */
     .app-footer { text-align:center; padding:24px 20px 36px; font-size:0.67rem; color:rgba(244,234,210,0.18); letter-spacing:0.08em; }
     .app-footer a { color:var(--gold); text-decoration:none; opacity:0.7; }
@@ -262,6 +295,25 @@
   </div>
 </header>
 
+<!-- INSTALL BANNER -->
+<div id="install-banner">
+  <div class="install-ico">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+    </svg>
+  </div>
+  <div class="install-text">
+    <div class="install-title" id="install-title">Installer l'application</div>
+    <div class="install-sub"   id="install-sub">Accès rapide depuis l'écran d'accueil</div>
+  </div>
+  <button class="install-btn" id="install-btn">Installer</button>
+  <button class="install-dismiss" id="install-dismiss">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  </button>
+</div>
+
 <!-- MAIN -->
 <main class="app-main">
   <!-- Call history -->
@@ -282,8 +334,8 @@
     document.documentElement.classList.add('light');
 })();
 
-const LANGS = { fr:'FR', en:'EN', ar:'عر' };
-const LANG_DIRS = { fr:'ltr', en:'ltr', ar:'rtl' };
+const LANG_FLAGS = { fr:'🇫🇷', en:'🇬🇧', ar:'🇸🇦' };
+const LANG_DIRS  = { fr:'ltr',  en:'ltr',  ar:'rtl' };
 
 const T = {
   fr: {
@@ -442,11 +494,11 @@ function applyLang() {
 function buildLangBtns() {
   const wrap = document.getElementById('lang-wrap');
   wrap.innerHTML = '';
-  Object.keys(LANGS).forEach(l => {
+  Object.keys(LANG_FLAGS).forEach(l => {
     const btn = document.createElement('button');
     btn.className = 'lang-btn' + (l === lang ? ' on' : '');
     btn.dataset.l = l;
-    btn.textContent = LANGS[l].split(' ')[0];
+    btn.textContent = LANG_FLAGS[l];
     btn.addEventListener('click', () => {
       lang = l;
       localStorage.setItem('mc_app_lang', l);
@@ -456,16 +508,21 @@ function buildLangBtns() {
   });
 }
 
-/* ── THÈME TOGGLE ── */
+/* ── THÈME ── */
+const SUN_PATH  = 'M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42';
+const MOON_PATH = 'M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z';
+
+function updateThemeIcon() {
+  const isLight = document.documentElement.classList.contains('light');
+  document.getElementById('app-theme-ico-path').setAttribute('d', isLight ? SUN_PATH : MOON_PATH);
+}
+// Appliquer l'icône correcte au chargement
+updateThemeIcon();
+
 document.getElementById('app-theme-btn').addEventListener('click', () => {
   const isLight = document.documentElement.classList.toggle('light');
   localStorage.setItem('mc_app_theme', isLight ? 'light' : 'dark');
-  const path = document.getElementById('app-theme-ico-path');
-  if (isLight) {
-    path.setAttribute('d','M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42');
-  } else {
-    path.setAttribute('d','M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z');
-  }
+  updateThemeIcon();
 });
 
 /* ── CONNECTION ── */
@@ -551,11 +608,61 @@ document.getElementById('alert-close').addEventListener('click', () => {
 /* ── REFRESH TIMES ── */
 setInterval(() => { if (calls.length) renderCalls(); }, 30000);
 
+/* ── INSTALL PWA ── */
+let _deferredInstall = null;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _deferredInstall = e;
+  document.getElementById('install-banner').classList.add('visible');
+});
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('install-banner').classList.remove('visible');
+  _deferredInstall = null;
+});
+
+function setupInstallBanner() {
+  // Textes traduits
+  const installLabels = {
+    fr: { title:'Installer l\'application', sub:'Accès rapide depuis l\'écran d\'accueil', btn:'Installer' },
+    en: { title:'Install the app',          sub:'Quick access from your home screen',      btn:'Install'  },
+    ar: { title:'تثبيت التطبيق',             sub:'وصول سريع من الشاشة الرئيسية',            btn:'تثبيت'   },
+  };
+
+  function updateInstallTexts() {
+    const l = installLabels[lang] || installLabels.fr;
+    document.getElementById('install-title').textContent = l.title;
+    document.getElementById('install-sub').textContent   = l.sub;
+    document.getElementById('install-btn').textContent   = l.btn;
+  }
+  updateInstallTexts();
+
+  document.getElementById('install-btn').addEventListener('click', async () => {
+    if (!_deferredInstall) return;
+    _deferredInstall.prompt();
+    const { outcome } = await _deferredInstall.userChoice;
+    if (outcome === 'accepted') {
+      document.getElementById('install-banner').classList.remove('visible');
+      _deferredInstall = null;
+    }
+  });
+
+  document.getElementById('install-dismiss').addEventListener('click', () => {
+    document.getElementById('install-banner').classList.remove('visible');
+  });
+
+  // Mettre à jour les textes quand la langue change
+  const origApplyLang = applyLang;
+  applyLang = function() { origApplyLang(); updateInstallTexts(); };
+}
+
 /* ── INIT ── */
 function init() {
   loadCalls();
   buildLangBtns();
   applyLang();
+  setupInstallBanner();
   startPolling();
   registerSW();
   document.addEventListener('touchstart', unlockAudio, { once: true, passive: true });
