@@ -94,13 +94,19 @@ async function deleteToken(projectId, accessToken, deviceId) {
   console.log('Deleted invalid token for:', deviceId);
 }
 
-async function sendFCM(projectId, accessToken, tokenObjs, table, lang) {
-  const MESSAGES = {
-    fr: `Table ${table} demande un serveur`,
-    en: `Table ${table} needs a waiter`,
-    ar: `الطاولة ${table} تطلب نادلاً`,
-  };
-  const body_text = MESSAGES[lang] || MESSAGES.fr;
+async function sendFCM(projectId, accessToken, tokenObjs, table, lang, customMessage) {
+  let body_text;
+  if (customMessage) {
+    // Message libre depuis admin
+    body_text = customMessage;
+  } else {
+    const MESSAGES = {
+      fr: `Table ${table} demande un serveur`,
+      en: `Table ${table} needs a waiter`,
+      ar: `الطاولة ${table} تطلب نادلاً`,
+    };
+    body_text = MESSAGES[lang] || MESSAGES.fr;
+  }
 
   let sent = 0;
   for (const { deviceId, token } of tokenObjs) {
@@ -157,8 +163,8 @@ module.exports = async (req, res) => {
   if (req.method !== 'POST') { res.status(405).json({ error: 'Method not allowed' }); return; }
 
   try {
-    const { table, lang } = req.body || {};
-    console.log('Notify called: table=' + table + ' lang=' + lang);
+    const { table, lang, message } = req.body || {};
+    console.log('Notify called: table=' + table + ' lang=' + lang + ' message=' + (message||''));
     if (!table) { res.status(400).json({ error: 'Missing table' }); return; }
 
     const sa = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
@@ -170,7 +176,7 @@ module.exports = async (req, res) => {
       res.status(200).json({ sent: 0, reason: 'no_tokens' }); return;
     }
 
-    const result = await sendFCM(sa.project_id, accessToken, tokens, table, lang);
+    const result = await sendFCM(sa.project_id, accessToken, tokens, table, lang, message);
     console.log('Result:', JSON.stringify(result));
     res.status(200).json(result);
 
