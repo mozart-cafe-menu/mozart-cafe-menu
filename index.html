@@ -167,18 +167,26 @@
       display:flex; flex-direction:column;
       align-items:center; justify-content:center;
       overflow:hidden;
-      /* Fond chaleureux pendant le chargement de la vidéo */
       background: radial-gradient(ellipse at 60% 40%, #2a1208 0%, #160d08 45%, #0f0906 100%);
     }
-    .hero-vid {
+    .hero-bg-img {
       position:absolute; inset:0;
-      width:100%; height:100%;
-      object-fit:cover; object-position:center;
-      transform:translateZ(0);
+      background-size:cover; background-position:center;
+      transform-origin:center;
       will-change:transform;
-      opacity:0; transition:opacity 0.8s ease;
+      opacity:0; transition:opacity 1.2s ease;
     }
-    .hero-vid.ready { opacity:1; }
+    .hero-bg-img.flow {
+      opacity:1;
+      animation:heroBgFlow 22s ease-in-out infinite;
+    }
+    @keyframes heroBgFlow {
+      0%   { transform:scale(1.08) translate(0%,    0%);    }
+      20%  { transform:scale(1.13) translate(-1.2%, -0.6%); }
+      45%  { transform:scale(1.10) translate(-2%,   -1.2%); }
+      70%  { transform:scale(1.13) translate(-0.8%, -2%);   }
+      100% { transform:scale(1.08) translate(0%,    0%);    }
+    }
 
     /* Logo dans le hero */
     .hero-logo {
@@ -1067,7 +1075,7 @@
      HERO
 ================================================ -->
 <section id="hero">
-  <video class="hero-vid" id="hero-vid" muted loop playsinline webkit-playsinline preload="none" disablepictureinpicture></video>
+  <div class="hero-bg-img" id="hero-bg-img"></div>
   <div class="hero-overlay"></div>
   <div class="hero-content">
     <img src="logo.png" class="hero-logo" alt="Mozart Coffee Lounge">
@@ -1705,6 +1713,9 @@ const LANG_LABELS = { fr:'FR', en:'EN', ar:'عر' };
    on écrase CATS et ITEMS avec ses données.
 ================================================ */
 function loadAdminData() {
+  // Appliquer l'image hero par défaut immédiatement (avant Firebase)
+  applyHeroImage('hero-bg.jpg');
+
   // Afficher d'abord avec les données en cache (instantané)
   try {
     const raw = localStorage.getItem('mc_admin_data_v1');
@@ -1764,6 +1775,9 @@ function applyAdminData(data) {
       });
     }
 
+    // Photo d'accueil hero (fallback → hero-bg.jpg si rien dans Firebase)
+    applyHeroImage(data.heroImage || 'hero-bg.jpg');
+
     // Mettre à jour les infos du footer
     if (data.info) {
       Object.keys(UI).forEach(l => {
@@ -1790,8 +1804,6 @@ function buildSubFromNames(names) {
    INIT
 ================================================ */
 function init() {
-  // Vidéo hero — chargement intelligent mobile
-  setupHeroVideo();
   // Initialiser l'UI de base immédiatement
   buildLangBtns();
   setupPreloader();
@@ -1812,63 +1824,24 @@ function init_after_data() {
 }
 
 /* ================================================
-   HERO VIDEO — chargement intelligent mobile
+   HERO IMAGE — fond animé (Ken Burns flow)
 ================================================ */
-function setupHeroVideo() {
-  const vid = document.getElementById('hero-vid');
-  if (!vid) return;
-
-  // Détecter connexion lente → pas de vidéo
-  const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-  const slowNet = conn && (conn.effectiveType === '2g' || conn.effectiveType === 'slow-2g' || conn.saveData);
-  if (slowNet) return; // garde le dégradé de fond
-
-  // Timeout de sécurité : si la vidéo ne démarre pas en 5s → on l'abandonne
-  let videoStarted = false;
-  const giveUpTimer = setTimeout(() => {
-    if (!videoStarted) {
-      vid.src = '';
-      vid.load();
-    }
-  }, 5000);
-
-  // Charger la source après que la page soit prête (ne pas bloquer le reste)
-  function loadVideo() {
-    const src = document.createElement('source');
-    src.src  = 'hero.mp4';
-    src.type = 'video/mp4';
-    vid.appendChild(src);
-    vid.load();
-
-    vid.addEventListener('canplay', () => {
-      videoStarted = true;
-      clearTimeout(giveUpTimer);
-      vid.playbackRate = 1.0;
-      vid.play().then(() => {
-        vid.classList.add('ready');
-      }).catch(() => {
-        // Autoplay bloqué → attendre un geste
-        const startOnGesture = () => {
-          vid.play().then(() => vid.classList.add('ready')).catch(()=>{});
-          document.removeEventListener('touchstart', startOnGesture);
-          document.removeEventListener('click', startOnGesture);
-        };
-        document.addEventListener('touchstart', startOnGesture, { once: true });
-        document.addEventListener('click',      startOnGesture, { once: true });
-      });
-    }, { once: true });
-
-    // Si la vidéo est suspendue / mise en pause par le navigateur mobile → relancer
-    vid.addEventListener('suspend', () => { if (!vid.paused) return; vid.play().catch(()=>{}); });
-    vid.addEventListener('stalled', () => { vid.load(); vid.play().catch(()=>{}); });
+function applyHeroImage(src) {
+  const el = document.getElementById('hero-bg-img');
+  if (!el) return;
+  if (!src) {
+    el.style.backgroundImage = '';
+    el.classList.remove('flow');
+    return;
   }
-
-  // Attendre que la page soit chargée pour ne pas concurrencer les ressources critiques
-  if (document.readyState === 'complete') {
-    loadVideo();
-  } else {
-    window.addEventListener('load', loadVideo, { once: true });
-  }
+  const img = new Image();
+  img.onload = () => {
+    el.style.backgroundImage = `url('${CSS.escape ? src : src}')`;
+    // Petite pause pour laisser le navigateur placer l'image avant d'animer
+    requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('flow')));
+  };
+  img.onerror = () => {}; // garde le dégradé si l'image échoue
+  img.src = src;
 }
 
 /* ================================================

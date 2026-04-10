@@ -171,6 +171,70 @@
     .adm-wrap { max-width:900px; margin:0 auto; padding:20px 16px 90px; }
     @media(min-width:900px) { .adm-wrap { padding:28px 24px 90px; } }
 
+    /* ── HERO IMAGE SECTION ── */
+    .hero-img-card {
+      background:var(--bg2); border:1px solid var(--border);
+      border-radius:16px; padding:16px; display:flex; flex-direction:column; gap:14px;
+    }
+    .hero-preview-wrap {
+      position:relative; width:100%; height:200px;
+      border-radius:12px; overflow:hidden;
+      background:var(--bg3); border:1px dashed var(--border);
+      display:flex; align-items:center; justify-content:center;
+    }
+    .hero-preview-empty {
+      display:flex; flex-direction:column; align-items:center; gap:10px;
+      color:var(--muted); font-size:0.82rem; letter-spacing:0.04em;
+    }
+    .hero-preview-img {
+      width:100%; height:100%; object-fit:cover; object-position:center;
+      display:block;
+    }
+    @keyframes flowPreview {
+      0%,100% { transform:scale(1.06) translate(0%,0%); }
+      50%      { transform:scale(1.1)  translate(-1.5%,-1%); }
+    }
+    .flow-preview { animation:flowPreview 12s ease-in-out infinite; }
+    .hero-del-btn {
+      position:absolute; top:8px; right:8px;
+      width:28px; height:28px; border-radius:50%;
+      background:rgba(0,0,0,0.55); border:1px solid rgba(255,255,255,0.15);
+      color:#fff; display:flex; align-items:center; justify-content:center;
+      cursor:pointer; transition:background 0.2s;
+    }
+    .hero-del-btn:hover { background:rgba(200,60,60,0.75); }
+    .hero-controls {
+      display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    }
+    .hero-upload-btn {
+      display:flex; align-items:center; gap:6px; cursor:pointer;
+      background:var(--gold); color:#0c0a08;
+      font-size:0.8rem; font-weight:500; letter-spacing:0.03em;
+      padding:8px 14px; border-radius:10px; transition:opacity 0.2s;
+      white-space:nowrap; flex-shrink:0;
+    }
+    .hero-upload-btn:hover { opacity:0.85; }
+    .hero-or { color:var(--muted); font-size:0.78rem; flex-shrink:0; }
+    .hero-url-input {
+      flex:1; min-width:160px;
+      background:var(--bg3); border:1px solid var(--border);
+      border-radius:9px; padding:8px 12px;
+      color:var(--cream); font-size:0.82rem; font-family:inherit;
+      outline:none; transition:border-color 0.2s;
+    }
+    .hero-url-input:focus { border-color:var(--gold); }
+    .hero-url-btn {
+      background:none; border:1px solid var(--border);
+      color:var(--gold); font-size:0.8rem; padding:8px 14px;
+      border-radius:9px; cursor:pointer; transition:border-color 0.2s, background 0.2s;
+      white-space:nowrap;
+    }
+    .hero-url-btn:hover { border-color:var(--gold); background:rgba(212,149,107,0.08); }
+    .hero-hint { font-size:0.72rem; color:var(--muted); letter-spacing:0.03em; }
+    html.light .hero-img-card { background:var(--bg3); }
+    html.light .hero-url-input { color:var(--cream); background:rgba(255,255,255,0.7); }
+    html.light .hero-preview-wrap { background:rgba(0,0,0,0.04); }
+
     /* ── SECTION ── */
     .adm-section { margin-bottom:32px; }
     .sec-hd {
@@ -556,6 +620,38 @@
   <!-- ── PROGRESSION TRADUCTION ── -->
   <div class="global-progress" id="global-progress"></div>
 
+  <!-- ── PHOTO D'ACCUEIL ── -->
+  <div class="adm-section">
+    <div class="sec-hd">Photo d'accueil <span class="sec-badge">Hero</span></div>
+    <div class="hero-img-card" id="hero-img-card">
+
+      <!-- Aperçu -->
+      <div class="hero-preview-wrap" id="hero-preview-wrap">
+        <div class="hero-preview-empty" id="hero-preview-empty">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <span>Aucune photo</span>
+        </div>
+        <img class="hero-preview-img flow-preview" id="hero-preview-img" src="" alt="" style="display:none">
+        <button class="hero-del-btn" id="hero-del-btn" style="display:none" title="Supprimer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <!-- Contrôles -->
+      <div class="hero-controls">
+        <label class="hero-upload-btn" for="hero-file-input">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Choisir une photo
+        </label>
+        <input type="file" id="hero-file-input" accept="image/*" style="display:none">
+        <span class="hero-or">ou</span>
+        <input type="url" class="hero-url-input" id="hero-url-input" placeholder="Coller une URL d'image…">
+        <button class="hero-url-btn" id="hero-url-btn">Appliquer</button>
+      </div>
+      <div class="hero-hint">Photo recommandée : format paysage, min. 1200×800 px</div>
+    </div>
+  </div>
+
   <!-- ── INFORMATIONS DU CAFÉ ── -->
   <div class="adm-section">
     <div class="sec-hd">Informations du café <span class="sec-badge">Footer</span></div>
@@ -939,9 +1035,80 @@ function showToast(msg) {
    RENDER ALL
 ═══════════════════════════════════════════ */
 function renderAll() {
+  renderHeroImageSection();
   renderInfoSection();
   renderCatsSection();
   renderProductsSection();
+}
+
+/* ─── SECTION HERO IMAGE ─── */
+function renderHeroImageSection() {
+  const previewImg   = document.getElementById('hero-preview-img');
+  const previewEmpty = document.getElementById('hero-preview-empty');
+  const delBtn       = document.getElementById('hero-del-btn');
+  const fileInput    = document.getElementById('hero-file-input');
+  const urlInput     = document.getElementById('hero-url-input');
+  const urlBtn       = document.getElementById('hero-url-btn');
+
+  function setPreview(src) {
+    if (src) {
+      previewImg.src = src;
+      previewImg.style.display = 'block';
+      previewEmpty.style.display = 'none';
+      delBtn.style.display = 'flex';
+    } else {
+      previewImg.src = '';
+      previewImg.style.display = 'none';
+      previewEmpty.style.display = 'flex';
+      delBtn.style.display = 'none';
+    }
+  }
+
+  // Afficher l'image actuelle
+  setPreview(adminData.heroImage || '');
+
+  // Upload fichier → compression canvas → base64
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1600;
+        let w = img.width, h = img.height;
+        if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        const compressed = canvas.toDataURL('image/jpeg', 0.82);
+        adminData.heroImage = compressed;
+        setPreview(compressed);
+        markUnsaved();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+    fileInput.value = '';
+  });
+
+  // URL directe
+  urlBtn.addEventListener('click', () => {
+    const url = urlInput.value.trim();
+    if (!url) return;
+    adminData.heroImage = url;
+    setPreview(url);
+    urlInput.value = '';
+    markUnsaved();
+  });
+  urlInput.addEventListener('keydown', e => { if (e.key === 'Enter') urlBtn.click(); });
+
+  // Supprimer
+  delBtn.addEventListener('click', () => {
+    adminData.heroImage = '';
+    setPreview('');
+    markUnsaved();
+  });
 }
 
 /* ─── SECTION INFO ─── */
