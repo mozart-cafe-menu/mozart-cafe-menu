@@ -167,11 +167,51 @@
       color:var(--cream); font-size:0.88rem; padding:6px 2px; outline:none; transition:border-color 0.2s;
     }
     .inline-input:focus { border-color:var(--gold); }
-    .icon-select {
-      background:var(--bg3); border:1px solid var(--bord2); border-radius:8px;
-      color:var(--cream); font-size:0.76rem; padding:7px 8px; outline:none;
-      min-height:36px;
+    .icon-select { display:none; } /* remplacé par le picker visuel */
+
+    /* ── Icon Picker ── */
+    .ico-picker-btn {
+      display:flex; align-items:center; gap:6px;
+      padding:7px 10px; border-radius:8px;
+      background:var(--bg3); border:1px solid var(--border);
+      color:var(--gold); font-size:0.75rem; cursor:pointer;
+      transition:border-color 0.2s, background 0.2s;
+      white-space:nowrap; flex-shrink:0;
     }
+    .ico-picker-btn:hover { border-color:var(--gold); background:rgba(201,168,76,0.08); }
+    .ico-picker-btn svg { width:16px; height:16px; flex-shrink:0; }
+    .ico-picker-btn .ico-pb-label { font-size:0.7rem; color:var(--muted); }
+
+    .ico-picker-popup {
+      display:none; position:absolute; z-index:500;
+      background:var(--card); border:1px solid var(--border2);
+      border-radius:14px; padding:12px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.5);
+      width:260px;
+    }
+    .ico-picker-popup.open { display:block; }
+    .ico-picker-grid {
+      display:grid; grid-template-columns:repeat(5,1fr); gap:6px;
+      margin-bottom:8px;
+    }
+    .ico-picker-item {
+      display:flex; flex-direction:column; align-items:center; gap:3px;
+      padding:8px 4px; border-radius:8px; cursor:pointer;
+      border:1px solid transparent;
+      transition:background 0.15s, border-color 0.15s;
+      font-size:0.58rem; color:var(--muted); text-align:center;
+    }
+    .ico-picker-item svg { width:18px; height:18px; color:var(--cream); }
+    .ico-picker-item:hover { background:rgba(201,168,76,0.1); border-color:rgba(201,168,76,0.3); }
+    .ico-picker-item.selected { background:rgba(201,168,76,0.15); border-color:var(--gold); }
+    .ico-picker-item.selected svg { color:var(--gold); }
+    .ico-picker-none {
+      width:100%; padding:7px; border-radius:8px; font-size:0.75rem;
+      background:rgba(224,82,82,0.08); border:1px solid rgba(224,82,82,0.2);
+      color:var(--red); cursor:pointer; text-align:center;
+      transition:background 0.15s;
+    }
+    .ico-picker-none:hover { background:rgba(224,82,82,0.15); }
     .btn-del {
       width:36px; height:36px; flex-shrink:0;
       border:1px solid rgba(224,82,82,0.3); border-radius:8px;
@@ -429,16 +469,14 @@
 ══════════════════════════════════════ -->
 <header class="adm-header" id="adm-header" style="display:none">
   <div>
-    <div class="adm-logo">Mozart Café</div>
+    <div class="adm-logo">Café &amp; Restaurant</div>
     <div class="adm-sub">Administration du menu</div>
   </div>
   <div class="adm-center">
     <select class="global-src-sel" id="global-src-lang">
       <option value="fr">🇫🇷 Français</option>
       <option value="en">🇬🇧 English</option>
-      <option value="el">🇬🇷 Ελληνικά</option>
       <option value="ar">🇸🇦 العربية</option>
-      <option value="de">🇩🇪 Deutsch</option>
     </select>
     <button class="btn-translate-global" id="btn-translate-all">
       🌐 Traduire toutes les autres langues
@@ -531,12 +569,12 @@ const DEFAULT_CATS = [
 ];
 
 const DEFAULT_INFO = {
-  wifi_name:  { fr:'WiFi', en:'WiFi', el:'WiFi', ar:'واي فاي', de:'WLAN' },
-  wifi_val:   { fr:'MozartCafe_Guest · Mozart2026', en:'MozartCafe_Guest · Mozart2026', el:'MozartCafe_Guest · Mozart2026', ar:'MozartCafe_Guest · Mozart2026', de:'MozartCafe_Guest · Mozart2026' },
-  hours_name: { fr:'Horaires', en:'Hours', el:'Ωράριο', ar:'مواعيد العمل', de:'Öffnungszeiten' },
-  hours_val:  { fr:'Lun–Sam 7h00–22h00  ·  Dim 8h00–21h00', en:'Mon–Sat 7:00–22:00  ·  Sun 8:00–21:00', el:'Δευ–Σαβ 7:00–22:00  ·  Κυρ 8:00–21:00', ar:'الإثنين–السبت 7:00–22:00  ·  الأحد 8:00–21:00', de:'Mo–Sa 7:00–22:00  ·  So 8:00–21:00' },
-  addr_name:  { fr:'Adresse', en:'Address', el:'Διεύθυνση', ar:'العنوان', de:'Adresse' },
-  addr_val:   { fr:'12, Rue Hermès · Kolonaki, Athènes', en:'12, Hermès Street · Kolonaki, Athens', el:'12, Οδός Ερμού · Κολωνάκι, Αθήνα', ar:'12، شارع هيرميس · كولوناكي، أثينا', de:'12, Hermès-Straße · Kolonaki, Athen' },
+  wifi_name:  { fr:'WiFi', en:'WiFi', ar:'واي فاي' },
+  wifi_val:   { fr:'MozartCafe_Free · Mozart2026', en:'MozartCafe_Free · Mozart2026', ar:'MozartCafe_Free · Mozart2026' },
+  hours_name: { fr:'Horaires', en:'Hours', ar:'أوقات العمل' },
+  hours_val:  { fr:'Tous les jours 7h00 – 00h00', en:'Every day 7:00 AM – midnight', ar:'كل يوم 7:00 صباحاً – منتصف الليل' },
+  addr_name:  { fr:'Adresse', en:'Address', ar:'العنوان' },
+  addr_val:   { fr:'Radès, Tunis, Tunisie', en:'Radès, Tunis, Tunisia', ar:'رادس، تونس، تونس' },
 };
 
 /* ═══════════════════════════════════════════
@@ -571,7 +609,7 @@ const ADMIN_UI = {
     phShortDesc:   'Description courte affichée dans la liste',
     phFullDesc:    'Texte complet affiché quand on clique sur le produit',
     phAllergens:   'ex: Lait, Gluten, Œufs',
-    phPrice:       '€4.50',
+    phPrice:       '0.000 DT',
     produits:      'produit(s)',
     toastSaved:    '✓ Modifications sauvegardées avec succès',
     toastProd:     '✓ Produit mis à jour',
@@ -616,7 +654,7 @@ const ADMIN_UI = {
     phShortDesc:   'Short description shown in the list',
     phFullDesc:    'Full text shown when the product is clicked',
     phAllergens:   'e.g. Milk, Gluten, Eggs',
-    phPrice:       '€4.50',
+    phPrice:       '0.000 DT',
     produits:      'product(s)',
     toastSaved:    '✓ Changes saved successfully',
     toastProd:     '✓ Product updated',
@@ -632,51 +670,6 @@ const ADMIN_UI = {
     badgeNew:      '✨ New',
     badgeVegan:    '🌱 Vegan',
     badgeSel:      '⭐ Daily selection',
-  },
-  el: {
-    admSub:        'Διαχείριση μενού',
-    btnPreview:    '👁 Προβολή μενού',
-    btnLogout:     'Αποσύνδεση',
-    btnTranslate:  '🌐 Μετάφραση όλων των άλλων γλωσσών',
-    secInfo:       'Πληροφορίες καφέ',
-    secCats:       'Κατηγορίες',
-    secProds:      'Προϊόντα',
-    btnAddCat:     '＋ Προσθήκη κατηγορίας',
-    btnSaveCats:   'Αποθήκευση κατηγοριών',
-    btnAddProd:    '＋ Προσθήκη προϊόντος',
-    btnSaveProd:   'Αποθήκευση προϊόντος',
-    btnDelProd:    'Διαγραφή',
-    lblCatName:    'Όνομα',
-    lblPrice:      'Τιμή',
-    lblBadges:     'Ετικέτες',
-    lblPhoto:      'Φωτογραφία',
-    lblFromDevice: 'Από τη συσκευή',
-    lblOrUnsplash: 'Ή ID / URL Unsplash',
-    lblPhotoHelp:  'ID από <a href="https://unsplash.com" target="_blank">unsplash.com</a> (π.χ. <em>photo-1234567890</em>) ή απευθείας μεταφόρτωση.',
-    lblName:       'Όνομα',
-    lblShortDesc:  'Σύντομη περιγραφή',
-    lblFullDesc:   'Πλήρης περιγραφή / Λεπτομέρειες',
-    lblAllergens:  'Αλλεργιογόνα — χωρισμένα με κόμμα',
-    phName:        'Όνομα προϊόντος',
-    phShortDesc:   'Σύντομη περιγραφή στη λίστα',
-    phFullDesc:    'Πλήρες κείμενο κατά το κλικ',
-    phAllergens:   'π.χ. Γάλα, Γλουτένη, Αυγά',
-    phPrice:       '€4.50',
-    produits:      'προϊόν(τα)',
-    toastSaved:    '✓ Οι αλλαγές αποθηκεύτηκαν',
-    toastProd:     '✓ Το προϊόν ενημερώθηκε',
-    fabTitle:      'Αποθήκευση όλων',
-    fabTooltip:    'Αποθήκευση όλων',
-    infoWifiName:  'WiFi — Όνομα',
-    infoWifiVal:   'WiFi — Κωδικός',
-    infoHoursName: 'Ωράριο — Τίτλος',
-    infoHoursVal:  'Ωράριο — Τιμή',
-    infoAddrName:  'Διεύθυνση — Τίτλος',
-    infoAddrVal:   'Διεύθυνση — Τιμή',
-    badgePopular:  '🔥 Δημοφιλές',
-    badgeNew:      '✨ Νέο',
-    badgeVegan:    '🌱 Vegan',
-    badgeSel:      '⭐ Επιλογή ημέρας',
   },
   ar: {
     admSub:        'إدارة القائمة',
@@ -706,7 +699,7 @@ const ADMIN_UI = {
     phShortDesc:   'وصف مختصر يظهر في القائمة',
     phFullDesc:    'النص الكامل عند النقر على المنتج',
     phAllergens:   'مثال: حليب، غلوتين، بيض',
-    phPrice:       '€4.50',
+    phPrice:       '0.000 DT',
     produits:      'منتج(ات)',
     toastSaved:    '✓ تم حفظ التغييرات بنجاح',
     toastProd:     '✓ تم تحديث المنتج',
@@ -723,58 +716,13 @@ const ADMIN_UI = {
     badgeVegan:    '🌱 نباتي',
     badgeSel:      '⭐ اختيار اليوم',
   },
-  de: {
-    admSub:        'Menüverwaltung',
-    btnPreview:    '👁 Menü anzeigen',
-    btnLogout:     'Abmelden',
-    btnTranslate:  '🌐 Alle anderen Sprachen übersetzen',
-    secInfo:       'Café-Informationen',
-    secCats:       'Kategorien',
-    secProds:      'Produkte',
-    btnAddCat:     '＋ Kategorie hinzufügen',
-    btnSaveCats:   'Kategorien speichern',
-    btnAddProd:    '＋ Produkt hinzufügen',
-    btnSaveProd:   'Dieses Produkt speichern',
-    btnDelProd:    'Löschen',
-    lblCatName:    'Name',
-    lblPrice:      'Preis',
-    lblBadges:     'Badges',
-    lblPhoto:      'Foto',
-    lblFromDevice: 'Vom Gerät',
-    lblOrUnsplash: 'Oder Unsplash-ID / URL',
-    lblPhotoHelp:  'ID von <a href="https://unsplash.com" target="_blank">unsplash.com</a> (z.B. <em>photo-1234567890</em>) oder direkt hochladen.',
-    lblName:       'Name',
-    lblShortDesc:  'Kurzbeschreibung',
-    lblFullDesc:   'Vollständige Beschreibung / Details',
-    lblAllergens:  'Allergene — kommagetrennt',
-    phName:        'Produktname',
-    phShortDesc:   'Kurzbeschreibung in der Liste',
-    phFullDesc:    'Volltext beim Klick auf das Produkt',
-    phAllergens:   'z.B. Milch, Gluten, Eier',
-    phPrice:       '€4.50',
-    produits:      'Produkt(e)',
-    toastSaved:    '✓ Änderungen erfolgreich gespeichert',
-    toastProd:     '✓ Produkt aktualisiert',
-    fabTitle:      'Alles speichern',
-    fabTooltip:    'Alles speichern',
-    infoWifiName:  'WLAN — Name',
-    infoWifiVal:   'WLAN — Passwort',
-    infoHoursName: 'Öffnungszeiten — Titel',
-    infoHoursVal:  'Öffnungszeiten — Wert',
-    infoAddrName:  'Adresse — Titel',
-    infoAddrVal:   'Adresse — Wert',
-    badgePopular:  '🔥 Beliebt',
-    badgeNew:      '✨ Neu',
-    badgeVegan:    '🌱 Vegan',
-    badgeSel:      '⭐ Tagesempfehlung',
-  },
 };
 
 /* ═══════════════════════════════════════════
    STATE
 ═══════════════════════════════════════════ */
 let adminData = null;  // { cats, items, info }
-let currentLang = localStorage.getItem('mc_admin_lang') || 'el';
+let currentLang = localStorage.getItem('mc_admin_lang') || 'fr';
 let unsaved = false;
 
 /* ═══════════════════════════════════════════
@@ -827,7 +775,10 @@ function loadData() {
   _db.ref('menu').once('value')
     .then(snapshot => {
       const data = snapshot.val();
-      if (data && data.cats && data.cats.length > 0) {
+      // Auto-reset si les données Firebase viennent de l'ancienne démo (prix en €)
+      const hasOldData = data && data.items && data.items.length > 0 &&
+        (data.items[0].price||'').startsWith('€');
+      if (data && data.cats && data.cats.length > 0 && !hasOldData) {
         adminData = data;
         if (!adminData.info)  adminData.info  = JSON.parse(JSON.stringify(DEFAULT_INFO));
         if (!adminData.items) adminData.items = getDefaultItems();
@@ -863,10 +814,10 @@ function sanitizeItems(items) {
     price:     item.price ?? '',
     photo:     item.photo ?? '',
     badges:    Array.isArray(item.badges) ? item.badges : [],
-    name:      item.name      || { fr:'', en:'', el:'', ar:'', de:'' },
-    desc:      item.desc      || { fr:'', en:'', el:'', ar:'', de:'' },
-    full:      item.full      || { fr:'', en:'', el:'', ar:'', de:'' },
-    allergens: item.allergens || { fr:[], en:[], el:[], ar:[], de:[] },
+    name:      item.name      || { fr:'', en:'', ar:'' },
+    desc:      item.desc      || { fr:'', en:'', ar:'' },
+    full:      item.full      || { fr:'', en:'', ar:'' },
+    allergens: item.allergens || { fr:[], en:[], ar:[] },
   }));
 }
 
@@ -1087,13 +1038,11 @@ function switchInfoLang(l) {
 }
 
 /* ─── SECTION CATÉGORIES ─── */
-const ICONS = ['ico-coffee','ico-cold','ico-food','ico-star','ico-bell','ico-clock','ico-diamond','ico-wifi','ico-pin'];
+const ICONS = ['ico-coffee','ico-cold','ico-food','ico-cake','ico-sunrise','ico-hookah','ico-star','ico-bell','ico-clock','ico-diamond','ico-wifi','ico-pin'];
 const ICON_LABELS = {
-  fr: { 'ico-coffee':'☕ Café',    'ico-cold':'🧊 Froid',   'ico-food':'🍽 Food',    'ico-star':'⭐ Spécial',  'ico-bell':'🔔 Bell', 'ico-clock':'🕐 Clock', 'ico-diamond':'💎 Diamond', 'ico-wifi':'📶 WiFi', 'ico-pin':'📍 Pin' },
-  en: { 'ico-coffee':'☕ Coffee',  'ico-cold':'🧊 Cold',    'ico-food':'🍽 Food',    'ico-star':'⭐ Special',  'ico-bell':'🔔 Bell', 'ico-clock':'🕐 Clock', 'ico-diamond':'💎 Diamond', 'ico-wifi':'📶 WiFi', 'ico-pin':'📍 Pin' },
-  el: { 'ico-coffee':'☕ Καφές',   'ico-cold':'🧊 Κρύο',    'ico-food':'🍽 Φαγητό', 'ico-star':'⭐ Ειδικό',  'ico-bell':'🔔 Bell', 'ico-clock':'🕐 Clock', 'ico-diamond':'💎 Diamond', 'ico-wifi':'📶 WiFi', 'ico-pin':'📍 Pin' },
-  ar: { 'ico-coffee':'☕ قهوة',    'ico-cold':'🧊 بارد',    'ico-food':'🍽 طعام',   'ico-star':'⭐ مميز',    'ico-bell':'🔔 Bell', 'ico-clock':'🕐 Clock', 'ico-diamond':'💎 Diamond', 'ico-wifi':'📶 WiFi', 'ico-pin':'📍 Pin' },
-  de: { 'ico-coffee':'☕ Kaffee',  'ico-cold':'🧊 Kalt',    'ico-food':'🍽 Essen',  'ico-star':'⭐ Spezial', 'ico-bell':'🔔 Bell', 'ico-clock':'🕐 Clock', 'ico-diamond':'💎 Diamond', 'ico-wifi':'📶 WiFi', 'ico-pin':'📍 Pin' },
+  fr: { 'ico-coffee':'☕ Café chaud', 'ico-cold':'🧊 Froid',   'ico-food':'🍽 Cuisine', 'ico-cake':'🍰 Sucré',   'ico-sunrise':'🌅 Matin',  'ico-hookah':'💨 Hookah',  'ico-star':'⭐ Spécial',  'ico-bell':'🔔 Bell', 'ico-clock':'🕐 Clock', 'ico-diamond':'💎 Diamond', 'ico-wifi':'📶 WiFi', 'ico-pin':'📍 Pin' },
+  en: { 'ico-coffee':'☕ Hot drink', 'ico-cold':'🧊 Cold',    'ico-food':'🍽 Food',    'ico-cake':'🍰 Sweet',   'ico-sunrise':'🌅 Morning','ico-hookah':'💨 Hookah',  'ico-star':'⭐ Special',  'ico-bell':'🔔 Bell', 'ico-clock':'🕐 Clock', 'ico-diamond':'💎 Diamond', 'ico-wifi':'📶 WiFi', 'ico-pin':'📍 Pin' },
+  ar: { 'ico-coffee':'☕ قهوة ساخنة','ico-cold':'🧊 بارد',   'ico-food':'🍽 طعام',   'ico-cake':'🍰 حلويات',  'ico-sunrise':'🌅 الصباح','ico-hookah':'💨 شيشة',    'ico-star':'⭐ مميز',    'ico-bell':'🔔 Bell', 'ico-clock':'🕐 Clock', 'ico-diamond':'💎 Diamond', 'ico-wifi':'📶 WiFi', 'ico-pin':'📍 Pin' },
 };
 function getIconLabel(ico) { return (ICON_LABELS[currentLang]||ICON_LABELS.fr)[ico]||ico; }
 
@@ -1108,23 +1057,41 @@ function renderCatsSection() {
     row.className = 'cat-row';
     row.dataset.ci = ci;
 
-    const iconOptions = ICONS.map(ic =>
-      `<option value="${ic}"${cat.ico===ic?' selected':''}>${getIconLabel(ic)}</option>`
-    ).join('');
+    const currentIco = cat.ico || '';
+    const icoLabel = currentIco ? getIconLabel(currentIco) : '— Aucune —';
+    const icoSvg   = currentIco
+      ? `<svg><use href="#${currentIco}"/></svg>`
+      : `<svg viewBox="0 0 24 24" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="1.8"/></svg>`;
 
     row.innerHTML = `
-      <div class="cat-row-ico">
-        <svg width="18" height="18"><use href="#${cat.ico}"/></svg>
+      <div class="cat-row-ico" id="cat-ico-preview-${ci}">
+        ${currentIco ? `<svg width="18" height="18"><use href="#${currentIco}"/></svg>` : ''}
       </div>
       <input class="inline-input" value="${esc(cat.names?.[currentLang] || cat.names?.fr || '')}"
         placeholder="Nom (${currentLang.toUpperCase()})"
         data-ci="${ci}">
-      <select class="icon-select" data-ci="${ci}">${iconOptions}</select>
+      <div style="position:relative">
+        <button class="ico-picker-btn" data-ci="${ci}" title="Changer l'icône">
+          ${icoSvg}
+          <span class="ico-pb-label">${icoLabel}</span>
+          <span>▾</span>
+        </button>
+        <div class="ico-picker-popup" id="ico-popup-${ci}">
+          <div class="ico-picker-grid">
+            ${ICONS.map(ic => `
+              <div class="ico-picker-item${ic===currentIco?' selected':''}" data-ico="${ic}" data-ci="${ci}" title="${getIconLabel(ic)}">
+                <svg width="18" height="18"><use href="#${ic}"/></svg>
+                <span>${getIconLabel(ic).replace(/^.+\s/,'')}</span>
+              </div>`).join('')}
+          </div>
+          <button class="ico-picker-none" data-ci="${ci}">✕ Supprimer l'icône</button>
+        </div>
+      </div>
       <button class="btn-del" data-ci="${ci}" title="Supprimer">✕</button>
     `;
     list.appendChild(row);
 
-    // Mise à jour du nom dans la langue active
+    // Nom
     row.querySelector('.inline-input').addEventListener('input', e => {
       const i = parseInt(e.target.dataset.ci);
       if (!adminData.cats[i].names) adminData.cats[i].names = {};
@@ -1133,12 +1100,35 @@ function renderCatsSection() {
       renderProductsSection();
     });
 
-    row.querySelector('.icon-select').addEventListener('change', e => {
+    // Ouvrir/fermer le picker
+    row.querySelector('.ico-picker-btn').addEventListener('click', e => {
+      e.stopPropagation();
+      const popup = document.getElementById(`ico-popup-${ci}`);
+      const isOpen = popup.classList.contains('open');
+      // Fermer tous les popups ouverts
+      document.querySelectorAll('.ico-picker-popup.open').forEach(p => p.classList.remove('open'));
+      if (!isOpen) popup.classList.add('open');
+    });
+
+    // Sélectionner une icône
+    row.querySelectorAll('.ico-picker-item').forEach(item => {
+      item.addEventListener('click', e => {
+        const i = parseInt(item.dataset.ci);
+        const ico = item.dataset.ico;
+        adminData.cats[i].ico = ico;
+        markUnsaved();
+        renderCatsSection();
+        renderProductsSection();
+      });
+    });
+
+    // Supprimer l'icône
+    row.querySelector('.ico-picker-none').addEventListener('click', e => {
       const i = parseInt(e.target.dataset.ci);
-      adminData.cats[i].ico = e.target.value;
-      // Mettre à jour l'icône affichée
-      row.querySelector('.cat-row-ico svg use').setAttribute('href', '#' + e.target.value);
+      adminData.cats[i].ico = '';
       markUnsaved();
+      renderCatsSection();
+      renderProductsSection();
     });
 
     row.querySelector('.btn-del').addEventListener('click', e => {
@@ -1180,7 +1170,7 @@ function renderProductsSection() {
 
     sec.innerHTML = `
       <div class="cat-products-hd">
-        <svg width="16" height="16" style="color:var(--gold)"><use href="#${cat.ico}"/></svg>
+        ${cat.ico ? `<svg width="16" height="16" style="color:var(--gold)"><use href="#${cat.ico}"/></svg>` : ''}
         <div class="cat-products-name">${esc(cat.names[currentLang] || cat.names.fr || 'Catégorie ' + ci)}</div>
         <span style="font-size:0.72rem;color:var(--muted);margin-left:4px">${catItems.length} ${(ADMIN_UI[currentLang]||ADMIN_UI.fr).produits}</span>
       </div>
@@ -1432,7 +1422,7 @@ function addProduct(ci) {
   const id = Date.now();
   const newItem = {
     id, cat: ci,
-    price: '€0.00',
+    price: '0.000 DT',
     photo: 'photo-1509042239860-f550ce710b93',
     badges: [],
     name: {}, desc: {}, full: {}, allergens: {}
@@ -1593,6 +1583,9 @@ function injectSVG() {
     <symbol id="ico-wifi" viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0114.08 0" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M1.42 9a16 16 0 0121.16 0" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M8.53 16.11a6 6 0 016.95 0" stroke="currentColor" stroke-width="1.8" fill="none"/><line x1="12" y1="20" x2="12.01" y2="20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></symbol>
     <symbol id="ico-pin" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z" stroke="currentColor" stroke-width="1.8" fill="none"/><circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="1.8" fill="none"/></symbol>
     <symbol id="ico-up" viewBox="0 0 24 24"><polyline points="18,15 12,9 6,15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></symbol>
+    <symbol id="ico-cake" viewBox="0 0 24 24"><path d="M20 21v-8a2 2 0 00-2-2H6a2 2 0 00-2 2v8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2 1 2 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><line x1="16" y1="5" x2="16" y2="11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8 11V5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 3v8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="ico-sunrise" viewBox="0 0 24 24"><path d="M17 18a5 5 0 00-10 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><line x1="12" y1="2" x2="12" y2="9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="4.22" y1="10.22" x2="5.64" y2="11.64" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="1" y1="18" x2="3" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="21" y1="18" x2="23" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="18.36" y1="11.64" x2="19.78" y2="10.22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="23" y1="22" x2="1" y2="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><polyline points="8,6 12,2 16,6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+    <symbol id="ico-hookah" viewBox="0 0 24 24"><path d="M12 3v5M9 8h6M10 13c0 2.5-3 4-3 7h10c0-3-3-4.5-3-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M8 8c0 2.2 1.8 4 4 4s4-1.8 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M5 20c.5-1.5 2-2 4-2h6c2 0 3.5.5 4 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></symbol>
   `;
   document.body.appendChild(svg);
 }
@@ -1602,106 +1595,401 @@ function injectSVG() {
 ═══════════════════════════════════════════ */
 function getDefaultItems() {
   return [
-  {id:1,cat:0,price:'€4.50',photo:'photo-1509042239860-f550ce710b93',badges:['popular'],
-   name:{fr:'Espresso Double',en:'Double Espresso',el:'Διπλό Εσπρέσο',ar:'إسبريسو مزدوج',de:'Doppelter Espresso'},
-   desc:{fr:'Deux shots d\'arabica de Yirgacheffe, Éthiopie — notes intenses de fruits noirs et fève de cacao.',en:'Two shots of Yirgacheffe arabica, Ethiopia — intense notes of dark fruit and cacao bean.',el:'Δύο σφηνάκια αραβικής Yirgacheffe Αιθιοπίας — έντονες νότες μαύρων φρούτων.',ar:'جرعتان من أرابيكا يرغاشيف الإثيوبية — نكهات مكثفة من الفاكهة الداكنة.',de:'Zwei Shots Yirgacheffe-Arabica aus Äthiopien — intensive Noten dunkler Früchte.'},
-   full:{fr:'Issu d\'une sélection rigoureuse parmi les meilleurs lots de Yirgacheffe en Éthiopie, notre espresso double est torréfié artisanalement pendant 14 minutes. L\'extraction à 9 bars révèle une crème dense avec des arômes de myrtille, chocolat noir de Madagascar et jasmin. Servi dans une tasse en porcelaine de Limoges préchauffée à 40°C.',en:'From a rigorous selection in Ethiopia\'s Yirgacheffe region, our double espresso is roasted 14 minutes. Extraction at 9 bars reveals a dense crema with aromas of blueberry, Madagascar dark chocolate and jasmine. Served in a preheated Limoges porcelain cup.',el:'Από αυστηρή επιλογή Yirgacheffe Αιθιοπίας, καβουρδισμένο 14 λεπτά. Κρέμα με αρώματα βατόμουρου, σοκολάτας Μαδαγασκάρης και γιασεμιού.',ar:'من انتقاء دقيق في يرغاشيف، يُحمَّص 14 دقيقة. قشدة كثيفة بروائح التوت الداكن والشوكولاتة والياسمين.',de:'Aus Yirgacheffe-Selektion, 14 Minuten geröstet. Crema mit Blaubeeren, Madagaskar-Schokolade und Jasmin.'},
-   allergens:{fr:['Lait'],en:['Milk'],el:['Γάλα'],ar:['الحليب'],de:['Milch']}},
-  {id:2,cat:0,price:'€5.50',photo:'photo-1572442388796-11668a67e53d',badges:['popular','selection'],
-   name:{fr:'Cappuccino Classique',en:'Classic Cappuccino',el:'Κλασικό Καπουτσίνο',ar:'كابتشينو كلاسيكي',de:'Klassischer Cappuccino'},
-   desc:{fr:'Équilibre parfait entre espresso de Colombie, mousse de lait crémeuse et art latte en cœur doré.',en:'Perfect balance of Colombian espresso, creamy milk foam and golden heart latte art.',el:'Τέλεια ισορροπία εσπρέσο Κολομβίας, κρεμώδης αφρός και latte art καρδιά.',ar:'توازن مثالي بين إسبريسو كولومبي ورغوة حليب وفن لاتيه.',de:'Perfekte Balance aus kolumbianischem Espresso, cremigem Milchschaum und goldenem Herz.'},
-   full:{fr:'Notre cappuccino utilise un arabica grand cru de Huila, Colombie. Lait jersey chauffé à 65°C pour une mousse soyeuse. Art latte en cœur dessiné à la main par nos baristas certifiés SCA.',en:'Our cappuccino uses grand cru arabica from Huila, Colombia. Jersey milk steamed to 65°C for silky foam. Heart latte art hand-drawn by our SCA-certified baristas.',el:'Arabica grand cru από Huila Κολομβίας. Γάλα Jersey 65°C. Χειροποίητο latte art από SCA baristas.',ar:'أرابيكا grand cru من هويلا الكولومبية. حليب جيرسي 65°C. فن لاتيه من بارستا SCA.',de:'Grand-Cru-Arabica aus Huila. Jersey-Milch 65°C. Handgezeichnetes Herz von SCA-Baristas.'},
-   allergens:{fr:['Lait'],en:['Milk'],el:['Γάλα'],ar:['الحليب'],de:['Milch']}},
-  {id:3,cat:0,price:'€5.00',photo:'photo-1561882468-9110e03e0f78',badges:[],
-   name:{fr:'Flat White',en:'Flat White',el:'Flat White',ar:'فلات وايت',de:'Flat White'},
-   desc:{fr:'Double ristretto australien sur lait velouté en micro-mousse — concentration et douceur en harmonie.',en:'Australian double ristretto over velvety micro-foam milk — concentration and softness in harmony.',el:'Αυστραλιανό διπλό ristretto με βελούδινο micro-foam — συγκέντρωση και απαλότητα.',ar:'ريستريتو مزدوج أسترالي على حليب مخملي — تركيز وحلاوة.',de:'Australischer Doppel-Ristretto über samtiger Micro-Foam-Milch.'},
-   full:{fr:'Né à Melbourne dans les années 80, notre Flat White utilise un double ristretto d\'arabica Éthiopie-Brésil (Cerrado Mineiro). Lait bio texturé en micro-mousse soyeuse à 62°C pour une boisson concentrée, ronde et sans amertume.',en:'Born in Melbourne in the 1980s, our Flat White uses a double ristretto from an Ethiopia-Brazil Cerrado Mineiro arabica blend. Organic milk textured at 62°C for a concentrated, rounded, bitterness-free drink.',el:'Γεννημένο στη Μελβούρνη, ristretto Αιθιοπίας-Βραζιλίας. Βιολογικό γάλα micro-foam στους 62°C.',ar:'وُلد في ملبورن، ريستريتو من إثيوبيا والبرازيل. حليب عضوي 62°C.',de:'In Melbourne geboren, Doppel-Ristretto Äthiopien-Brasilien. Bio-Milch bei 62°C Micro-Foam.'},
-   allergens:{fr:['Lait'],en:['Milk'],el:['Γάλα'],ar:['الحليب'],de:['Milch']}},
-  {id:4,cat:0,price:'€6.00',photo:'photo-1534778101976-62847782c213',badges:['new'],
-   name:{fr:'Latte Noisette',en:'Hazelnut Latte',el:'Λάτε Φουντούκι',ar:'لاتيه البندق',de:'Haselnuss-Latte'},
-   desc:{fr:'Espresso velouté sur sirop de noisette du Piémont et lait d\'avoine — douceur automnale envoûtante.',en:'Velvety espresso over Piedmont hazelnut syrup and oat milk — enchanting autumnal sweetness.',el:'Βελούδινο espresso με σιρόπι φουντουκιού Πιεμόντε και γάλα βρώμης.',ar:'إسبريسو مخملي مع شراب البندق البيدموني وحليب الشوفان.',de:'Espresso über Piemonteser Haselnusssirup und Hafermilch.'},
-   full:{fr:'Notre sirop de noisette est élaboré à partir de noisettes IGP du Piémont grillées à sec. L\'espresso kenyan AA de Nyeri révèle une acidité lumineuse contrastant avec la rondeur de la noisette. Complété de lait d\'avoine biologique. Création de saison.',en:'Our hazelnut syrup is crafted from IGP Piedmont hazelnuts, dry-roasted. Kenyan AA arabica delivers bright acidity contrasting with hazelnut roundness. With organic oat milk. Seasonal creation.',el:'Σιρόπι από ΠΓΕ φουντούκια Πιεμόντε. Κενυανό AA arabica. Βιολογικό γάλα βρώμης.',ar:'شراب من بندق بيدمونت. أرابيكا كيني AA. حليب الشوفان العضوي.',de:'Haselnusssirup aus IGP-Piemonthaselnüssen. Kenyanischer AA-Arabica. Bio-Hafermilch.'},
-   allergens:{fr:['Lait','Fruits à coque'],en:['Milk','Tree nuts'],el:['Γάλα','Ξηροί καρποί'],ar:['الحليب','المكسرات'],de:['Milch','Schalenfrüchte']}},
-  {id:5,cat:0,price:'€5.50',photo:'photo-1536256263959-770b48d82b0a',badges:['vegan'],
-   name:{fr:'Matcha Latte Végétal',en:'Vegan Matcha Latte',el:'Βίγκαν Λάτε Ματσά',ar:'لاتيه ماتشا نباتي',de:'Veganes Matcha-Latte'},
-   desc:{fr:'Poudre de matcha cérémonial d\'Uji au Japon, fouettée avec lait de coco — vert, crémeux, apaisant.',en:'Ceremonial matcha powder from Uji, Japan, whisked with coconut milk — green, creamy, calming.',el:'Τελετουργική σκόνη matcha από Uji Ιαπωνίας, χτυπημένη με γάλα καρύδας.',ar:'مسحوق ماتشا احتفالي من أوجي اليابانية، مخفوق مع حليب جوز الهند.',de:'Zeremonielles Matcha-Pulver aus Uji, Japan, mit Kokosmilch.'},
-   full:{fr:'Matcha cérémonial de Marukyu-Koyamaen à Uji, Kyoto, cultivé à l\'ombre 3 semaines. Fouetté chasen-style à 75°C. Mélangé au lait de coco de Thaïlande pour une boisson 100% végétale riche en antioxydants.',en:'Ceremonial matcha from Marukyu-Koyamaen in Uji, Kyoto, shade-grown 3 weeks. Whisked chasen-style at 75°C. Blended with Thai coconut milk for a 100% plant-based antioxidant-rich drink.',el:'Matcha από Marukyu-Koyamaen, Uji. Χτυπιέται chasen 75°C. Γάλα καρύδας Ταϊλάνδης.',ar:'ماتشا من ماروكيو-كوياماين. يُخفق على 75°C. حليب جوز هند تايلاندي.',de:'Matcha aus Marukyu-Koyamaen, Uji. Bei 75°C aufgeschlagen. Thai-Kokosmilch.'},
-   allergens:{fr:['Avoine'],en:['Oats'],el:['Βρώμη'],ar:['الشوفان'],de:['Hafer']}},
-  {id:6,cat:1,price:'€6.50',photo:'photo-1461023058943-07fcbe16d735',badges:['popular'],
-   name:{fr:'Cold Brew 18h',en:'Cold Brew 18h',el:'Cold Brew 18ω',ar:'كولد برو 18 ساعة',de:'Cold Brew 18h'},
-   desc:{fr:'Café d\'Éthiopie extrait à froid 18 heures — douceur naturelle, zéro amertume, notes de caramel liquide.',en:'Ethiopian coffee cold-extracted for 18 hours — natural sweetness, zero bitterness, liquid caramel notes.',el:'Αιθιοπιακός καφές cold-extracted 18 ώρες — φυσική γλύκα, μηδέν πικράδα.',ar:'قهوة إثيوبية مستخلصة بارداً لـ18 ساعة — حلاوة طبيعية، صفر مرارة.',de:'Äthiopischer Kaffee 18h kaltextrahiert — natürliche Süße, null Bitterkeit.'},
-   full:{fr:'Notre cold brew est préparé par immersion à froid de 18 heures avec un arabica single-origin de Sidama, Éthiopie. La basse température préserve les sucres naturels pour une boisson 67% moins acide qu\'un espresso, avec des notes de caramel beurre, pêche et vanille de Madagascar.',en:'Our cold brew is 18h cold immersion with single-origin arabica from Sidama, Ethiopia. Low temperatures preserve natural sugars for a drink 67% less acidic than espresso, with butterscotch, peach and Madagascar vanilla notes.',el:'18ωρη ψυχρή εμβάπτιση arabica Sidama. 67% λιγότερο ξινό, με νότες καραμέλας, ροδάκινου, βανίλιας.',ar:'نقع بارد 18 ساعة من أرابيكا سيداما. 67% أقل حموضة، بنكهات الكراميل والخوخ.',de:'18h Kaltextraktion mit Sidama-Single-Origin. 67% weniger sauer, Butterscotch, Pfirsich, Vanille.'},
-   allergens:{fr:[],en:[],el:[],ar:[],de:[]}},
-  {id:7,cat:1,price:'€7.00',photo:'photo-1559056199-641a0ac8b55e',badges:['new','selection'],
-   name:{fr:'Frappé Grec Authentique',en:'Authentic Greek Frappé',el:'Αυθεντικό Ελληνικό Φραπέ',ar:'فرابيه يوناني أصيل',de:'Authentischer Griechischer Frappé'},
-   desc:{fr:'L\'icone du café grec — mousse dense, café instantané Nescafé, glaçons et lait condensé.',en:'The icon of Greek coffee — dense foam, Nescafé instant coffee, ice cubes and condensed milk.',el:'Το εμβληματικό ελληνικό ποτό — πυκνός αφρός, Nescafé, παγάκια και γάλα.',ar:'رمز القهوة اليونانية — رغوة كثيفة، نسكافيه، مكعبات ثلج وحليب مكثف.',de:'Die Ikone des griechischen Kaffees — dichter Schaum, Nescafé, Eiswürfel und Kondensmilch.'},
-   full:{fr:'Né à Thessalonique en 1957, notre frappé grec est un hommage à la culture hellénique. Nescafé Original battu électriquement pour une mousse dense de 4 cm. Servi en grand verre avec glaçons à l\'eau de source de l\'Olympe et filet de lait condensé Nestlé.',en:'Born in Thessaloniki in 1957, our Greek frappé is a tribute to Hellenic coffee culture. Nescafé electric-shaken for 4cm dense foam. Tall glass with Olympus spring water ice cubes and Nestlé condensed milk.',el:'Γεννημένο στη Θεσσαλονίκη το 1957. Nescafé ηλεκτρικά για αφρό 4 εκ. Παγάκια νερό Ολύμπου, γάλα Nestlé.',ar:'وُلد في ثيسالونيكي 1957. نسكافيه مخفوق كهربياً لرغوة 4 سم. مكعبات ثلج وحليب مكثف.',de:'In Thessaloniki 1957 geboren. Nescafé elektrisch für 4cm Schaum. Olymp-Quellwasser-Eiswürfel, Kondensmilch.'},
-   allergens:{fr:['Lait'],en:['Milk'],el:['Γάλα'],ar:['الحليب'],de:['Milch']}},
-  {id:8,cat:1,price:'€7.50',photo:'photo-1553530979-7ee42e081808',badges:[],
-   name:{fr:'Smoothie Tropical Doré',en:'Golden Tropical Smoothie',el:'Χρυσή Τροπική Σμούθι',ar:'عصير استوائي ذهبي',de:'Goldener Tropischer Smoothie'},
-   desc:{fr:'Mangue Alphonso, ananas Victoria, banane et curcuma frais — éclat tropical et bien-être dans un verre.',en:'Alphonso mango, Victoria pineapple, banana and fresh turmeric — tropical radiance and wellness.',el:'Μάνγκο Alphonso, ανανάς Victoria, μπανάνα και φρέσκος κουρκουμάς.',ar:'مانجو ألفونسو وأناناس فيكتوريا وموز وكركم طازج.',de:'Alphonso-Mango, Victoria-Ananas, Banane und frischer Kurkuma.'},
-   full:{fr:'Mangue Alphonso de Ratnagiri — reine des mangues — avec ananas Victoria de La Réunion. Curcuma frais bio de Ceylan pour ses propriétés anti-inflammatoires. Mixé à froid avec glaçons de lait de coco. Zéro sucre ajouté.',en:'Alphonso mango from Ratnagiri, India — queen of mangoes — with Victoria pineapple from Réunion. Fresh organic Ceylon turmeric for anti-inflammatory benefits. Cold-blended with coconut milk ice cubes. No added sugar.',el:'Mango Alphonso από Ratnagiri. Ανανάς Victoria από Réunion. Κουρκουμάς Κεϋλάνης. Παγάκια γάλακτος καρύδας.',ar:'مانجو ألفونسو من راتناغيري. أناناس فيكتوريا من ريونيون. كركم سيلاني. مكعبات جوز الهند.',de:'Alphonso-Mango aus Ratnagiri. Victoria-Ananas aus Réunion. Bio-Kurkuma aus Ceylon. Kokosmilch-Eiswürfel.'},
-   allergens:{fr:['Fruits à coque'],en:['Tree nuts'],el:['Ξηροί καρποί'],ar:['المكسرات'],de:['Schalenfrüchte']}},
-  {id:9,cat:1,price:'€6.00',photo:'photo-1499638673689-79a0b5115d87',badges:['vegan'],
-   name:{fr:'Limonade Lavande',en:'Lavender Lemonade',el:'Λεμονάδα Λεβάντα',ar:'ليمونادة اللافندر',de:'Lavendel-Limonade'},
-   desc:{fr:'Citrons de Menton pressés à la main, sirop de lavande de Provence et eau pétillante — romance botanique.',en:'Hand-pressed Menton lemons, Provence lavender syrup and sparkling water — a botanical romance.',el:'Χειροστυμμένα λεμόνια Μεντόν, σιρόπι λεβάντας Προβηγκίας και ανθρακούχο νερό.',ar:'ليمون منتون معصور يدوياً وشراب لافندر وماء فوار.',de:'Handgepresste Menton-Zitronen, Provence-Lavendelsirup und Sprudelwasser.'},
-   full:{fr:'Citrons de Menton IGP pressés à la minute. Sirop de lavande fine de Haute-Provence AOP, macéré à froid 48h. Avec eau gazeuse minérale, menthe fraîche et fleurs de lavande comestibles. Aucun arôme artificiel.',en:'IGP Menton lemons pressed to order. Fine lavender from Haute-Provence AOP, cold macerated 48h. With mineral sparkling water, fresh mint and edible lavender flowers. No artificial flavours.',el:'ΠΓΕ λεμόνια Μεντόν. Λεβάντα Haute-Provence AOP, 48ωρη μακεράρισμα. Ανθρακούχο νερό, μέντα.',ar:'ليمون منتون. لافندر هوت-بروفانس، نقع بارد 48 ساعة. ماء فوار ونعناع.',de:'IGP-Menton-Zitronen. Haute-Provence AOP Lavendel, 48h kalt mazeriert. Sprudelwasser, Minze.'},
-   allergens:{fr:[],en:[],el:[],ar:[],de:[]}},
-  {id:10,cat:1,price:'€8.00',photo:'photo-1568901346375-23c9450c58cd',badges:['new'],
-   name:{fr:'Affogato al Cioccolato',en:'Affogato al Cioccolato',el:'Αφφογκάτο αλ Τσοκολάτο',ar:'أفوغاتو بالشوكولاتة',de:'Affogato al Cioccolato'},
-   desc:{fr:'Glace vanille artisanale noyée dans un espresso chaud et chocolat noir 72% — rencontre italienne légendaire.',en:'Artisan vanilla ice cream drowned in hot espresso and 72% dark chocolate — a legendary Italian encounter.',el:'Χειροποίητο παγωτό βανίλιας πνιγμένο σε espresso και σοκολάτα 72%.',ar:'آيس كريم فانيليا يدوي مغرق في إسبريسو وشوكولاتة 72%.',de:'Handgemachtes Vanilleeis in Espresso und 72% Zartbitterschokolade.'},
-   full:{fr:'L\'affogato — "noyé" en italien — avec deux scoops de glace vanille Bourbon de Madagascar sans conservateurs, préparée le matin même. Un espresso double bouillant coulé au dernier moment, suivi de ganache Valrhona 72% Grand Cru de São Tomé.',en:'The affogato — "drowned" in Italian — with two scoops of preservative-free Madagascar Bourbon vanilla ice cream, prepared fresh each morning. A boiling double espresso poured last, then Valrhona 72% Grand Cru ganache from São Tomé.',el:'Δύο μπάλες παγωτό Bourbon βανίλιας Μαδαγασκάρης. Καυτό espresso και ganache Valrhona 72% São Tomé.',ar:'كرتا آيس كريم فانيليا بوربون مدغشقر. إسبريسو مغلي وغاناش فالرهونا 72%.',de:'Bourbon-Vanilleeis aus Madagaskar. Kochender Espresso und Valrhona 72% Ganache São Tomé.'},
-   allergens:{fr:['Lait'],en:['Milk'],el:['Γάλα'],ar:['الحليب'],de:['Milch']}},
-  {id:11,cat:2,price:'€9.50',photo:'photo-1555507036-ab1f4038024a',badges:['popular'],
-   name:{fr:'Croissant Beurre AOP',en:'AOP Butter Croissant',el:'Κρουασάν Βουτύρου AOP',ar:'كرواسان زبدة AOP',de:'AOP-Butter-Croissant'},
-   desc:{fr:'Feuilletage délicat en 27 couches, beurre Charentes-Poitou AOP, doré à la perfection chaque matin.',en:'Delicate 27-layer puff pastry, Charentes-Poitou AOP butter, gilded to perfection each morning.',el:'Λεπτή 27-στρώματη ζύμη, βούτυρο Charentes-Poitou AOP, χρυσαφένιο κάθε πρωί.',ar:'معجنة بـ27 طبقة، زبدة شارونت-بواتو AOP، مذهّبة كل صباح.',de:'27-schichtiges Blätterteig, Charentes-Poitou AOP-Butter, täglich goldgebacken.'},
-   full:{fr:'Notre croissant est livré chaque matin à 5h30 par la Maison Picard d\'Athènes formée à Paris. Feuilletage à la main en 3 tours doubles pour 27 couches, beurre Charentes-Poitou AOP — le plus riche en acide butyrique.',en:'Our croissant is delivered daily at 5:30 AM by Maison Picard, an Athenian bakery trained in Paris. Hand-laminated in 3 double turns for 27 layers, Charentes-Poitou AOP butter — richest in butyric acid.',el:'Παραδίδεται 5:30 από Maison Picard Αθήνας. Χειροποίητο 27 στρώματα, βούτυρο AOP.',ar:'يُسلَّم 5:30 من مخبز ماييزون بيكار. ملفوف 27 طبقة بزبدة AOP.',de:'Täglich 5:30 von Maison Picard. Hand-laminiert 27 Schichten, AOP-Butter.'},
-   allergens:{fr:['Gluten','Lait','Œufs'],en:['Gluten','Milk','Eggs'],el:['Γλουτένη','Γάλα','Αυγά'],ar:['الغلوتين','الحليب','البيض'],de:['Gluten','Milch','Eier']}},
-  {id:12,cat:2,price:'€12.00',photo:'photo-1546069901-ba9599a7e63c',badges:[],
-   name:{fr:'Tartine Avocat & Feta',en:'Avocado & Feta Toast',el:'Τοστ Αβοκάντο & Φέτα',ar:'خبزة الأفوكادو والفيتا',de:'Avocado-Feta-Toast'},
-   desc:{fr:'Avocat Hass d\'Espagne, feta AOP d\'Égine, pain de seigle au levain — fraîcheur méditerranéenne absolue.',en:'Hass avocado from Spain, AOP feta from Aegina, sourdough rye bread — absolute Mediterranean freshness.',el:'Αβοκάντο Hass Ισπανίας, φέτα ΠΟΠ Αίγινας, ψωμί σίκαλης με προζύμι.',ar:'أفوكادو هاس إسباني وجبن فيتا AOP من إيجينا وخبز الجاودار.',de:'Hass-Avocado aus Spanien, AOP-Feta aus Ägina, Sauerteig-Roggenbrot.'},
-   full:{fr:'Avocat Hass de Málaga écrasé avec huile d\'olive extra-vierge du Péloponnèse, fleur de sel de Guerande et zeste de citron de Menton. Sur pain de seigle au levain de la Maison Picard. Coiffé de feta AOP d\'Égine, sésame noir torréfié et piment d\'Espelette.',en:'Málaga Hass avocado mashed with Peloponnese extra-virgin olive oil, Guérande fleur de sel and Menton lemon zest. On Maison Picard sourdough rye. Topped with Aegina AOP feta, black sesame and Espelette pepper.',el:'Αβοκάντο Hass Μάλαγα, ελαιόλαδο Πελοποννήσου. Ψωμί σίκαλης Maison Picard. Φέτα ΠΟΠ Αίγινας, σουσάμι.',ar:'أفوكادو هاس من مالاغا مع زيت زيتون. على خبز جاودار. فيتا AOP من إيجينا وسمسم أسود.',de:'Málaga-Avocado mit Peloponnes-Olivenöl. Auf Roggenbrot. Aegina-AOP-Feta, schwarzer Sesam.'},
-   allergens:{fr:['Gluten','Lait'],en:['Gluten','Milk'],el:['Γλουτένη','Γάλα'],ar:['الغلوتين','الحليب'],de:['Gluten','Milch']}},
-  {id:13,cat:2,price:'€8.50',photo:'photo-1590301157890-4810ed352733',badges:['vegan'],
-   name:{fr:'Energy Bowl Açaí',en:'Açaí Energy Bowl',el:'Μπολ Ενέργειας Açaí',ar:'وعاء طاقة الأساي',de:'Açaí Energy Bowl'},
-   desc:{fr:'Base açaí de Pará au Brésil, granola maison, fruits frais de saison et coulis de fruits rouges.',en:'Açaí base from Pará, Brazil, house granola, seasonal fresh fruits and red berry coulis.',el:'Βάση açaí από Pará Βραζιλίας, σπιτική granola, φρέσκα φρούτα εποχής.',ar:'قاعدة أساي من بارا البرازيلية، غرانولا منزلية، فواكه طازجة موسمية.',de:'Açaí-Basis aus Pará Brasilien, hausgemachtes Granola, saisonale Früchte.'},
-   full:{fr:'L\'açaí vient de coopératives de l\'État de Pará, Amazonie brésilienne. Pulpe surgelée mixée à la minute avec banane et lait de coco. Garnie de granola maison (avoine, chia, amandes du Chili, miel de l\'Hymette) et fruits de saison. 100% végétale.',en:'Açaí from cooperatives in Pará, Brazilian Amazon. Frozen pulp blended to order with banana and coconut milk. Topped with house granola (oats, chia, Chilean almonds, Hymettus honey) and seasonal fruits. 100% plant-based.',el:'Açaí από Pará. Πολτός με μπανάνα και γάλα καρύδας. Granola (βρώμη, chia, αμύγδαλα, μέλι Υμηττού).',ar:'أساي من بارا. لب مع موز وجوز الهند. غرانولا (شوفان وشيا ولوز وعسل أثيني).',de:'Açaí aus Pará. Fruchtfleisch mit Banane und Kokosmilch. Granola (Hafer, Chia, Mandeln, Hymettus-Honig).'},
-   allergens:{fr:['Fruits à coque'],en:['Tree nuts'],el:['Ξηροί καρποί'],ar:['المكسرات'],de:['Schalenfrüchte']}},
-  {id:14,cat:2,price:'€11.00',photo:'photo-1528735602780-2552fd46c7af',badges:['popular'],
-   name:{fr:'Club Sandwich Poulet',en:'Chicken Club Sandwich',el:'Club Σάντουιτς Κοτόπουλο',ar:'ساندوتش كلوب الدجاج',de:'Hähnchen-Club-Sandwich'},
-   desc:{fr:'Poulet rôti aux herbes de Provence, bacon fumé, tomate cerise, avocat et mayo maison au citron.',en:'Herb-roasted chicken, smoked bacon, cherry tomatoes, avocado and house lemon mayo.',el:'Κοτόπουλο ψητό με βότανα, καπνιστό μπέικον, ντοματάκια, αβοκάντο και mayo λεμονιού.',ar:'دجاج مشوي بأعشاب ولحم مقدد وطماطم وأفوكادو ومايونيز ليمون.',de:'Kräuterhähnchen, Speck, Kirschtomaten, Avocado und Zitronen-Mayonnaise.'},
-   full:{fr:'Poulet Label Rouge hellénique élevé en plein air, mariné 24h aux herbes de Provence et rôti à 70°C pendant 3 heures. Assemblé sur pain brioche toasté avec laitue romaine croquante, tomates cerise de Crète, bacon ibérique fumé au hêtre et avocat. Mayonnaise maison au citron de Menton.',en:'Hellenic free-range Label Rouge chicken, marinated 24h in Provence herbs and slow-roasted at 70°C for 3 hours. On toasted brioche with romaine, Cretan cherry tomatoes, beech-smoked Iberian bacon and avocado. House-made Menton lemon mayo.',el:'Κοτόπουλο Label Rouge, μαρινάτο 24ω, ψημένο 70°C. Brioche, ρόμεην, ντοματάκια Κρήτης, μπέικον ιβηρικό.',ar:'دجاج لابيل روج، متبَّل 24 ساعة، مشوي 70°C. برييوش وخس وطماطم ومقدد إيبيري.',de:'Freiland-Hähnchen Label Rouge, 24h mariniert, bei 70°C. Brioche, Romana, kretische Tomaten, iberischer Speck.'},
-   allergens:{fr:['Gluten','Lait','Œufs'],en:['Gluten','Milk','Eggs'],el:['Γλουτένη','Γάλα','Αυγά'],ar:['الغلوتين','الحليب','البيض'],de:['Gluten','Milch','Eier']}},
-  {id:15,cat:2,price:'€7.00',photo:'photo-1585937421612-70a008356fbe',badges:['vegan','new'],
-   name:{fr:'Houmous Trio',en:'Hummus Trio',el:'Τρίο Χούμους',ar:'ثلاثي الحمص',de:'Hummus-Trio'},
-   desc:{fr:'Trois hummus signature : classique, betterave-cumin et poivron rôti, avec pain pita chaud maison.',en:'Three signature hummus: classic, beetroot-cumin and roasted pepper, with warm house pita bread.',el:'Τρία signature hummus: κλασικό, παντζάρι-κύμινο και ψητή πιπεριά, με σπιτική πίτα.',ar:'ثلاثة حمص: كلاسيكي وشمندر-كمون وفلفل مشوي مع خبز بيتا منزلي.',de:'Drei Hummus-Varianten: klassisch, Rote-Bete-Kreuzkümmel und Paprika, mit Haus-Pita.'},
-   full:{fr:'Notre trio de houmous est préparé chaque matin avec des pois chiches bio de Farsala (Thessalie), trempés 12h. Tahin d\'un moulin artisanal de Jérusalem. Classique : citron de Menton. Betterave : betteraves macédoniennes rôties. Poivron : poivrons au four à bois, paprika fumé de La Vera. Pita sortie du four toutes les 30 minutes.',en:'Our hummus trio is prepared each morning with organic chickpeas from Farsala, Thessaly, soaked 12h. Tahini from a Jerusalem artisan mill. Classic: Menton lemon. Beetroot: roasted Macedonian beets. Pepper: wood-oven roasted peppers, La Vera smoked paprika. House pita every 30 minutes.',el:'Βιολογικά ρεβίθια Φαρσάλων, 12 ώρες. Ταχίνι Ιερουσαλήμ. Κλασικό: λεμόνι. Παντζάρι: ψητό. Πιπεριά: ξυλόφουρνος.',ar:'حمص عضوي من فارسالا، نقع 12 ساعة. طحينة أورشليم. كلاسيكي: ليمون. شمندر: مشوي. فلفل: فرن خشبي.',de:'Bio-Kichererbsen aus Farsala, 12h. Jerusalem-Tahini. Klassisch: Menton-Zitrone. Rübe: geröstete Bete. Paprika: Holzofen.'},
-   allergens:{fr:['Sésame'],en:['Sesame'],el:['Σουσάμι'],ar:['السمسم'],de:['Sesam']}},
-  {id:16,cat:3,price:'€8.50',photo:'photo-1563227812-0ea4c22e6cc8',badges:['new'],
-   name:{fr:'Latte Pistache & Rose',en:'Pistachio Rose Latte',el:'Λάτε Φιστίκι & Τριαντάφυλλο',ar:'لاتيه الفستق والورد',de:'Pistazien-Rosen-Latte'},
-   desc:{fr:'Pistaches d\'Égine et eau de rose de Damas — une création florale et gourmande unique au Mozart Café.',en:'Aegina pistachios and Damascus rose water — a floral, indulgent creation unique to Mozart Café.',el:'Φιστίκια Αίγινας και ροδόνερο Δαμασκού — ανθική δημιουργία μοναδική στο Mozart Café.',ar:'فستق إيجينا وماء ورد دمشقي — إبداع زهري حصري لإليزيه.',de:'Ägina-Pistazien und Damaszener Rosenwasser — florale Kreation, einzigartig im Mozart Café.'},
-   full:{fr:'Cette création de notre Chef Barista s\'inspire des traditions perses de café parfumé. Sirop de pistache DOP d\'Égine grillées à sec et mixées en pâte pure. Une touche d\'eau de rose de Damas bio. Espresso Guji Éthiopie en micro-mousse jersey, pétales de rose séchés et éclats de pistache.',en:'Our Head Barista\'s creation inspired by Persian perfumed coffee traditions. DOP pistachio syrup from Aegina Island — finest in the Mediterranean — dry-roasted into pure paste. A touch of organic Damascus rose water. Ethiopian Guji espresso with jersey micro-foam, dried rose petals and pistachio shards.',el:'Σιρόπι ΠΟΠ φιστικιού Αίγινας. Ροδόνερο Δαμασκού. Espresso Guji Αιθιοπίας, micro-foam jersey.',ar:'شراب فستق DOP من إيجينا. ماء ورد دمشقي. إسبريسو غوجي مع micro-foam وبتلات ورد.',de:'DOP-Pistaziensirup von Aegina. Damaszener Rosenwasser. Guji-Espresso, Jersey-Micro-Foam.'},
-   allergens:{fr:['Pistaches','Lait'],en:['Pistachios','Milk'],el:['Φιστίκια','Γάλα'],ar:['الفستق','الحليب'],de:['Pistazien','Milch']}},
-  {id:17,cat:3,price:'€9.00',photo:'photo-1530373239216-42518e6b4063',badges:['popular','selection'],
-   name:{fr:'Mozart Café Signature',en:'Mozart Café Signature',el:'Mozart Café Signature',ar:'قهوة موزارت سيجنيتشر',de:'Mozart Café Signature'},
-   desc:{fr:'Notre blend maison exclusif — arabica d\'Éthiopie et de Colombie — la quintessence du Mozart Café.',en:'Our exclusive house blend — Ethiopian and Colombian arabica — the quintessence of Mozart Café.',el:'Το αποκλειστικό house blend μας — Αιθιοπία και Κολομβία — η ουσία του Mozart Café.',ar:'مزيجنا المنزلي الحصري — أرابيكا إثيوبية وكولومبية — جوهر موزارت كافيه.',de:'Unsere exklusive Hausmischung — äthiopische und kolumbianische Arabica.'},
-   full:{fr:'Le Mozart Café Signature est le fruit de deux ans de sélection par nos sommeliers. Blend 60/40 : arabica Yirgacheffe Éthiopie (floral, fruits exotiques) et Huila Colombie (caramel, amandes). Torréfié en 16 minutes dans notre brûlerie partenaire de Kifissia. Servi en lungo dans une tasse chauffée avec twist d\'orange Moro de Sicile. Carré de chocolat Valrhona offert.',en:'The Mozart Café Signature is the result of two years of selection by our coffee sommeliers. 60/40 blend: Yirgacheffe Ethiopia (floral, exotic fruits) and Huila Colombia (caramel, almonds). Slow-roasted 16 minutes. Served as a lungo in a heated cup with Sicilian Moro orange twist. Complimentary Valrhona chocolate square.',el:'Δύο χρόνια επιλογής. Blend 60/40 Yirgacheffe Αιθιοπίας και Huila Κολομβίας. Lungo με twist πορτοκαλιού, Valrhona.',ar:'نتيجة عامين من الاختيار. مزيج 60/40 يرغاشيف وهويلا. لونغو مع قشر برتقال وشوكولاتة فالرهونا.',de:'Ergebnis zweijähriger Selektion. 60/40 Yirgacheffe und Huila. Lungo mit Orangen-Twist und Valrhona.'},
-   allergens:{fr:['Lait'],en:['Milk'],el:['Γάλα'],ar:['الحليب'],de:['Milch']}},
-  {id:18,cat:3,price:'€7.50',photo:'photo-1558857563-b371033873b8',badges:['vegan'],
-   name:{fr:'Golden Milk Curcuma',en:'Turmeric Golden Milk',el:'Χρυσό Γάλα Κουρκουμά',ar:'حليب ذهبي بالكركم',de:'Kurkuma Golden Milk'},
-   desc:{fr:'Lait de coco de Thaïlande, curcuma de Ceylan, gingembre frais, poivre noir et miel de l\'Hymette.',en:'Thai coconut milk, Ceylon turmeric, fresh ginger, black pepper and Hymettus honey.',el:'Γάλα καρύδας Ταϊλάνδης, κουρκουμάς Κεϋλάνης, φρέσκος τζίντζερ, πιπέρι και μέλι Υμηττού.',ar:'حليب جوز هند تايلاندي وكركم سيلاني وزنجبيل طازج وفلفل أسود وعسل أثيني.',de:'Thailändische Kokosmilch, Ceylon-Kurkuma, frischer Ingwer, schwarzer Pfeffer, Hymettus-Honig.'},
-   full:{fr:'Le Golden Milk ayurvédique est préparé avec curcuma bio Grade A de Ceylan. Notre recette : lait de coco entier de Thaïlande (sans émulsifiant), gingembre frais bio râpé, poivre noir du Kerala (×20 absorption de curcumine), cardamome de Guatemala et miel de thym brut de l\'Hymette — le miel le plus précieux de Grèce. Chauffé à 72°C.',en:'Ayurvedic Golden Milk prepared with Grade A organic Ceylon turmeric. Our recipe: whole Thai coconut milk, freshly grated organic ginger, Kerala black pepper (×20 curcumin absorption), Guatemalan cardamom and raw Hymettus thyme honey — Greece\'s most precious honey. Heated to 72°C.',el:'Βιολογικός κουρκουμάς Grade A Κεϋλάνης. Γάλα καρύδας Ταϊλάνδης, τζίντζερ, πιπέρι Kerala (×20), κάρδαμο, μέλι Υμηττού.',ar:'كركم عضوي Grade A من سيلان. حليب جوز هند تايلاندي، زنجبيل، فلفل كيرالا (×20)، هيل، عسل أثيني.',de:'Bio-Kurkuma Grade A aus Ceylon. Thai-Kokosmilch, Bio-Ingwer, Kerala-Pfeffer (×20), Kardamom, Hymettus-Rohhonig.'},
-   allergens:{fr:['Noix de coco'],en:['Coconut'],el:['Καρύδα'],ar:['جوز الهند'],de:['Kokosnuss']}},
-  {id:19,cat:3,price:'€14.00',photo:'photo-1504674900247-0877df9cc836',badges:['popular','new'],
-   name:{fr:'Brunch Board Mozart',en:'Mozart Brunch Board',el:'Brunch Board Mozart',ar:'طبق برنش موزارت',de:'Mozart Brunch Board'},
-   desc:{fr:'Un plateau royal : œuf parfait, saumon fumé d\'Écosse, avocat, feta d\'Égine et tartines grillées.',en:'A royal board: perfect egg, Scottish smoked salmon, avocado, Aegina feta and grilled toasts.',el:'Βασιλικό πλατό: τέλειο αυγό, καπνιστός σολομός Σκωτίας, αβοκάντο, φέτα Αίγινας.',ar:'طبق ملكي: بيضة مثالية وسلمون مدخن اسكتلندي وأفوكادو وفيتا إيجينا.',de:'Königliches Board: perfektes Ei, schottischer Räucherlachs, Avocado, Aegina-Feta.'},
-   full:{fr:'Le Brunch Board Mozart est notre pièce maîtresse du week-end. Œuf poché à 63°C en sous-vide 45 min, saumon fumé à froid 24h d\'Écosse (AOC), avocat Hass tranché, feta AOP d\'Égine émiettée, tartines de pain de seigle au levain grillées, quenelle de fromage de chèvre de Macédoine avec compotée de figues de Kalamata. Jus d\'agrumes pressés et café Mozart inclus.',en:'The Mozart Brunch Board is our weekend showpiece. 63°C sous-vide egg 45 min, Scottish 24h cold-smoked salmon (AOC), sliced Hass avocado, crumbled Aegina AOP feta, grilled sourdough rye toasts, quenelle of Macedonian goat cheese with Kalamata fig compote. Freshly pressed citrus juice and Mozart coffee included.',el:'Αυγό sous-vide 63°C 45 λεπτά. Σολομός Σκωτίας, αβοκάντο Hass, φέτα Αίγινας, ψωμί σίκαλης, κατσικίσιο τυρί Μακεδονίας με σύκο Καλαμάτας.',ar:'بيضة سوس-فيد 63°C لـ45 دقيقة. سلمون اسكتلندي، أفوكادو هاس، فيتا إيجينا، خبز جاودار، جبن ماعز مقدوني مع تين.',de:'63°C Sous-Vide-Ei 45 Min. Schottischer Räucherlachs, Hass-Avocado, Aegina-Feta, Roggenbrot, mazedonischer Ziegenkäse.'},
-   allergens:{fr:['Gluten','Lait','Œufs'],en:['Gluten','Milk','Eggs'],el:['Γλουτένη','Γάλα','Αυγά'],ar:['الغلوتين','الحليب','البيض'],de:['Gluten','Milch','Eier']}},
-  {id:20,cat:3,price:'€6.50',photo:'photo-1551024506-0bccd828d307',badges:[],
-   name:{fr:'Tiramisu Maison',en:'House Tiramisu',el:'Σπιτικό Τιραμισού',ar:'تيراميسو البيت',de:'Hausgemachtes Tiramisu'},
-   desc:{fr:'Mascarpone de Lombardie, biscuits de Savoie trempés dans notre espresso Signature, cacao de Madagascar.',en:'Lombard mascarpone, Savoy biscuits soaked in our Signature espresso, Madagascar cocoa.',el:'Μασκαρπόνε Λομβαρδίας, μπισκότα Savoie στο Signature espresso, κακάο Μαδαγασκάρης.',ar:'ماسكاربوني لومباردي وبسكويت سافوا منقوع في إسبريسو سيجنيتشر وكاكاو مدغشقر.',de:'Lombardisches Mascarpone, Savoiardi in Signature-Espresso getränkt, Madagaskar-Kakao.'},
-   full:{fr:'Notre tiramisu maison suit scrupuleusement la recette vénitienne du XVIIe siècle. Mascarpone bio de Lombardie (50% MG) battu avec des œufs fermiers de Béotie et sucre de canne non raffiné. Savoiardi trempés dans notre espresso Mozart Signature refroidi et un trait de marsala sicilien Florio. Monté en couches et reposé 12h au frais. Finition au cacao pur Valrhona Madagascar tamisé avant service.',en:'Our house tiramisu strictly follows the 17th-century Venetian recipe. Organic Lombard mascarpone (50% fat) beaten with Boeotian free-range eggs and unrefined cane sugar. Savoiardi soaked in chilled Mozart Signature espresso and Florio Sicilian marsala. Assembled in layers, rested 12 hours. Finished with pure Valrhona Madagascar cocoa powder sifted before serving.',el:'Βιολογικό μασκαρπόνε Λομβαρδίας με αυγά Βοιωτίας. Savoiardi στο Signature espresso και Florio Marsala. 12 ώρες. Κακάο Valrhona Μαδαγασκάρης.',ar:'ماسكاربوني لومبارد عضوي مع بيض بيوطي. بسكويت في إسبريسو سيجنيتشر ومارسالا. 12 ساعة. كاكاو فالرهونا مدغشقر.',de:'Bio-Lombard-Mascarpone mit boeotischen Eiern. Savoiardi in Signature-Espresso und Florio-Marsala. 12h Ruhezeit. Valrhona-Madagaskar-Kakao.'},
-   allergens:{fr:['Lait','Gluten','Œufs'],en:['Milk','Gluten','Eggs'],el:['Γάλα','Γλουτένη','Αυγά'],ar:['الحليب','الغلوتين','البيض'],de:['Milch','Gluten','Eier']}}
+  /* ---- CAT 0: Boissons Chaudes ---- */
+  {
+    id:1, cat:0, price:'3.500 DT', photo:'photo-1509042239860-f550ce710b93',
+    badges:['popular'],
+    name:{ fr:'Espresso', en:'Espresso', ar:'إسبريسو' },
+    desc:{ fr:'Café court et intense — pur, concentré, signature Mozart.', en:'Short and intense coffee — pure, concentrated, Mozart signature.', ar:'قهوة قصيرة ومكثفة — نقية وصافية، توقيع موزارت.' },
+    full:{ fr:'Notre espresso est extrait à la pression idéale de 9 bars, révélant des arômes profonds de noisette et de chocolat noir. Servi dans une tasse préchauffée pour préserver toutes ses saveurs.', en:'Our espresso is extracted at the ideal pressure of 9 bars, revealing deep notes of hazelnut and dark chocolate. Served in a preheated cup to preserve all its flavours.', ar:'يُستخلص إسبريسونا على ضغط مثالي 9 بار، ليكشف نكهات عميقة من البندق والشوكولاتة الداكنة. يُقدَّم في كوب مسخَّن مسبقاً للحفاظ على كل نكهاته.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:2, cat:0, price:'4.000 DT', photo:'photo-1565031491910-e57fac031c41',
+    badges:[],
+    name:{ fr:'Doppio', en:'Doppio', ar:'دوبيو' },
+    desc:{ fr:'Double espresso puissant — pour les vrais amateurs de café fort.', en:'Powerful double espresso — for true lovers of strong coffee.', ar:'إسبريسو مزدوج قوي — لعشاق القهوة الحقيقيين.' },
+    full:{ fr:'Deux extractions d\'espresso combinées dans une même tasse. Un café généreux, puissant et plein de caractère, idéal l\'après-midi ou en fin de repas.', en:'Two espresso extractions combined in one cup. A generous, powerful, full-character coffee, perfect in the afternoon or after a meal.', ar:'استخلاصان من الإسبريسو مجمعتان في كوب واحد. قهوة سخية وقوية ومليئة بالطابع، مثالية بعد الظهر أو بعد الأكل.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:3, cat:0, price:'5.500 DT', photo:'photo-1572442388796-11668a67e53d',
+    badges:['popular'],
+    name:{ fr:'Cappuccino', en:'Cappuccino', ar:'كابتشينو' },
+    desc:{ fr:'Espresso, lait chaud et mousse veloutée — l\'équilibre parfait.', en:'Espresso, steamed milk and velvety foam — the perfect balance.', ar:'إسبريسو وحليب مسخَّن وزبد مخملي — التوازن المثالي.' },
+    full:{ fr:'Notre cappuccino est préparé avec un espresso maison et un lait entier texturé à la vapeur à 65°C pour une mousse soyeuse et homogène. Un classique indémodable.', en:'Our cappuccino is made with a house espresso and whole milk textured with steam at 65°C for a silky, even foam. A timeless classic.', ar:'يُحضَّر كابتشينو بإسبريسو البيت وحليب كامل الدسم مبخَّر على 65°C لزبد حريري ومتجانس. كلاسيكي لا يمل.' },
+    allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
+  },
+  {
+    id:4, cat:0, price:'6.000 DT', photo:'photo-1561882468-9110e03e0f78',
+    badges:['popular'],
+    name:{ fr:'Café Latte', en:'Café Latte', ar:'كافيه لاتيه' },
+    desc:{ fr:'Espresso sur lit de lait soyeux, doux et crémeux.', en:'Espresso on a bed of silky milk, soft and creamy.', ar:'إسبريسو على سرير من الحليب الحريري، ناعم وكريمي.' },
+    full:{ fr:'Le café latte associe un espresso intense à une grande quantité de lait micro-moussé pour une boisson douce, longue et réconfortante. Parfait pour un moment de détente.', en:'The café latte combines an intense espresso with a large amount of micro-frothed milk for a soft, long and comforting drink. Perfect for a relaxing moment.', ar:'يجمع الكافيه لاتيه بين إسبريسو قوي وكمية كبيرة من الحليب المرغي لمشروب ناعم وطويل ومريح. مثالي للاسترخاء.' },
+    allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
+  },
+  {
+    id:5, cat:0, price:'5.000 DT', photo:'photo-1514432324607-a09d9b4aefdd',
+    badges:[],
+    name:{ fr:'Café Noisette', en:'Hazelnut Coffee', ar:'قهوة بالبندق' },
+    desc:{ fr:'Espresso allongé d\'un nuage de lait parfumé à la noisette.', en:'Espresso with a cloud of hazelnut-scented milk.', ar:'إسبريسو مع قليل من الحليب بنكهة البندق.' },
+    full:{ fr:'Un espresso doux agrémenté d\'un soupçon de lait chaud et d\'un arôme de noisette. La douceur d\'un latte avec le caractère d\'un espresso.', en:'A mild espresso enhanced with a hint of hot milk and hazelnut aroma. The sweetness of a latte with the character of an espresso.', ar:'إسبريسو ناعم مع لمسة من الحليب الساخن ورائحة البندق. حلاوة اللاتيه مع طابع الإسبريسو.' },
+    allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
+  },
+  {
+    id:6, cat:0, price:'4.500 DT', photo:'photo-1496318447583-f524534e9ce1',
+    badges:[],
+    name:{ fr:'Americano', en:'Americano', ar:'أمريكانو' },
+    desc:{ fr:'Espresso allongé à l\'eau chaude — café long et équilibré.', en:'Espresso extended with hot water — long and balanced coffee.', ar:'إسبريسو ممدود بالماء الساخن — قهوة طويلة ومتوازنة.' },
+    full:{ fr:'L\'americano est un espresso dilué avec de l\'eau chaude pour obtenir un café long avec un goût plein mais moins intense. Idéal pour ceux qui préfèrent un café plus doux.', en:'The americano is an espresso diluted with hot water to create a long coffee with a full taste but less intense. Ideal for those who prefer a milder coffee.', ar:'الأمريكانو هو إسبريسو مخفف بالماء الساخن للحصول على قهوة طويلة بطعم كامل لكن أقل حدة. مثالي لمن يفضلون قهوة أكثر نعومة.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:7, cat:0, price:'3.000 DT', photo:'photo-1544787219-7f47ccb76574',
+    badges:[],
+    name:{ fr:'Thé Nature', en:'Plain Tea', ar:'شاي طبيعي' },
+    desc:{ fr:'Thé noir ou vert selon votre choix — chaud et réconfortant.', en:'Black or green tea of your choice — warm and comforting.', ar:'شاي أسود أو أخضر حسب اختيارك — دافئ ومريح.' },
+    full:{ fr:'Un thé préparé avec soin, servi dans une théière élégante avec sucre et citron. Choisissez entre thé noir Ceylon et thé vert Gunpowder.', en:'Carefully prepared tea, served in an elegant teapot with sugar and lemon. Choose between Ceylon black tea and Gunpowder green tea.', ar:'شاي محضَّر بعناية، يُقدَّم في إبريق أنيق مع السكر والليمون. اختر بين الشاي الأسود سيلاني والشاي الأخضر.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:8, cat:0, price:'4.000 DT', photo:'photo-1556679343-c7306c1976bc',
+    badges:['popular'],
+    name:{ fr:'Thé à la Menthe', en:'Mint Tea', ar:'شاي بالنعناع' },
+    desc:{ fr:'Thé vert frais infusé avec de la menthe fraîche — traditionnel et rafraîchissant.', en:'Fresh green tea infused with fresh mint — traditional and refreshing.', ar:'شاي أخضر طازج منقوع بالنعناع الطازج — تقليدي ومنعش.' },
+    full:{ fr:'Notre thé à la menthe est préparé à la façon traditionnelle avec de la menthe fraîche du jardin, du thé vert de qualité et une touche de sucre. Un classique intemporel.', en:'Our mint tea is prepared in the traditional way with fresh garden mint, quality green tea and a touch of sugar. A timeless classic.', ar:'يُحضَّر شاي النعناع بالطريقة التقليدية مع نعناع طازج وشاي أخضر عالي الجودة ولمسة من السكر. كلاسيكي خالد.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:9, cat:0, price:'7.000 DT', photo:'photo-1542990253-a781e904e62f',
+    badges:[],
+    name:{ fr:'Chocolat Chaud', en:'Hot Chocolate', ar:'شوكولاتة ساخنة' },
+    desc:{ fr:'Chocolat onctueux et crémeux — réconfort assuré.', en:'Smooth and creamy chocolate — guaranteed comfort.', ar:'شوكولاتة ناعمة وكريمية — راحة مضمونة.' },
+    full:{ fr:'Un chocolat chaud préparé avec du vrai cacao en poudre et du lait entier, couronné d\'une généreuse touche de chantilly. Le petit plaisir par excellence.', en:'A hot chocolate made with real cocoa powder and whole milk, topped with a generous swirl of whipped cream. The ultimate little pleasure.', ar:'شوكولاتة ساخنة محضرة بمسحوق الكاكاو الحقيقي والحليب الكامل، مزيَّنة بالكريمة المخفوقة. المتعة الصغيرة بامتياز.' },
+    allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
+  },
+
+  /* ---- CAT 1: Boissons Froides ---- */
+  {
+    id:10, cat:1, price:'12.000 DT', photo:'photo-1514362545857-3bc16c4c7d1b',
+    badges:['popular'],
+    name:{ fr:'Mojito Classique', en:'Classic Mojito', ar:'موهيتو كلاسيك' },
+    desc:{ fr:'Menthe fraîche, citron vert, sucre de canne et eau pétillante — l\'original.', en:'Fresh mint, lime, cane sugar and sparkling water — the original.', ar:'نعناع طازج وليمون أخضر وسكر قصب ومياه فوارة — الأصلي.' },
+    full:{ fr:'Notre mojito classique est préparé minute avec de la menthe fraîche écrasée, du jus de citron vert pressé, du sucre de canne et de l\'eau pétillante. Sans alcool, 100% saveur.', en:'Our classic mojito is freshly prepared with crushed fresh mint, freshly squeezed lime juice, cane sugar and sparkling water. Alcohol-free, 100% flavour.', ar:'موهيتو الكلاسيك يُحضَّر لحظياً بالنعناع الطازج المهروس وعصير الليمون الأخضر الطازج وسكر القصب والمياه الفوارة. بدون كحول، 100% نكهة.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:11, cat:1, price:'12.000 DT', photo:'photo-1544145945-f90425340c7e',
+    badges:['popular'],
+    name:{ fr:'Mojito Fraise', en:'Strawberry Mojito', ar:'موهيتو فراولة' },
+    desc:{ fr:'Fraises fraîches, menthe, citron vert et eau pétillante — fruité et frais.', en:'Fresh strawberries, mint, lime and sparkling water — fruity and fresh.', ar:'فراولة طازجة ونعناع وليمون أخضر ومياه فوارة — فاكهي ومنعش.' },
+    full:{ fr:'Une version gourmande de notre mojito avec des fraises fraîches mixées, de la menthe écrasée et une eau pétillante bien froide. Visuellement magnifique et délicieux.', en:'A gourmet version of our mojito with blended fresh strawberries, crushed mint and very cold sparkling water. Visually stunning and delicious.', ar:'نسخة شهية من موهيتونا مع فراولة طازجة مهروسة ونعناع مسحوق ومياه فوارة باردة جداً. جميل بصرياً ولذيذ.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:12, cat:1, price:'13.000 DT', photo:'photo-1553361371-9b22f78e8b1d',
+    badges:[],
+    name:{ fr:'Smoothie Fruits Rouges', en:'Red Fruits Smoothie', ar:'سموثي فواكه حمراء' },
+    desc:{ fr:'Fraises, framboises et myrtilles mixées — onctueux et vitaminé.', en:'Blended strawberries, raspberries and blueberries — smooth and full of vitamins.', ar:'فراولة وتوت أحمر وتوت أزرق — ناعم ومليء بالفيتامينات.' },
+    full:{ fr:'Un mélange généreux de fruits rouges frais ou surgelés, mixés avec du lait ou du jus de pomme pour une texture épaisse et onctueuse. Riche en antioxydants.', en:'A generous blend of fresh or frozen red fruits, blended with milk or apple juice for a thick and smooth texture. Rich in antioxidants.', ar:'مزيج سخي من الفواكه الحمراء الطازجة أو المجمدة، مخلوطة بالحليب أو عصير التفاح لقوام كثيف وناعم. غني بمضادات الأكسدة.' },
+    allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
+  },
+  {
+    id:13, cat:1, price:'13.000 DT', photo:'photo-1490645935967-10de6ba17061',
+    badges:[],
+    name:{ fr:'Smoothie Mangue-Banane', en:'Mango Banana Smoothie', ar:'سموثي مانجو وموز' },
+    desc:{ fr:'Mangue et banane mixées — tropical, doux et nourrissant.', en:'Blended mango and banana — tropical, sweet and nourishing.', ar:'مانجو وموز مهروسان — استوائي، حلو ومغذٍّ.' },
+    full:{ fr:'Mangue juteuse et banane crémeuse mixées ensemble pour un smoothie épais, sucré naturellement et plein d\'énergie. Le plein de vitamines tropicales.', en:'Juicy mango and creamy banana blended together for a thick, naturally sweet and energising smoothie. A full load of tropical vitamins.', ar:'مانجو عصيرية وموز كريمي مخلوطان معاً لسموثي كثيف محلى طبيعياً وممتلئ بالطاقة. شحنة كاملة من الفيتامينات الاستوائية.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:14, cat:1, price:'8.000 DT', photo:'photo-1621506289937-a8e4df240d0b',
+    badges:[],
+    name:{ fr:'Jus d\'Orange Pressé', en:'Fresh Orange Juice', ar:'عصير برتقال طازج' },
+    desc:{ fr:'Oranges fraîches pressées à la demande — pur et naturel.', en:'Fresh oranges pressed on demand — pure and natural.', ar:'برتقال طازج معصور عند الطلب — نقي وطبيعي.' },
+    full:{ fr:'Des oranges fraîches sélectionnées avec soin, pressées devant vous pour garantir un jus pur sans additifs ni conservateurs. Le goût du naturel.', en:'Carefully selected fresh oranges, pressed in front of you to guarantee a pure juice without additives or preservatives. The taste of nature.', ar:'برتقال طازج مختار بعناية، معصور أمامك لضمان عصير نقي بدون إضافات أو مواد حافظة. طعم الطبيعة.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:15, cat:1, price:'8.000 DT', photo:'photo-1589733955941-5eeaf752f6dd',
+    badges:[],
+    name:{ fr:'Jus de Pastèque', en:'Watermelon Juice', ar:'عصير بطيخ' },
+    desc:{ fr:'Pastèque fraîche mixée — légère, sucrée et ultra-rafraîchissante.', en:'Blended fresh watermelon — light, sweet and ultra-refreshing.', ar:'بطيخ طازج مهروس — خفيف وحلو ومنعش للغاية.' },
+    full:{ fr:'Pastèque rouge bien mûre mixée avec une touche de menthe et de citron pour un jus d\'été désaltérant et plein de fraîcheur. Servi bien frais.', en:'Ripe red watermelon blended with a touch of mint and lemon for a refreshing summer juice full of freshness. Served very cold.', ar:'بطيخ أحمر ناضج مهروس مع لمسة من النعناع والليمون لعصير صيفي منعش. يُقدَّم بارداً جداً.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:16, cat:1, price:'9.000 DT', photo:'photo-1461023058943-07fcbe16d735',
+    badges:['popular'],
+    name:{ fr:'Ice Latte', en:'Ice Latte', ar:'آيس لاتيه' },
+    desc:{ fr:'Espresso sur glaçons avec lait froid — café glacé velouté.', en:'Espresso over ice with cold milk — velvety iced coffee.', ar:'إسبريسو على الثلج مع حليب بارد — قهوة مثلجة مخملية.' },
+    full:{ fr:'Un espresso double versé sur des glaçons avec du lait entier froid pour une boisson rafraîchissante qui allie la puissance du café à la douceur du lait. À siroter lentement.', en:'A double espresso poured over ice with cold whole milk for a refreshing drink that combines the power of coffee with the sweetness of milk. To be sipped slowly.', ar:'إسبريسو مزدوج يُسكب على الثلج مع حليب كامل الدسم بارد لمشروب منعش يجمع قوة القهوة مع حلاوة الحليب. اشربه ببطء.' },
+    allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
+  },
+  {
+    id:17, cat:1, price:'8.000 DT', photo:'photo-1600718374662-0483d2b9da44',
+    badges:[],
+    name:{ fr:'Ice Coffee', en:'Ice Coffee', ar:'قهوة مثلجة' },
+    desc:{ fr:'Café froid préparé, sucré et servi sur glaçons — simple et délicieux.', en:'Prepared cold coffee, sweetened and served over ice — simple and delicious.', ar:'قهوة باردة محضَّرة، محلاة ومقدَّمة على الثلج — بسيطة ولذيذة.' },
+    full:{ fr:'Notre ice coffee est préparé avec un café fort refroidi, légèrement sucré et servi dans un grand verre sur des glaçons. Parfait pour les journées chaudes.', en:'Our ice coffee is made with strong chilled coffee, lightly sweetened and served in a large glass over ice. Perfect for hot days.', ar:'يُحضَّر آيس كوفي من قهوة قوية مبرَّدة، محلاة قليلاً في كوب كبير على الثلج. مثالي للأيام الحارة.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:18, cat:1, price:'13.000 DT', photo:'photo-1568901346375-23c9450c58cd',
+    badges:[],
+    name:{ fr:'Milkshake Chocolat', en:'Chocolate Milkshake', ar:'ميلك شيك شوكولاتة' },
+    desc:{ fr:'Lait, glace chocolat et sirop — épais, riche et gourmand.', en:'Milk, chocolate ice cream and syrup — thick, rich and indulgent.', ar:'حليب وآيس كريم شوكولاتة وشراب — كثيف وغني وشهي.' },
+    full:{ fr:'Notre milkshake au chocolat est mixé avec de la glace artisanale au chocolat, du lait entier et un généreux filet de sirop de chocolat. Couronné de chantilly et d\'éclats de chocolat.', en:'Our chocolate milkshake is blended with artisan chocolate ice cream, whole milk and a generous drizzle of chocolate syrup. Topped with whipped cream and chocolate shards.', ar:'ميلك شيك الشوكولاتة مخلوط بآيس كريم شوكولاتة حرفي وحليب كامل الدسم وشراب شوكولاتة سخي. مزيَّن بالكريمة المخفوقة وشظايا الشوكولاتة.' },
+    allergens:{ fr:['Lait','Gluten'], en:['Milk','Gluten'], ar:['الحليب','الغلوتين'] }
+  },
+  {
+    id:19, cat:1, price:'13.000 DT', photo:'photo-1614086138868-51ab4f45f84c',
+    badges:['popular'],
+    name:{ fr:'Milkshake Fraise', en:'Strawberry Milkshake', ar:'ميلك شيك فراولة' },
+    desc:{ fr:'Fraises fraîches, glace vanille et lait — fruité et crémeux.', en:'Fresh strawberries, vanilla ice cream and milk — fruity and creamy.', ar:'فراولة طازجة وآيس كريم فانيلا وحليب — فاكهي وكريمي.' },
+    full:{ fr:'Des fraises fraîches mixées avec de la glace à la vanille et du lait pour un shake fruité et crémeux. Une douceur irrésistible à toute heure.', en:'Fresh strawberries blended with vanilla ice cream and milk for a fruity, creamy shake. An irresistible treat at any hour.', ar:'فراولة طازجة مخلوطة مع آيس كريم الفانيلا والحليب لميلك شيك فاكهي وكريمي. متعة لا تقاوم في أي وقت.' },
+    allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
+  },
+  {
+    id:20, cat:1, price:'14.000 DT', photo:'photo-1551024709-8f23befc6f87',
+    badges:['new'],
+    name:{ fr:'Cocktail Tropical', en:'Tropical Cocktail', ar:'كوكتيل استوائي' },
+    desc:{ fr:'Ananas, mangue, fruit de la passion et citron vert — un voyage tropical.', en:'Pineapple, mango, passion fruit and lime — a tropical journey.', ar:'أناناس ومانجو وفاكهة العاطفة والليمون الأخضر — رحلة استوائية.' },
+    full:{ fr:'Un cocktail sans alcool aux accents tropicaux, préparé avec du jus d\'ananas, de la purée de mangue, du fruit de la passion et une touche de citron vert. Exotique et désaltérant.', en:'An alcohol-free cocktail with tropical accents, prepared with pineapple juice, mango purée, passion fruit and a touch of lime. Exotic and thirst-quenching.', ar:'كوكتيل بدون كحول بنكهات استوائية، محضَّر بعصير الأناناس وبيوريه المانجو وفاكهة العاطفة ولمسة من الليمون الأخضر. غريب الطابع ومروٍّ للعطش.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:21, cat:1, price:'11.000 DT', photo:'photo-1543362906-acfc16c67564',
+    badges:[],
+    name:{ fr:'Détox Citron-Gingembre', en:'Lemon Ginger Detox', ar:'ديتوكس ليمون وزنجبيل' },
+    desc:{ fr:'Eau infusée au citron, gingembre et menthe — purifiante et vitaminée.', en:'Water infused with lemon, ginger and mint — purifying and vitamin-rich.', ar:'ماء منقوع بالليمون والزنجبيل والنعناع — منقٍّ وغني بالفيتامينات.' },
+    full:{ fr:'Notre détox est préparé avec de l\'eau froide infusée au citron frais, au gingembre râpé et à la menthe fraîche. Une boisson saine, légère et revigorante.', en:'Our detox is prepared with cold water infused with fresh lemon, grated ginger and fresh mint. A healthy, light and invigorating drink.', ar:'ديتوكس محضَّر بماء بارد منقوع بالليمون الطازج والزنجبيل المبشور والنعناع الطازج. مشروب صحي وخفيف ومنشط.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+
+  /* ---- CAT 2: Cuisine ---- */
+  {
+    id:22, cat:2, price:'17.000 DT', photo:'photo-1512621776951-a57141f2eefd',
+    badges:[],
+    name:{ fr:'Salade César', en:'Caesar Salad', ar:'سالاد سيزار' },
+    desc:{ fr:'Laitue romaine, poulet grillé, croûtons, parmesan et sauce César maison.', en:'Romaine lettuce, grilled chicken, croutons, parmesan and house Caesar dressing.', ar:'خس روماني ودجاج مشوي وخبز محمص وبارميزان وصلصة سيزار البيت.' },
+    full:{ fr:'Notre salade César est préparée avec de la laitue romaine croquante, du poulet grillé mariné aux herbes, des croûtons dorés maison, des copeaux de parmesan et notre sauce César crémeuse préparée chaque jour.', en:'Our Caesar salad is prepared with crunchy romaine lettuce, herb-marinated grilled chicken, house-made golden croutons, parmesan shavings and our creamy Caesar dressing made daily.', ar:'سالاد سيزار يُحضَّر بالخس الروماني المقرمش والدجاج المشوي المتبَّل بالأعشاب والخبز المحمص المنزلي وشرائح البارميزان وصلصة سيزار الكريمية اليومية.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+  },
+  {
+    id:23, cat:2, price:'16.000 DT', photo:'photo-1540420773420-3366772f4999',
+    badges:[],
+    name:{ fr:'Salade Thon', en:'Tuna Salad', ar:'سالاد تونة' },
+    desc:{ fr:'Thon, tomates, olives, œuf dur, maïs et vinaigrette maison.', en:'Tuna, tomatoes, olives, hard-boiled egg, corn and house vinaigrette.', ar:'تونة وطماطم وزيتون وبيض مسلوق وذرة وخل البيت.' },
+    full:{ fr:'Une salade fraîche et nourrissante avec du thon de qualité, des légumes croquants, des olives et une vinaigrette légère préparée chaque jour. Idéale pour un repas léger.', en:'A fresh and nourishing salad with quality tuna, crunchy vegetables, olives and a light vinaigrette made daily. Ideal for a light meal.', ar:'سالاد طازج ومغذٍّ مع تونة عالية الجودة وخضروات مقرمشة وزيتون وخل خفيف يُحضَّر يومياً. مثالي لوجبة خفيفة.' },
+    allergens:{ fr:['Œufs','Poisson'], en:['Eggs','Fish'], ar:['البيض','السمك'] }
+  },
+  {
+    id:24, cat:2, price:'24.000 DT', photo:'photo-1563379926898-05f4575a45d8',
+    badges:['popular'],
+    name:{ fr:'Pasta Carbonara', en:'Pasta Carbonara', ar:'باستا كاربونارا' },
+    desc:{ fr:'Pâtes crémeuses, lardons, jaune d\'œuf et parmesan — un classique italien.', en:'Creamy pasta, bacon, egg yolk and parmesan — an Italian classic.', ar:'معكرونة كريمية ولحم مقدد وصفار بيض وبارميزان — كلاسيكي إيطالي.' },
+    full:{ fr:'Notre carbonara est préparée avec des pâtes fraîches cuites al dente, une crème de parmesan onctueuse et du bacon fumé. Saupoudrée de poivre noir fraîchement moulu.', en:'Our carbonara is made with fresh pasta cooked al dente, a smooth parmesan cream and smoked bacon. Sprinkled with freshly ground black pepper.', ar:'كاربونارا محضَّرة بمعكرونة طازجة مطبوخة al dente وكريمة البارميزان الناعمة واللحم المقدد المدخن. مرشوشة بالفلفل الأسود الطازج.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+  },
+  {
+    id:25, cat:2, price:'24.000 DT', photo:'photo-1621996346565-e3dbc646d9a9',
+    badges:[],
+    name:{ fr:'Pasta Bolognaise', en:'Pasta Bolognese', ar:'باستا بولونيز' },
+    desc:{ fr:'Pâtes avec sauce tomate à la viande hachée, mijotée longuement.', en:'Pasta with minced meat tomato sauce, slow-simmered.', ar:'معكرونة مع صلصة طماطم اللحم المفروم، مطهوة ببطء.' },
+    full:{ fr:'Notre bolognaise est préparée avec de la viande hachée de bœuf, des tomates concassées, des oignons et des herbes aromatiques, mijotée pendant plusieurs heures pour un goût riche et profond.', en:'Our bolognese is made with ground beef, crushed tomatoes, onions and aromatic herbs, simmered for several hours for a rich and deep flavour.', ar:'بولونيز محضَّرة من اللحم المفروم والطماطم المجروشة والبصل والأعشاب العطرية، مطهوة لساعات لطعم غني وعميق.' },
+    allergens:{ fr:['Gluten'], en:['Gluten'], ar:['الغلوتين'] }
+  },
+  {
+    id:26, cat:2, price:'26.000 DT', photo:'photo-1586190848861-99aa4a171e90',
+    badges:['popular'],
+    name:{ fr:'Hamburger Classic', en:'Classic Burger', ar:'هامبرغر كلاسيك' },
+    desc:{ fr:'Steak haché, cheddar fondu, salade, tomate et sauce maison.', en:'Beef patty, melted cheddar, lettuce, tomato and house sauce.', ar:'لحم مفروم وشيدر مذاب وخس وطماطم وصلصة البيت.' },
+    full:{ fr:'Notre burger est composé d\'un steak haché de bœuf juteux, d\'une tranche de cheddar fondu, de salade fraîche, de tomate et de notre sauce secrète maison. Servi avec des frites ou une salade.', en:'Our burger is composed of a juicy beef patty, a slice of melted cheddar, fresh lettuce, tomato and our secret house sauce. Served with fries or a salad.', ar:'يتكون هامبرغر من لحم بقري عصيري وشريحة شيدر مذوبة وخس طازج وطماطم وصلصتنا السرية. يُقدَّم مع البطاطس أو السالاد.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+  },
+  {
+    id:27, cat:2, price:'26.000 DT', photo:'photo-1568901346375-23c9450c58cd',
+    badges:['new'],
+    name:{ fr:'Burger Crispy Chicken', en:'Crispy Chicken Burger', ar:'بيرغر دجاج كريسبي' },
+    desc:{ fr:'Poulet croustillant frit, coleslaw, pickles et sauce ranch.', en:'Crispy fried chicken, coleslaw, pickles and ranch sauce.', ar:'دجاج مقلي مقرمش وكول سلو ومخللات وصلصة رانش.' },
+    full:{ fr:'Un filet de poulet croustillant pané et frit, posé sur un pain brioché avec du coleslaw maison, des pickles croquants et une sauce ranch crémeuse. Savoureux et généreux.', en:'A crispy breaded fried chicken fillet on a brioche bun with house coleslaw, crunchy pickles and a creamy ranch sauce. Tasty and generous.', ar:'فيليه دجاج مقرمش مُقلَّى على خبز برييوش مع كول سلو منزلي ومخللات مقرمشة وصلصة رانش كريمية. لذيذ وسخي.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+  },
+  {
+    id:28, cat:2, price:'22.000 DT', photo:'photo-1552332386-f8dd00dc2f85',
+    badges:['popular'],
+    name:{ fr:'Tacos Poulet', en:'Chicken Tacos', ar:'تاكوس دجاج' },
+    desc:{ fr:'Galette moelleuse, poulet grillé, fromage fondu, salade et sauce.', en:'Soft flatbread, grilled chicken, melted cheese, salad and sauce.', ar:'خبز ناعم ودجاج مشوي وجبن مذاب وخس وصلصة.' },
+    full:{ fr:'Nos tacos sont préparés dans une galette moelleuse avec du poulet mariné grillé, du fromage fondu, de la salade fraîche, des tomates et une sauce crémeuse épicée.', en:'Our tacos are made in a soft flatbread with marinated grilled chicken, melted cheese, fresh salad, tomatoes and a spiced creamy sauce.', ar:'تاكوس محضَّرة في خبز ناعم مع دجاج مشوي متبَّل وجبن مذاب وخس طازج وطماطم وصلصة كريمية حارة.' },
+    allergens:{ fr:['Gluten','Lait'], en:['Gluten','Milk'], ar:['الغلوتين','الحليب'] }
+  },
+  {
+    id:29, cat:2, price:'20.000 DT', photo:'photo-1528735602780-2552fd46c7af',
+    badges:[],
+    name:{ fr:'Ciabatta Thon-Fromage', en:'Tuna Cheese Ciabatta', ar:'شياباتا تونة وجبن' },
+    desc:{ fr:'Pain ciabatta grillé, thon, fromage fondu, tomates et roquette.', en:'Grilled ciabatta, tuna, melted cheese, tomatoes and rocket.', ar:'خبز شياباتا مشوي وتونة وجبن مذاب وطماطم وجرجير.' },
+    full:{ fr:'Une ciabatta croustillante garnie de thon à l\'huile d\'olive, de fromage fondu, de tomates fraîches et de roquette. Grillée à point pour un résultat chaud et savoureux.', en:'A crispy ciabatta filled with tuna in olive oil, melted cheese, fresh tomatoes and rocket. Grilled to perfection for a warm and tasty result.', ar:'شياباتا مقرمشة محشوة بالتونة بزيت الزيتون والجبن المذاب والطماطم الطازجة والجرجير. مشوية بشكل مثالي لنتيجة دافئة ولذيذة.' },
+    allergens:{ fr:['Gluten','Lait','Poisson'], en:['Gluten','Milk','Fish'], ar:['الغلوتين','الحليب','السمك'] }
+  },
+  {
+    id:30, cat:2, price:'18.000 DT', photo:'photo-1565299507177-b0ac66763828',
+    badges:[],
+    name:{ fr:'Sandwich Libanais Poulet', en:'Lebanese Chicken Sandwich', ar:'ساندويش لبناني دجاج' },
+    desc:{ fr:'Pain pita, poulet grillé aux épices, toum, chou et tomates.', en:'Pita bread, spiced grilled chicken, toum, cabbage and tomatoes.', ar:'خبز بيتا ودجاج مشوي بالتوابل وثوم وملفوف وطماطم.' },
+    full:{ fr:'Un sandwich généreux dans un pain pita chaud avec du poulet mariné aux épices orientales, de la sauce toum à l\'ail, du chou blanc et des tomates fraîches. Un goût authentique.', en:'A generous sandwich in warm pita bread with chicken marinated in oriental spices, garlic toum sauce, white cabbage and fresh tomatoes. An authentic taste.', ar:'ساندويش سخي في خبز بيتا دافئ مع دجاج متبَّل بالتوابل الشرقية وصلصة الثوم (التومة) والملفوف الأبيض والطماطم الطازجة. طعم أصيل.' },
+    allergens:{ fr:['Gluten'], en:['Gluten'], ar:['الغلوتين'] }
+  },
+  {
+    id:31, cat:2, price:'16.000 DT', photo:'photo-1519676867240-f03562e64548',
+    badges:[],
+    name:{ fr:'Crêpe Poulet-Fromage', en:'Chicken Cheese Crêpe', ar:'كريب دجاج وجبن' },
+    desc:{ fr:'Fine crêpe salée, poulet grillé, fromage fondu et herbes fraîches.', en:'Thin savoury crêpe, grilled chicken, melted cheese and fresh herbs.', ar:'كريب رفيع مملح ودجاج مشوي وجبن مذاب وأعشاب طازجة.' },
+    full:{ fr:'Une crêpe salée fine et dorée garnie de poulet grillé émincé, de fromage fondu crémeux et de fines herbes fraîches. Pliée et servie chaude.', en:'A thin golden savoury crêpe filled with sliced grilled chicken, creamy melted cheese and fresh fine herbs. Folded and served hot.', ar:'كريب مملح رفيع وذهبي محشو بشرائح الدجاج المشوي والجبن المذاب الكريمي والأعشاب الطازجة. مطوي ومقدَّم ساخناً.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+  },
+  {
+    id:32, cat:2, price:'16.000 DT', photo:'photo-1528735602780-2552fd46c7af',
+    badges:[],
+    name:{ fr:'Panini Mozzarella-Tomates', en:'Mozzarella Tomato Panini', ar:'باني موزاريلا وطماطم' },
+    desc:{ fr:'Pain panini grillé, mozzarella fondante, tomates fraîches et basilic.', en:'Grilled panini bread, melting mozzarella, fresh tomatoes and basil.', ar:'خبز باني مشوي وموزاريلا ذائبة وطماطم طازجة وريحان.' },
+    full:{ fr:'Un panini grillé croustillant garni de mozzarella fondante, de tomates fraîches tranchées et de feuilles de basilic frais. Un délice simple et savoureux.', en:'A crispy grilled panini filled with melting mozzarella, sliced fresh tomatoes and fresh basil leaves. A simple and delicious delight.', ar:'باني مشوي مقرمش محشو بالموزاريلا الذائبة والطماطم الطازجة المقطعة وأوراق الريحان الطازج. متعة بسيطة ولذيذة.' },
+    allergens:{ fr:['Gluten','Lait'], en:['Gluten','Milk'], ar:['الغلوتين','الحليب'] }
+  },
+  {
+    id:33, cat:2, price:'14.000 DT', photo:'photo-1525351484163-7529414344d8',
+    badges:[],
+    name:{ fr:'Omlette au Fromage', en:'Cheese Omelette', ar:'أومليت بالجبن' },
+    desc:{ fr:'Trois œufs frais, fromage fondu, herbes aromatiques — simple et généreux.', en:'Three fresh eggs, melted cheese, aromatic herbs — simple and generous.', ar:'ثلاث بيضات طازجة وجبن مذاب وأعشاب عطرية — بسيط وسخي.' },
+    full:{ fr:'Notre omlette est préparée avec trois œufs frais battus, du fromage fondu généreusement et des fines herbes fraîches. Moelleuse à l\'intérieur, légèrement dorée à l\'extérieur.', en:'Our omelette is made with three beaten fresh eggs, generously melted cheese and fresh fine herbs. Soft inside, lightly golden outside.', ar:'أومليت محضَّرة من ثلاث بيضات طازجة مخفوقة وجبن مذاب بسخاء وأعشاب طازجة. طرية من الداخل، ذهبية خفيفة من الخارج.' },
+    allergens:{ fr:['Œufs','Lait'], en:['Eggs','Milk'], ar:['البيض','الحليب'] }
+  },
+
+  /* ---- CAT 3: Sucré ---- */
+  {
+    id:34, cat:3, price:'10.000 DT', photo:'photo-1519676867240-f03562e64548',
+    badges:['popular'],
+    name:{ fr:'Crêpe Nutella', en:'Nutella Crêpe', ar:'كريب نوتيلا' },
+    desc:{ fr:'Fine crêpe sucrée généreusement garnie de Nutella — un classique indémodable.', en:'Fine sweet crêpe generously filled with Nutella — a timeless classic.', ar:'كريب رفيع محشو بسخاء بالنوتيلا — كلاسيكي خالد.' },
+    full:{ fr:'Une crêpe fine et dorée nappée d\'une couche généreuse de Nutella fondant. Simple, gourmand et inégalable. À déguster chaud pour un maximum de plaisir.', en:'A fine golden crêpe coated with a generous layer of melting Nutella. Simple, indulgent and unbeatable. Best enjoyed warm for maximum pleasure.', ar:'كريب رفيع ذهبي مطلي بطبقة سخية من النوتيلا الذائبة. بسيط وشهي ولا يُضاهى. الأفضل تناوله ساخناً للحصول على أقصى متعة.' },
+    allergens:{ fr:['Gluten','Lait','Fruits à coque'], en:['Gluten','Milk','Tree nuts'], ar:['الغلوتين','الحليب','المكسرات'] }
+  },
+  {
+    id:35, cat:3, price:'11.000 DT', photo:'photo-1605288558240-e2d0fa15c1d4',
+    badges:[],
+    name:{ fr:'Crêpe Fraise-Chantilly', en:'Strawberry Cream Crêpe', ar:'كريب فراولة وكريمة' },
+    desc:{ fr:'Crêpe sucrée avec fraises fraîches et chantilly maison.', en:'Sweet crêpe with fresh strawberries and house whipped cream.', ar:'كريب حلو مع فراولة طازجة وكريمة شانتيه البيت.' },
+    full:{ fr:'Une crêpe légère garnie de fraises fraîches tranchées et d\'une généreuse rosette de chantilly maison. Un dessert frais et élégant.', en:'A light crêpe filled with sliced fresh strawberries and a generous rosette of house whipped cream. A fresh and elegant dessert.', ar:'كريب خفيف محشو بشرائح الفراولة الطازجة وزهرة سخية من كريمة شانتيه البيت. حلوى طازجة وأنيقة.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+  },
+  {
+    id:36, cat:3, price:'11.000 DT', photo:'photo-1562376552-0d160a2f238a',
+    badges:[],
+    name:{ fr:'Gaufre Chocolat', en:'Chocolate Waffle', ar:'غوفر شوكولاتة' },
+    desc:{ fr:'Gaufre croustillante, sauce chocolat chaude et chantilly.', en:'Crispy waffle, warm chocolate sauce and whipped cream.', ar:'غوفر مقرمش وصلصة شوكولاتة ساخنة وكريمة مخفوقة.' },
+    full:{ fr:'Notre gaufre est croustillante à l\'extérieur et moelleuse à l\'intérieur, nappée d\'une sauce au chocolat chaude et couronnée d\'une généreuse chantilly. Un régal à partager.', en:'Our waffle is crispy outside and soft inside, coated with a warm chocolate sauce and topped with generous whipped cream. A treat to share.', ar:'غوفر مقرمشة من الخارج وطرية من الداخل، مغطاة بصلصة شوكولاتة ساخنة ومزيَّنة بكريمة مخفوقة سخية. متعة للمشاركة.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+  },
+  {
+    id:37, cat:3, price:'13.000 DT', photo:'photo-1567620832903-9fc6debc209f',
+    badges:['new','popular'],
+    name:{ fr:'Gaufre Lotus', en:'Lotus Waffle', ar:'غوفر لوتس' },
+    desc:{ fr:'Gaufre dorée, crème de biscuit Lotus et éclats de Speculoos.', en:'Golden waffle, Lotus biscuit cream and Speculoos crumbles.', ar:'غوفر ذهبي وكريمة بسكويت لوتس وفتات سبيكولوس.' },
+    full:{ fr:'Notre gaufre Lotus est notre création signature. Une gaufre dorée et croustillante généreusement nappée de crème de biscuit Lotus fondu, parsemée d\'éclats de Speculoos caramélisés.', en:'Our Lotus waffle is our signature creation. A golden, crispy waffle generously coated with melted Lotus biscuit cream, sprinkled with caramelised Speculoos crumbles.', ar:'غوفر لوتس هو إبداعنا المميز. غوفر ذهبي ومقرمش مغطى بسخاء بكريمة بسكويت لوتس المذاب، مرشوش بفتات سبيكولوس المكرمل.' },
+    allergens:{ fr:['Gluten','Lait'], en:['Gluten','Milk'], ar:['الغلوتين','الحليب'] }
+  },
+  {
+    id:38, cat:3, price:'12.000 DT', photo:'photo-1530373239216-42518e6b4063',
+    badges:['popular'],
+    name:{ fr:'Tiramisu Maison', en:'House Tiramisu', ar:'تيراميسو البيت' },
+    desc:{ fr:'Mascarpone, biscuits imbibés de café, cacao — recette italienne maison.', en:'Mascarpone, coffee-soaked biscuits, cocoa — homemade Italian recipe.', ar:'ماسكاربوني وبسكويت منقوع بالقهوة وكاكاو — وصفة إيطالية منزلية.' },
+    full:{ fr:'Notre tiramisu est préparé chaque jour selon la recette italienne traditionnelle : mascarpone crémeux, biscuits savoiardi imbibés de café fort et saupoudrés de cacao pur. Un dessert inoubliable.', en:'Our tiramisu is prepared daily according to the traditional Italian recipe: creamy mascarpone, savoiardi biscuits soaked in strong coffee and dusted with pure cocoa. An unforgettable dessert.', ar:'يُحضَّر تيراميسو يومياً وفق الوصفة الإيطالية التقليدية: ماسكاربوني كريمي وبسكويت سافواردي منقوع في قهوة قوية ومرشوش بالكاكاو الخالص. حلوى لا تُنسى.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+  },
+  {
+    id:39, cat:3, price:'12.000 DT', photo:'photo-1533134242443-d4fd215305ad',
+    badges:[],
+    name:{ fr:'Cheesecake', en:'Cheesecake', ar:'تشيز كيك' },
+    desc:{ fr:'Base sablée, crème de fromage onctueuse et coulis de fruits rouges.', en:'Buttery base, smooth cream cheese and red fruit coulis.', ar:'قاعدة هشة وكريمة جبن ناعمة وصلصة فواكه حمراء.' },
+    full:{ fr:'Notre cheesecake est préparé avec une base de biscuits émiettés beurrés, une crème de fromage Philadelphia onctueuse et un coulis de fruits rouges maison. Fraîcheur et gourmandise.', en:'Our cheesecake features a buttered crumbled biscuit base, a smooth Philadelphia cream cheese filling and a house red fruit coulis. Freshness and indulgence.', ar:'تشيز كيك يتميز بقاعدة بسكويت مجروش بالزبدة وحشوة جبن فيلادلفيا ناعمة وصلصة فواكه حمراء منزلية. نضارة وشهوة.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+  },
+  {
+    id:40, cat:3, price:'10.000 DT', photo:'photo-1606312619070-d48b5b7a1b96',
+    badges:[],
+    name:{ fr:'Brownie Chaud', en:'Warm Brownie', ar:'براوني ساخن' },
+    desc:{ fr:'Brownie au chocolat fondant, servi chaud avec glace vanille.', en:'Melting chocolate brownie, served warm with vanilla ice cream.', ar:'براوني شوكولاتة ذائب، مقدَّم ساخناً مع آيس كريم فانيلا.' },
+    full:{ fr:'Un brownie dense et fondant, riche en chocolat et noix, servi chaud et accompagné d\'une boule de glace à la vanille. Le contraste chaud-froid est irrésistible.', en:'A dense and melting brownie, rich in chocolate and nuts, served warm and accompanied by a scoop of vanilla ice cream. The hot-cold contrast is irresistible.', ar:'براوني كثيف وذائب، غني بالشوكولاتة والمكسرات، مقدَّم ساخناً مع كرة آيس كريم فانيلا. التناقض بين الحار والبارد لا يقاوم.' },
+    allergens:{ fr:['Gluten','Lait','Œufs','Fruits à coque'], en:['Gluten','Milk','Eggs','Tree nuts'], ar:['الغلوتين','الحليب','البيض','المكسرات'] }
+  },
+  {
+    id:41, cat:3, price:'13.000 DT', photo:'photo-1564355808539-22fda35bed7e',
+    badges:['popular'],
+    name:{ fr:'Coulant Chocolat', en:'Chocolate Lava Cake', ar:'كولان شوكولاتة' },
+    desc:{ fr:'Gâteau moelleux au cœur coulant de chocolat chaud — le dessert signature.', en:'Soft cake with a flowing hot chocolate centre — the signature dessert.', ar:'كيك طري بقلب شوكولاتة ساخنة ذائبة — الحلوى المميزة.' },
+    full:{ fr:'Notre coulant est cuit à la commande pour garantir un cœur coulant parfait. Servi avec une boule de glace à la vanille, il révèle un chocolat noir intense à la première cuillère.', en:'Our lava cake is baked to order to guarantee a perfect flowing centre. Served with a scoop of vanilla ice cream, it reveals an intense dark chocolate at the first spoonful.', ar:'يُخبز الكولان عند الطلب لضمان قلب ذائب مثالي. مقدَّم مع كرة آيس كريم فانيلا، يكشف شوكولاتة داكنة مكثفة عند أول ملعقة.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+  },
+
+  /* ---- CAT 4: Le Matin ---- */
+  {
+    id:42, cat:4, price:'18.000 DT', photo:'photo-1504754524776-8f4f37790ca0',
+    badges:[],
+    name:{ fr:'Petit-Déjeuner Classique', en:'Classic Breakfast', ar:'فطور كلاسيك' },
+    desc:{ fr:'Café ou thé, pain beurre et confiture, jus d\'orange et fromage frais.', en:'Coffee or tea, bread with butter and jam, orange juice and fresh cheese.', ar:'قهوة أو شاي وخبز بالزبدة والمربى وعصير برتقال وجبن طازج.' },
+    full:{ fr:'Notre petit-déjeuner classique comprend une boisson chaude au choix, des tranches de pain frais avec beurre et confiture, un jus d\'orange pressé et un fromage frais. Le démarrage parfait.', en:'Our classic breakfast includes a hot drink of your choice, slices of fresh bread with butter and jam, a pressed orange juice and fresh cheese. The perfect start.', ar:'فطور كلاسيك يشمل مشروباً ساخناً حسب الاختيار وشرائح خبز طازج مع الزبدة والمربى وعصير برتقال معصور وجبناً طازجاً. البداية المثالية.' },
+    allergens:{ fr:['Gluten','Lait'], en:['Gluten','Milk'], ar:['الغلوتين','الحليب'] }
+  },
+  {
+    id:43, cat:4, price:'24.000 DT', photo:'photo-1533089860892-a7c6f0a88666',
+    badges:['popular'],
+    name:{ fr:'Petit-Déjeuner Complet', en:'Full Breakfast', ar:'فطور كامل' },
+    desc:{ fr:'Œufs brouillés, fromage, pain grillé, jus, café, yaourt et fruits frais.', en:'Scrambled eggs, cheese, toast, juice, coffee, yoghurt and fresh fruit.', ar:'بيض مخفوق وجبن وخبز محمص وعصير وقهوة ويوغرت وفواكه طازجة.' },
+    full:{ fr:'Un petit-déjeuner généreux avec des œufs brouillés crémeux, du fromage, des toasts grillés, un jus de fruits pressé, un café maison, un yaourt et une assiette de fruits de saison.', en:'A generous breakfast with creamy scrambled eggs, cheese, grilled toasts, fresh-pressed fruit juice, house coffee, yoghurt and a plate of seasonal fruit.', ar:'فطور سخي مع بيض مخفوق كريمي وجبن وخبز مشوي وعصير فواكه طازج وقهوة البيت ويوغرت وصحن فواكه موسمية.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+  },
+  {
+    id:44, cat:4, price:'26.000 DT', photo:'photo-1484723091739-30990009462f',
+    badges:['new'],
+    name:{ fr:'Petit-Déjeuner Américain', en:'American Breakfast', ar:'فطور أمريكي' },
+    desc:{ fr:'Pancakes, œufs au plat, bacon, sirop d\'érable et jus de fruits.', en:'Pancakes, fried eggs, bacon, maple syrup and fruit juice.', ar:'بانكيك وبيض مقلي ولحم مقدد وشراب القيقب وعصير فواكه.' },
+    full:{ fr:'Trois pancakes moelleux accompagnés d\'œufs au plat, de bacon croustillant, d\'un sirop d\'érable et d\'un grand verre de jus de fruits frais. Le brunch américain par excellence.', en:'Three soft pancakes accompanied by fried eggs, crispy bacon, maple syrup and a large glass of fresh fruit juice. The American brunch par excellence.', ar:'ثلاثة بانكيك طري مع بيض مقلي ولحم مقدد مقرمش وشراب القيقب وكوب كبير من عصير الفواكه الطازج. الفطور الأمريكي بامتياز.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+  },
+
+  /* ---- CAT 5: Hookah ---- */
+  {
+    id:45, cat:5, price:'35.000 DT', photo:'photo-1584302179602-e4c3d3fd629d',
+    badges:['popular'],
+    name:{ fr:'Chicha Simple', en:'Single Hookah', ar:'شيشة سيمبل' },
+    desc:{ fr:'Chicha premium au parfum de votre choix — détente garantie.', en:'Premium hookah with your choice of flavour — relaxation guaranteed.', ar:'شيشة بريميوم بنكهة حسب اختيارك — استرخاء مضمون.' },
+    full:{ fr:'Profitez d\'une chicha de qualité premium avec un large choix de parfums : pomme, menthe, fruits tropicaux, double pomme et bien plus encore. Charbon naturel et préparation soignée.', en:'Enjoy a premium quality hookah with a wide range of flavours: apple, mint, tropical fruits, double apple and much more. Natural charcoal and careful preparation.', ar:'استمتع بشيشة ذات جودة بريميوم مع مجموعة واسعة من النكهات: تفاح ونعناع وفواكه استوائية وتفاح مزدوج والمزيد. فحم طبيعي وتحضير دقيق.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:46, cat:5, price:'40.000 DT', photo:'photo-1584302179602-e4c3d3fd629d',
+    badges:[],
+    name:{ fr:'Chicha Double', en:'Double Hookah', ar:'شيشة دابل' },
+    desc:{ fr:'Chicha double avec deux parfums combinés — expérience enrichie.', en:'Double hookah with two combined flavours — enriched experience.', ar:'شيشة دابل بنكهتين مدمجتين — تجربة مُثرَاة.' },
+    full:{ fr:'Une chicha double avec une combinaison de deux parfums au choix pour une expérience aromatique unique. Idéale pour les amateurs qui souhaitent une saveur plus complexe.', en:'A double hookah with a combination of two flavours of your choice for a unique aromatic experience. Ideal for enthusiasts who want a more complex flavour.', ar:'شيشة دابل مع مزيج من نكهتين حسب الاختيار لتجربة عطرية فريدة. مثالية لعشاق الشيشة الذين يريدون نكهة أكثر تعقيداً.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:47, cat:5, price:'6.000 DT', photo:'photo-1534353341816-abfbe27f97da',
+    badges:[],
+    name:{ fr:'Supplément Glace', en:'Ice Supplement', ar:'إضافة ثلج' },
+    desc:{ fr:'Ajoutez des glaçons dans le vase de votre chicha pour une fumée plus fraîche.', en:'Add ice to your hookah vase for a cooler, smoother smoke.', ar:'أضف ثلجاً إلى إناء الشيشة للحصول على دخان أبرد وأكثر نعومة.' },
+    full:{ fr:'L\'ajout de glace dans le vase refroidit la fumée avant inhalation, offrant une sensation plus fraîche et une expérience plus douce et agréable.', en:'Adding ice to the vase cools the smoke before inhalation, offering a fresher sensation and a smoother, more enjoyable experience.', ar:'إضافة الثلج إلى الإناء يبرد الدخان قبل الاستنشاق، مما يوفر إحساساً أكثر برودة وتجربة أكثر نعومة وإمتاعاً.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:48, cat:5, price:'6.000 DT', photo:'photo-1534353341816-abfbe27f97da',
+    badges:[],
+    name:{ fr:'Supplément Lait de Coco', en:'Coconut Milk Supplement', ar:'إضافة حليب جوز الهند' },
+    desc:{ fr:'Remplacez l\'eau par du lait de coco pour une fumée crémeuse et exotique.', en:'Replace water with coconut milk for a creamy, exotic smoke.', ar:'استبدل الماء بحليب جوز الهند للحصول على دخان كريمي واستوائي.' },
+    full:{ fr:'En remplaçant l\'eau du vase par du lait de coco, la fumée acquiert une douceur crémeuse et un arôme exotique subtil qui transforme complètement l\'expérience chicha.', en:'By replacing the vase water with coconut milk, the smoke acquires a creamy softness and a subtle exotic aroma that completely transforms the hookah experience.', ar:'باستبدال ماء الإناء بحليب جوز الهند، يكتسب الدخان نعومة كريمية وعطراً استوائياً خفياً يحوِّل تجربة الشيشة كلياً.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  }
   ];
 }
 
@@ -1713,7 +2001,7 @@ function getDefaultItems() {
 ═══════════════════════════════════════════ */
 
 // Codes langue pour MyMemory
-const MYMEMORY_CODES = { fr:'fr-FR', en:'en-GB', el:'el-GR', ar:'ar-SA', de:'de-DE' };
+const MYMEMORY_CODES = { fr:'fr-FR', en:'en-GB', ar:'ar-SA' };
 
 async function translateText(text, fromLang, toLang) {
   if (!text || !text.trim()) return '';
@@ -1774,6 +2062,11 @@ function esc(str) {
    INIT
 ═══════════════════════════════════════════ */
 checkLogin();
+
+// Fermer tous les icon pickers si clic en dehors
+document.addEventListener('click', () => {
+  document.querySelectorAll('.ico-picker-popup.open').forEach(p => p.classList.remove('open'));
+});
 </script>
 </body>
 </html>
