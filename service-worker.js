@@ -3,7 +3,7 @@
    Gère le cache offline + notifications push
 ================================================ */
 
-const CACHE = 'mozart-cafe-v1';
+const CACHE = 'mozart-cafe-v4';
 const ASSETS = [
   'app.html',
   'manifest.json',

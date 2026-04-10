@@ -564,6 +564,8 @@ function getDeviceId() {
 
 function registerFCM() {
   if (!('Notification' in window)) return;
+  if (Notification.permission === 'denied') return;
+
   if (Notification.permission !== 'granted') {
     Notification.requestPermission().then(p => { if (p === 'granted') registerFCM(); });
     return;
@@ -571,19 +573,23 @@ function registerFCM() {
 
   const deviceId = getDeviceId();
 
-  // Si token déjà enregistré depuis moins de 24h → on ne re-enregistre pas
-  // (évite la notification Chrome au démarrage)
+  // Rafraîchir le token max 1 fois par heure (pas par 24h)
   const lastReg = parseInt(localStorage.getItem('mc_fcm_last_reg') || '0');
-  if (Date.now() - lastReg < 24 * 60 * 60 * 1000) return;
+  const TOKEN_TTL = 60 * 60 * 1000; // 1 heure
+  if (Date.now() - lastReg < TOKEN_TTL) return;
 
   navigator.serviceWorker.ready.then(swReg => {
     _msg.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: swReg })
       .then(token => {
-        if (!token) return;
-        _db.ref('fcm_tokens/' + deviceId).set({ token, ts: Date.now() })
+        if (!token) {
+          // Token vide → forcer renouvellement au prochain lancement
+          localStorage.removeItem('mc_fcm_last_reg');
+          return;
+        }
+        return _db.ref('fcm_tokens/' + deviceId).set({ token, ts: Date.now() })
           .then(() => localStorage.setItem('mc_fcm_last_reg', String(Date.now())));
       })
-      .catch(() => {});
+      .catch(() => { localStorage.removeItem('mc_fcm_last_reg'); });
   }).catch(() => {});
 
   // FCM foreground : ignoré, le listener RTDB gère déjà l'alerte
@@ -611,10 +617,35 @@ setInterval(() => { if (calls.length) renderCalls(); }, 30000);
 /* ── INSTALL PWA ── */
 let _deferredInstall = null;
 
+const installLabels = {
+  fr: {
+    title:'Installer l\'application', btn:'Installer',
+    subAndroid:'Ajouter à l\'écran d\'accueil en un clic',
+    subIos:'Appuyez sur  puis "Sur l\'écran d\'accueil"',
+  },
+  en: {
+    title:'Install the app', btn:'Install',
+    subAndroid:'Add to home screen with one tap',
+    subIos:'Tap  then "Add to Home Screen"',
+  },
+  ar: {
+    title:'تثبيت التطبيق', btn:'تثبيت',
+    subAndroid:'إضافة إلى الشاشة الرئيسية بنقرة واحدة',
+    subIos:'اضغط  ثم "إضافة إلى الشاشة الرئيسية"',
+  },
+};
+
+// Déjà installée en mode standalone → ne jamais montrer le banner
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+  || window.navigator.standalone === true;
+
+const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+
+// Android/Chrome : écouter l'événement natif
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   _deferredInstall = e;
-  document.getElementById('install-banner').classList.add('visible');
+  if (!isStandalone) showInstallBanner();
 });
 
 window.addEventListener('appinstalled', () => {
@@ -622,19 +653,23 @@ window.addEventListener('appinstalled', () => {
   _deferredInstall = null;
 });
 
+function showInstallBanner() {
+  document.getElementById('install-banner').classList.add('visible');
+}
+
 function setupInstallBanner() {
-  // Textes traduits
-  const installLabels = {
-    fr: { title:'Installer l\'application', sub:'Accès rapide depuis l\'écran d\'accueil', btn:'Installer' },
-    en: { title:'Install the app',          sub:'Quick access from your home screen',      btn:'Install'  },
-    ar: { title:'تثبيت التطبيق',             sub:'وصول سريع من الشاشة الرئيسية',            btn:'تثبيت'   },
-  };
+  // Si déjà installée → rien
+  if (isStandalone) return;
+  // Si iOS → montrer directement avec instructions manuelles
+  if (isIos) showInstallBanner();
 
   function updateInstallTexts() {
     const l = installLabels[lang] || installLabels.fr;
     document.getElementById('install-title').textContent = l.title;
-    document.getElementById('install-sub').textContent   = l.sub;
+    document.getElementById('install-sub').textContent   = isIos ? l.subIos : l.subAndroid;
     document.getElementById('install-btn').textContent   = l.btn;
+    // Sur iOS le bouton n'a rien à faire (c'est manuel)
+    document.getElementById('install-btn').style.display = isIos ? 'none' : '';
   }
   updateInstallTexts();
 
@@ -650,7 +685,15 @@ function setupInstallBanner() {
 
   document.getElementById('install-dismiss').addEventListener('click', () => {
     document.getElementById('install-banner').classList.remove('visible');
+    // Mémoriser le refus pendant 7 jours
+    localStorage.setItem('mc_install_dismissed', String(Date.now()));
   });
+
+  // Ne pas reafficher si l'utilisateur a déjà fermé le banner récemment
+  const dismissed = parseInt(localStorage.getItem('mc_install_dismissed') || '0');
+  if (Date.now() - dismissed < 7 * 24 * 60 * 60 * 1000) {
+    document.getElementById('install-banner').classList.remove('visible');
+  }
 
   // Mettre à jour les textes quand la langue change
   const origApplyLang = applyLang;

@@ -5,35 +5,34 @@
 
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
-
-/* ✅ Configuration chargée depuis firebase-config.js */
 importScripts('/firebase-config.js');
 
 firebase.initializeApp(FIREBASE_CONFIG);
-
 const messaging = firebase.messaging();
 
 /* ── Message reçu en background ── */
 messaging.onBackgroundMessage(payload => {
-  const table = payload.data?.table || payload.notification?.body?.match(/\d+/)?.[0] || '?';
-  const title = payload.notification?.title || '🔔 Mozart Café';
-  const body  = payload.notification?.body  || `Table ${table} demande un serveur`;
+  const data  = payload.data || {};
+  const table = data.table || payload.notification?.body?.match(/\d+/)?.[0] || '?';
+  const title = data.title || payload.notification?.title || '🔔 Mozart Café';
+  const body  = data.body  || payload.notification?.body  || `Table ${table} demande un serveur`;
 
-  self.registration.getNotifications({ tag: 'mc-call' }).then(existing => {
-    if (existing.length > 0) return;
-    self.registration.showNotification(title, {
-      body,
-      icon:  '/icon.svg',
-      badge: '/icon.svg',
-      tag:   'mc-call',
-      requireInteraction: true,
-      vibrate: [200, 80, 200, 80, 350],
-      actions: [
-        { action: 'open',    title: "Ouvrir l'app" },
-        { action: 'dismiss', title: 'Fermer' }
-      ],
-      data: { table, url: '/app.html' }
-    });
+  // Tag unique par appel → plusieurs notifs possibles sans blocage
+  const tag = 'mc-call-' + table + '-' + Date.now();
+
+  return self.registration.showNotification(title, {
+    body,
+    icon:  '/icon.svg',
+    badge: '/icon.svg',
+    tag,
+    renotify: true,
+    requireInteraction: true,
+    vibrate: [200, 80, 200, 80, 350],
+    actions: [
+      { action: 'open',    title: "Ouvrir l'app" },
+      { action: 'dismiss', title: 'Fermer' }
+    ],
+    data: { table, url: '/app.html' }
   });
 });
 
@@ -52,7 +51,7 @@ self.addEventListener('notificationclick', e => {
 });
 
 /* ── Cache offline ── */
-const CACHE = 'mozart-cafe-v1';
+const CACHE  = 'mozart-cafe-v4';
 const ASSETS = ['app.html', 'manifest.json', 'icon.svg', 'firebase-config.js'];
 
 self.addEventListener('install', e => {
