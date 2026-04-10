@@ -96,11 +96,22 @@ async function sendFCM(projectId, accessToken, tokens, table, lang) {
 
   let sent = 0;
   for (const token of tokens) {
+    // data-only → toujours traité par le service worker (foreground + background)
+    // notification field omis intentionnellement pour éviter les doublons système
     const payload = JSON.stringify({
       message: {
         token,
-        notification: { title: '🔔 Mozart Café', body: body_text },
-        data: { table: String(table), lang: lang || 'fr' }
+        data: {
+          table: String(table),
+          lang:  lang || 'fr',
+          title: '🔔 Mozart Café',
+          body:  body_text
+        },
+        android: { priority: 'high' },
+        apns: {
+          headers: { 'apns-priority': '10' },
+          payload: { aps: { contentAvailable: true } }
+        }
       }
     });
     try {
