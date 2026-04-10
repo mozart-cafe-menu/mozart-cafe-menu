@@ -432,13 +432,13 @@
     .lang-wrap { display:flex; gap:2px; }
     .lang-btn {
       background:none; border:1px solid transparent;
-      color:var(--muted);
-      font-family:'Outfit',sans-serif;
-      font-size:0.64rem; font-weight:500;
-      padding:5px 6px; border-radius:6px; min-height:30px;
-      transition:var(--tr); letter-spacing:0.04em;
+      color:var(--muted); font-family:'Outfit',sans-serif;
+      font-size:1.15rem; line-height:1;
+      padding:4px 5px; border-radius:6px; min-height:30px;
+      transition:var(--tr);
     }
-    .lang-btn.on { border-color:var(--border2); color:var(--gold); background:rgba(212,149,107,0.08); }
+    .lang-btn.on { border-color:var(--border2); background:rgba(212,149,107,0.10); opacity:1; }
+    .lang-btn:not(.on) { opacity:0.55; }
     .theme-btn {
       width:32px; height:32px;
       border:1px solid var(--border); border-radius:8px;
@@ -1900,7 +1900,7 @@ function buildLangBtns() {
     const btn = document.createElement('button');
     btn.className = 'lang-btn' + (l === lang ? ' on' : '');
     btn.dataset.lang = l;
-    btn.textContent = LANG_LABELS[l];
+    btn.textContent = LANG_FLAGS[l];
     btn.addEventListener('click', () => changeLang(l));
     wrap.appendChild(btn);
   });
@@ -2026,6 +2026,8 @@ function renderMenu() {
   });
   // IntersectionObserver gère l'apparition (plus rapide, pas de setTimeout)
   setupScrollObserver();
+  // Signaler que le menu est rendu → setupFAB peut observer la première card
+  document.dispatchEvent(new Event('menuRendered'));
 }
 
 function createCard(item, idx) {
@@ -2238,13 +2240,29 @@ function setupStickyNav() {
    FAB
 ================================================ */
 function setupFAB() {
-  const fab = document.getElementById('fab');
+  const fab     = document.getElementById('fab');
   const callFab = document.getElementById('call-fab');
-  const heroH = () => document.getElementById('hero').offsetHeight;
+
+  // Call FAB : apparaît dès que le premier produit entre dans le viewport
+  const firstCardObs = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) {
+      callFab.classList.add('show');
+      firstCardObs.disconnect();
+    }
+  }, { threshold: 0.15 });
+
+  function observeFirstCard() {
+    const first = document.querySelector('.card');
+    if (first) firstCardObs.observe(first);
+  }
+  // Les cards peuvent ne pas exister encore (chargement Firebase) → réessayer
+  observeFirstCard();
+  document.addEventListener('menuRendered', observeFirstCard, { once: true });
+
   window.addEventListener('scroll', () => {
     fab.classList.toggle('show', window.scrollY > 400);
-    callFab.classList.toggle('show', window.scrollY >= heroH());
   }, { passive: true });
+
   fab.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 }
 
