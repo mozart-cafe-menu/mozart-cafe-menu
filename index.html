@@ -171,21 +171,37 @@
     }
     .hero-bg-img {
       position:absolute; inset:0;
-      background-size:cover; background-position:center;
+      background-size:cover;
+      /* Centre légèrement en haut-gauche pour cadrer la tasse sur mobile portrait */
+      background-position:42% 38%;
       transform-origin:center;
       will-change:transform;
       opacity:0; transition:opacity 1.2s ease;
     }
     .hero-bg-img.flow {
       opacity:1;
-      animation:heroBgFlow 22s ease-in-out infinite;
+      animation:heroBgFlow 24s ease-in-out infinite;
     }
     @keyframes heroBgFlow {
-      0%   { transform:scale(1.08) translate(0%,    0%);    }
-      20%  { transform:scale(1.13) translate(-1.2%, -0.6%); }
-      45%  { transform:scale(1.10) translate(-2%,   -1.2%); }
-      70%  { transform:scale(1.13) translate(-0.8%, -2%);   }
-      100% { transform:scale(1.08) translate(0%,    0%);    }
+      0%   { transform:scale(1.10) translate(0%,     0%);    }
+      25%  { transform:scale(1.14) translate(-1%,   -0.5%); }
+      50%  { transform:scale(1.11) translate(-1.8%, -1%);   }
+      75%  { transform:scale(1.14) translate(-0.6%, -1.6%); }
+      100% { transform:scale(1.10) translate(0%,     0%);    }
+    }
+    /* Mobile : animation plus douce, position recadrée portrait */
+    @media(max-width:600px) {
+      .hero-bg-img {
+        background-position:42% 30%;
+      }
+      @keyframes heroBgFlow {
+        0%,100% { transform:scale(1.07) translate(0%,   0%);   }
+        50%     { transform:scale(1.10) translate(-1%, -0.8%); }
+      }
+    }
+    /* Tablette paysage */
+    @media(min-width:601px) and (max-width:1024px) {
+      .hero-bg-img { background-position:42% 35%; }
     }
 
     /* Logo dans le hero */
