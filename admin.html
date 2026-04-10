@@ -515,17 +515,19 @@ const STORE_KEY = 'mc_admin_data_v1';
 /* ═══════════════════════════════════════════
    LANGUES DISPONIBLES
 ═══════════════════════════════════════════ */
-const LANGS = ['fr', 'en', 'el', 'ar', 'de'];
-const LANG_LABELS = { fr:'🇫🇷', en:'🇬🇧', el:'🇬🇷', ar:'🇸🇦', de:'🇩🇪' };
+const LANGS = ['fr', 'en', 'ar'];
+const LANG_LABELS = { fr:'🇫🇷 FR', en:'🇬🇧 EN', ar:'🇸🇦 AR' };
 
 /* ═══════════════════════════════════════════
    DONNÉES PAR DÉFAUT (chargées depuis index.html)
 ═══════════════════════════════════════════ */
 const DEFAULT_CATS = [
-  { key:'hot',  ico:'ico-coffee', names:{ fr:'Cafés Chauds', en:'Hot Coffees', el:'Ζεστοί Καφέδες', ar:'قهوة ساخنة', de:'Heiße Kaffeespezialitäten' } },
-  { key:'cold', ico:'ico-cold',   names:{ fr:'Boissons Froides', en:'Cold Drinks', el:'Κρύα Ροφήματα', ar:'مشروبات باردة', de:'Kalte Getränke' } },
-  { key:'food', ico:'ico-food',   names:{ fr:'Snacks & Food', en:'Snacks & Food', el:'Σνακ & Φαγητό', ar:'وجبات خفيفة', de:'Snacks & Food' } },
-  { key:'spec', ico:'ico-star',   names:{ fr:'Spéciaux Maison', en:'House Specials', el:'Σπεσιαλιτέ Σπιτιού', ar:'تخصصات البيت', de:'Hauskreationen' } },
+  { key:'hot',     ico:'ico-coffee',  names:{ fr:'Boissons Chaudes', en:'Hot Drinks',    ar:'مشروبات ساخنة' } },
+  { key:'cold',    ico:'ico-cold',    names:{ fr:'Boissons Froides', en:'Cold Drinks',   ar:'مشروبات باردة' } },
+  { key:'food',    ico:'ico-food',    names:{ fr:'Cuisine',          en:'Food',           ar:'الأكل'         } },
+  { key:'sweet',   ico:'ico-cake',    names:{ fr:'Sucré',            en:'Sweet',          ar:'حلويات'        } },
+  { key:'morning', ico:'ico-sunrise', names:{ fr:'Le Matin',         en:'Breakfast',      ar:'الصباح'        } },
+  { key:'hookah',  ico:'ico-hookah',  names:{ fr:'Hookah',           en:'Hookah',         ar:'الشيشة'        } },
 ];
 
 const DEFAULT_INFO = {
