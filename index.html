@@ -575,10 +575,12 @@
     .bdg-n { background:rgba(200,164,78,0.13); color:var(--gold); border:1px solid rgba(200,164,78,0.28); }
     .bdg-p { background:rgba(232,133,74,0.13); color:#e8854a; border:1px solid rgba(232,133,74,0.28); }
     .bdg-v { background:rgba(126,189,106,0.13); color:#7ebd6a; border:1px solid rgba(126,189,106,0.28); }
-    .bdg-s {
-      background:transparent; color:var(--gold); border:1px solid var(--gold);
-      animation:pulse 2.6s ease-in-out infinite;
-    }
+    .bdg-l { background:rgba(220,80,80,0.12); color:#e07070; border:1px solid rgba(220,80,80,0.28); animation:pulse 2.6s ease-in-out infinite; }
+    .bdg-m { background:rgba(255,190,80,0.13); color:#f5a623; border:1px solid rgba(255,190,80,0.28); }
+    .bdg-type { background:rgba(100,140,200,0.12); color:#8ab4e8; border:1px solid rgba(100,140,200,0.25); }
+    .bdg-temp-chaud { background:rgba(220,100,60,0.12); color:#e08060; border:1px solid rgba(220,100,60,0.25); }
+    .bdg-temp-froid { background:rgba(80,160,220,0.12); color:#70b8e8; border:1px solid rgba(80,160,220,0.25); }
+    .bdg-temp-glace { background:rgba(120,200,240,0.12); color:#80d0f0; border:1px solid rgba(120,200,240,0.25); }
     @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(200,164,78,0)} 50%{box-shadow:0 0 0 3px rgba(200,164,78,0.2)} }
 
     /* ================================================
@@ -1236,12 +1238,26 @@
 ================================================ */
 
 const CATS = [
-  { key:'hot',     ico:'ico-coffee',  sub:{ fr:'boissons',  en:'drinks',   ar:'مشروبات' } },
-  { key:'cold',    ico:'ico-cold',    sub:{ fr:'boissons',  en:'drinks',   ar:'مشروبات' } },
-  { key:'food',    ico:'ico-food',    sub:{ fr:'plats',     en:'dishes',   ar:'أطباق'   } },
-  { key:'sweet',   ico:'ico-cake',    sub:{ fr:'desserts',  en:'desserts', ar:'حلويات'  } },
-  { key:'morning', ico:'ico-sunrise', sub:{ fr:'formules',  en:'formulas', ar:'وجبات'   } },
-  { key:'hookah',  ico:'ico-hookah',  sub:{ fr:'chichas',   en:'hookahs',  ar:'شيشة'    } },
+  { key:'morning',    ico:'ico-sunrise', sub:{ fr:'formules',   en:'formulas',  ar:'وجبات'      } },
+  { key:'hot-coffee', ico:'ico-coffee',  sub:{ fr:'café chaud', en:'hot coffee',ar:'قهوة ساخنة' } },
+  { key:'cold-coffee',ico:'ico-cold',    sub:{ fr:'café froid', en:'cold coffee',ar:'قهوة باردة'} },
+  { key:'hot-tea',    ico:'ico-coffee',  sub:{ fr:'thé chaud',  en:'hot tea',   ar:'شاي ساخن'   } },
+  { key:'cold-tea',   ico:'ico-cold',    sub:{ fr:'thé froid',  en:'iced tea',  ar:'شاي بارد'   } },
+  { key:'milkshake',  ico:'ico-cold',    sub:{ fr:'boissons',   en:'drinks',    ar:'مشروبات'    } },
+  { key:'detox',      ico:'ico-cold',    sub:{ fr:'boissons',   en:'drinks',    ar:'مشروبات'    } },
+  { key:'mojito',     ico:'ico-cold',    sub:{ fr:'cocktails',  en:'cocktails', ar:'كوكتيل'     } },
+  { key:'smoothie',   ico:'ico-cold',    sub:{ fr:'boissons',   en:'drinks',    ar:'مشروبات'    } },
+  { key:'juice',      ico:'ico-cold',    sub:{ fr:'jus',        en:'juices',    ar:'عصائر'      } },
+  { key:'cocktail',   ico:'ico-star',    sub:{ fr:'cocktails',  en:'cocktails', ar:'كوكتيل'     } },
+  { key:'salade',     ico:'ico-food',    sub:{ fr:'salades',    en:'salads',    ar:'سلطات'      } },
+  { key:'hamburger',  ico:'ico-food',    sub:{ fr:'burgers',    en:'burgers',   ar:'برغر'       } },
+  { key:'sandwich',   ico:'ico-food',    sub:{ fr:'sandwichs',  en:'sandwiches',ar:'ساندويش'    } },
+  { key:'pates',      ico:'ico-food',    sub:{ fr:'plats',      en:'dishes',    ar:'أطباق'      } },
+  { key:'plat',       ico:'ico-food',    sub:{ fr:'plats',      en:'dishes',    ar:'أطباق'      } },
+  { key:'crepe-sal',  ico:'ico-food',    sub:{ fr:'crêpes',     en:'crêpes',    ar:'كريب'       } },
+  { key:'crepe-suc',  ico:'ico-cake',    sub:{ fr:'crêpes',     en:'crêpes',    ar:'كريب'       } },
+  { key:'dessert',    ico:'ico-cake',    sub:{ fr:'desserts',   en:'desserts',  ar:'حلويات'     } },
+  { key:'hookah',     ico:'ico-hookah',  sub:{ fr:'chichas',    en:'hookahs',   ar:'شيشة'       } },
 ];
 
 const UI = {
@@ -1252,8 +1268,10 @@ const UI = {
     explore:'Menu',
     search:'Rechercher dans le menu…',
     all:'Tout',
-    cats:['Boissons Chaudes','Boissons Froides','Cuisine','Sucré','Le Matin','Hookah'],
-    badgeN:'Nouveau', badgeP:'Populaire', badgeV:'Végé', badgeS:'★ Coup de cœur',
+    cats:['Petit-Déjeuner','Café Chaud','Café Froid','Thé Chaud','Thé Froid','Milkshake','Détox','Mojito','Smoothie','Jus','Cocktail','Salade','Hamburger','Libanais · Tacos','Pâtes','Plat','Crêpe Salée','Crêpe Sucrée','Dessert','Chichas'],
+    badgeN:'Nouveau', badgeP:'Populaire', badgeV:'Vegan', badgeL:'Offre limitée', badgeM:'Le Matin',
+    bdgBoisson:'Boisson', bdgCuisine:'Cuisine', bdgSucre:'Sucré', bdgHookah:'Hookah',
+    bdgChaud:'Chaud', bdgFroid:'Froid', bdgGlace:'Glacé',
     callBtn:'Appeler le serveur',
     notified:'Serveur notifié ✓',
     notifiedTable:'Serveur notifié · Table {n} ✓',
@@ -1274,8 +1292,10 @@ const UI = {
     explore:'Menu',
     search:'Search the menu…',
     all:'All',
-    cats:['Hot Drinks','Cold Drinks','Food','Sweet','Breakfast','Hookah'],
-    badgeN:'New', badgeP:'Popular', badgeV:'Veg', badgeS:'★ Chef\'s Pick',
+    cats:['Breakfast','Hot Coffee','Cold Coffee','Hot Tea','Iced Tea','Milkshake','Detox','Mojito','Smoothie','Juice','Cocktail','Salad','Burger','Sandwich','Pasta','Main Dish','Savoury Crêpe','Sweet Crêpe','Dessert','Hookah'],
+    badgeN:'New', badgeP:'Popular', badgeV:'Vegan', badgeL:'Limited offer', badgeM:'Morning',
+    bdgBoisson:'Drink', bdgCuisine:'Food', bdgSucre:'Sweet', bdgHookah:'Hookah',
+    bdgChaud:'Hot', bdgFroid:'Cold', bdgGlace:'Iced',
     callBtn:'Call the waiter',
     notified:'Waiter notified ✓',
     notifiedTable:'Waiter notified · Table {n} ✓',
@@ -1296,8 +1316,10 @@ const UI = {
     explore:'القائمة',
     search:'ابحث في القائمة…',
     all:'الكل',
-    cats:['مشروبات ساخنة','مشروبات باردة','الأكل','حلويات','الصباح','الشيشة'],
-    badgeN:'جديد', badgeP:'الأكثر طلباً', badgeV:'نباتي', badgeS:'★ اختيار الشيف',
+    cats:['الفطور','قهوة ساخنة','قهوة باردة','شاي ساخن','شاي بارد','ميلك شيك','ديتوكس','موهيتو','سموثي','عصائر','كوكتيل','سالاد','هامبرغر','ساندويش','معكرونة','أطباق','كريب مملح','كريب حلو','حلويات','شيشة'],
+    badgeN:'جديد', badgeP:'الأكثر طلباً', badgeV:'نباتي', badgeL:'عرض محدود', badgeM:'الصباح',
+    bdgBoisson:'مشروب', bdgCuisine:'أكل', bdgSucre:'حلو', bdgHookah:'شيشة',
+    bdgChaud:'ساخن', bdgFroid:'بارد', bdgGlace:'مثلج',
     callBtn:'استدعاء النادل',
     notified:'تم إخطار النادل ✓',
     notifiedTable:'تم إخطار النادل · طاولة {n} ✓',
@@ -1314,7 +1336,7 @@ const UI = {
 };
 
 const ITEMS = [
-  /* ---- CAT 0: Boissons Chaudes ---- */
+  /* ---- CAT 0: Petit-Déjeuner ---- */
   {
     id:1, cat:0, price:'3.500 DT', photo:'photo-1509042239860-f550ce710b93',
     badges:['popular'],
@@ -2037,13 +2059,24 @@ function createCard(item, idx) {
   card.dataset.item = item.id;
   card.style.transitionDelay = `${Math.min(idx * 0.025, 0.12)}s`;
 
-  const badges = (item.badges || []).map(b => {
-    if (b === 'new') return `<span class="bdg bdg-n">${t.badgeN}</span>`;
-    if (b === 'popular') return `<span class="bdg bdg-p">${t.badgeP}</span>`;
-    if (b === 'vegan') return `<span class="bdg bdg-v">${t.badgeV}</span>`;
-    if (b === 'selection') return `<span class="bdg bdg-s">${t.badgeS}</span>`;
-    return '';
-  }).join('');
+  const bdgParts = [];
+  if (item.type) {
+    const typeLabel = { boisson:t.bdgBoisson, cuisine:t.bdgCuisine, sucre:t.bdgSucre, hookah:t.bdgHookah }[item.type] || '';
+    if (typeLabel) bdgParts.push(`<span class="bdg bdg-type">${typeLabel}</span>`);
+  }
+  if (item.temp) {
+    const tempLabel = { chaud:t.bdgChaud, froid:t.bdgFroid, glace:t.bdgGlace }[item.temp] || '';
+    const tempCls = `bdg-temp-${item.temp}`;
+    if (tempLabel) bdgParts.push(`<span class="bdg ${tempCls}">${tempLabel}</span>`);
+  }
+  (item.badges || []).forEach(b => {
+    if (b === 'new')     bdgParts.push(`<span class="bdg bdg-n">${t.badgeN}</span>`);
+    if (b === 'popular') bdgParts.push(`<span class="bdg bdg-p">${t.badgeP}</span>`);
+    if (b === 'vegan')   bdgParts.push(`<span class="bdg bdg-v">${t.badgeV}</span>`);
+    if (b === 'limited') bdgParts.push(`<span class="bdg bdg-l">${t.badgeL}</span>`);
+    if (b === 'morning') bdgParts.push(`<span class="bdg bdg-m">${t.badgeM}</span>`);
+  });
+  const badges = bdgParts.join('');
 
   const allergenArr = (item.allergens && item.allergens[lang]) || [];
 
