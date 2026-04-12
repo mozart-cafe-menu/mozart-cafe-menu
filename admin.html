@@ -215,28 +215,62 @@
     }
     .phone-content {
       position:absolute; inset:0; z-index:2;
-      display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
-      padding:0 10px 14px;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      padding:18px 10px 30px; gap:4px;
     }
     .phone-logo {
-      width:52%; filter:grayscale(1) brightness(6) drop-shadow(0 2px 8px rgba(0,0,0,0.8));
-      margin-bottom:5px;
+      width:55%; filter:grayscale(1) brightness(6) drop-shadow(0 2px 8px rgba(0,0,0,0.8));
+      margin-bottom:3px;
+    }
+    .phone-ornament {
+      display:flex; align-items:center; gap:6px; color:var(--gold); margin-bottom:1px;
+    }
+    .phone-orn-line {
+      width:22px; height:1px; background:linear-gradient(90deg,transparent,var(--gold));
+    }
+    .phone-orn-line-r { background:linear-gradient(270deg,transparent,var(--gold)); }
+    .phone-title {
+      font-family:'Cormorant',serif; font-size:0.88rem; font-weight:600;
+      color:#f5e8d4; letter-spacing:0.04em; text-align:center; line-height:1.1;
     }
     .phone-tagline {
-      font-family:'Cormorant',serif; font-size:0.5rem; font-weight:300;
-      color:rgba(245,232,212,0.65); letter-spacing:0.2em; text-transform:uppercase;
-      margin-bottom:5px; text-align:center;
+      font-family:'Cormorant',serif; font-style:italic; font-size:0.54rem;
+      color:rgba(200,164,78,0.9); text-align:center; letter-spacing:0.04em;
     }
-    .phone-menu-lbl {
-      font-size:0.4rem; font-weight:500; letter-spacing:0.18em; text-transform:uppercase;
-      color:rgba(245,232,212,0.5); border:1px solid rgba(212,149,107,0.3);
-      border-radius:20px; padding:3px 10px; margin-bottom:7px;
+    .phone-sub {
+      font-family:'Cormorant',serif; font-size:0.4rem; letter-spacing:0.06em;
+      color:rgba(200,164,78,0.65); text-align:center;
+      display:flex; flex-wrap:wrap; justify-content:center; gap:2px;
+      line-height:1.4;
     }
-    .phone-socials { display:flex; gap:4px; }
+    .phone-sub-dot { color:var(--gold); margin:0 2px; }
+    .phone-socials { display:flex; gap:4px; margin-top:3px; }
     .phone-social-btn {
-      font-size:0.36rem; padding:3px 7px; border-radius:8px;
-      background:rgba(0,0,0,0.35); border:1px solid rgba(212,149,107,0.28);
-      color:rgba(245,232,212,0.65);
+      display:flex; align-items:center; gap:2px;
+      font-size:0.38rem; padding:3px 7px; border-radius:20px;
+      border:1px solid rgba(212,149,107,0.35); color:rgba(212,149,107,0.85);
+      letter-spacing:0.03em;
+    }
+    .phone-scroll {
+      position:absolute; bottom:8px; left:0; right:0;
+      display:flex; flex-direction:column; align-items:center; gap:3px; z-index:3;
+    }
+    .phone-scroll-lbl {
+      font-family:'Cormorant',serif; font-size:0.38rem; letter-spacing:0.12em;
+      color:rgba(200,164,78,0.7); text-transform:uppercase;
+    }
+    .phone-capsule {
+      width:7px; height:13px; border:1px solid rgba(200,164,78,0.5);
+      border-radius:5px; display:flex; align-items:flex-start;
+      justify-content:center; padding-top:2px;
+    }
+    .phone-capsule-dot {
+      width:2px; height:3px; background:rgba(200,164,78,0.85);
+      border-radius:1px; animation:pScroll 1.6s ease-in-out infinite;
+    }
+    @keyframes pScroll {
+      0%,100% { transform:translateY(0); opacity:1; }
+      80%      { transform:translateY(4px); opacity:0; }
     }
     /* Contrôles */
     .hero-preview-empty {
@@ -756,12 +790,32 @@
             <div class="phone-overlay"></div>
             <div class="phone-content">
               <img src="logo.png" class="phone-logo" alt="Mozart">
-              <div class="phone-tagline">Une expérience culinaire raffinée</div>
-              <div class="phone-menu-lbl">MENU</div>
-              <div class="phone-socials">
-                <span class="phone-social-btn">f Facebook</span>
-                <span class="phone-social-btn">◎ Instagram</span>
+              <div class="phone-ornament">
+                <div class="phone-orn-line"></div>
+                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:var(--gold)"><polygon points="12,2 22,9 18,20 6,20 2,9"/></svg>
+                <div class="phone-orn-line phone-orn-line-r"></div>
               </div>
+              <div class="phone-title" id="pm-title">Café &amp; Restaurant</div>
+              <div class="phone-tagline" id="pm-tagline">Une expérience culinaire raffinée</div>
+              <div class="phone-sub" id="pm-sub">
+                <span>Cafés d'exception</span><span class="phone-sub-dot">·</span>
+                <span>Plats gourmets</span><span class="phone-sub-dot">·</span>
+                <span>Ambiance élégante</span>
+              </div>
+              <div class="phone-socials">
+                <span class="phone-social-btn">
+                  <svg width="7" height="7" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+                  Facebook
+                </span>
+                <span class="phone-social-btn">
+                  <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+                  Instagram
+                </span>
+              </div>
+            </div>
+            <div class="phone-scroll">
+              <div class="phone-scroll-lbl">Menu</div>
+              <div class="phone-capsule"><div class="phone-capsule-dot"></div></div>
             </div>
           </div>
         </div>

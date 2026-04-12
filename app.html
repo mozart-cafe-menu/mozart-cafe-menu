@@ -503,6 +503,9 @@ function buildLangBtns() {
       lang = l;
       localStorage.setItem('mc_app_lang', l);
       applyLang();
+      // Mettre à jour la langue dans Firebase pour les notifs
+      const deviceId = localStorage.getItem('mc_device_id');
+      if (_db && deviceId) _db.ref('fcm_tokens/' + deviceId + '/lang').set(l).catch(() => {});
     });
     wrap.appendChild(btn);
   });
@@ -586,7 +589,7 @@ function registerFCM() {
           localStorage.removeItem('mc_fcm_last_reg');
           return;
         }
-        return _db.ref('fcm_tokens/' + deviceId).set({ token, ts: Date.now() })
+        return _db.ref('fcm_tokens/' + deviceId).set({ token, ts: Date.now(), lang })
           .then(() => localStorage.setItem('mc_fcm_last_reg', String(Date.now())));
       })
       .catch(() => { localStorage.removeItem('mc_fcm_last_reg'); });
