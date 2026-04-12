@@ -101,6 +101,7 @@ async function sendFCM(projectId, accessToken, tokenObjs, table, lang, customMes
     ar: `الطاولة ${table} تطلب نادلاً`,
   };
   let sent = 0;
+  let lastError = null;
   for (const tokenObj of tokenObjs) {
     const { deviceId, token } = tokenObj;
     const deviceLang = tokenObj.lang || lang || 'fr';
@@ -148,14 +149,17 @@ async function sendFCM(projectId, accessToken, tokenObjs, table, lang, customMes
       if (res.status === 200) {
         sent++;
       } else if (res.status === 404 || res.body?.error?.status === 'NOT_FOUND') {
-        // Token invalide → supprimer de Firebase
         await deleteToken(projectId, accessToken, deviceId);
+        lastError = 'Token invalide (404)';
+      } else {
+        lastError = `FCM ${res.status}: ${res.body?.error?.message || JSON.stringify(res.body)}`;
       }
     } catch(e) {
       console.error('FCM error:', e.message);
+      lastError = e.message;
     }
   }
-  return { sent, total: tokenObjs.length };
+  return { sent, total: tokenObjs.length, error: sent === 0 && lastError ? lastError : undefined };
 }
 
 module.exports = async (req, res) => {
