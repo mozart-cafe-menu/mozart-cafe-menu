@@ -94,6 +94,15 @@ async function deleteToken(projectId, accessToken, deviceId) {
   console.log('Deleted invalid token for:', deviceId);
 }
 
+async function storeAdminMessage(projectId, accessToken, message) {
+  const body = JSON.stringify({ message, ts: Date.now() });
+  const url  = `https://${projectId}-default-rtdb.europe-west1.firebasedatabase.app/admin_messages.json?access_token=${accessToken}`;
+  await httpsRequest(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) }
+  }, body).catch(e => console.warn('storeAdminMessage failed:', e.message));
+}
+
 async function sendFCM(projectId, accessToken, tokenObjs, table, lang, customMessage) {
   const WAITER_MESSAGES = {
     fr: `Table ${table} demande un serveur`,
@@ -185,6 +194,8 @@ module.exports = async (req, res) => {
     }
 
     const result = await sendFCM(sa.project_id, accessToken, tokens, table, lang, message);
+    // Stocker les messages admin dans Firebase pour l'historique dans l'app
+    if (message) await storeAdminMessage(sa.project_id, accessToken, message);
     console.log('Result:', JSON.stringify(result));
     res.status(200).json(result);
 
