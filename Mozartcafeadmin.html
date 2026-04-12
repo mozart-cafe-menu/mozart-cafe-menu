@@ -2058,16 +2058,17 @@ async function doSaveAll() {
   // 1. Collecter les formulaires ouverts
   collectAllForms();
 
-  // 2. Auto-traduire FR → EN et FR → AR (seulement les champs qui ont changé)
+  // 2. Auto-traduire FR → EN et FR → AR uniquement si on est en mode français
   const targets    = ['en', 'ar'];
   const infoFields = ['wifi_name','wifi_val','hours_name','hours_val','addr_name','addr_val'];
   const prodFields = ['name','desc','full'];
   if (!adminData._txHashes) adminData._txHashes = {};
   const hashes = adminData._txHashes;
 
-  const hasContent =
+  const hasContent = currentLang === 'fr' && (
     adminData.cats.some(c => (c.names?.fr || '').trim()) ||
-    adminData.items.some(it => (it.name?.fr || '').trim());
+    adminData.items.some(it => (it.name?.fr || '').trim())
+  );
 
   if (hasContent) {
     let totalDone = 0;
