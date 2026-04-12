@@ -778,7 +778,11 @@ function init() {
   document.addEventListener('click',      unlockAudio, { once: true });
 }
 
-document.addEventListener('DOMContentLoaded', init);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
 </script>
 </body>
 </html>
