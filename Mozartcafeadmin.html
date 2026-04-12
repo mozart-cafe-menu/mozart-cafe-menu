@@ -669,17 +669,6 @@
       min-height:32px;
     }
     .global-src-sel option { background:#181612; color:var(--cream); }
-    .btn-translate-global {
-      padding:7px 14px; border-radius:10px;
-      border:1px solid rgba(126,189,106,0.4);
-      color:var(--green); background:rgba(126,189,106,0.08);
-      font-size:0.76rem; font-weight:500;
-      display:flex; align-items:center; gap:6px;
-      transition:var(--tr); white-space:nowrap; min-height:32px;
-    }
-    .btn-translate-global:hover:not(:disabled) { background:rgba(126,189,106,0.15); border-color:var(--green); }
-    .btn-translate-global:disabled { opacity:0.4; cursor:not-allowed; }
-    .btn-translate-global.loading { animation:tl-pulse 1s ease-in-out infinite; }
     .global-progress {
       padding:4px 16px 0; font-size:0.74rem; color:var(--green);
       min-height:0; width:100%; transition:opacity 0.3s;
@@ -756,9 +745,6 @@
       <option value="en">🇬🇧 English</option>
       <option value="ar">🇸🇦 العربية</option>
     </select>
-    <button class="btn-translate-global" id="btn-translate-all">
-      🌐 Traduire toutes les autres langues
-    </button>
   </div>
   <div class="adm-right">
     <button class="btn-theme" id="adm-theme-btn" title="Changer le thème">
@@ -966,7 +952,6 @@ const ADMIN_UI = {
     admSub:        'Administration du menu',
     btnPreview:    '👁 Voir le menu',
     btnLogout:     'Déconnexion',
-    btnTranslate:  '🌐 Traduire toutes les autres langues',
     secInfo:       'Informations du café',
     secCats:       'Catégories',
     secProds:      'Produits',
@@ -1016,7 +1001,6 @@ const ADMIN_UI = {
     admSub:        'Menu administration',
     btnPreview:    '👁 View menu',
     btnLogout:     'Logout',
-    btnTranslate:  '🌐 Translate all other languages',
     secInfo:       'Café information',
     secCats:       'Categories',
     secProds:      'Products',
@@ -1066,7 +1050,6 @@ const ADMIN_UI = {
     admSub:        'إدارة القائمة',
     btnPreview:    '👁 عرض القائمة',
     btnLogout:     'تسجيل الخروج',
-    btnTranslate:  '🌐 ترجمة جميع اللغات الأخرى',
     secInfo:       'معلومات المقهى',
     secCats:       'الفئات',
     secProds:      'المنتجات',
@@ -1461,9 +1444,6 @@ function applyAdminUI(l) {
   if (preview) preview.innerHTML = t.btnPreview;
   const logout = $('logout-btn');
   if (logout) logout.textContent = t.btnLogout;
-  const translateBtn = $('btn-translate-all');
-  if (translateBtn && !translateBtn.disabled) translateBtn.innerHTML = t.btnTranslate;
-
   // Section titres
   const secHds = document.querySelectorAll('.sec-hd');
   secHds.forEach(hd => {
@@ -2041,143 +2021,127 @@ function collectAllForms() {
   });
 }
 
-document.getElementById('btn-save-all').addEventListener('click', () => {
-  collectAllForms(); saveData(); renderAll();
-});
-document.getElementById('fab-save').addEventListener('click', () => {
-  collectAllForms(); saveData(); renderAll();
-});
+document.getElementById('btn-save-all').addEventListener('click', () => doSaveAll());
+document.getElementById('fab-save').addEventListener('click', () => doSaveAll());
 
 /* ═══════════════════════════════════════════
-   GLOBAL TRANSLATE — traduit TOUT en une fois
-   Catégories + tous les produits + infos café
+   SAVE ALL — collecte + traduit FR→EN/AR + sauvegarde
 ═══════════════════════════════════════════ */
-// Simple hash: somme des char codes pour comparaison rapide
+// Hash simple pour détecter les changements de texte FR
 function simpleHash(str) {
   let h = 0;
   for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
   return h;
 }
 
-// Clé de cache des hashes (stocke le hash FR au moment de la dernière traduction)
-// Format: adminData._txHashes = { 'item-{id}-{field}': hash, 'cat-{idx}-name': hash, ... }
-
-document.getElementById('btn-translate-all').addEventListener('click', async () => {
-  const srcLang  = document.getElementById('global-src-lang').value;
-  const targets  = LANGS.filter(l => l !== srcLang);
-  const btn      = document.getElementById('btn-translate-all');
+async function doSaveAll() {
+  const fab      = document.getElementById('fab-save');
   const progress = document.getElementById('global-progress');
+  if (fab.dataset.saving) return;   // éviter double-clic
+  fab.dataset.saving = '1';
 
-  // Vérifier qu'il y a du contenu à traduire
-  const hasContent =
-    adminData.cats.some(c => (c.names?.[srcLang] || '').trim()) ||
-    adminData.items.some(it => (it.name?.[srcLang] || '').trim());
+  // 1. Collecter les formulaires ouverts
+  collectAllForms();
 
-  if (!hasContent) {
-    showToast('⚠ Remplissez d\'abord les champs dans la langue source ' + LANG_LABELS[srcLang]);
-    return;
-  }
-
-  // Initialiser le cache de hashes
+  // 2. Auto-traduire FR → EN et FR → AR (seulement les champs qui ont changé)
+  const targets    = ['en', 'ar'];
+  const infoFields = ['wifi_name','wifi_val','hours_name','hours_val','addr_name','addr_val'];
+  const prodFields = ['name','desc','full'];
   if (!adminData._txHashes) adminData._txHashes = {};
   const hashes = adminData._txHashes;
 
-  btn.disabled = true;
-  btn.classList.add('loading');
-  btn.textContent = '⏳ Traduction en cours…';
+  const hasContent =
+    adminData.cats.some(c => (c.names?.fr || '').trim()) ||
+    adminData.items.some(it => (it.name?.fr || '').trim());
 
-  const infoFields = ['wifi_name','wifi_val','hours_name','hours_val','addr_name','addr_val'];
-  const prodFields = ['name','desc','full'];
-  let totalDone = 0;
-  const totalTargets = targets.length;
-  let skipped = 0;
-  let translated = 0;
+  if (hasContent) {
+    let totalDone = 0;
+    let translated = 0, skipped = 0;
 
-  for (const toLang of targets) {
-    totalDone++;
-    progress.textContent = `→ ${LANG_LABELS[toLang]} (${totalDone}/${totalTargets}) — Catégories…`;
+    for (const toLang of targets) {
+      totalDone++;
+      progress.textContent = `⏳ Traduction → ${LANG_LABELS[toLang]} (${totalDone}/${targets.length}) — Catégories…`;
 
-    // 1. Traduire les catégories
-    for (let ci = 0; ci < adminData.cats.length; ci++) {
-      const cat = adminData.cats[ci];
-      const srcName = (cat.names?.[srcLang] || '').trim();
-      if (!srcName) continue;
-      const hashKey = `cat-${ci}-${toLang}`;
-      const curHash = simpleHash(srcName);
-      if (hashes[hashKey] === curHash && (cat.names?.[toLang] || '').trim()) { skipped++; continue; }
-      try {
-        const tx = await translateText(srcName, srcLang, toLang);
-        if (tx) { if (!cat.names) cat.names = {}; cat.names[toLang] = tx; hashes[hashKey] = curHash; translated++; }
-      } catch(_) {}
-      await sleep(150);
-    }
-
-    progress.textContent = `→ ${LANG_LABELS[toLang]} (${totalDone}/${totalTargets}) — Produits…`;
-
-    // 2. Traduire les produits
-    for (const item of adminData.items) {
-      for (const field of prodFields) {
-        const srcText = (item[field]?.[srcLang] || '').trim();
-        if (!srcText) continue;
-        const hashKey = `item-${item.id}-${field}-${toLang}`;
-        const curHash = simpleHash(srcText);
-        if (hashes[hashKey] === curHash && (item[field]?.[toLang] || '').trim()) { skipped++; continue; }
+      for (let ci = 0; ci < adminData.cats.length; ci++) {
+        const cat = adminData.cats[ci];
+        const srcName = (cat.names?.fr || '').trim();
+        if (!srcName) continue;
+        const hashKey = `cat-${ci}-${toLang}`;
+        const curHash = simpleHash(srcName);
+        if (hashes[hashKey] === curHash && (cat.names?.[toLang] || '').trim()) { skipped++; continue; }
         try {
-          const tx = await translateText(srcText, srcLang, toLang);
-          if (tx) { if (!item[field]) item[field] = {}; item[field][toLang] = tx; hashes[hashKey] = curHash; translated++; }
+          const tx = await translateText(srcName, 'fr', toLang);
+          if (tx) { if (!cat.names) cat.names = {}; cat.names[toLang] = tx; hashes[hashKey] = curHash; translated++; }
         } catch(_) {}
-        await sleep(200);
+        await sleep(150);
       }
-      // Allergènes
-      const srcAl = (item.allergens?.[srcLang] || []).join(', ');
-      if (srcAl.trim()) {
-        const hashKey = `item-${item.id}-al-${toLang}`;
-        const curHash = simpleHash(srcAl);
-        if (!(hashes[hashKey] === curHash && (item.allergens?.[toLang]||[]).length)) {
+
+      progress.textContent = `⏳ Traduction → ${LANG_LABELS[toLang]} (${totalDone}/${targets.length}) — Produits…`;
+
+      for (const item of adminData.items) {
+        for (const field of prodFields) {
+          const srcText = (item[field]?.fr || '').trim();
+          if (!srcText) continue;
+          const hashKey = `item-${item.id}-${field}-${toLang}`;
+          const curHash = simpleHash(srcText);
+          if (hashes[hashKey] === curHash && (item[field]?.[toLang] || '').trim()) { skipped++; continue; }
           try {
-            const tx = await translateText(srcAl, srcLang, toLang);
-            if (tx) {
-              if (!item.allergens) item.allergens = {};
-              item.allergens[toLang] = tx.split(',').map(s => s.trim()).filter(Boolean);
-              hashes[hashKey] = curHash; translated++;
-            }
+            const tx = await translateText(srcText, 'fr', toLang);
+            if (tx) { if (!item[field]) item[field] = {}; item[field][toLang] = tx; hashes[hashKey] = curHash; translated++; }
           } catch(_) {}
-          await sleep(150);
-        } else { skipped++; }
+          await sleep(200);
+        }
+        // Allergènes
+        const srcAl = (item.allergens?.fr || []).join(', ');
+        if (srcAl.trim()) {
+          const hashKey = `item-${item.id}-al-${toLang}`;
+          const curHash = simpleHash(srcAl);
+          if (!(hashes[hashKey] === curHash && (item.allergens?.[toLang]||[]).length)) {
+            try {
+              const tx = await translateText(srcAl, 'fr', toLang);
+              if (tx) {
+                if (!item.allergens) item.allergens = {};
+                item.allergens[toLang] = tx.split(',').map(s => s.trim()).filter(Boolean);
+                hashes[hashKey] = curHash; translated++;
+              }
+            } catch(_) {}
+            await sleep(150);
+          } else { skipped++; }
+        }
+      }
+
+      progress.textContent = `⏳ Traduction → ${LANG_LABELS[toLang]} (${totalDone}/${targets.length}) — Infos café…`;
+
+      for (const field of infoFields) {
+        const srcText = (adminData.info[field]?.fr || '').trim();
+        if (!srcText) continue;
+        const hashKey = `info-${field}-${toLang}`;
+        const curHash = simpleHash(srcText);
+        if (hashes[hashKey] === curHash && (adminData.info[field]?.[toLang] || '').trim()) { skipped++; continue; }
+        try {
+          const tx = await translateText(srcText, 'fr', toLang);
+          if (tx) {
+            if (!adminData.info[field]) adminData.info[field] = {};
+            adminData.info[field][toLang] = tx; hashes[hashKey] = curHash; translated++;
+          }
+        } catch(_) {}
+        await sleep(150);
       }
     }
 
-    progress.textContent = `→ ${LANG_LABELS[toLang]} (${totalDone}/${totalTargets}) — Infos café…`;
-
-    // 3. Traduire les infos café
-    for (const field of infoFields) {
-      const srcText = (adminData.info[field]?.[srcLang] || '').trim();
-      if (!srcText) continue;
-      const hashKey = `info-${field}-${toLang}`;
-      const curHash = simpleHash(srcText);
-      if (hashes[hashKey] === curHash && (adminData.info[field]?.[toLang] || '').trim()) { skipped++; continue; }
-      try {
-        const tx = await translateText(srcText, srcLang, toLang);
-        if (tx) {
-          if (!adminData.info[field]) adminData.info[field] = {};
-          adminData.info[field][toLang] = tx; hashes[hashKey] = curHash; translated++;
-        }
-      } catch(_) {}
-      await sleep(150);
+    if (translated > 0) {
+      progress.textContent = `✓ ${translated} champ(s) traduits automatiquement`;
+    } else {
+      progress.textContent = '';
     }
+    setTimeout(() => { progress.textContent = ''; }, 5000);
   }
 
-  btn.disabled = false;
-  btn.classList.remove('loading');
-  btn.innerHTML = '🌐 Traduire toutes les autres langues';
-  const msg = translated > 0
-    ? `✓ ${translated} traduits, ${skipped} ignorés (inchangés) — pensez à sauvegarder !`
-    : `✓ Tout est déjà à jour (${skipped} ignorés)`;
-  progress.textContent = msg;
-  setTimeout(() => { progress.textContent = ''; }, 7000);
-  markUnsaved();
+  // 3. Sauvegarder
+  delete fab.dataset.saving;
+  saveData();
   renderAll();
-});
+}
 
 /* ═══════════════════════════════════════════
    SVG ICONS (copié depuis index.html pour les aperçus)
