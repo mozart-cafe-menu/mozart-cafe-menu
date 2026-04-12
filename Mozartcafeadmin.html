@@ -852,7 +852,7 @@
 
   <!-- ── PRODUITS PAR CATÉGORIE ── -->
   <div class="adm-section">
-    <div class="sec-hd">Produits</div>
+    <div class="sec-hd" id="sec-hd-produits">Produits <span class="sec-badge" id="prod-count-badge">0</span></div>
     <div id="products-area"></div>
   </div>
 
@@ -1469,8 +1469,8 @@ function applyAdminUI(l) {
   }
   const secCatsHd = document.querySelector('#cats-list')?.closest('.adm-section')?.querySelector('.sec-hd');
   if (secCatsHd) secCatsHd.firstChild.textContent = t.secCats + ' ';
-  const secProdsHd = document.querySelector('#products-area')?.closest('.adm-section')?.querySelector('.sec-hd');
-  if (secProdsHd) secProdsHd.textContent = t.secProds;
+  const secProdsHd = document.getElementById('sec-hd-produits');
+  if (secProdsHd) secProdsHd.firstChild.textContent = t.secProds + ' ';
 
   // Boutons statiques
   const addCat = $('btn-add-cat');
@@ -1709,6 +1709,8 @@ document.getElementById('btn-save-cats').addEventListener('click', () => {
 function renderProductsSection() {
   const area = document.getElementById('products-area');
   area.innerHTML = '';
+  const badge = document.getElementById('prod-count-badge');
+  if (badge) badge.textContent = adminData.items.length;
 
   adminData.cats.forEach((cat, ci) => {
     const catItems = adminData.items.filter(it => it.cat === ci);
