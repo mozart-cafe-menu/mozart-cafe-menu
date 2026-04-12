@@ -1729,7 +1729,9 @@ const ITEMS = [
 ================================================ */
 let lang = 'fr';
 let activeCat = 'all';
-let theme = 'dark';
+let theme = localStorage.getItem('mc_menu_theme') === 'light' ? 'light' : 'dark';
+// Appliquer immédiatement pour éviter le flash
+if (theme === 'light') document.documentElement.classList.add('light');
 let sheetItem = null;
 const LANG_FLAGS = { fr:'🇫🇷', en:'🇬🇧', ar:'🇸🇦' };
 const LANG_DIRS = { fr:'ltr', en:'ltr', ar:'rtl' };
@@ -1737,7 +1739,7 @@ const LANG_LABELS = { fr:'FR', en:'EN', ar:'عر' };
 
 /* ================================================
    ADMIN DATA OVERRIDE
-   Si le propriétaire a modifié le menu via admin.html,
+   Si le propriétaire a modifié le menu via Mozartcafeadmin.html,
    on écrase CATS et ITEMS avec ses données.
 ================================================ */
 function loadAdminData() {
@@ -2221,11 +2223,15 @@ window.addEventListener('popstate', e => {
    THEME
 ================================================ */
 function setupTheme() {
+  // Icône correcte dès le chargement
+  const ico = document.getElementById('theme-ico');
+  ico.innerHTML = `<use href="${theme === 'dark' ? '#ico-moon' : '#ico-sun'}"/>`;
+
   document.getElementById('theme-btn').addEventListener('click', () => {
     theme = theme === 'dark' ? 'light' : 'dark';
     document.documentElement.classList.toggle('light', theme === 'light');
-    const ico = document.getElementById('theme-ico');
     ico.innerHTML = `<use href="${theme === 'dark' ? '#ico-moon' : '#ico-sun'}"/>`;
+    localStorage.setItem('mc_menu_theme', theme);
   });
 }
 
