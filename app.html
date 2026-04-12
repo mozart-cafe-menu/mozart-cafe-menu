@@ -351,6 +351,9 @@
   </div>
 </main>
 
+<!-- DEBUG FCM -->
+<div id="fcm-debug" style="display:none; margin:12px 14px; background:#1a0f06; border:1px solid rgba(212,149,107,0.3); border-radius:12px; padding:12px 14px; font-size:0.72rem; font-family:monospace; color:#e8b48a; line-height:1.7; word-break:break-all;"></div>
+
 <footer class="app-footer">
   © 2026 Mozart Café &nbsp;·&nbsp; <a href="index.html" id="ft-menu">Voir le menu</a>
 </footer>
@@ -692,51 +695,61 @@ function getDeviceId() {
   return deviceId;
 }
 
+function _dbg(msg) {
+  const el = document.getElementById('fcm-debug');
+  if (!el) return;
+  el.style.display = 'block';
+  el.innerHTML += msg + '<br>';
+}
+
 function registerFCM() {
-  if (!('Notification' in window)) return;
-  if (Notification.permission === 'denied') return;
+  if (!('Notification' in window)) { _dbg('❌ Notifications non supportées'); return; }
+  if (Notification.permission === 'denied') { _dbg('❌ Permission refusée'); return; }
   if (Notification.permission !== 'granted') {
+    _dbg('⏳ Permission pas encore accordée (' + Notification.permission + ')');
     Notification.requestPermission().then(p => { if (p === 'granted') registerFCM(); });
     return;
   }
+  _dbg('✅ Permission accordée');
   const deviceId = getDeviceId();
+  _dbg('📱 Device: ' + deviceId);
   navigator.serviceWorker.ready.then(swReg => {
+    _dbg('✅ Service Worker prêt');
     const swOpts = { vapidKey: VAPID_KEY, serviceWorkerRegistration: swReg };
-    // Essayer d'abord de récupérer le token existant sans le détruire
     _msg.getToken(swOpts)
       .then(token => {
         if (!token) {
-          console.warn('[FCM] getToken null → renouvellement forcé');
+          _dbg('⚠️ getToken = null → renouvellement forcé');
           return _fcmForceRenew(swReg, swOpts, deviceId);
         }
-        console.log('[FCM] Token:', token.slice(0, 20) + '…');
+        _dbg('🔑 Token: ' + token.slice(0, 25) + '…');
         return _db.ref('fcm_tokens/' + deviceId).set({ token, ts: Date.now(), lang })
-          .then(() => console.log('[FCM] Sauvegardé dans Firebase'));
+          .then(() => _dbg('✅ Token sauvegardé dans Firebase'));
       })
       .catch(err => {
-        console.error('[FCM] getToken erreur:', err.code || '', err.message);
+        _dbg('❌ getToken erreur: ' + (err.code || '') + ' ' + err.message);
         return _fcmForceRenew(swReg, swOpts, deviceId);
       });
-  }).catch(err => console.error('[FCM] SW ready erreur:', err.message));
+  }).catch(err => _dbg('❌ SW erreur: ' + err.message));
   _msg.onMessage(() => {});
 }
 
 function _fcmForceRenew(swReg, swOpts, deviceId) {
-  console.log('[FCM] Renouvellement forcé en cours…');
+  _dbg('🔄 Renouvellement forcé…');
   return swReg.pushManager.getSubscription()
     .then(sub => {
-      console.log('[FCM] Souscription existante:', !!sub);
+      _dbg('📡 Souscription push existante: ' + (sub ? 'oui' : 'non'));
       return sub ? sub.unsubscribe() : Promise.resolve();
     })
-    .then(() => _msg.deleteToken().catch(e => console.warn('[FCM] deleteToken:', e.message)))
-    .then(() => _msg.getToken(swOpts))
+    .then(() => _msg.deleteToken().catch(e => _dbg('⚠️ deleteToken: ' + e.message)))
+    .then(() => { _dbg('📤 Demande nouveau token…'); return _msg.getToken(swOpts); })
     .then(token => {
-      if (!token) { console.error('[FCM] Toujours null après renouvellement'); return; }
-      console.log('[FCM] Nouveau token:', token.slice(0, 20) + '…');
+      if (!token) { _dbg('❌ Toujours null après renouvellement'); return; }
+      _dbg('🔑 Nouveau token: ' + token.slice(0, 25) + '…');
       return _db.ref('fcm_tokens/' + deviceId).set({ token, ts: Date.now(), lang })
-        .then(() => console.log('[FCM] Nouveau token sauvegardé'));
+        .then(() => _dbg('✅ Nouveau token sauvegardé'));
     })
-    .catch(err => console.error('[FCM] Renouvellement erreur:', err.code || '', err.message));
+    .catch(err => _dbg('❌ Renouvellement erreur: ' + (err.code || '') + ' ' + err.message));
 }
 
 function registerSW() {
