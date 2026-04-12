@@ -1188,6 +1188,11 @@ function loadData() {
           items: getDefaultItems()
         };
       }
+      // Restaurer le cache de hashes depuis localStorage (exclu de Firebase)
+      try {
+        const savedHashes = localStorage.getItem('mc_tx_hashes');
+        if (savedHashes) adminData._txHashes = JSON.parse(savedHashes);
+      } catch(_) {}
       renderAll();
       applyAdminUI(currentLang);
     })
@@ -1229,12 +1234,14 @@ function saveData() {
   _db.ref('menu').set(dataForDb)
     .then(() => {
       localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
+      localStorage.setItem('mc_tx_hashes', JSON.stringify(adminData._txHashes || {}));
       unsaved = false;
       document.getElementById('fab-save').classList.remove('unsaved');
       showToast((ADMIN_UI[currentLang]||ADMIN_UI.fr).toastSaved);
     })
     .catch(() => {
       localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
+      localStorage.setItem('mc_tx_hashes', JSON.stringify(adminData._txHashes || {}));
       unsaved = false;
       document.getElementById('fab-save').classList.remove('unsaved');
       showToast('⚠️ Sauvegarde locale uniquement (pas de connexion)');
@@ -2590,33 +2597,24 @@ function getDefaultItems() {
 }
 
 /* ═══════════════════════════════════════════
-   TRADUCTION AUTOMATIQUE — MyMemory API (gratuite)
-   Limite : ~5000 mots/jour par adresse IP.
-   Pour un usage professionnel intensif, ajoutez
-   votre email en paramètre de-a pour 10x plus.
+   TRADUCTION AUTOMATIQUE — Google Translate (endpoint public)
+   Aucune clé requise, qualité excellente, supporte FR/EN/AR.
 ═══════════════════════════════════════════ */
-
-// Codes langue pour MyMemory
-const MYMEMORY_CODES = { fr:'fr-FR', en:'en-GB', ar:'ar-SA' };
 
 async function translateText(text, fromLang, toLang) {
   if (!text || !text.trim()) return '';
   if (fromLang === toLang) return text;
 
-  const src = MYMEMORY_CODES[fromLang] || fromLang;
-  const tgt = MYMEMORY_CODES[toLang]   || toLang;
-
-  // MyMemory a une limite de 500 chars par requête — on découpe si nécessaire
-  if (text.length <= 500) {
-    return await myMemoryCall(text, src, tgt);
+  // Découper si trop long (limite ~1000 chars par requête)
+  if (text.length <= 1000) {
+    return await googleTranslateCall(text, fromLang, toLang);
   }
 
-  // Découper par phrases pour les textes longs
   const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
   const chunks = [];
   let current = '';
   for (const s of sentences) {
-    if ((current + s).length > 480) {
+    if ((current + s).length > 900) {
       if (current) chunks.push(current.trim());
       current = s;
     } else {
@@ -2627,22 +2625,23 @@ async function translateText(text, fromLang, toLang) {
 
   const results = [];
   for (const chunk of chunks) {
-    const translated = await myMemoryCall(chunk, src, tgt);
-    results.push(translated || chunk);
-    await sleep(150);
+    const tx = await googleTranslateCall(chunk, fromLang, toLang);
+    results.push(tx || chunk);
+    await sleep(200);
   }
   return results.join(' ');
 }
 
-async function myMemoryCall(text, src, tgt) {
-  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${src}|${tgt}&de=mozartcafe2026@gmail.com`;
+async function googleTranslateCall(text, src, tgt) {
+  const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${src}&tl=${tgt}&dt=t&q=${encodeURIComponent(text)}`;
   const res  = await fetch(url);
   if (!res.ok) throw new Error('API error ' + res.status);
   const data = await res.json();
-  if (data.responseStatus === 200 && data.responseData?.translatedText) {
-    return data.responseData.translatedText;
+  // La réponse est un tableau imbriqué : [[["texte traduit","texte source",...],...],...]
+  if (Array.isArray(data) && Array.isArray(data[0])) {
+    return data[0].map(part => part[0]).filter(Boolean).join('');
   }
-  throw new Error('Translation failed: ' + (data.responseDetails || 'unknown'));
+  throw new Error('Réponse inattendue de Google Translate');
 }
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
