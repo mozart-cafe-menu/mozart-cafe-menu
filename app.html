@@ -233,16 +233,6 @@
     .install-dismiss:hover { color:var(--cream); }
     .install-dismiss svg { width:14px; height:14px; }
 
-    /* ── NOTIF BANNER ── */
-    #notif-banner {
-      display:none;
-      margin:12px 14px 0;
-      background:var(--bg3); border:1px solid rgba(200,164,78,0.35);
-      border-radius:16px; padding:14px 16px;
-      align-items:center; gap:12px;
-    }
-    #notif-banner.visible { display:flex; }
-
     /* ── FOOTER ── */
     .app-footer { text-align:center; padding:24px 20px 36px; font-size:0.67rem; color:rgba(244,234,210,0.18); letter-spacing:0.08em; }
     .app-footer a { color:var(--gold); text-decoration:none; opacity:0.7; }
@@ -324,21 +314,6 @@
   </button>
 </div>
 
-<!-- NOTIF BANNER -->
-<div id="notif-banner">
-  <div class="install-ico">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-      <path d="M13.73 21a2 2 0 01-3.46 0"/>
-    </svg>
-  </div>
-  <div class="install-text">
-    <div class="install-title" id="notif-banner-title">Activer les notifications</div>
-    <div class="install-sub"   id="notif-banner-sub">Recevez les appels de table en temps réel</div>
-  </div>
-  <button class="install-btn" id="notif-banner-btn">Activer</button>
-</div>
-
 <!-- MAIN -->
 <main class="app-main">
   <!-- Call history -->
@@ -370,7 +345,6 @@ const T = {
     callMsg:'Table {n} — Serveur demandé', received:'Reçu',
     noCalls:'Aucun appel reçu pour le moment', ftMenu:'Voir le menu',
     ago0:'À l\'instant', agoMin:'Il y a {n} min', agoH:'Il y a {n}h',
-    notifTitle:'Activer les notifications', notifSub:'Recevez les appels de table en temps réel', notifBtn:'Activer',
   },
   en: {
     hdrSub:'Waiter Interface', connWait:'Waiting…', connOn:'Connected',
@@ -379,7 +353,6 @@ const T = {
     callMsg:'Table {n} — Waiter needed', received:'Received',
     noCalls:'No calls received yet', ftMenu:'View menu',
     ago0:'Just now', agoMin:'{n} min ago', agoH:'{n}h ago',
-    notifTitle:'Enable notifications', notifSub:'Receive table calls in real time', notifBtn:'Enable',
   },
   ar: {
     hdrSub:'واجهة النادل', connWait:'في انتظار…', connOn:'متصل',
@@ -388,7 +361,6 @@ const T = {
     callMsg:'طاولة {n} — النادل مطلوب', received:'استُلم',
     noCalls:'لم تُستلم أي نداءات بعد', ftMenu:'عرض القائمة',
     ago0:'الآن', agoMin:'منذ {n} دق', agoH:'منذ {n}س',
-    notifTitle:'تفعيل الإشعارات', notifSub:'استقبل نداءات الطاولة فوراً', notifBtn:'تفعيل',
   }
 };
 
@@ -516,10 +488,6 @@ function applyLang() {
   document.getElementById('no-calls-msg').textContent = t.noCalls;
   document.getElementById('ft-menu').textContent = t.ftMenu;
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('on', b.dataset.l === lang));
-  // Bandeau notification
-  document.getElementById('notif-banner-title').textContent = t.notifTitle;
-  document.getElementById('notif-banner-sub').textContent   = t.notifSub;
-  document.getElementById('notif-banner-btn').textContent   = t.notifBtn;
   renderCalls();
 }
 
@@ -597,29 +565,14 @@ function getDeviceId() {
   return deviceId;
 }
 
-/* ── BANDEAU NOTIFICATION ── */
-function checkNotifBanner() {
-  const banner = document.getElementById('notif-banner');
-  if (!banner || !('Notification' in window)) return;
-  // Afficher si permission pas encore accordée (et pas refusée)
-  banner.classList.toggle('visible', Notification.permission === 'default');
-}
-
-document.getElementById('notif-banner-btn').addEventListener('click', () => {
-  Notification.requestPermission().then(p => {
-    if (p === 'granted') {
-      document.getElementById('notif-banner').classList.remove('visible');
-      registerFCM();
-    } else {
-      // Refusé → cacher le bandeau (ne peut plus rien faire depuis JS)
-      document.getElementById('notif-banner').classList.remove('visible');
-    }
-  });
-});
-
 function registerFCM() {
   if (!('Notification' in window)) return;
-  if (Notification.permission !== 'granted') return;
+  if (Notification.permission === 'denied') return;
+
+  if (Notification.permission !== 'granted') {
+    Notification.requestPermission().then(p => { if (p === 'granted') registerFCM(); });
+    return;
+  }
 
   const deviceId = getDeviceId();
 
@@ -650,7 +603,7 @@ function registerSW() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/firebase-messaging-sw.js')
       .then(() => navigator.serviceWorker.ready)
-      .then(() => { checkNotifBanner(); registerFCM(); })
+      .then(() => registerFCM())
       .catch(() => {});
   }
 }

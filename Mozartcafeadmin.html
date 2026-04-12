@@ -1378,11 +1378,15 @@ function setupNotifFab() {
       if (data.sent > 0) {
         closeModal();
         showToastMsg('✓ Notification envoyée à ' + data.sent + ' appareil(s)');
+      } else if (data.error) {
+        showToastMsg('✗ Erreur serveur : ' + data.error, true);
+      } else if (data.reason === 'no_tokens') {
+        showToastMsg('⚠ Aucun token enregistré', true);
       } else {
-        showToastMsg('⚠ Aucun appareil connecté', true);
+        showToastMsg('⚠ Envoi échoué — ' + JSON.stringify(data), true);
       }
     } catch(e) {
-      showToastMsg('✗ Erreur d\'envoi', true);
+      showToastMsg('✗ Erreur réseau : ' + e.message, true);
     }
 
     sendBtn.disabled = false;
