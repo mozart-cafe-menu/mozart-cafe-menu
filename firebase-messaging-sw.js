@@ -1,6 +1,5 @@
 /* ================================================
-   Firebase Messaging Service Worker
-   Mozart Café — Notifications push (app fermée)
+   Firebase Messaging Service Worker — Mozart Café
 ================================================ */
 
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
@@ -15,6 +14,7 @@ firebase.initializeApp({
   appId:             "1:89531105163:web:224863264ff5eebdb9b98e",
   databaseURL:       "https://mozart-cafe-ae8e0-default-rtdb.europe-west1.firebasedatabase.app"
 });
+
 const messaging = firebase.messaging();
 
 /* ── Message reçu en background ── */
@@ -22,9 +22,8 @@ messaging.onBackgroundMessage(payload => {
   const data  = payload.data || {};
   const table = data.table || payload.notification?.body?.match(/\d+/)?.[0] || '?';
   const title = data.title || payload.notification?.title || '🔔 Mozart Café';
-  const body  = data.body  || payload.notification?.body  || `Table ${table} demande un serveur`;
+  const body  = data.body  || payload.notification?.body  || 'Table ' + table + ' demande un serveur';
 
-  // Tag unique par appel → plusieurs notifs possibles sans blocage
   const tag = 'mc-call-' + table + '-' + Date.now();
 
   return self.registration.showNotification(title, {
@@ -58,7 +57,7 @@ self.addEventListener('notificationclick', e => {
 });
 
 /* ── Cache offline ── */
-const CACHE  = 'mozart-cafe-v11';
+const CACHE  = 'mozart-cafe-v12';
 const ASSETS = ['app.html', 'manifest.json'];
 
 self.addEventListener('install', e => {

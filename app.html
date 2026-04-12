@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-  <meta name="theme-color" content="#c8a44e">
+  <meta name="theme-color" content="#c9a84c">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,17 +15,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@200;300;400;500;600&family=Noto+Sans+Arabic:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:     #0f0906;
-      --bg2:    #160d08;
-      --bg3:    #1e1009;
-      --card:   rgba(255,255,255,0.05);
-      --gold:   #d4956b;
-      --gold-l: #e8b48a;
-      --gold-d: #a86840;
-      --cream:  #f5e8d4;
-      --muted:  rgba(245,232,212,0.50);
-      --border: rgba(212,149,107,0.18);
-      --bord2:  rgba(212,149,107,0.36);
+      --bg:     #09080f;
+      --bg2:    #0e0c18;
+      --bg3:    #141220;
+      --card:   rgba(255,255,255,0.04);
+      --gold:   #c9a84c;
+      --gold-l: #e2c278;
+      --gold-d: #9a7a35;
+      --cream:  #f4ead2;
+      --muted:  rgba(244,234,210,0.50);
+      --border: rgba(201,168,76,0.16);
+      --bord2:  rgba(201,168,76,0.34);
       --green:  #7ebd6a;
       --tr:     0.3s cubic-bezier(0.4,0,0.2,1);
       --r:      18px;
@@ -45,12 +45,13 @@
     }
     html.light body { background:var(--bg); color:var(--cream); }
     html.light .app-header { background:rgba(240,228,210,0.97) !important; }
-    html.light #call-alert { background:var(--bg3); box-shadow:0 12px 48px rgba(139,94,60,0.18), 0 4px 20px rgba(0,0,0,0.1); }
+    html.light #call-alert { background:var(--bg3); }
     html.light .call-item { background:rgba(255,255,255,0.92); }
     html.light .conn-badge { color:var(--muted); border-color:rgba(139,94,60,0.28); }
     html.light .lang-btn { color:var(--muted); }
     html.light .header-sub { color:var(--muted); }
     html.light .app-footer { color:rgba(28,16,7,0.38); }
+
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     html { overflow-x:hidden; }
     body {
@@ -77,7 +78,7 @@
 
     /* ── HEADER ── */
     .app-header {
-      background:rgba(15,9,6,0.96);
+      background:rgba(9,8,15,0.95);
       backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
       border-bottom:1px solid var(--border);
       padding:12px 16px 10px;
@@ -91,23 +92,14 @@
     .header-right { display:flex; align-items:center; gap:8px; }
 
     /* Lang buttons */
-    .lang-wrap { display:flex; gap:2px; }
+    .lang-wrap { display:flex; gap:3px; }
     .lang-btn {
       background:none; border:1px solid transparent;
-      font-size:1.15rem; line-height:1;
-      padding:4px 5px; border-radius:6px; min-height:30px;
-      transition:var(--tr); opacity:0.55;
+      color:var(--muted); font-family:'Outfit',sans-serif;
+      font-size:0.66rem; font-weight:500;
+      padding:4px 6px; border-radius:6px; transition:var(--tr);
     }
-    .lang-btn.on { border-color:var(--bord2); background:rgba(212,149,107,0.10); opacity:1; }
-    .theme-btn-app {
-      width:32px; height:32px;
-      border:1px solid var(--border); border-radius:8px;
-      color:var(--muted); background:none; cursor:pointer;
-      display:flex; align-items:center; justify-content:center;
-      transition:var(--tr); flex-shrink:0;
-    }
-    .theme-btn-app:hover { border-color:var(--gold); color:var(--gold); }
-    .theme-btn-app svg { width:14px; height:14px; pointer-events:none; }
+    .lang-btn.on { border-color:var(--bord2); color:var(--gold); background:rgba(201,168,76,0.07); }
 
     /* Connection badge */
     .conn-badge {
@@ -131,7 +123,7 @@
       border-radius:20px;
       padding:16px 18px;
       z-index:200;
-      box-shadow:0 12px 48px rgba(200,164,78,0.22), 0 4px 20px rgba(0,0,0,0.6);
+      box-shadow:0 12px 48px rgba(201,168,76,0.22), 0 4px 20px rgba(0,0,0,0.6);
       transition:transform 0.52s cubic-bezier(0.34,1.56,0.64,1);
       display:flex; align-items:center; gap:14px;
     }
@@ -139,13 +131,13 @@
     html[dir="rtl"] #call-alert { flex-direction:row-reverse; }
     .alert-ring {
       width:44px; height:44px; flex-shrink:0;
-      background:rgba(200,164,78,0.12); border:1px solid var(--gold); border-radius:50%;
+      background:rgba(201,168,76,0.12); border:1px solid var(--gold); border-radius:50%;
       display:flex; align-items:center; justify-content:center; color:var(--gold);
       animation:ring 1s ease-in-out infinite;
     }
     @keyframes ring {
-      0%,100%{transform:scale(1); box-shadow:0 0 0 0 rgba(200,164,78,0.4)}
-      50%{transform:scale(1.1); box-shadow:0 0 0 8px rgba(200,164,78,0)}
+      0%,100%{transform:scale(1); box-shadow:0 0 0 0 rgba(201,168,76,0.4)}
+      50%{transform:scale(1.1); box-shadow:0 0 0 8px rgba(201,168,76,0)}
     }
     .alert-ring svg { width:20px; height:20px; }
     .alert-info { flex:1; }
@@ -172,19 +164,6 @@
     html[dir="rtl"] .section-title { flex-direction:row-reverse; }
     html[dir="rtl"] .section-title::after { background:linear-gradient(270deg,var(--bord2),transparent); }
 
-    /* ── TABS ── */
-    .tab-bar {
-      display:flex; gap:6px; padding:16px 0 4px;
-    }
-    .tab-btn {
-      flex:1; padding:9px 8px; border-radius:12px; font-size:0.78rem; font-weight:500;
-      border:1px solid var(--border); color:var(--muted); background:transparent;
-      transition:var(--tr); letter-spacing:0.02em;
-    }
-    .tab-btn.active { border-color:var(--bord2); color:var(--gold); background:rgba(212,149,107,0.08); }
-    .tab-pane { display:none; }
-    .tab-pane.active { display:block; }
-
     /* ── CALLS HISTORY ── */
     #calls-list { display:flex; flex-direction:column; gap:9px; }
     .no-calls { text-align:center; padding:36px 20px; font-family:'Cormorant',serif; font-size:1rem; font-style:italic; color:var(--muted); }
@@ -195,10 +174,10 @@
     }
     html[dir="rtl"] .call-item { flex-direction:row-reverse; }
     @keyframes slideIn { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
-    .call-item.fresh { border-color:var(--bord2); background:rgba(200,164,78,0.04); }
+    .call-item.fresh { border-color:var(--bord2); background:rgba(201,168,76,0.04); }
     .call-badge {
       width:42px; height:42px; flex-shrink:0;
-      background:linear-gradient(135deg,rgba(200,164,78,0.14),rgba(200,164,78,0.05));
+      background:linear-gradient(135deg,rgba(201,168,76,0.14),rgba(201,168,76,0.05));
       border:1px solid var(--bord2); border-radius:11px;
       display:flex; flex-direction:column; align-items:center; justify-content:center;
     }
@@ -213,65 +192,44 @@
       background:rgba(126,189,106,0.1); color:var(--green); border:1px solid rgba(126,189,106,0.25);
     }
 
-    /* ── NOTIF BANNER ── */
-    #notif-banner {
-      display:none; margin:12px 14px 0;
-      background:var(--bg3); border:1px solid rgba(200,164,78,0.4);
-      border-radius:16px; padding:13px 15px;
-      align-items:center; gap:12px;
+    /* Theme button */
+    .theme-btn {
+      width:32px; height:32px; border-radius:50%;
+      border:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center;
+      color:var(--muted); transition:var(--tr);
     }
-    #notif-banner.visible { display:flex; }
-
-    /* ── MESSAGES LIST ── */
-    #messages-list { display:flex; flex-direction:column; gap:9px; }
-    .msg-item {
-      background:var(--card); border:1px solid rgba(200,164,78,0.2); border-radius:14px;
-      padding:13px 15px; animation:slideIn 0.4s ease;
-    }
-    .msg-item.fresh { border-color:var(--bord2); background:rgba(200,164,78,0.04); }
-    .msg-sender { font-size:0.72rem; color:var(--gold); font-weight:500; margin-bottom:4px; letter-spacing:0.04em; }
-    .msg-body   { font-size:0.88rem; color:var(--cream); line-height:1.5; }
-    .msg-time   { font-size:0.71rem; color:var(--muted); margin-top:4px; }
-
-    /* ── NOTIF / INSTALL ICON ── */
-    .install-ico {
-      width:40px; height:40px; flex-shrink:0; border-radius:10px;
-      background:linear-gradient(135deg,var(--gold-d),var(--gold));
-      display:flex; align-items:center; justify-content:center; color:#fff;
-    }
-    .install-ico svg { width:20px; height:20px; }
-    .install-text { flex:1; }
-    .install-title { font-size:0.88rem; font-weight:500; color:var(--cream); }
-    .install-sub   { font-size:0.72rem; color:var(--muted); margin-top:2px; }
-    .install-btn {
-      background:var(--gold); color:#0c0a08;
-      font-size:0.78rem; font-weight:600; letter-spacing:0.03em;
-      padding:8px 14px; border-radius:10px; white-space:nowrap;
-      flex-shrink:0; transition:opacity 0.2s;
-    }
-    .install-btn:hover { opacity:0.85; }
+    .theme-btn:hover { color:var(--gold); border-color:var(--bord2); }
+    .theme-btn svg { width:15px; height:15px; pointer-events:none; }
 
     /* ── FOOTER ── */
     .app-footer { text-align:center; padding:24px 20px 36px; font-size:0.67rem; color:rgba(244,234,210,0.18); letter-spacing:0.08em; }
     .app-footer a { color:var(--gold); text-decoration:none; opacity:0.7; }
   </style>
+  <!-- Thème appliqué avant rendu pour éviter le flash -->
+  <script>
+    (function() {
+      if (localStorage.getItem('mc_app_theme') === 'light')
+        document.documentElement.classList.add('light');
+    })();
+  </script>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
-  <!-- ✅ Configuration centralisée — modifier uniquement firebase-config.js -->
-  <script src="firebase-config.js"></script>
   <script>
-    try {
-      firebase.initializeApp(FIREBASE_CONFIG);
-    } catch(e) {
-      document.addEventListener('DOMContentLoaded', function() {
-        var el = document.getElementById('fcm-debug');
-        if (el) el.innerHTML = '❌ Firebase init erreur: ' + e.message;
-      });
-    }
-    const _db  = firebase.database();
-    const _msg = firebase.messaging();
+    firebase.initializeApp({
+      apiKey:            "AIzaSyAOuYRxE39KDgmizSdqCzAglWrkL4DZXYQ",
+      authDomain:        "mozart-cafe-ae8e0.firebaseapp.com",
+      projectId:         "mozart-cafe-ae8e0",
+      storageBucket:     "mozart-cafe-ae8e0.firebasestorage.app",
+      messagingSenderId: "89531105163",
+      appId:             "1:89531105163:web:224863264ff5eebdb9b98e",
+      databaseURL:       "https://mozart-cafe-ae8e0-default-rtdb.europe-west1.firebasedatabase.app"
+    });
+    const _db       = firebase.database();
+    const _msg      = firebase.messaging();
+    const VAPID_KEY = "BFSmZPEJy1iWKkamRsoAxjVnwII1uELkb6dRgn9jfwIAZSzcUV8S2EOM8PPShr_PZU6pdPE7rfkxBd9W_VGZ1vw";
   </script>
 </head>
 <body>
@@ -307,9 +265,9 @@
     </div>
     <div class="header-right">
       <div class="lang-wrap" id="lang-wrap"></div>
-      <button class="theme-btn-app" id="app-theme-btn" title="Thème">
+      <button class="theme-btn" id="theme-btn" aria-label="Thème">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-          <path id="app-theme-ico-path" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+          <path id="theme-ico-path" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
         </svg>
       </button>
       <div class="conn-badge" id="conn-badge">
@@ -320,60 +278,21 @@
   </div>
 </header>
 
-<!-- NOTIF BANNER -->
-<div id="notif-banner">
-  <div class="install-ico">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-      <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-      <path d="M13.73 21a2 2 0 01-3.46 0"/>
-    </svg>
-  </div>
-  <div class="install-text">
-    <div class="install-title" id="notif-title">Activer les notifications</div>
-    <div class="install-sub"   id="notif-sub">Recevez les appels de table en temps réel</div>
-  </div>
-  <button class="install-btn" id="notif-btn">Activer</button>
-</div>
-
 <!-- MAIN -->
 <main class="app-main">
-  <!-- Tabs -->
-  <div class="tab-bar">
-    <button class="tab-btn active" id="tab-calls" onclick="switchTab('calls')">📞 <span id="tab-calls-lbl">Appels récents</span></button>
-    <button class="tab-btn"        id="tab-msgs"  onclick="switchTab('msgs')">💬 <span id="tab-msgs-lbl">Messages reçus</span></button>
-  </div>
-
-  <!-- Pane 1 : appels -->
-  <div class="tab-pane active" id="pane-calls">
-    <div id="calls-list">
-      <div class="no-calls" id="no-calls-msg">Aucun appel reçu pour le moment</div>
-    </div>
-  </div>
-
-  <!-- Pane 2 : messages admin -->
-  <div class="tab-pane" id="pane-msgs">
-    <div id="messages-list">
-      <div class="no-calls" id="no-msgs-msg">Aucun message reçu pour le moment</div>
-    </div>
+  <div class="section-title" id="sec-history">Appels récents</div>
+  <div id="calls-list">
+    <div class="no-calls" id="no-calls-msg">Aucun appel reçu pour le moment</div>
   </div>
 </main>
-
-<!-- DEBUG FCM -->
-<div id="fcm-debug" style="display:block; margin:12px 14px; background:#1a0f06; border:1px solid rgba(212,149,107,0.3); border-radius:12px; padding:12px 14px; font-size:0.72rem; font-family:monospace; color:#e8b48a; line-height:1.7; word-break:break-all;">Chargement…</div>
 
 <footer class="app-footer">
   © 2026 Mozart Café &nbsp;·&nbsp; <a href="index.html" id="ft-menu">Voir le menu</a>
 </footer>
 
 <script>
-/* ── THÈME (appliqué avant tout rendu) ── */
-(function() {
-  if (localStorage.getItem('mc_app_theme') === 'light')
-    document.documentElement.classList.add('light');
-})();
-
-const LANG_FLAGS = { fr:'🇫🇷', en:'🇬🇧', ar:'🇸🇦' };
-const LANG_DIRS  = { fr:'ltr',  en:'ltr',  ar:'rtl' };
+const LANGS     = { fr:'🇫🇷', en:'🇬🇧', ar:'🇸🇦' };
+const LANG_DIRS = { fr:'ltr', en:'ltr', ar:'rtl' };
 
 const T = {
   fr: {
@@ -383,9 +302,6 @@ const T = {
     callMsg:'Table {n} — Serveur demandé', received:'Reçu',
     noCalls:'Aucun appel reçu pour le moment', ftMenu:'Voir le menu',
     ago0:'À l\'instant', agoMin:'Il y a {n} min', agoH:'Il y a {n}h',
-    tabCalls:'Appels récents', tabMsgs:'Messages reçus',
-    noMsgs:'Aucun message reçu pour le moment',
-    notifTitle:'Activer les notifications', notifSub:'Recevez les appels de table en temps réel', notifBtn:'Activer',
   },
   en: {
     hdrSub:'Waiter Interface', connWait:'Waiting…', connOn:'Connected',
@@ -394,9 +310,6 @@ const T = {
     callMsg:'Table {n} — Waiter needed', received:'Received',
     noCalls:'No calls received yet', ftMenu:'View menu',
     ago0:'Just now', agoMin:'{n} min ago', agoH:'{n}h ago',
-    tabCalls:'Recent calls', tabMsgs:'Messages received',
-    noMsgs:'No messages received yet',
-    notifTitle:'Enable notifications', notifSub:'Receive table calls in real time', notifBtn:'Enable',
   },
   ar: {
     hdrSub:'واجهة النادل', connWait:'في انتظار…', connOn:'متصل',
@@ -405,9 +318,6 @@ const T = {
     callMsg:'طاولة {n} — النادل مطلوب', received:'استُلم',
     noCalls:'لم تُستلم أي نداءات بعد', ftMenu:'عرض القائمة',
     ago0:'الآن', agoMin:'منذ {n} دق', agoH:'منذ {n}س',
-    tabCalls:'النداءات الأخيرة', tabMsgs:'الرسائل المستلمة',
-    noMsgs:'لم تُستلم أي رسائل بعد',
-    notifTitle:'تفعيل الإشعارات', notifSub:'استقبل نداءات الطاولة فوراً', notifBtn:'تفعيل',
   }
 };
 
@@ -534,134 +444,27 @@ function applyLang() {
   document.getElementById('sec-history').textContent = t.secHistory;
   document.getElementById('no-calls-msg').textContent = t.noCalls;
   document.getElementById('ft-menu').textContent = t.ftMenu;
-  document.getElementById('tab-calls-lbl').textContent = t.tabCalls;
-  document.getElementById('tab-msgs-lbl').textContent  = t.tabMsgs;
-  document.getElementById('no-msgs-msg').textContent   = t.noMsgs;
-  document.getElementById('notif-title').textContent   = t.notifTitle;
-  document.getElementById('notif-sub').textContent     = t.notifSub;
-  document.getElementById('notif-btn').textContent     = t.notifBtn;
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('on', b.dataset.l === lang));
   renderCalls();
-  renderMessages();
 }
 
 function buildLangBtns() {
   const wrap = document.getElementById('lang-wrap');
   wrap.innerHTML = '';
-  Object.keys(LANG_FLAGS).forEach(l => {
+  Object.keys(LANGS).forEach(l => {
     const btn = document.createElement('button');
     btn.className = 'lang-btn' + (l === lang ? ' on' : '');
     btn.dataset.l = l;
-    btn.textContent = LANG_FLAGS[l];
+    btn.textContent = LANGS[l];
     btn.addEventListener('click', () => {
       lang = l;
       localStorage.setItem('mc_app_lang', l);
+      // Mettre à jour la langue dans Firebase pour les notifications
+      const deviceId = getDeviceId();
+      _db.ref('fcm_tokens/' + deviceId + '/lang').set(l).catch(() => {});
       applyLang();
-      // Mettre à jour la langue dans Firebase pour les notifs
-      const deviceId = localStorage.getItem('mc_device_id');
-      if (_db && deviceId) _db.ref('fcm_tokens/' + deviceId + '/lang').set(l).catch(() => {});
     });
     wrap.appendChild(btn);
-  });
-}
-
-/* ── THÈME ── */
-const SUN_PATH  = 'M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42';
-const MOON_PATH = 'M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z';
-
-function updateThemeIcon() {
-  const isLight = document.documentElement.classList.contains('light');
-  document.getElementById('app-theme-ico-path').setAttribute('d', isLight ? SUN_PATH : MOON_PATH);
-}
-// Appliquer l'icône correcte au chargement
-updateThemeIcon();
-
-document.getElementById('app-theme-btn').addEventListener('click', () => {
-  const isLight = document.documentElement.classList.toggle('light');
-  localStorage.setItem('mc_app_theme', isLight ? 'light' : 'dark');
-  updateThemeIcon();
-});
-
-/* ── BANDEAU NOTIFICATION ── */
-function setupNotifBanner() {
-  const banner = document.getElementById('notif-banner');
-  if (!banner || !('Notification' in window) || Notification.permission !== 'default') return;
-  banner.classList.add('visible');
-  document.getElementById('notif-btn').addEventListener('click', () => {
-    Notification.requestPermission().then(p => {
-      banner.classList.remove('visible');
-      if (p === 'granted') registerFCM();
-    }).catch(() => banner.classList.remove('visible'));
-  });
-}
-
-/* ── TABS ── */
-let currentTab = 'calls';
-function switchTab(tab) {
-  currentTab = tab;
-  document.getElementById('tab-calls').classList.toggle('active', tab === 'calls');
-  document.getElementById('tab-msgs').classList.toggle('active',  tab === 'msgs');
-  document.getElementById('pane-calls').classList.toggle('active', tab === 'calls');
-  document.getElementById('pane-msgs').classList.toggle('active',  tab === 'msgs');
-}
-
-/* ── ADMIN MESSAGES ── */
-const MSGS_KEY = 'mc_admin_msgs_v1';
-let adminMsgs = [];
-
-function loadAdminMsgs() {
-  try {
-    const raw = localStorage.getItem(MSGS_KEY);
-    if (raw) adminMsgs = JSON.parse(raw);
-  } catch(_) {}
-}
-function saveAdminMsgs() {
-  try { localStorage.setItem(MSGS_KEY, JSON.stringify(adminMsgs.slice(0, 50))); } catch(_) {}
-}
-function renderMessages() {
-  const list = document.getElementById('messages-list');
-  const none = document.getElementById('no-msgs-msg');
-  if (!adminMsgs.length) { none.style.display = ''; list.innerHTML = ''; list.appendChild(none); return; }
-  none.style.display = 'none';
-  list.innerHTML = '';
-  adminMsgs.slice().reverse().forEach((m, i) => {
-    const el = document.createElement('div');
-    el.className = 'msg-item' + (i === 0 ? ' fresh' : '');
-    el.innerHTML = `
-      <div class="msg-sender">Moudir</div>
-      <div class="msg-body">${m.message.replace(/</g,'&lt;')}</div>
-      <div class="msg-time">${timeAgo(m.ts)}</div>
-    `;
-    list.appendChild(el);
-  });
-}
-
-function receiveAdminMsg(msg, ts) {
-  // Éviter les doublons
-  if (adminMsgs.some(m => m.ts === ts)) return;
-  adminMsgs.push({ message: msg, ts });
-  adminMsgs.sort((a,b) => a.ts - b.ts);
-  saveAdminMsgs();
-  renderMessages();
-  // Afficher l'alerte si app ouverte
-  const t = T[lang];
-  const titleEl = document.getElementById('alert-title');
-  const subEl   = document.getElementById('alert-sub');
-  titleEl.textContent = 'Moudir';
-  subEl.textContent   = msg;
-  document.getElementById('call-alert').classList.add('show');
-  clearTimeout(alertTimer);
-  alertTimer = setTimeout(() => document.getElementById('call-alert').classList.remove('show'), 8000);
-  playRing();
-}
-
-function startMessagesListener() {
-  _db.ref('admin_messages').orderByChild('ts').limitToLast(50).on('value', snapshot => {
-    const data = snapshot.val();
-    if (!data) return;
-    Object.values(data).forEach(m => {
-      if (m && m.message && m.ts) receiveAdminMsg(m.message, m.ts);
-    });
   });
 }
 
@@ -690,7 +493,6 @@ function startPolling() {
 
 /* ── FCM (app fermée) ── */
 function getDeviceId() {
-  // ID stable basé sur le navigateur — identique entre Chrome et PWA sur le même téléphone
   let deviceId = localStorage.getItem('mc_device_id');
   if (!deviceId) {
     const ua = navigator.userAgent + screen.width + screen.height;
@@ -702,57 +504,56 @@ function getDeviceId() {
   return deviceId;
 }
 
-function _dbg(msg) {
-  const el = document.getElementById('fcm-debug');
-  if (!el) return;
-  el.style.display = 'block';
-  el.innerHTML += msg + '<br>';
-}
-
 function registerFCM() {
-  if (!('Notification' in window)) { _dbg('❌ Notifications non supportées'); return; }
+  if (!('Notification' in window)) return;
   if (Notification.permission !== 'granted') {
-    _dbg('⏳ Permission: ' + Notification.permission);
     Notification.requestPermission().then(p => { if (p === 'granted') registerFCM(); });
     return;
   }
-  _dbg('✅ Permission accordée');
-  const deviceId = getDeviceId();
-  _dbg('📱 Device: ' + deviceId);
 
-  // Ne re-enregistre pas si token déjà sauvegardé depuis moins de 24h
+  const deviceId = getDeviceId();
+
+  // Si token déjà enregistré depuis moins de 24h → on ne re-enregistre pas
   const lastReg = parseInt(localStorage.getItem('mc_fcm_last_reg') || '0');
-  if (Date.now() - lastReg < 24 * 60 * 60 * 1000) {
-    _dbg('⏩ Token récent (< 24h), skip');
-    return;
-  }
+  if (Date.now() - lastReg < 24 * 60 * 60 * 1000) return;
 
   navigator.serviceWorker.ready.then(swReg => {
-    _dbg('✅ Service Worker prêt');
     _msg.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: swReg })
       .then(token => {
-        if (!token) { _dbg('⚠️ getToken = null'); return; }
-        _dbg('🔑 Token: ' + token.slice(0, 25) + '…');
-        return _db.ref('fcm_tokens/' + deviceId).set({ token, ts: Date.now(), lang })
-          .then(() => {
-            localStorage.setItem('mc_fcm_last_reg', String(Date.now()));
-            _dbg('✅ Token sauvegardé dans Firebase');
-          })
-          .catch(err => _dbg('❌ Firebase write erreur: ' + (err.code || err.message)));
+        if (!token) return;
+        _db.ref('fcm_tokens/' + deviceId).set({ token, ts: Date.now(), lang })
+          .then(() => localStorage.setItem('mc_fcm_last_reg', String(Date.now())));
       })
-      .catch(err => _dbg('❌ getToken erreur: ' + (err.code || '') + ' ' + err.message));
-  }).catch(err => _dbg('❌ SW erreur: ' + err.message));
+      .catch(() => {});
+  }).catch(() => {});
 
   _msg.onMessage(() => {});
 }
 
 function registerSW() {
-  if (!('serviceWorker' in navigator)) { _dbg('❌ SW non supporté'); return; }
-  navigator.serviceWorker.register('/firebase-messaging-sw.js')
-    .then(() => navigator.serviceWorker.ready)
-    .then(() => registerFCM())
-    .catch(err => _dbg('❌ SW erreur: ' + err.message));
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/firebase-messaging-sw.js')
+      .then(() => navigator.serviceWorker.ready)
+      .then(() => registerFCM())
+      .catch(() => {});
+  }
 }
+
+/* ── THEME ── */
+function updateThemeIcon() {
+  const isLight = document.documentElement.classList.contains('light');
+  document.getElementById('theme-ico-path').setAttribute('d',
+    isLight
+      ? 'M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42M12 6a6 6 0 100 12A6 6 0 0012 6z'
+      : 'M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z'
+  );
+}
+updateThemeIcon();
+document.getElementById('theme-btn').addEventListener('click', () => {
+  const isLight = document.documentElement.classList.toggle('light');
+  localStorage.setItem('mc_app_theme', isLight ? 'light' : 'dark');
+  updateThemeIcon();
+});
 
 /* ── ALERT CLOSE ── */
 document.getElementById('alert-close').addEventListener('click', () => {
@@ -765,24 +566,16 @@ setInterval(() => { if (calls.length) renderCalls(); }, 30000);
 
 /* ── INIT ── */
 function init() {
-  _dbg('▶ App v8 chargée — ' + new Date().toLocaleTimeString());
   loadCalls();
-  loadAdminMsgs();
   buildLangBtns();
   applyLang();
-  setupNotifBanner();
   startPolling();
-  startMessagesListener();
   registerSW();
   document.addEventListener('touchstart', unlockAudio, { once: true, passive: true });
-  document.addEventListener('click',      unlockAudio, { once: true });
+  document.addEventListener('click', unlockAudio, { once: true });
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
-}
+document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
