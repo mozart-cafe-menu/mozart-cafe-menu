@@ -85,7 +85,7 @@ async function getFCMTokens(projectId, accessToken) {
   if (!body) return [];
   return Object.entries(body)
     .filter(([, v]) => v && v.token)
-    .map(([deviceId, v]) => ({ deviceId, token: v.token }));
+    .map(([deviceId, v]) => ({ deviceId, token: v.token, lang: v.lang || 'fr' }));
 }
 
 async function deleteToken(projectId, accessToken, deviceId) {
@@ -95,29 +95,33 @@ async function deleteToken(projectId, accessToken, deviceId) {
 }
 
 async function sendFCM(projectId, accessToken, tokenObjs, table, lang, customMessage) {
-  let body_text;
-  if (customMessage) {
-    // Message libre depuis admin
-    body_text = customMessage;
-  } else {
-    const MESSAGES = {
-      fr: `Table ${table} demande un serveur`,
-      en: `Table ${table} needs a waiter`,
-      ar: `الطاولة ${table} تطلب نادلاً`,
-    };
-    body_text = MESSAGES[lang] || MESSAGES.fr;
-  }
-
+  const WAITER_MESSAGES = {
+    fr: `Table ${table} demande un serveur`,
+    en: `Table ${table} needs a waiter`,
+    ar: `الطاولة ${table} تطلب نادلاً`,
+  };
   let sent = 0;
-  for (const { deviceId, token } of tokenObjs) {
+  for (const tokenObj of tokenObjs) {
+    const { deviceId, token } = tokenObj;
+    const deviceLang = tokenObj.lang || lang || 'fr';
+
+    let title_text, body_text;
+    if (customMessage) {
+      title_text = '📢 Moudir — Mozart Café';
+      body_text  = `Moudir : ${customMessage}`;
+    } else {
+      title_text = '🔔 Mozart Café';
+      body_text  = WAITER_MESSAGES[deviceLang] || WAITER_MESSAGES.fr;
+    }
+
     const payload = JSON.stringify({
       message: {
         token,
-        notification: { title: '🔔 Mozart Café', body: body_text },
+        notification: { title: title_text, body: body_text },
         data: {
           table: String(table),
-          lang:  lang || 'fr',
-          title: '🔔 Mozart Café',
+          lang:  deviceLang,
+          title: title_text,
           body:  body_text
         },
         android: { priority: 'high' },
