@@ -670,9 +670,11 @@
     }
     .global-src-sel option { background:#181612; color:var(--cream); }
     .global-progress {
-      padding:4px 16px 0; font-size:0.74rem; color:var(--green);
-      min-height:0; width:100%; transition:opacity 0.3s;
+      font-size:0.73rem; color:var(--green); white-space:nowrap;
+      max-width:260px; overflow:hidden; text-overflow:ellipsis;
+      transition:opacity 0.3s;
     }
+    .global-progress.err { color:var(--red); }
 
     /* Lang tabs */
     .lang-tabs {
@@ -745,6 +747,7 @@
       <option value="en">🇬🇧 English</option>
       <option value="ar">🇸🇦 العربية</option>
     </select>
+    <div class="global-progress" id="global-progress"></div>
   </div>
   <div class="adm-right">
     <button class="btn-theme" id="adm-theme-btn" title="Changer le thème">
@@ -758,9 +761,6 @@
 </header>
 
 <div class="adm-wrap" id="adm-wrap" style="display:none">
-
-  <!-- ── PROGRESSION TRADUCTION ── -->
-  <div class="global-progress" id="global-progress"></div>
 
   <!-- ── PHOTO D'ACCUEIL ── -->
   <div class="adm-section">
@@ -2040,6 +2040,14 @@ async function doSaveAll() {
   if (fab.dataset.saving) return;   // éviter double-clic
   fab.dataset.saving = '1';
 
+  function setProgress(msg, isErr) {
+    progress.textContent = msg;
+    progress.classList.toggle('err', !!isErr);
+  }
+  function clearProgress(delay = 6000) {
+    setTimeout(() => { progress.textContent = ''; progress.classList.remove('err'); }, delay);
+  }
+
   // 1. Collecter les formulaires ouverts
   collectAllForms();
 
@@ -2056,12 +2064,13 @@ async function doSaveAll() {
 
   if (hasContent) {
     let totalDone = 0;
-    let translated = 0, skipped = 0;
+    let translated = 0, skipped = 0, errors = 0;
 
     for (const toLang of targets) {
       totalDone++;
-      progress.textContent = `⏳ Traduction → ${LANG_LABELS[toLang]} (${totalDone}/${targets.length}) — Catégories…`;
 
+      // ── Catégories ──
+      setProgress(`⏳ → ${LANG_LABELS[toLang]} (${totalDone}/${targets.length}) Catégories…`);
       for (let ci = 0; ci < adminData.cats.length; ci++) {
         const cat = adminData.cats[ci];
         const srcName = (cat.names?.fr || '').trim();
@@ -2072,12 +2081,13 @@ async function doSaveAll() {
         try {
           const tx = await translateText(srcName, 'fr', toLang);
           if (tx) { if (!cat.names) cat.names = {}; cat.names[toLang] = tx; hashes[hashKey] = curHash; translated++; }
-        } catch(_) {}
+          else errors++;
+        } catch(e) { errors++; console.warn('Traduction cat échouée:', e.message); }
         await sleep(150);
       }
 
-      progress.textContent = `⏳ Traduction → ${LANG_LABELS[toLang]} (${totalDone}/${targets.length}) — Produits…`;
-
+      // ── Produits ──
+      setProgress(`⏳ → ${LANG_LABELS[toLang]} (${totalDone}/${targets.length}) Produits…`);
       for (const item of adminData.items) {
         for (const field of prodFields) {
           const srcText = (item[field]?.fr || '').trim();
@@ -2088,7 +2098,8 @@ async function doSaveAll() {
           try {
             const tx = await translateText(srcText, 'fr', toLang);
             if (tx) { if (!item[field]) item[field] = {}; item[field][toLang] = tx; hashes[hashKey] = curHash; translated++; }
-          } catch(_) {}
+            else errors++;
+          } catch(e) { errors++; console.warn('Traduction produit échouée:', e.message); }
           await sleep(200);
         }
         // Allergènes
@@ -2103,15 +2114,15 @@ async function doSaveAll() {
                 if (!item.allergens) item.allergens = {};
                 item.allergens[toLang] = tx.split(',').map(s => s.trim()).filter(Boolean);
                 hashes[hashKey] = curHash; translated++;
-              }
-            } catch(_) {}
+              } else errors++;
+            } catch(e) { errors++; console.warn('Traduction allergènes échouée:', e.message); }
             await sleep(150);
           } else { skipped++; }
         }
       }
 
-      progress.textContent = `⏳ Traduction → ${LANG_LABELS[toLang]} (${totalDone}/${targets.length}) — Infos café…`;
-
+      // ── Infos café ──
+      setProgress(`⏳ → ${LANG_LABELS[toLang]} (${totalDone}/${targets.length}) Infos café…`);
       for (const field of infoFields) {
         const srcText = (adminData.info[field]?.fr || '').trim();
         if (!srcText) continue;
@@ -2123,18 +2134,24 @@ async function doSaveAll() {
           if (tx) {
             if (!adminData.info[field]) adminData.info[field] = {};
             adminData.info[field][toLang] = tx; hashes[hashKey] = curHash; translated++;
-          }
-        } catch(_) {}
+          } else errors++;
+        } catch(e) { errors++; console.warn('Traduction info échouée:', e.message); }
         await sleep(150);
       }
     }
 
-    if (translated > 0) {
-      progress.textContent = `✓ ${translated} champ(s) traduits automatiquement`;
+    if (errors > 0 && translated === 0) {
+      setProgress(`⚠ Traduction échouée (limite API atteinte ?) — données FR sauvegardées`, true);
+      clearProgress(10000);
+    } else if (errors > 0) {
+      setProgress(`⚠ ${translated} traduits, ${errors} erreurs — vérifiez EN/AR`, true);
+      clearProgress(8000);
+    } else if (translated > 0) {
+      setProgress(`✓ ${translated} champ(s) traduits automatiquement`);
+      clearProgress();
     } else {
-      progress.textContent = '';
+      setProgress('');
     }
-    setTimeout(() => { progress.textContent = ''; }, 5000);
   }
 
   // 3. Sauvegarder
