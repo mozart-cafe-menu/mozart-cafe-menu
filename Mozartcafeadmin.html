@@ -2023,7 +2023,8 @@ function addProduct(ci) {
    SAVE ALL
 ═══════════════════════════════════════════ */
 function collectAllForms() {
-  document.querySelectorAll('.prod-card.open').forEach(card => {
+  // Collecter toutes les cartes (ouvertes ET fermées) pour ne perdre aucune modification
+  document.querySelectorAll('.prod-card').forEach(card => {
     const itemId = parseInt(card.dataset.id);
     const item = adminData.items.find(it => it.id === itemId);
     if (item) collectProdForm(card, item);
