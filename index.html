@@ -739,15 +739,13 @@
       animation:callFabPulse 4s ease-in-out 2s infinite;
     }
     #call-fab.fab-top {
-      bottom:calc(100dvh - 72px) !important;
-      animation:fabShine 0.7s ease 0.45s forwards !important;
-      box-shadow:0 6px 28px rgba(200,164,78,0.75), 0 0 0 0 rgba(200,164,78,0.2) !important;
+      animation:fabShine 0.65s ease 0.32s forwards !important;
     }
     @keyframes fabShine {
       0%   { transform:scale(1); box-shadow:0 6px 28px rgba(200,164,78,0.75); }
-      40%  { transform:scale(1.2); box-shadow:0 10px 40px rgba(200,164,78,0.95),0 0 0 12px rgba(200,164,78,0.18); }
-      65%  { transform:scale(0.94); }
-      82%  { transform:scale(1.06); }
+      40%  { transform:scale(1.22); box-shadow:0 10px 42px rgba(200,164,78,0.95),0 0 0 14px rgba(200,164,78,0.18); }
+      65%  { transform:scale(0.93); }
+      82%  { transform:scale(1.07); }
       100% { transform:scale(1); box-shadow:0 6px 24px rgba(200,164,78,0.65),0 0 0 0 rgba(200,164,78,0); }
     }
     #call-fab .cfab-ico { width:22px; height:22px; flex-shrink:0; }
@@ -2197,9 +2195,12 @@ function openSheet(item) {
   document.getElementById('sheet').classList.add('on');
   document.body.style.overflow = 'hidden';
 
-  // FAB monte en haut avec animation spring
+  // FAB se positionne sur le bord supérieur du sheet avec animation spring
   const callFab = document.getElementById('call-fab');
-  callFab.style.transition = 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1), bottom 0.6s cubic-bezier(0.34,1.4,0.64,1), box-shadow 0.4s ease';
+  const sheetEl  = document.getElementById('sheet');
+  const sheetH   = Math.min(sheetEl.scrollHeight, window.innerHeight * 0.92);
+  callFab.style.bottom = `${sheetH - 26}px`;
+  callFab.style.transition = 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1), bottom 0.4s cubic-bezier(0.32,0.72,0,1), box-shadow 0.4s ease';
   callFab.classList.add('fab-top');
 
   // Intercepter le bouton retour Android : pousser un état dans l'historique
@@ -2213,8 +2214,10 @@ function closeSheet() {
 
   // FAB redescend avec animation fluide
   const callFab = document.getElementById('call-fab');
-  callFab.style.transition = 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1), bottom 0.55s cubic-bezier(0.4,0,0.2,1), box-shadow 0.4s ease';
+  callFab.style.transition = 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1), bottom 0.5s cubic-bezier(0.4,0,0.2,1), box-shadow 0.4s ease';
   callFab.classList.remove('fab-top');
+  callFab.style.bottom = '';
+  setTimeout(() => { callFab.style.transition = ''; callFab.style.bottom = ''; }, 550);
 
   // Si on ferme via code (overlay, swipe, escape), retirer l'état qu'on avait poussé
   if (history.state && history.state.sheetOpen) {
@@ -2230,8 +2233,10 @@ window.addEventListener('popstate', e => {
     document.body.style.overflow = '';
     // FAB redescend
     const callFab = document.getElementById('call-fab');
-    callFab.style.transition = 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1), bottom 0.55s cubic-bezier(0.4,0,0.2,1), box-shadow 0.4s ease';
+    callFab.style.transition = 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1), bottom 0.5s cubic-bezier(0.4,0,0.2,1), box-shadow 0.4s ease';
     callFab.classList.remove('fab-top');
+    callFab.style.bottom = '';
+    setTimeout(() => { callFab.style.transition = ''; callFab.style.bottom = ''; }, 550);
     // Ne pas appeler closeSheet() pour éviter une boucle history.back()
   }
 });
