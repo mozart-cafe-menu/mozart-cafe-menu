@@ -2635,7 +2635,7 @@ async function translateText(text, fromLang, toLang) {
 }
 
 async function myMemoryCall(text, src, tgt) {
-  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${src}|${tgt}&de=admin@mozartcafe.tn`;
+  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${src}|${tgt}&de=mozartcafe2026@gmail.com`;
   const res  = await fetch(url);
   if (!res.ok) throw new Error('API error ' + res.status);
   const data = await res.json();
