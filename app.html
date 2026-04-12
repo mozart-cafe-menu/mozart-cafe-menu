@@ -730,7 +730,8 @@ function registerFCM() {
           .then(() => {
             localStorage.setItem('mc_fcm_last_reg', String(Date.now()));
             _dbg('✅ Token sauvegardé dans Firebase');
-          });
+          })
+          .catch(err => _dbg('❌ Firebase write erreur: ' + (err.code || err.message)));
       })
       .catch(err => _dbg('❌ getToken erreur: ' + (err.code || '') + ' ' + err.message));
   }).catch(err => _dbg('❌ SW erreur: ' + err.message));
@@ -739,12 +740,21 @@ function registerFCM() {
 }
 
 function registerSW() {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/firebase-messaging-sw.js')
-      .then(() => navigator.serviceWorker.ready)
-      .then(() => registerFCM())
-      .catch(() => {});
-  }
+  if (!('serviceWorker' in navigator)) return;
+  // Désinscrire tout ancien SW qui n'est pas firebase-messaging-sw.js
+  navigator.serviceWorker.getRegistrations().then(regs => {
+    regs.forEach(reg => {
+      const url = (reg.active || reg.installing || reg.waiting || {}).scriptURL || '';
+      if (!url.includes('firebase-messaging-sw.js')) {
+        reg.unregister();
+        _dbg('🗑️ Ancien SW supprimé: ' + url.split('/').pop());
+      }
+    });
+  });
+  navigator.serviceWorker.register('/firebase-messaging-sw.js')
+    .then(() => navigator.serviceWorker.ready)
+    .then(() => registerFCM())
+    .catch(err => _dbg('❌ SW registration: ' + err.message));
 }
 
 /* ── ALERT CLOSE ── */
@@ -758,6 +768,7 @@ setInterval(() => { if (calls.length) renderCalls(); }, 30000);
 
 /* ── INIT ── */
 function init() {
+  _dbg('▶ App v8 chargée — ' + new Date().toLocaleTimeString());
   loadCalls();
   loadAdminMsgs();
   buildLangBtns();
