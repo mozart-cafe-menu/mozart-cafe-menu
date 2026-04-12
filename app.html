@@ -233,15 +233,7 @@
     .msg-body   { font-size:0.88rem; color:var(--cream); line-height:1.5; }
     .msg-time   { font-size:0.71rem; color:var(--muted); margin-top:4px; }
 
-    /* ── INSTALL BANNER ── */
-    #install-banner {
-      display:none;
-      margin:16px 14px 0;
-      background:var(--bg3); border:1px solid var(--bord2);
-      border-radius:16px; padding:14px 16px;
-      align-items:center; gap:12px;
-    }
-    #install-banner.visible { display:flex; }
+    /* ── NOTIF / INSTALL ICON ── */
     .install-ico {
       width:40px; height:40px; flex-shrink:0; border-radius:10px;
       background:linear-gradient(135deg,var(--gold-d),var(--gold));
@@ -258,13 +250,6 @@
       flex-shrink:0; transition:opacity 0.2s;
     }
     .install-btn:hover { opacity:0.85; }
-    .install-dismiss {
-      width:24px; height:24px; flex-shrink:0;
-      color:var(--muted); display:flex; align-items:center; justify-content:center;
-      border-radius:50%; transition:color 0.2s;
-    }
-    .install-dismiss:hover { color:var(--cream); }
-    .install-dismiss svg { width:14px; height:14px; }
 
     /* ── FOOTER ── */
     .app-footer { text-align:center; padding:24px 20px 36px; font-size:0.67rem; color:rgba(244,234,210,0.18); letter-spacing:0.08em; }
@@ -327,25 +312,6 @@
     </div>
   </div>
 </header>
-
-<!-- INSTALL BANNER -->
-<div id="install-banner">
-  <div class="install-ico">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-    </svg>
-  </div>
-  <div class="install-text">
-    <div class="install-title" id="install-title">Installer l'application</div>
-    <div class="install-sub"   id="install-sub">Accès rapide depuis l'écran d'accueil</div>
-  </div>
-  <button class="install-btn" id="install-btn">Installer</button>
-  <button class="install-dismiss" id="install-dismiss">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-    </svg>
-  </button>
-</div>
 
 <!-- NOTIF BANNER -->
 <div id="notif-banner">
@@ -733,27 +699,44 @@ function registerFCM() {
     Notification.requestPermission().then(p => { if (p === 'granted') registerFCM(); });
     return;
   }
-
   const deviceId = getDeviceId();
-
   navigator.serviceWorker.ready.then(swReg => {
     const swOpts = { vapidKey: VAPID_KEY, serviceWorkerRegistration: swReg };
-    // Toujours forcer un token complètement neuf :
-    // 1. Désabonner la souscription push du navigateur
-    // 2. Supprimer le cache SDK Firebase
-    // 3. Obtenir un token frais auprès de FCM
-    swReg.pushManager.getSubscription()
-      .then(sub => sub ? sub.unsubscribe() : Promise.resolve())
-      .then(() => _msg.deleteToken().catch(() => {}))
-      .then(() => _msg.getToken(swOpts))
+    // Essayer d'abord de récupérer le token existant sans le détruire
+    _msg.getToken(swOpts)
       .then(token => {
-        if (!token) return;
-        return _db.ref('fcm_tokens/' + deviceId).set({ token, ts: Date.now(), lang });
+        if (!token) {
+          console.warn('[FCM] getToken null → renouvellement forcé');
+          return _fcmForceRenew(swReg, swOpts, deviceId);
+        }
+        console.log('[FCM] Token:', token.slice(0, 20) + '…');
+        return _db.ref('fcm_tokens/' + deviceId).set({ token, ts: Date.now(), lang })
+          .then(() => console.log('[FCM] Sauvegardé dans Firebase'));
       })
-      .catch(() => {});
-  }).catch(() => {});
-
+      .catch(err => {
+        console.error('[FCM] getToken erreur:', err.code || '', err.message);
+        return _fcmForceRenew(swReg, swOpts, deviceId);
+      });
+  }).catch(err => console.error('[FCM] SW ready erreur:', err.message));
   _msg.onMessage(() => {});
+}
+
+function _fcmForceRenew(swReg, swOpts, deviceId) {
+  console.log('[FCM] Renouvellement forcé en cours…');
+  return swReg.pushManager.getSubscription()
+    .then(sub => {
+      console.log('[FCM] Souscription existante:', !!sub);
+      return sub ? sub.unsubscribe() : Promise.resolve();
+    })
+    .then(() => _msg.deleteToken().catch(e => console.warn('[FCM] deleteToken:', e.message)))
+    .then(() => _msg.getToken(swOpts))
+    .then(token => {
+      if (!token) { console.error('[FCM] Toujours null après renouvellement'); return; }
+      console.log('[FCM] Nouveau token:', token.slice(0, 20) + '…');
+      return _db.ref('fcm_tokens/' + deviceId).set({ token, ts: Date.now(), lang })
+        .then(() => console.log('[FCM] Nouveau token sauvegardé'));
+    })
+    .catch(err => console.error('[FCM] Renouvellement erreur:', err.code || '', err.message));
 }
 
 function registerSW() {
@@ -774,98 +757,12 @@ document.getElementById('alert-close').addEventListener('click', () => {
 /* ── REFRESH TIMES ── */
 setInterval(() => { if (calls.length) renderCalls(); }, 30000);
 
-/* ── INSTALL PWA ── */
-let _deferredInstall = null;
-
-const installLabels = {
-  fr: {
-    title:'Installer l\'application', btn:'Installer',
-    subAndroid:'Ajouter à l\'écran d\'accueil en un clic',
-    subIos:'Appuyez sur  puis "Sur l\'écran d\'accueil"',
-  },
-  en: {
-    title:'Install the app', btn:'Install',
-    subAndroid:'Add to home screen with one tap',
-    subIos:'Tap  then "Add to Home Screen"',
-  },
-  ar: {
-    title:'تثبيت التطبيق', btn:'تثبيت',
-    subAndroid:'إضافة إلى الشاشة الرئيسية بنقرة واحدة',
-    subIos:'اضغط  ثم "إضافة إلى الشاشة الرئيسية"',
-  },
-};
-
-// Déjà installée en mode standalone → ne jamais montrer le banner
-const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-  || window.navigator.standalone === true;
-
-const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
-
-// Android/Chrome : écouter l'événement natif
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  _deferredInstall = e;
-  if (!isStandalone) showInstallBanner();
-});
-
-window.addEventListener('appinstalled', () => {
-  document.getElementById('install-banner').classList.remove('visible');
-  _deferredInstall = null;
-});
-
-function showInstallBanner() {
-  // Ne pas montrer si l'utilisateur a fermé le banner récemment (24h)
-  const dismissed = parseInt(localStorage.getItem('mc_install_dismissed') || '0');
-  if (Date.now() - dismissed < 24 * 60 * 60 * 1000) return;
-  document.getElementById('install-banner').classList.add('visible');
-}
-
-function setupInstallBanner() {
-  // Si déjà installée → rien
-  if (isStandalone) return;
-  // Si iOS → montrer directement avec instructions manuelles
-  if (isIos) showInstallBanner();
-
-  function updateInstallTexts() {
-    const l = installLabels[lang] || installLabels.fr;
-    document.getElementById('install-title').textContent = l.title;
-    document.getElementById('install-sub').textContent   = isIos ? l.subIos : l.subAndroid;
-    document.getElementById('install-btn').textContent   = l.btn;
-    // Sur iOS le bouton n'a rien à faire (c'est manuel)
-    document.getElementById('install-btn').style.display = isIos ? 'none' : '';
-  }
-  updateInstallTexts();
-
-  document.getElementById('install-btn').addEventListener('click', async () => {
-    if (!_deferredInstall) return;
-    _deferredInstall.prompt();
-    const { outcome } = await _deferredInstall.userChoice;
-    if (outcome === 'accepted') {
-      document.getElementById('install-banner').classList.remove('visible');
-      _deferredInstall = null;
-    }
-  });
-
-  document.getElementById('install-dismiss').addEventListener('click', () => {
-    document.getElementById('install-banner').classList.remove('visible');
-    // Mémoriser le refus pendant 7 jours
-    localStorage.setItem('mc_install_dismissed', String(Date.now()));
-  });
-
-  // (check dismissed géré dans showInstallBanner)
-
-  // Mettre à jour les textes quand la langue change
-  const origApplyLang = applyLang;
-  applyLang = function() { origApplyLang(); updateInstallTexts(); };
-}
-
 /* ── INIT ── */
 function init() {
   loadCalls();
   loadAdminMsgs();
   buildLangBtns();
   applyLang();
-  setupInstallBanner();
   setupNotifBanner();
   startPolling();
   startMessagesListener();
