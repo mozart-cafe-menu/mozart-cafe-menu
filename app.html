@@ -737,11 +737,6 @@ function registerFCM() {
 
   const deviceId = getDeviceId();
 
-  // Rafraîchir le token max 1 fois par 24h
-  const lastReg = parseInt(localStorage.getItem('mc_fcm_last_reg') || '0');
-  const TOKEN_TTL = 24 * 60 * 60 * 1000;
-  if (Date.now() - lastReg < TOKEN_TTL) return;
-
   navigator.serviceWorker.ready.then(swReg => {
     _msg.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: swReg })
       .then(token => {
@@ -750,10 +745,9 @@ function registerFCM() {
           localStorage.removeItem('mc_fcm_last_reg');
           return;
         }
-        return _db.ref('fcm_tokens/' + deviceId).set({ token, ts: Date.now(), lang })
-          .then(() => localStorage.setItem('mc_fcm_last_reg', String(Date.now())));
+        return _db.ref('fcm_tokens/' + deviceId).set({ token, ts: Date.now(), lang });
       })
-      .catch(() => { localStorage.removeItem('mc_fcm_last_reg'); });
+      .catch(() => {});
   }).catch(() => {});
 
   // FCM foreground : ignoré, le listener RTDB gère déjà l'alerte
