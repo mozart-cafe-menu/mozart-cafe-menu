@@ -540,16 +540,25 @@
     .btn-clear-photo:hover { opacity:1; border-color:var(--red); background:rgba(224,82,82,0.06); }
     input.photo-file-input { display:none; }
 
-    /* Badges checkboxes */
-    .badges-wrap { display:flex; flex-wrap:wrap; gap:8px; }
-    .badge-chk { display:flex; align-items:center; gap:5px; cursor:pointer; }
-    .badge-chk input { display:none; }
-    .badge-pill {
-      font-size:0.74rem; font-weight:500; padding:7px 14px; border-radius:20px;
-      border:1px solid var(--border); color:var(--muted); transition:var(--tr);
-      min-height:34px; display:flex; align-items:center;
+    /* Badges */
+    .badges-wrap { display:flex; flex-direction:column; gap:8px; }
+    .badge-selects { display:flex; gap:8px; flex-wrap:wrap; }
+    .badge-select {
+      flex:1; min-width:120px; padding:8px 10px; border-radius:10px;
+      border:1px solid var(--border); background:var(--bg2);
+      color:var(--cream); font-size:0.78rem; cursor:pointer;
+      transition:var(--tr); outline:none; font-family:inherit;
     }
-    .badge-chk input:checked + .badge-pill { border-color:var(--gold); color:var(--gold); background:rgba(200,164,78,0.1); }
+    .badge-select:focus { border-color:var(--gold); }
+    .badge-select option { background:var(--bg2); }
+    .badge-toggles { display:flex; flex-wrap:wrap; gap:8px; }
+    .badge-toggle {
+      font-size:0.74rem; font-weight:500; padding:7px 13px; border-radius:20px;
+      border:1px solid var(--border); color:var(--muted); background:transparent;
+      transition:var(--tr); cursor:pointer; font-family:inherit;
+    }
+    .badge-toggle:hover { border-color:var(--gold-lt); color:var(--gold-lt); }
+    .badge-toggle.active { border-color:var(--gold); color:var(--gold); background:rgba(200,164,78,0.1); }
 
     /* Product action buttons */
     .prod-actions { display:flex; gap:8px; margin-top:16px; }
@@ -930,10 +939,15 @@ const ADMIN_UI = {
     infoHoursVal:  'Horaires — Valeur',
     infoAddrName:  'Adresse — Titre',
     infoAddrVal:   'Adresse — Valeur',
-    badgePopular:  '🔥 Populaire',
-    badgeNew:      '✨ Nouveau',
+    badgeType:     '— Type —',
+    badgeTemp:     '— Température —',
+    bdgBoisson:'🥤 Boisson', bdgCuisine:'🍽 Cuisine', bdgSucre:'🧁 Sucré', bdgHookah:'💨 HOOKAH',
+    bdgChaud:'🔥 Chaud', bdgFroid:'❄ Froid', bdgGlace:'🧊 Glacé',
+    badgeMorning:  '☀ Le Matin',
     badgeVegan:    '🌱 Vegan',
-    badgeSel:      '⭐ Sélection du jour',
+    badgeLimited:  '⏳ Offre limitée',
+    badgeNew:      '✨ Nouveau',
+    badgePopular:  '🔥 Populaire',
   },
   en: {
     admSub:        'Menu administration',
@@ -975,10 +989,15 @@ const ADMIN_UI = {
     infoHoursVal:  'Hours — Value',
     infoAddrName:  'Address — Title',
     infoAddrVal:   'Address — Value',
-    badgePopular:  '🔥 Popular',
-    badgeNew:      '✨ New',
+    badgeType:     '— Type —',
+    badgeTemp:     '— Temperature —',
+    bdgBoisson:'🥤 Drink', bdgCuisine:'🍽 Food', bdgSucre:'🧁 Sweet', bdgHookah:'💨 Hookah',
+    bdgChaud:'🔥 Hot', bdgFroid:'❄ Cold', bdgGlace:'🧊 Iced',
+    badgeMorning:  '☀ Morning',
     badgeVegan:    '🌱 Vegan',
-    badgeSel:      '⭐ Daily selection',
+    badgeLimited:  '⏳ Limited offer',
+    badgeNew:      '✨ New',
+    badgePopular:  '🔥 Popular',
   },
   ar: {
     admSub:        'إدارة القائمة',
@@ -1020,10 +1039,15 @@ const ADMIN_UI = {
     infoHoursVal:  'المواعيد — القيمة',
     infoAddrName:  'العنوان — العنوان',
     infoAddrVal:   'العنوان — القيمة',
-    badgePopular:  '🔥 الأكثر طلباً',
-    badgeNew:      '✨ جديد',
+    badgeType:     '— النوع —',
+    badgeTemp:     '— الحرارة —',
+    bdgBoisson:'🥤 مشروب', bdgCuisine:'🍽 أكل', bdgSucre:'🧁 حلو', bdgHookah:'💨 شيشة',
+    bdgChaud:'🔥 ساخن', bdgFroid:'❄ بارد', bdgGlace:'🧊 مثلج',
+    badgeMorning:  '☀ الصباح',
     badgeVegan:    '🌱 نباتي',
-    badgeSel:      '⭐ اختيار اليوم',
+    badgeLimited:  '⏳ عرض محدود',
+    badgeNew:      '✨ جديد',
+    badgePopular:  '🔥 الأكثر طلباً',
   },
 };
 
@@ -1141,6 +1165,8 @@ function sanitizeItems(items) {
     cat:       item.cat ?? 0,
     price:     item.price ?? '',
     photo:     item.photo ?? '',
+    type:      item.type  || '',
+    temp:      item.temp  || '',
     badges:    Array.isArray(item.badges) ? item.badges : [],
     name:      item.name      || { fr:'', en:'', ar:'' },
     desc:      item.desc      || { fr:'', en:'', ar:'' },
@@ -1151,7 +1177,9 @@ function sanitizeItems(items) {
 
 function saveData() {
   adminData.items = sanitizeItems(adminData.items);
-  _db.ref('menu').set(adminData)
+  // Exclure _txHashes de Firebase (usage interne uniquement)
+  const { _txHashes, ...dataForDb } = adminData;
+  _db.ref('menu').set(dataForDb)
     .then(() => {
       localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
       unsaved = false;
@@ -1464,12 +1492,27 @@ function applyAdminUI(l) {
     inp.placeholder = t.lblCatName + ' (' + l.toUpperCase() + ')';
   });
 
-  // Badges labels
-  const badgeMap = { popular: t.badgePopular, new: t.badgeNew, vegan: t.badgeVegan, selection: t.badgeSel };
-  document.querySelectorAll('.badge-chk').forEach(chk => {
-    const inp = chk.querySelector('input');
-    const pill = chk.querySelector('.badge-pill');
-    if (inp && pill && badgeMap[inp.dataset.badge]) pill.textContent = badgeMap[inp.dataset.badge];
+  // Badges — update toggle labels when language changes
+  const flagLabelMap = { morning: t.badgeMorning, vegan: t.badgeVegan, limited: t.badgeLimited, new: t.badgeNew, popular: t.badgePopular };
+  document.querySelectorAll('.badge-toggle[data-badge]').forEach(btn => {
+    const lbl = flagLabelMap[btn.dataset.badge];
+    if (lbl) btn.textContent = lbl;
+  });
+  // Dropdowns
+  document.querySelectorAll('[data-bdg-select="type"]').forEach(sel => {
+    const opts = sel.options;
+    if (opts[0]) opts[0].textContent = t.badgeType;
+    if (opts[1]) opts[1].textContent = t.bdgBoisson;
+    if (opts[2]) opts[2].textContent = t.bdgCuisine;
+    if (opts[3]) opts[3].textContent = t.bdgSucre;
+    if (opts[4]) opts[4].textContent = t.bdgHookah;
+  });
+  document.querySelectorAll('[data-bdg-select="temp"]').forEach(sel => {
+    const opts = sel.options;
+    if (opts[0]) opts[0].textContent = t.badgeTemp;
+    if (opts[1]) opts[1].textContent = t.bdgChaud;
+    if (opts[2]) opts[2].textContent = t.bdgFroid;
+    if (opts[3]) opts[3].textContent = t.bdgGlace;
   });
 }
 
@@ -1721,6 +1764,11 @@ function renderProdCard(container, item, ci) {
     card.querySelector('.prod-thumb').src = 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=200&h=200&fit=crop';
   });
 
+  // Badge toggles
+  card.querySelectorAll('.badge-toggle').forEach(btn => {
+    btn.addEventListener('click', () => { btn.classList.toggle('active'); markUnsaved(); });
+  });
+
   // Delete product
   card.querySelector('.btn-del-prod').addEventListener('click', () => {
     if (!confirm('Supprimer ce produit ?')) return;
@@ -1771,15 +1819,32 @@ function buildProdForm(item) {
   `).join('');
 
   // Badges
-  const allBadges = ['popular','new','vegan','selection'];
   const t1 = ADMIN_UI[currentLang] || ADMIN_UI.fr;
-  const badgeLabels = { popular: t1.badgePopular, new: t1.badgeNew, vegan: t1.badgeVegan, selection: t1.badgeSel };
-  const badgesHtml = allBadges.map(b => `
-    <label class="badge-chk">
-      <input type="checkbox" data-badge="${b}" ${(item.badges||[]).includes(b)?'checked':''}>
-      <span class="badge-pill">${badgeLabels[b]}</span>
-    </label>
-  `).join('');
+  const curType  = item.type  || '';
+  const curTemp  = item.temp  || '';
+  const curFlags = Array.isArray(item.badges) ? item.badges : [];
+  const typeOpts = [
+    ['', t1.badgeType],
+    ['boisson', t1.bdgBoisson], ['cuisine', t1.bdgCuisine],
+    ['sucre', t1.bdgSucre], ['hookah', t1.bdgHookah],
+  ].map(([v,l]) => `<option value="${v}"${curType===v?' selected':''}>${l}</option>`).join('');
+  const tempOpts = [
+    ['', t1.badgeTemp],
+    ['chaud', t1.bdgChaud], ['froid', t1.bdgFroid], ['glace', t1.bdgGlace],
+  ].map(([v,l]) => `<option value="${v}"${curTemp===v?' selected':''}>${l}</option>`).join('');
+  const toggleFlags = [
+    ['morning', t1.badgeMorning], ['vegan', t1.badgeVegan],
+    ['limited', t1.badgeLimited], ['new', t1.badgeNew], ['popular', t1.badgePopular],
+  ];
+  const badgesHtml = `
+    <div class="badge-selects">
+      <select class="badge-select" data-bdg-select="type">${typeOpts}</select>
+      <select class="badge-select" data-bdg-select="temp">${tempOpts}</select>
+    </div>
+    <div class="badge-toggles">
+      ${toggleFlags.map(([f,l]) => `<button type="button" class="badge-toggle${curFlags.includes(f)?' active':''}" data-badge="${f}">${l}</button>`).join('')}
+    </div>
+  `;
 
   const photoId = item.photo || '';
   const photoSrc = photoId
@@ -1848,10 +1913,15 @@ function collectProdForm(card, item) {
     }
   }
 
-  // Badges
+  // Badges — dropdowns
+  const typeEl = card.querySelector('[data-bdg-select="type"]');
+  if (typeEl) item.type = typeEl.value;
+  const tempEl = card.querySelector('[data-bdg-select="temp"]');
+  if (tempEl) item.temp = tempEl.value;
+  // Badges — toggle flags
   item.badges = [];
-  card.querySelectorAll('[data-badge]').forEach(chk => {
-    if (chk.checked) item.badges.push(chk.dataset.badge);
+  card.querySelectorAll('.badge-toggle.active').forEach(btn => {
+    item.badges.push(btn.dataset.badge);
   });
 
   // Multilang fields
@@ -1918,6 +1988,16 @@ document.getElementById('fab-save').addEventListener('click', () => {
    GLOBAL TRANSLATE — traduit TOUT en une fois
    Catégories + tous les produits + infos café
 ═══════════════════════════════════════════ */
+// Simple hash: somme des char codes pour comparaison rapide
+function simpleHash(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+  return h;
+}
+
+// Clé de cache des hashes (stocke le hash FR au moment de la dernière traduction)
+// Format: adminData._txHashes = { 'item-{id}-{field}': hash, 'cat-{idx}-name': hash, ... }
+
 document.getElementById('btn-translate-all').addEventListener('click', async () => {
   const srcLang  = document.getElementById('global-src-lang').value;
   const targets  = LANGS.filter(l => l !== srcLang);
@@ -1934,6 +2014,10 @@ document.getElementById('btn-translate-all').addEventListener('click', async () 
     return;
   }
 
+  // Initialiser le cache de hashes
+  if (!adminData._txHashes) adminData._txHashes = {};
+  const hashes = adminData._txHashes;
+
   btn.disabled = true;
   btn.classList.add('loading');
   btn.textContent = '⏳ Traduction en cours…';
@@ -1942,21 +2026,24 @@ document.getElementById('btn-translate-all').addEventListener('click', async () 
   const prodFields = ['name','desc','full'];
   let totalDone = 0;
   const totalTargets = targets.length;
+  let skipped = 0;
+  let translated = 0;
 
   for (const toLang of targets) {
     totalDone++;
     progress.textContent = `→ ${LANG_LABELS[toLang]} (${totalDone}/${totalTargets}) — Catégories…`;
 
     // 1. Traduire les catégories
-    for (const cat of adminData.cats) {
+    for (let ci = 0; ci < adminData.cats.length; ci++) {
+      const cat = adminData.cats[ci];
       const srcName = (cat.names?.[srcLang] || '').trim();
       if (!srcName) continue;
+      const hashKey = `cat-${ci}-${toLang}`;
+      const curHash = simpleHash(srcName);
+      if (hashes[hashKey] === curHash && (cat.names?.[toLang] || '').trim()) { skipped++; continue; }
       try {
-        const translated = await translateText(srcName, srcLang, toLang);
-        if (translated) {
-          if (!cat.names) cat.names = {};
-          cat.names[toLang] = translated;
-        }
+        const tx = await translateText(srcName, srcLang, toLang);
+        if (tx) { if (!cat.names) cat.names = {}; cat.names[toLang] = tx; hashes[hashKey] = curHash; translated++; }
       } catch(_) {}
       await sleep(150);
     }
@@ -1968,26 +2055,31 @@ document.getElementById('btn-translate-all').addEventListener('click', async () 
       for (const field of prodFields) {
         const srcText = (item[field]?.[srcLang] || '').trim();
         if (!srcText) continue;
+        const hashKey = `item-${item.id}-${field}-${toLang}`;
+        const curHash = simpleHash(srcText);
+        if (hashes[hashKey] === curHash && (item[field]?.[toLang] || '').trim()) { skipped++; continue; }
         try {
-          const translated = await translateText(srcText, srcLang, toLang);
-          if (translated) {
-            if (!item[field]) item[field] = {};
-            item[field][toLang] = translated;
-          }
+          const tx = await translateText(srcText, srcLang, toLang);
+          if (tx) { if (!item[field]) item[field] = {}; item[field][toLang] = tx; hashes[hashKey] = curHash; translated++; }
         } catch(_) {}
         await sleep(200);
       }
-      // Allergènes (tableau → string → traduit → retableau)
+      // Allergènes
       const srcAl = (item.allergens?.[srcLang] || []).join(', ');
       if (srcAl.trim()) {
-        try {
-          const translated = await translateText(srcAl, srcLang, toLang);
-          if (translated) {
-            if (!item.allergens) item.allergens = {};
-            item.allergens[toLang] = translated.split(',').map(s => s.trim()).filter(Boolean);
-          }
-        } catch(_) {}
-        await sleep(150);
+        const hashKey = `item-${item.id}-al-${toLang}`;
+        const curHash = simpleHash(srcAl);
+        if (!(hashes[hashKey] === curHash && (item.allergens?.[toLang]||[]).length)) {
+          try {
+            const tx = await translateText(srcAl, srcLang, toLang);
+            if (tx) {
+              if (!item.allergens) item.allergens = {};
+              item.allergens[toLang] = tx.split(',').map(s => s.trim()).filter(Boolean);
+              hashes[hashKey] = curHash; translated++;
+            }
+          } catch(_) {}
+          await sleep(150);
+        } else { skipped++; }
       }
     }
 
@@ -1997,11 +2089,14 @@ document.getElementById('btn-translate-all').addEventListener('click', async () 
     for (const field of infoFields) {
       const srcText = (adminData.info[field]?.[srcLang] || '').trim();
       if (!srcText) continue;
+      const hashKey = `info-${field}-${toLang}`;
+      const curHash = simpleHash(srcText);
+      if (hashes[hashKey] === curHash && (adminData.info[field]?.[toLang] || '').trim()) { skipped++; continue; }
       try {
-        const translated = await translateText(srcText, srcLang, toLang);
-        if (translated) {
+        const tx = await translateText(srcText, srcLang, toLang);
+        if (tx) {
           if (!adminData.info[field]) adminData.info[field] = {};
-          adminData.info[field][toLang] = translated;
+          adminData.info[field][toLang] = tx; hashes[hashKey] = curHash; translated++;
         }
       } catch(_) {}
       await sleep(150);
@@ -2011,8 +2106,11 @@ document.getElementById('btn-translate-all').addEventListener('click', async () 
   btn.disabled = false;
   btn.classList.remove('loading');
   btn.innerHTML = '🌐 Traduire toutes les autres langues';
-  progress.textContent = '✓ Traduction terminée — pensez à sauvegarder !';
-  setTimeout(() => { progress.textContent = ''; }, 6000);
+  const msg = translated > 0
+    ? `✓ ${translated} traduits, ${skipped} ignorés (inchangés) — pensez à sauvegarder !`
+    : `✓ Tout est déjà à jour (${skipped} ignorés)`;
+  progress.textContent = msg;
+  setTimeout(() => { progress.textContent = ''; }, 7000);
   markUnsaved();
   renderAll();
 });

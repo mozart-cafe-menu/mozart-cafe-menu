@@ -776,7 +776,11 @@
 
     /* Light mode badge adjustments */
     html.light .bdg-n { background:rgba(154,122,53,0.12); color:var(--gold); border-color:rgba(154,122,53,0.3); }
-    html.light .bdg-s { border-color:var(--gold); color:var(--gold); }
+    html.light .bdg-l { background:rgba(180,60,60,0.10); color:#c05050; border-color:rgba(180,60,60,0.28); }
+    html.light .bdg-type { background:rgba(60,90,150,0.10); color:#5070b0; border-color:rgba(60,90,150,0.25); }
+    html.light .bdg-temp-chaud { background:rgba(180,70,40,0.10); color:#b86040; border-color:rgba(180,70,40,0.25); }
+    html.light .bdg-temp-froid { background:rgba(40,120,180,0.10); color:#4090c8; border-color:rgba(40,120,180,0.25); }
+    html.light .bdg-temp-glace { background:rgba(60,160,200,0.10); color:#40a8d0; border-color:rgba(60,160,200,0.25); }
 
     /* Smooth sheet scrollbar */
     #sheet::-webkit-scrollbar { width:2px; }
@@ -1238,26 +1242,12 @@
 ================================================ */
 
 const CATS = [
-  { key:'morning',    ico:'ico-sunrise', sub:{ fr:'formules',   en:'formulas',  ar:'وجبات'      } },
-  { key:'hot-coffee', ico:'ico-coffee',  sub:{ fr:'café chaud', en:'hot coffee',ar:'قهوة ساخنة' } },
-  { key:'cold-coffee',ico:'ico-cold',    sub:{ fr:'café froid', en:'cold coffee',ar:'قهوة باردة'} },
-  { key:'hot-tea',    ico:'ico-coffee',  sub:{ fr:'thé chaud',  en:'hot tea',   ar:'شاي ساخن'   } },
-  { key:'cold-tea',   ico:'ico-cold',    sub:{ fr:'thé froid',  en:'iced tea',  ar:'شاي بارد'   } },
-  { key:'milkshake',  ico:'ico-cold',    sub:{ fr:'boissons',   en:'drinks',    ar:'مشروبات'    } },
-  { key:'detox',      ico:'ico-cold',    sub:{ fr:'boissons',   en:'drinks',    ar:'مشروبات'    } },
-  { key:'mojito',     ico:'ico-cold',    sub:{ fr:'cocktails',  en:'cocktails', ar:'كوكتيل'     } },
-  { key:'smoothie',   ico:'ico-cold',    sub:{ fr:'boissons',   en:'drinks',    ar:'مشروبات'    } },
-  { key:'juice',      ico:'ico-cold',    sub:{ fr:'jus',        en:'juices',    ar:'عصائر'      } },
-  { key:'cocktail',   ico:'ico-star',    sub:{ fr:'cocktails',  en:'cocktails', ar:'كوكتيل'     } },
-  { key:'salade',     ico:'ico-food',    sub:{ fr:'salades',    en:'salads',    ar:'سلطات'      } },
-  { key:'hamburger',  ico:'ico-food',    sub:{ fr:'burgers',    en:'burgers',   ar:'برغر'       } },
-  { key:'sandwich',   ico:'ico-food',    sub:{ fr:'sandwichs',  en:'sandwiches',ar:'ساندويش'    } },
-  { key:'pates',      ico:'ico-food',    sub:{ fr:'plats',      en:'dishes',    ar:'أطباق'      } },
-  { key:'plat',       ico:'ico-food',    sub:{ fr:'plats',      en:'dishes',    ar:'أطباق'      } },
-  { key:'crepe-sal',  ico:'ico-food',    sub:{ fr:'crêpes',     en:'crêpes',    ar:'كريب'       } },
-  { key:'crepe-suc',  ico:'ico-cake',    sub:{ fr:'crêpes',     en:'crêpes',    ar:'كريب'       } },
-  { key:'dessert',    ico:'ico-cake',    sub:{ fr:'desserts',   en:'desserts',  ar:'حلويات'     } },
-  { key:'hookah',     ico:'ico-hookah',  sub:{ fr:'chichas',    en:'hookahs',   ar:'شيشة'       } },
+  { key:'hot',     ico:'ico-coffee',  sub:{ fr:'boissons',  en:'drinks',   ar:'مشروبات' } },
+  { key:'cold',    ico:'ico-cold',    sub:{ fr:'boissons',  en:'drinks',   ar:'مشروبات' } },
+  { key:'food',    ico:'ico-food',    sub:{ fr:'plats',     en:'dishes',   ar:'أطباق'   } },
+  { key:'sweet',   ico:'ico-cake',    sub:{ fr:'desserts',  en:'desserts', ar:'حلويات'  } },
+  { key:'morning', ico:'ico-sunrise', sub:{ fr:'formules',  en:'formulas', ar:'وجبات'   } },
+  { key:'hookah',  ico:'ico-hookah',  sub:{ fr:'chichas',   en:'hookahs',  ar:'شيشة'    } },
 ];
 
 const UI = {
@@ -1268,7 +1258,7 @@ const UI = {
     explore:'Menu',
     search:'Rechercher dans le menu…',
     all:'Tout',
-    cats:['Petit-Déjeuner','Café Chaud','Café Froid','Thé Chaud','Thé Froid','Milkshake','Détox','Mojito','Smoothie','Jus','Cocktail','Salade','Hamburger','Libanais · Tacos','Pâtes','Plat','Crêpe Salée','Crêpe Sucrée','Dessert','Chichas'],
+    cats:['Boissons Chaudes','Boissons Froides','Cuisine','Sucré','Le Matin','Hookah'],
     badgeN:'Nouveau', badgeP:'Populaire', badgeV:'Vegan', badgeL:'Offre limitée', badgeM:'Le Matin',
     bdgBoisson:'Boisson', bdgCuisine:'Cuisine', bdgSucre:'Sucré', bdgHookah:'Hookah',
     bdgChaud:'Chaud', bdgFroid:'Froid', bdgGlace:'Glacé',
@@ -1292,7 +1282,7 @@ const UI = {
     explore:'Menu',
     search:'Search the menu…',
     all:'All',
-    cats:['Breakfast','Hot Coffee','Cold Coffee','Hot Tea','Iced Tea','Milkshake','Detox','Mojito','Smoothie','Juice','Cocktail','Salad','Burger','Sandwich','Pasta','Main Dish','Savoury Crêpe','Sweet Crêpe','Dessert','Hookah'],
+    cats:['Hot Drinks','Cold Drinks','Food','Sweet','Breakfast','Hookah'],
     badgeN:'New', badgeP:'Popular', badgeV:'Vegan', badgeL:'Limited offer', badgeM:'Morning',
     bdgBoisson:'Drink', bdgCuisine:'Food', bdgSucre:'Sweet', bdgHookah:'Hookah',
     bdgChaud:'Hot', bdgFroid:'Cold', bdgGlace:'Iced',
@@ -1316,7 +1306,7 @@ const UI = {
     explore:'القائمة',
     search:'ابحث في القائمة…',
     all:'الكل',
-    cats:['الفطور','قهوة ساخنة','قهوة باردة','شاي ساخن','شاي بارد','ميلك شيك','ديتوكس','موهيتو','سموثي','عصائر','كوكتيل','سالاد','هامبرغر','ساندويش','معكرونة','أطباق','كريب مملح','كريب حلو','حلويات','شيشة'],
+    cats:['مشروبات ساخنة','مشروبات باردة','الأكل','حلويات','الصباح','الشيشة'],
     badgeN:'جديد', badgeP:'الأكثر طلباً', badgeV:'نباتي', badgeL:'عرض محدود', badgeM:'الصباح',
     bdgBoisson:'مشروب', bdgCuisine:'أكل', bdgSucre:'حلو', bdgHookah:'شيشة',
     bdgChaud:'ساخن', bdgFroid:'بارد', bdgGlace:'مثلج',
@@ -1336,7 +1326,7 @@ const UI = {
 };
 
 const ITEMS = [
-  /* ---- CAT 0: Petit-Déjeuner ---- */
+  /* ---- CAT 0: Boissons Chaudes ---- */
   {
     id:1, cat:0, price:'3.500 DT', photo:'photo-1509042239860-f550ce710b93',
     badges:['popular'],
