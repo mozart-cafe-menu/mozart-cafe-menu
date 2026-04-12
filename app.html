@@ -738,19 +738,18 @@ function registerFCM() {
   const deviceId = getDeviceId();
 
   navigator.serviceWorker.ready.then(swReg => {
-    _msg.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: swReg })
+    const swOpts = { vapidKey: VAPID_KEY, serviceWorkerRegistration: swReg };
+    // Supprimer l'ancien token pour forcer un token frais auprès de FCM
+    _msg.deleteToken()
+      .catch(() => {}) // ignorer si pas de token existant
+      .then(() => _msg.getToken(swOpts))
       .then(token => {
-        if (!token) {
-          // Token vide → forcer renouvellement au prochain lancement
-          localStorage.removeItem('mc_fcm_last_reg');
-          return;
-        }
+        if (!token) return;
         return _db.ref('fcm_tokens/' + deviceId).set({ token, ts: Date.now(), lang });
       })
       .catch(() => {});
   }).catch(() => {});
 
-  // FCM foreground : ignoré, le listener RTDB gère déjà l'alerte
   _msg.onMessage(() => {});
 }
 
