@@ -513,9 +513,9 @@ function registerFCM() {
 
   const deviceId = getDeviceId();
 
-  // Si token déjà enregistré depuis moins de 24h → on ne re-enregistre pas
+  // Si token déjà enregistré depuis moins de 6h → on ne re-enregistre pas
   const lastReg = parseInt(localStorage.getItem('mc_fcm_last_reg') || '0');
-  if (Date.now() - lastReg < 24 * 60 * 60 * 1000) return;
+  if (Date.now() - lastReg < 6 * 60 * 60 * 1000) return;
 
   navigator.serviceWorker.ready.then(swReg => {
     _msg.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: swReg })
@@ -531,12 +531,29 @@ function registerFCM() {
 }
 
 function registerSW() {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/firebase-messaging-sw.js')
-      .then(() => navigator.serviceWorker.ready)
-      .then(() => registerFCM())
-      .catch(() => {});
-  }
+  if (!('serviceWorker' in navigator)) return;
+  // Supprimer tout ancien SW (service-worker.js) qui pourrait bloquer FCM
+  navigator.serviceWorker.getRegistrations().then(regs => {
+    regs.forEach(reg => {
+      const script = (reg.active || reg.installing || reg.waiting || {}).scriptURL || '';
+      if (!script.includes('firebase-messaging-sw.js')) reg.unregister();
+    });
+  });
+  navigator.serviceWorker.register('/firebase-messaging-sw.js')
+    .then(() => navigator.serviceWorker.ready)
+    .then(() => registerFCM())
+    .catch(() => {});
+
+  // Surveiller si le token est supprimé de Firebase (token invalide côté serveur)
+  // → forcer un re-enregistrement immédiat
+  const deviceId = getDeviceId();
+  _db.ref('fcm_tokens/' + deviceId).on('value', snap => {
+    if (snap.val() === null) {
+      // Token supprimé par le serveur → effacer le TTL et re-enregistrer
+      localStorage.removeItem('mc_fcm_last_reg');
+      registerFCM();
+    }
+  });
 }
 
 /* ── THEME ── */
