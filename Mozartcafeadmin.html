@@ -1826,6 +1826,7 @@ function renderProdCard(container, item, ci) {
   // Clear photo
   card.querySelector('.btn-clear-photo').addEventListener('click', () => {
     item._photoBase64 = null;
+    card.dataset.photoClear = '1';   // ← marque intention explicite de suppression
     card.querySelector('.photo-id-input').value = '';
     const prev = card.querySelector('.photo-preview');
     prev.src = ''; prev.style.display = 'none';
@@ -1960,14 +1961,23 @@ function collectProdForm(card, item) {
 
   // Photo : priorité au base64 uploadé, sinon ID Unsplash
   if (item._photoBase64) {
+    // Photo uploadée depuis l'appareil → stocker le base64
     item.photo = item._photoBase64;
     item._photoBase64 = null;
+  } else if (card.dataset.photoClear === '1') {
+    // L'utilisateur a cliqué explicitement "Supprimer" → effacer
+    item.photo = '';
+    delete card.dataset.photoClear;
   } else {
     const photoEl = card.querySelector('.photo-id-input');
     if (photoEl) {
       let val = photoEl.value.trim();
       val = val.replace('https://images.unsplash.com/','').split('?')[0];
-      item.photo = val;
+      if (val) {
+        // ID Unsplash renseigné → l'utiliser
+        item.photo = val;
+      }
+      // Si vide et pas de flag clear → photo base64 existante, ne pas toucher item.photo
     }
   }
 
