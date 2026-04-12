@@ -262,9 +262,16 @@
   <!-- ✅ Configuration centralisée — modifier uniquement firebase-config.js -->
   <script src="firebase-config.js"></script>
   <script>
-    firebase.initializeApp(FIREBASE_CONFIG);
-    const _db      = firebase.database();
-    const _msg     = firebase.messaging();
+    try {
+      firebase.initializeApp(FIREBASE_CONFIG);
+    } catch(e) {
+      document.addEventListener('DOMContentLoaded', function() {
+        var el = document.getElementById('fcm-debug');
+        if (el) el.innerHTML = '❌ Firebase init erreur: ' + e.message;
+      });
+    }
+    const _db  = firebase.database();
+    const _msg = firebase.messaging();
   </script>
 </head>
 <body>
@@ -352,7 +359,7 @@
 </main>
 
 <!-- DEBUG FCM -->
-<div id="fcm-debug" style="display:none; margin:12px 14px; background:#1a0f06; border:1px solid rgba(212,149,107,0.3); border-radius:12px; padding:12px 14px; font-size:0.72rem; font-family:monospace; color:#e8b48a; line-height:1.7; word-break:break-all;"></div>
+<div id="fcm-debug" style="display:block; margin:12px 14px; background:#1a0f06; border:1px solid rgba(212,149,107,0.3); border-radius:12px; padding:12px 14px; font-size:0.72rem; font-family:monospace; color:#e8b48a; line-height:1.7; word-break:break-all;">Chargement…</div>
 
 <footer class="app-footer">
   © 2026 Mozart Café &nbsp;·&nbsp; <a href="index.html" id="ft-menu">Voir le menu</a>
@@ -741,30 +748,9 @@ function registerFCM() {
 
 function registerSW() {
   if (!('serviceWorker' in navigator)) { _dbg('❌ SW non supporté'); return; }
-  // Désinscrire tout ancien SW qui n'est pas firebase-messaging-sw.js
-  navigator.serviceWorker.getRegistrations().then(regs => {
-    regs.forEach(reg => {
-      const url = (reg.active || reg.installing || reg.waiting || {}).scriptURL || '';
-      if (!url.includes('firebase-messaging-sw.js')) {
-        reg.unregister();
-        _dbg('🗑️ Ancien SW supprimé: ' + url.split('/').pop());
-      }
-    });
-  });
-  _dbg('⏳ Enregistrement SW…');
   navigator.serviceWorker.register('/firebase-messaging-sw.js')
-    .then(reg => {
-      _dbg('✅ SW enregistré — attente activation…');
-      // Timeout de 10s si le SW ne devient jamais actif
-      return Promise.race([
-        navigator.serviceWorker.ready,
-        new Promise((_, rej) => setTimeout(() => rej(new Error('SW ready timeout (10s)')), 10000))
-      ]);
-    })
-    .then(swReg => {
-      _dbg('✅ SW actif');
-      registerFCM();
-    })
+    .then(() => navigator.serviceWorker.ready)
+    .then(() => registerFCM())
     .catch(err => _dbg('❌ SW erreur: ' + err.message));
 }
 
