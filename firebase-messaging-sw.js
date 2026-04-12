@@ -58,8 +58,8 @@ self.addEventListener('notificationclick', e => {
 });
 
 /* ── Cache offline ── */
-const CACHE  = 'mozart-cafe-v9';
-const ASSETS = ['app.html', 'manifest.json', 'icon-192.png', 'icon-512.png', 'firebase-config.js'];
+const CACHE  = 'mozart-cafe-v10';
+const ASSETS = ['app.html', 'manifest.json'];
 
 self.addEventListener('install', e => {
   e.waitUntil(
