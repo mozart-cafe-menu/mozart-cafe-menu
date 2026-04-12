@@ -4,7 +4,7 @@
   "short_name": "Mozart Serveur",
   "description": "Application de notification pour le personnel du Mozart Café",
   "start_url": "/app.html",
-  "scope": "/app.html",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#09080f",
