@@ -213,6 +213,15 @@
       background:rgba(126,189,106,0.1); color:var(--green); border:1px solid rgba(126,189,106,0.25);
     }
 
+    /* ── NOTIF BANNER ── */
+    #notif-banner {
+      display:none; margin:12px 14px 0;
+      background:var(--bg3); border:1px solid rgba(200,164,78,0.4);
+      border-radius:16px; padding:13px 15px;
+      align-items:center; gap:12px;
+    }
+    #notif-banner.visible { display:flex; }
+
     /* ── MESSAGES LIST ── */
     #messages-list { display:flex; flex-direction:column; gap:9px; }
     .msg-item {
@@ -338,6 +347,21 @@
   </button>
 </div>
 
+<!-- NOTIF BANNER -->
+<div id="notif-banner">
+  <div class="install-ico">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+      <path d="M13.73 21a2 2 0 01-3.46 0"/>
+    </svg>
+  </div>
+  <div class="install-text">
+    <div class="install-title" id="notif-title">Activer les notifications</div>
+    <div class="install-sub"   id="notif-sub">Recevez les appels de table en temps réel</div>
+  </div>
+  <button class="install-btn" id="notif-btn">Activer</button>
+</div>
+
 <!-- MAIN -->
 <main class="app-main">
   <!-- Tabs -->
@@ -385,6 +409,7 @@ const T = {
     ago0:'À l\'instant', agoMin:'Il y a {n} min', agoH:'Il y a {n}h',
     tabCalls:'Appels récents', tabMsgs:'Messages reçus',
     noMsgs:'Aucun message reçu pour le moment',
+    notifTitle:'Activer les notifications', notifSub:'Recevez les appels de table en temps réel', notifBtn:'Activer',
   },
   en: {
     hdrSub:'Waiter Interface', connWait:'Waiting…', connOn:'Connected',
@@ -395,6 +420,7 @@ const T = {
     ago0:'Just now', agoMin:'{n} min ago', agoH:'{n}h ago',
     tabCalls:'Recent calls', tabMsgs:'Messages received',
     noMsgs:'No messages received yet',
+    notifTitle:'Enable notifications', notifSub:'Receive table calls in real time', notifBtn:'Enable',
   },
   ar: {
     hdrSub:'واجهة النادل', connWait:'في انتظار…', connOn:'متصل',
@@ -405,6 +431,7 @@ const T = {
     ago0:'الآن', agoMin:'منذ {n} دق', agoH:'منذ {n}س',
     tabCalls:'النداءات الأخيرة', tabMsgs:'الرسائل المستلمة',
     noMsgs:'لم تُستلم أي رسائل بعد',
+    notifTitle:'تفعيل الإشعارات', notifSub:'استقبل نداءات الطاولة فوراً', notifBtn:'تفعيل',
   }
 };
 
@@ -534,6 +561,9 @@ function applyLang() {
   document.getElementById('tab-calls-lbl').textContent = t.tabCalls;
   document.getElementById('tab-msgs-lbl').textContent  = t.tabMsgs;
   document.getElementById('no-msgs-msg').textContent   = t.noMsgs;
+  document.getElementById('notif-title').textContent   = t.notifTitle;
+  document.getElementById('notif-sub').textContent     = t.notifSub;
+  document.getElementById('notif-btn').textContent     = t.notifBtn;
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('on', b.dataset.l === lang));
   renderCalls();
   renderMessages();
@@ -575,6 +605,19 @@ document.getElementById('app-theme-btn').addEventListener('click', () => {
   localStorage.setItem('mc_app_theme', isLight ? 'light' : 'dark');
   updateThemeIcon();
 });
+
+/* ── BANDEAU NOTIFICATION ── */
+function setupNotifBanner() {
+  const banner = document.getElementById('notif-banner');
+  if (!banner || !('Notification' in window) || Notification.permission !== 'default') return;
+  banner.classList.add('visible');
+  document.getElementById('notif-btn').addEventListener('click', () => {
+    Notification.requestPermission().then(p => {
+      banner.classList.remove('visible');
+      if (p === 'granted') registerFCM();
+    }).catch(() => banner.classList.remove('visible'));
+  });
+}
 
 /* ── TABS ── */
 let currentTab = 'calls';
@@ -775,6 +818,9 @@ window.addEventListener('appinstalled', () => {
 });
 
 function showInstallBanner() {
+  // Ne pas montrer si l'utilisateur a fermé le banner récemment (24h)
+  const dismissed = parseInt(localStorage.getItem('mc_install_dismissed') || '0');
+  if (Date.now() - dismissed < 24 * 60 * 60 * 1000) return;
   document.getElementById('install-banner').classList.add('visible');
 }
 
@@ -810,11 +856,7 @@ function setupInstallBanner() {
     localStorage.setItem('mc_install_dismissed', String(Date.now()));
   });
 
-  // Ne pas reafficher si l'utilisateur a déjà fermé le banner récemment (24h)
-  const dismissed = parseInt(localStorage.getItem('mc_install_dismissed') || '0');
-  if (Date.now() - dismissed < 24 * 60 * 60 * 1000) {
-    document.getElementById('install-banner').classList.remove('visible');
-  }
+  // (check dismissed géré dans showInstallBanner)
 
   // Mettre à jour les textes quand la langue change
   const origApplyLang = applyLang;
@@ -828,15 +870,12 @@ function init() {
   buildLangBtns();
   applyLang();
   setupInstallBanner();
+  setupNotifBanner();
   startPolling();
   startMessagesListener();
-  // Demander la permission notifications dès l'ouverture (sans attendre le SW)
-  if ('Notification' in window && Notification.permission === 'default') {
-    Notification.requestPermission().catch(() => {});
-  }
   registerSW();
   document.addEventListener('touchstart', unlockAudio, { once: true, passive: true });
-  document.addEventListener('click', unlockAudio, { once: true });
+  document.addEventListener('click',      unlockAudio, { once: true });
 }
 
 document.addEventListener('DOMContentLoaded', init);
