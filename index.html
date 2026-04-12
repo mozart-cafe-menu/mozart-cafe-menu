@@ -258,6 +258,19 @@
       color: #fdf6ed;
       box-shadow: 0 2px 12px rgba(168,104,64,0.25);
     }
+    html.light #call-fab {
+      background: linear-gradient(135deg, #d4a47a, #a86840, #cc9060, #b87448);
+      background-size: 250% 250%;
+      animation: lightFlow 5s ease infinite, callFabPulse 4s ease-in-out 2s infinite;
+      color: #fdf6ed;
+      box-shadow: 0 4px 18px rgba(168,104,64,0.45);
+    }
+    html.light #call-fab.show {
+      animation: lightFlow 5s ease infinite, callFabPulse 4s ease-in-out 2s infinite;
+    }
+    html.light #call-fab.fab-top {
+      animation: lightFlow 5s ease infinite, fabShine 0.65s ease 0.32s forwards !important;
+    }
     html.light .social-link {
       background: linear-gradient(135deg, #d4a47a, #a86840, #cc9060, #b87448);
       background-size: 250% 250%;
@@ -554,7 +567,10 @@
     }
     html[dir="rtl"] .c-name { font-family:'Noto Sans Arabic',sans-serif; text-align:right; }
     .c-price {
-      background:var(--gold); color:#0c0a08;
+      background: linear-gradient(135deg, var(--gold-lt), var(--gold), var(--gold-dk), var(--gold), var(--gold-lt));
+      background-size: 250% 250%;
+      animation: lightFlow 5s ease infinite;
+      color:#0c0a08;
       font-size:0.8rem; font-weight:600;
       padding:4px 10px; border-radius:20px; white-space:nowrap; flex-shrink:0;
     }
@@ -721,7 +737,9 @@
       z-index:202;
       width:52px; height:52px;
       display:flex; align-items:center; justify-content:center;
-      background:linear-gradient(135deg, var(--gold-lt), var(--gold), var(--gold-dk));
+      background:linear-gradient(135deg, var(--gold-lt), var(--gold), var(--gold-dk), var(--gold), var(--gold-lt));
+      background-size:250% 250%;
+      animation:lightFlow 5s ease infinite;
       border-radius:50%;
       color:#0c0a08;
       cursor:pointer; border:none;
@@ -736,10 +754,10 @@
     #call-fab.show {
       opacity:1; transform:scale(1);
       pointer-events:auto;
-      animation:callFabPulse 4s ease-in-out 2s infinite;
+      animation:lightFlow 5s ease infinite, callFabPulse 4s ease-in-out 2s infinite;
     }
     #call-fab.fab-top {
-      animation:fabShine 0.65s ease 0.32s forwards !important;
+      animation:lightFlow 5s ease infinite, fabShine 0.65s ease 0.32s forwards !important;
     }
     @keyframes fabShine {
       0%   { transform:scale(1); box-shadow:0 6px 28px rgba(200,164,78,0.75); }
