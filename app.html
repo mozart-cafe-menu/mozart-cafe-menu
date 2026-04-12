@@ -738,36 +738,19 @@ function registerFCM() {
 
   navigator.serviceWorker.ready.then(swReg => {
     const swOpts = { vapidKey: VAPID_KEY, serviceWorkerRegistration: swReg };
-
-    // Vérifier si notre token existe encore dans Firebase
-    _db.ref('fcm_tokens/' + deviceId).once('value').then(snap => {
-      const existing = snap.val();
-      if (existing && existing.token) {
-        // Token présent dans Firebase → juste mettre à jour la langue
-        _db.ref('fcm_tokens/' + deviceId + '/lang').set(lang).catch(() => {});
-      } else {
-        // Token absent (supprimé par le serveur car invalide) → forcer un token complètement neuf
-        // 1. Supprimer la souscription push du navigateur (niveau bas)
-        swReg.pushManager.getSubscription()
-          .then(sub => sub ? sub.unsubscribe() : Promise.resolve())
-          // 2. Supprimer le token du SDK Firebase
-          .then(() => _msg.deleteToken().catch(() => {}))
-          // 3. Obtenir un nouveau token frais
-          .then(() => _msg.getToken(swOpts))
-          .then(token => {
-            if (!token) return;
-            return _db.ref('fcm_tokens/' + deviceId).set({ token, ts: Date.now(), lang });
-          })
-          .catch(() => {});
-      }
-    }).catch(() => {
-      // Pas de connexion Firebase → essayer quand même
-      _msg.getToken(swOpts).then(token => {
+    // Toujours forcer un token complètement neuf :
+    // 1. Désabonner la souscription push du navigateur
+    // 2. Supprimer le cache SDK Firebase
+    // 3. Obtenir un token frais auprès de FCM
+    swReg.pushManager.getSubscription()
+      .then(sub => sub ? sub.unsubscribe() : Promise.resolve())
+      .then(() => _msg.deleteToken().catch(() => {}))
+      .then(() => _msg.getToken(swOpts))
+      .then(token => {
         if (!token) return;
-        _db.ref('fcm_tokens/' + deviceId).set({ token, ts: Date.now(), lang }).catch(() => {});
-      }).catch(() => {});
-    });
-
+        return _db.ref('fcm_tokens/' + deviceId).set({ token, ts: Date.now(), lang });
+      })
+      .catch(() => {});
   }).catch(() => {});
 
   _msg.onMessage(() => {});
