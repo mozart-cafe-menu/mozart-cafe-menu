@@ -704,52 +704,38 @@ function _dbg(msg) {
 
 function registerFCM() {
   if (!('Notification' in window)) { _dbg('❌ Notifications non supportées'); return; }
-  if (Notification.permission === 'denied') { _dbg('❌ Permission refusée'); return; }
   if (Notification.permission !== 'granted') {
-    _dbg('⏳ Permission pas encore accordée (' + Notification.permission + ')');
+    _dbg('⏳ Permission: ' + Notification.permission);
     Notification.requestPermission().then(p => { if (p === 'granted') registerFCM(); });
     return;
   }
   _dbg('✅ Permission accordée');
   const deviceId = getDeviceId();
   _dbg('📱 Device: ' + deviceId);
+
+  // Ne re-enregistre pas si token déjà sauvegardé depuis moins de 24h
+  const lastReg = parseInt(localStorage.getItem('mc_fcm_last_reg') || '0');
+  if (Date.now() - lastReg < 24 * 60 * 60 * 1000) {
+    _dbg('⏩ Token récent (< 24h), skip');
+    return;
+  }
+
   navigator.serviceWorker.ready.then(swReg => {
     _dbg('✅ Service Worker prêt');
-    const swOpts = { vapidKey: VAPID_KEY, serviceWorkerRegistration: swReg };
-    _msg.getToken(swOpts)
+    _msg.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: swReg })
       .then(token => {
-        if (!token) {
-          _dbg('⚠️ getToken = null → renouvellement forcé');
-          return _fcmForceRenew(swReg, swOpts, deviceId);
-        }
+        if (!token) { _dbg('⚠️ getToken = null'); return; }
         _dbg('🔑 Token: ' + token.slice(0, 25) + '…');
         return _db.ref('fcm_tokens/' + deviceId).set({ token, ts: Date.now(), lang })
-          .then(() => _dbg('✅ Token sauvegardé dans Firebase'));
+          .then(() => {
+            localStorage.setItem('mc_fcm_last_reg', String(Date.now()));
+            _dbg('✅ Token sauvegardé dans Firebase');
+          });
       })
-      .catch(err => {
-        _dbg('❌ getToken erreur: ' + (err.code || '') + ' ' + err.message);
-        return _fcmForceRenew(swReg, swOpts, deviceId);
-      });
+      .catch(err => _dbg('❌ getToken erreur: ' + (err.code || '') + ' ' + err.message));
   }).catch(err => _dbg('❌ SW erreur: ' + err.message));
-  _msg.onMessage(() => {});
-}
 
-function _fcmForceRenew(swReg, swOpts, deviceId) {
-  _dbg('🔄 Renouvellement forcé…');
-  return swReg.pushManager.getSubscription()
-    .then(sub => {
-      _dbg('📡 Souscription push existante: ' + (sub ? 'oui' : 'non'));
-      return sub ? sub.unsubscribe() : Promise.resolve();
-    })
-    .then(() => _msg.deleteToken().catch(e => _dbg('⚠️ deleteToken: ' + e.message)))
-    .then(() => { _dbg('📤 Demande nouveau token…'); return _msg.getToken(swOpts); })
-    .then(token => {
-      if (!token) { _dbg('❌ Toujours null après renouvellement'); return; }
-      _dbg('🔑 Nouveau token: ' + token.slice(0, 25) + '…');
-      return _db.ref('fcm_tokens/' + deviceId).set({ token, ts: Date.now(), lang })
-        .then(() => _dbg('✅ Nouveau token sauvegardé'));
-    })
-    .catch(err => _dbg('❌ Renouvellement erreur: ' + (err.code || '') + ' ' + err.message));
+  _msg.onMessage(() => {});
 }
 
 function registerSW() {

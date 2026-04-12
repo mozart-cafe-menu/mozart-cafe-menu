@@ -5,9 +5,16 @@
 
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
-importScripts('/firebase-config.js');
 
-firebase.initializeApp(FIREBASE_CONFIG);
+firebase.initializeApp({
+  apiKey:            "AIzaSyAOuYRxE39KDgmizSdqCzAglWrkL4DZXYQ",
+  authDomain:        "mozart-cafe-ae8e0.firebaseapp.com",
+  projectId:         "mozart-cafe-ae8e0",
+  storageBucket:     "mozart-cafe-ae8e0.firebasestorage.app",
+  messagingSenderId: "89531105163",
+  appId:             "1:89531105163:web:224863264ff5eebdb9b98e",
+  databaseURL:       "https://mozart-cafe-ae8e0-default-rtdb.europe-west1.firebasedatabase.app"
+});
 const messaging = firebase.messaging();
 
 /* ── Message reçu en background ── */
@@ -51,7 +58,7 @@ self.addEventListener('notificationclick', e => {
 });
 
 /* ── Cache offline ── */
-const CACHE  = 'mozart-cafe-v7';
+const CACHE  = 'mozart-cafe-v8';
 const ASSETS = ['app.html', 'manifest.json', 'icon-192.png', 'icon-512.png', 'firebase-config.js'];
 
 self.addEventListener('install', e => {
