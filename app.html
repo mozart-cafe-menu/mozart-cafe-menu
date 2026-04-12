@@ -810,9 +810,9 @@ function setupInstallBanner() {
     localStorage.setItem('mc_install_dismissed', String(Date.now()));
   });
 
-  // Ne pas reafficher si l'utilisateur a déjà fermé le banner récemment
+  // Ne pas reafficher si l'utilisateur a déjà fermé le banner récemment (24h)
   const dismissed = parseInt(localStorage.getItem('mc_install_dismissed') || '0');
-  if (Date.now() - dismissed < 7 * 24 * 60 * 60 * 1000) {
+  if (Date.now() - dismissed < 24 * 60 * 60 * 1000) {
     document.getElementById('install-banner').classList.remove('visible');
   }
 
@@ -830,9 +830,11 @@ function init() {
   setupInstallBanner();
   startPolling();
   startMessagesListener();
+  // Demander la permission notifications dès l'ouverture (sans attendre le SW)
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission().catch(() => {});
+  }
   registerSW();
-  // Forcer renouvellement du token FCM si le précédent était invalide
-  localStorage.removeItem('mc_fcm_last_reg');
   document.addEventListener('touchstart', unlockAudio, { once: true, passive: true });
   document.addEventListener('click', unlockAudio, { once: true });
 }
