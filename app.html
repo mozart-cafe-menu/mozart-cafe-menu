@@ -209,7 +209,7 @@
   <!-- Thème appliqué avant rendu pour éviter le flash -->
   <script>
     (function() {
-      if (localStorage.getItem('mc_app_theme') === 'light')
+      if (localStorage.getItem('mc_app_theme') !== 'dark')
         document.documentElement.classList.add('light');
     })();
   </script>
@@ -561,8 +561,8 @@ function updateThemeIcon() {
   const isLight = document.documentElement.classList.contains('light');
   document.getElementById('theme-ico-path').setAttribute('d',
     isLight
-      ? 'M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42M12 6a6 6 0 100 12A6 6 0 0012 6z'
-      : 'M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z'
+      ? 'M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z'
+      : 'M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42M12 6a6 6 0 100 12A6 6 0 0012 6z'
   );
 }
 updateThemeIcon();

@@ -1756,7 +1756,7 @@ const ITEMS = [
 ================================================ */
 let lang = 'fr';
 let activeCat = 'all';
-let theme = localStorage.getItem('mc_menu_theme') === 'light' ? 'light' : 'dark';
+let theme = localStorage.getItem('mc_menu_theme') === 'dark' ? 'dark' : 'light';
 // Appliquer immédiatement pour éviter le flash
 if (theme === 'light') document.documentElement.classList.add('light');
 let sheetItem = null;
@@ -2265,12 +2265,12 @@ window.addEventListener('popstate', e => {
 function setupTheme() {
   // Icône correcte dès le chargement
   const ico = document.getElementById('theme-ico');
-  ico.innerHTML = `<use href="${theme === 'dark' ? '#ico-moon' : '#ico-sun'}"/>`;
+  ico.innerHTML = `<use href="${theme === 'light' ? '#ico-moon' : '#ico-sun'}"/>`;
 
   document.getElementById('theme-btn').addEventListener('click', () => {
     theme = theme === 'dark' ? 'light' : 'dark';
     document.documentElement.classList.toggle('light', theme === 'light');
-    ico.innerHTML = `<use href="${theme === 'dark' ? '#ico-moon' : '#ico-sun'}"/>`;
+    ico.innerHTML = `<use href="${theme === 'light' ? '#ico-moon' : '#ico-sun'}"/>`;
     localStorage.setItem('mc_menu_theme', theme);
   });
 }
