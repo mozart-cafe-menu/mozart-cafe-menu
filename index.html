@@ -729,7 +729,7 @@
       /* Caché au départ */
       opacity:0; transform:scale(0.6);
       pointer-events:none;
-      transition:opacity 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      transition:opacity 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1), bottom 0.6s cubic-bezier(0.34,1.4,0.64,1), box-shadow 0.4s ease;
       -webkit-tap-highlight-color:transparent;
       touch-action:manipulation;
     }
@@ -737,6 +737,18 @@
       opacity:1; transform:scale(1);
       pointer-events:auto;
       animation:callFabPulse 4s ease-in-out 2s infinite;
+    }
+    #call-fab.fab-top {
+      bottom:calc(100dvh - 72px) !important;
+      animation:fabShine 0.7s ease 0.45s forwards !important;
+      box-shadow:0 6px 28px rgba(200,164,78,0.75), 0 0 0 0 rgba(200,164,78,0.2) !important;
+    }
+    @keyframes fabShine {
+      0%   { transform:scale(1); box-shadow:0 6px 28px rgba(200,164,78,0.75); }
+      40%  { transform:scale(1.2); box-shadow:0 10px 40px rgba(200,164,78,0.95),0 0 0 12px rgba(200,164,78,0.18); }
+      65%  { transform:scale(0.94); }
+      82%  { transform:scale(1.06); }
+      100% { transform:scale(1); box-shadow:0 6px 24px rgba(200,164,78,0.65),0 0 0 0 rgba(200,164,78,0); }
     }
     #call-fab .cfab-ico { width:22px; height:22px; flex-shrink:0; }
     @keyframes callFabPulse {
@@ -1794,6 +1806,8 @@ function applyAdminData(data) {
           cat:       item.cat ?? 0,
           price:     item.price ?? '',
           photo:     item.photo ?? '',
+          type:      item.type  || '',
+          temp:      item.temp  || '',
           badges:    Array.isArray(item.badges) ? item.badges : [],
           name:      item.name      || { fr:'', en:'', ar:'' },
           desc:      item.desc      || { fr:'', en:'', ar:'' },
@@ -2183,6 +2197,11 @@ function openSheet(item) {
   document.getElementById('sheet').classList.add('on');
   document.body.style.overflow = 'hidden';
 
+  // FAB monte en haut avec animation spring
+  const callFab = document.getElementById('call-fab');
+  callFab.style.transition = 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1), bottom 0.6s cubic-bezier(0.34,1.4,0.64,1), box-shadow 0.4s ease';
+  callFab.classList.add('fab-top');
+
   // Intercepter le bouton retour Android : pousser un état dans l'historique
   history.pushState({ sheetOpen: true }, '');
 }
@@ -2191,6 +2210,12 @@ function closeSheet() {
   document.getElementById('overlay').classList.remove('on');
   document.getElementById('sheet').classList.remove('on');
   document.body.style.overflow = '';
+
+  // FAB redescend avec animation fluide
+  const callFab = document.getElementById('call-fab');
+  callFab.style.transition = 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1), bottom 0.55s cubic-bezier(0.4,0,0.2,1), box-shadow 0.4s ease';
+  callFab.classList.remove('fab-top');
+
   // Si on ferme via code (overlay, swipe, escape), retirer l'état qu'on avait poussé
   if (history.state && history.state.sheetOpen) {
     history.back();
@@ -2203,6 +2228,10 @@ window.addEventListener('popstate', e => {
     document.getElementById('overlay').classList.remove('on');
     document.getElementById('sheet').classList.remove('on');
     document.body.style.overflow = '';
+    // FAB redescend
+    const callFab = document.getElementById('call-fab');
+    callFab.style.transition = 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1), bottom 0.55s cubic-bezier(0.4,0,0.2,1), box-shadow 0.4s ease';
+    callFab.classList.remove('fab-top');
     // Ne pas appeler closeSheet() pour éviter une boucle history.back()
   }
 });
