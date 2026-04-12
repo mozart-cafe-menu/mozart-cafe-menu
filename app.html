@@ -172,6 +172,19 @@
     html[dir="rtl"] .section-title { flex-direction:row-reverse; }
     html[dir="rtl"] .section-title::after { background:linear-gradient(270deg,var(--bord2),transparent); }
 
+    /* ── TABS ── */
+    .tab-bar {
+      display:flex; gap:6px; padding:16px 0 4px;
+    }
+    .tab-btn {
+      flex:1; padding:9px 8px; border-radius:12px; font-size:0.78rem; font-weight:500;
+      border:1px solid var(--border); color:var(--muted); background:transparent;
+      transition:var(--tr); letter-spacing:0.02em;
+    }
+    .tab-btn.active { border-color:var(--bord2); color:var(--gold); background:rgba(212,149,107,0.08); }
+    .tab-pane { display:none; }
+    .tab-pane.active { display:block; }
+
     /* ── CALLS HISTORY ── */
     #calls-list { display:flex; flex-direction:column; gap:9px; }
     .no-calls { text-align:center; padding:36px 20px; font-family:'Cormorant',serif; font-size:1rem; font-style:italic; color:var(--muted); }
@@ -199,6 +212,17 @@
       font-size:0.67rem; font-weight:500; padding:3px 9px; border-radius:10px; flex-shrink:0;
       background:rgba(126,189,106,0.1); color:var(--green); border:1px solid rgba(126,189,106,0.25);
     }
+
+    /* ── MESSAGES LIST ── */
+    #messages-list { display:flex; flex-direction:column; gap:9px; }
+    .msg-item {
+      background:var(--card); border:1px solid rgba(200,164,78,0.2); border-radius:14px;
+      padding:13px 15px; animation:slideIn 0.4s ease;
+    }
+    .msg-item.fresh { border-color:var(--bord2); background:rgba(200,164,78,0.04); }
+    .msg-sender { font-size:0.72rem; color:var(--gold); font-weight:500; margin-bottom:4px; letter-spacing:0.04em; }
+    .msg-body   { font-size:0.88rem; color:var(--cream); line-height:1.5; }
+    .msg-time   { font-size:0.71rem; color:var(--muted); margin-top:4px; }
 
     /* ── INSTALL BANNER ── */
     #install-banner {
@@ -316,10 +340,24 @@
 
 <!-- MAIN -->
 <main class="app-main">
-  <!-- Call history -->
-  <div class="section-title" id="sec-history">Appels récents</div>
-  <div id="calls-list">
-    <div class="no-calls" id="no-calls-msg">Aucun appel reçu pour le moment</div>
+  <!-- Tabs -->
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tab-calls" onclick="switchTab('calls')">📞 <span id="tab-calls-lbl">Appels récents</span></button>
+    <button class="tab-btn"        id="tab-msgs"  onclick="switchTab('msgs')">💬 <span id="tab-msgs-lbl">Messages reçus</span></button>
+  </div>
+
+  <!-- Pane 1 : appels -->
+  <div class="tab-pane active" id="pane-calls">
+    <div id="calls-list">
+      <div class="no-calls" id="no-calls-msg">Aucun appel reçu pour le moment</div>
+    </div>
+  </div>
+
+  <!-- Pane 2 : messages admin -->
+  <div class="tab-pane" id="pane-msgs">
+    <div id="messages-list">
+      <div class="no-calls" id="no-msgs-msg">Aucun message reçu pour le moment</div>
+    </div>
   </div>
 </main>
 
@@ -345,6 +383,8 @@ const T = {
     callMsg:'Table {n} — Serveur demandé', received:'Reçu',
     noCalls:'Aucun appel reçu pour le moment', ftMenu:'Voir le menu',
     ago0:'À l\'instant', agoMin:'Il y a {n} min', agoH:'Il y a {n}h',
+    tabCalls:'Appels récents', tabMsgs:'Messages reçus',
+    noMsgs:'Aucun message reçu pour le moment',
   },
   en: {
     hdrSub:'Waiter Interface', connWait:'Waiting…', connOn:'Connected',
@@ -353,6 +393,8 @@ const T = {
     callMsg:'Table {n} — Waiter needed', received:'Received',
     noCalls:'No calls received yet', ftMenu:'View menu',
     ago0:'Just now', agoMin:'{n} min ago', agoH:'{n}h ago',
+    tabCalls:'Recent calls', tabMsgs:'Messages received',
+    noMsgs:'No messages received yet',
   },
   ar: {
     hdrSub:'واجهة النادل', connWait:'في انتظار…', connOn:'متصل',
@@ -361,6 +403,8 @@ const T = {
     callMsg:'طاولة {n} — النادل مطلوب', received:'استُلم',
     noCalls:'لم تُستلم أي نداءات بعد', ftMenu:'عرض القائمة',
     ago0:'الآن', agoMin:'منذ {n} دق', agoH:'منذ {n}س',
+    tabCalls:'النداءات الأخيرة', tabMsgs:'الرسائل المستلمة',
+    noMsgs:'لم تُستلم أي رسائل بعد',
   }
 };
 
@@ -487,8 +531,12 @@ function applyLang() {
   document.getElementById('sec-history').textContent = t.secHistory;
   document.getElementById('no-calls-msg').textContent = t.noCalls;
   document.getElementById('ft-menu').textContent = t.ftMenu;
+  document.getElementById('tab-calls-lbl').textContent = t.tabCalls;
+  document.getElementById('tab-msgs-lbl').textContent  = t.tabMsgs;
+  document.getElementById('no-msgs-msg').textContent   = t.noMsgs;
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('on', b.dataset.l === lang));
   renderCalls();
+  renderMessages();
 }
 
 function buildLangBtns() {
@@ -527,6 +575,76 @@ document.getElementById('app-theme-btn').addEventListener('click', () => {
   localStorage.setItem('mc_app_theme', isLight ? 'light' : 'dark');
   updateThemeIcon();
 });
+
+/* ── TABS ── */
+let currentTab = 'calls';
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('tab-calls').classList.toggle('active', tab === 'calls');
+  document.getElementById('tab-msgs').classList.toggle('active',  tab === 'msgs');
+  document.getElementById('pane-calls').classList.toggle('active', tab === 'calls');
+  document.getElementById('pane-msgs').classList.toggle('active',  tab === 'msgs');
+}
+
+/* ── ADMIN MESSAGES ── */
+const MSGS_KEY = 'mc_admin_msgs_v1';
+let adminMsgs = [];
+
+function loadAdminMsgs() {
+  try {
+    const raw = localStorage.getItem(MSGS_KEY);
+    if (raw) adminMsgs = JSON.parse(raw);
+  } catch(_) {}
+}
+function saveAdminMsgs() {
+  try { localStorage.setItem(MSGS_KEY, JSON.stringify(adminMsgs.slice(0, 50))); } catch(_) {}
+}
+function renderMessages() {
+  const list = document.getElementById('messages-list');
+  const none = document.getElementById('no-msgs-msg');
+  if (!adminMsgs.length) { none.style.display = ''; list.innerHTML = ''; list.appendChild(none); return; }
+  none.style.display = 'none';
+  list.innerHTML = '';
+  adminMsgs.slice().reverse().forEach((m, i) => {
+    const el = document.createElement('div');
+    el.className = 'msg-item' + (i === 0 ? ' fresh' : '');
+    el.innerHTML = `
+      <div class="msg-sender">Moudir</div>
+      <div class="msg-body">${m.message.replace(/</g,'&lt;')}</div>
+      <div class="msg-time">${timeAgo(m.ts)}</div>
+    `;
+    list.appendChild(el);
+  });
+}
+
+function receiveAdminMsg(msg, ts) {
+  // Éviter les doublons
+  if (adminMsgs.some(m => m.ts === ts)) return;
+  adminMsgs.push({ message: msg, ts });
+  adminMsgs.sort((a,b) => a.ts - b.ts);
+  saveAdminMsgs();
+  renderMessages();
+  // Afficher l'alerte si app ouverte
+  const t = T[lang];
+  const titleEl = document.getElementById('alert-title');
+  const subEl   = document.getElementById('alert-sub');
+  titleEl.textContent = 'Moudir';
+  subEl.textContent   = msg;
+  document.getElementById('call-alert').classList.add('show');
+  clearTimeout(alertTimer);
+  alertTimer = setTimeout(() => document.getElementById('call-alert').classList.remove('show'), 8000);
+  playRing();
+}
+
+function startMessagesListener() {
+  _db.ref('admin_messages').orderByChild('ts').limitToLast(50).on('value', snapshot => {
+    const data = snapshot.val();
+    if (!data) return;
+    Object.values(data).forEach(m => {
+      if (m && m.message && m.ts) receiveAdminMsg(m.message, m.ts);
+    });
+  });
+}
 
 /* ── CONNECTION ── */
 function setConnected(on) {
@@ -576,9 +694,9 @@ function registerFCM() {
 
   const deviceId = getDeviceId();
 
-  // Rafraîchir le token max 1 fois par 6h
+  // Rafraîchir le token max 1 fois par 24h
   const lastReg = parseInt(localStorage.getItem('mc_fcm_last_reg') || '0');
-  const TOKEN_TTL = 6 * 60 * 60 * 1000;
+  const TOKEN_TTL = 24 * 60 * 60 * 1000;
   if (Date.now() - lastReg < TOKEN_TTL) return;
 
   navigator.serviceWorker.ready.then(swReg => {
@@ -706,11 +824,15 @@ function setupInstallBanner() {
 /* ── INIT ── */
 function init() {
   loadCalls();
+  loadAdminMsgs();
   buildLangBtns();
   applyLang();
   setupInstallBanner();
   startPolling();
+  startMessagesListener();
   registerSW();
+  // Forcer renouvellement du token FCM si le précédent était invalide
+  localStorage.removeItem('mc_fcm_last_reg');
   document.addEventListener('touchstart', unlockAudio, { once: true, passive: true });
   document.addEventListener('click', unlockAudio, { once: true });
 }
