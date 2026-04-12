@@ -1170,10 +1170,9 @@
       <h2 class="sh-name" id="sh-name"></h2>
       <span class="sh-price" id="sh-price"></span>
     </div>
-    <p class="sh-desc" id="sh-desc"></p>
     <div class="sh-al">
-      <div class="al-lbl" id="al-lbl">Allergènes</div>
-      <div class="al-tags" id="sh-al"></div>
+      <div class="al-lbl" id="al-lbl">Détails</div>
+      <p class="sh-desc" id="sh-desc"></p>
     </div>
   </div>
 </div>
@@ -1269,7 +1268,7 @@ const UI = {
     tableDesc:'Entrez votre numéro de table',
     tableConfirm:'Confirmer',
     tableCancel:'Annuler',
-    alLabel:'Allergènes',
+    alLabel:'Détails',
     noRes:'Aucun résultat pour votre recherche',
     wifiN:'WiFi ', wifiV:'MozartCafe_Free · Mozart2026',
     hoursN:'Horaires ', hoursV:'Tous les jours 7h00 – 00h00',
@@ -1293,7 +1292,7 @@ const UI = {
     tableDesc:'Enter your table number',
     tableConfirm:'Confirm',
     tableCancel:'Cancel',
-    alLabel:'Allergens',
+    alLabel:'Details',
     noRes:'No results for your search',
     wifiN:'WiFi ', wifiV:'MozartCafe_Free · Mozart2026',
     hoursN:'Hours ', hoursV:'Every day 7:00 AM – midnight',
@@ -1317,7 +1316,7 @@ const UI = {
     tableDesc:'أدخل رقم طاولتك',
     tableConfirm:'تأكيد',
     tableCancel:'إلغاء',
-    alLabel:'مسببات الحساسية',
+    alLabel:'التفاصيل',
     noRes:'لا توجد نتائج لبحثك',
     wifiN:'واي فاي ', wifiV:'MozartCafe_Free · Mozart2026',
     hoursN:'أوقات العمل ', hoursV:'كل يوم 7:00 صباحاً – منتصف الليل',
@@ -2070,8 +2069,6 @@ function createCard(item, idx) {
   });
   const badges = bdgParts.join('');
 
-  const allergenArr = (item.allergens && item.allergens[lang]) || [];
-
   card.innerHTML = `
     <div class="card-top">
       <div class="c-img-w">
@@ -2082,7 +2079,6 @@ function createCard(item, idx) {
           <div class="c-name">${item.name[lang]}</div>
           <div class="c-price">${item.price}</div>
         </div>
-        <div class="c-desc">${item.desc[lang]}</div>
         ${badges ? `<div class="c-badges">${badges}</div>` : ''}
       </div>
     </div>
@@ -2182,14 +2178,6 @@ function openSheet(item) {
   document.getElementById('sh-price').textContent = item.price;
   document.getElementById('sh-desc').textContent = item.full[lang];
   document.getElementById('al-lbl').textContent = t.alLabel;
-
-  const alEl = document.getElementById('sh-al');
-  const allergens = (item.allergens && item.allergens[lang]) || [];
-  if (allergens.length === 0) {
-    alEl.innerHTML = `<span class="al-none">—</span>`;
-  } else {
-    alEl.innerHTML = allergens.map(a => `<span class="al-tag">${a}</span>`).join('');
-  }
 
   document.getElementById('overlay').classList.add('on');
   document.getElementById('sheet').classList.add('on');

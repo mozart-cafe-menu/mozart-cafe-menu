@@ -969,7 +969,7 @@ const ADMIN_UI = {
     lblPhotoHelp:  'ID depuis <a href="https://unsplash.com" target="_blank">unsplash.com</a> (ex: <em>photo-1234567890</em>) ou upload direct depuis votre téléphone/ordinateur.',
     lblName:       'Nom',
     lblShortDesc:  'Description courte',
-    lblFullDesc:   'Description complète / Détails',
+    lblFullDesc:   'Détails',
     lblAllergens:  'Allergènes — séparés par des virgules',
     phName:        'Nom du produit',
     phShortDesc:   'Description courte affichée dans la liste',
@@ -1018,7 +1018,7 @@ const ADMIN_UI = {
     lblPhotoHelp:  'ID from <a href="https://unsplash.com" target="_blank">unsplash.com</a> (e.g. <em>photo-1234567890</em>) or upload directly from your phone/computer.',
     lblName:       'Name',
     lblShortDesc:  'Short description',
-    lblFullDesc:   'Full description / Details',
+    lblFullDesc:   'Details',
     lblAllergens:  'Allergens — comma separated',
     phName:        'Product name',
     phShortDesc:   'Short description shown in the list',
@@ -1067,7 +1067,7 @@ const ADMIN_UI = {
     lblPhotoHelp:  'المعرف من <a href="https://unsplash.com" target="_blank">unsplash.com</a> أو رفع مباشر من جهازك.',
     lblName:       'الاسم',
     lblShortDesc:  'وصف مختصر',
-    lblFullDesc:   'الوصف الكامل / التفاصيل',
+    lblFullDesc:   'التفاصيل',
     lblAllergens:  'المواد المسببة للحساسية — مفصولة بفواصل',
     phName:        'اسم المنتج',
     phShortDesc:   'وصف مختصر يظهر في القائمة',
@@ -1858,19 +1858,9 @@ function buildProdForm(item) {
           value="${esc(item.name?.[l] || '')}" placeholder="${t0.phName}">
       </div>
       <div class="form-group">
-        <div class="form-lbl" data-uitxt="lblShortDesc">${t0.lblShortDesc} (${l.toUpperCase()})</div>
-        <textarea class="form-textarea" data-field="desc" data-lang="${l}" data-uiph="phShortDesc"
-          placeholder="${t0.phShortDesc}">${esc(item.desc?.[l] || '')}</textarea>
-      </div>
-      <div class="form-group">
         <div class="form-lbl" data-uitxt="lblFullDesc">${t0.lblFullDesc} (${l.toUpperCase()})</div>
         <textarea class="form-textarea" data-field="full" data-lang="${l}" style="min-height:110px" data-uiph="phFullDesc"
           placeholder="${t0.phFullDesc}">${esc(item.full?.[l] || '')}</textarea>
-      </div>
-      <div class="form-group">
-        <div class="form-lbl" data-uitxt="lblAllergens">${t0.lblAllergens} (${l.toUpperCase()})</div>
-        <input class="form-input" data-field="allergens" data-lang="${l}" data-uiph="phAllergens"
-          value="${esc((item.allergens?.[l] || []).join(', '))}" placeholder="${t0.phAllergens}">
       </div>
     </div>
   `).join('');
@@ -2005,13 +1995,11 @@ function addProduct(ci) {
     price: '0.000 DT',
     photo: 'photo-1509042239860-f550ce710b93',
     badges: [],
-    name: {}, desc: {}, full: {}, allergens: {}
+    name: {}, full: {}
   };
   LANGS.forEach(l => {
-    newItem.name[l]      = 'Nouveau produit';
-    newItem.desc[l]      = '';
-    newItem.full[l]      = '';
-    newItem.allergens[l] = [];
+    newItem.name[l] = 'Nouveau produit';
+    newItem.full[l] = '';
   });
   adminData.items.push(newItem);
   markUnsaved();
