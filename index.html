@@ -2199,7 +2199,7 @@ function openSheet(item) {
   const callFab = document.getElementById('call-fab');
   const sheetEl  = document.getElementById('sheet');
   const sheetH   = Math.min(sheetEl.scrollHeight, window.innerHeight * 0.92);
-  callFab.style.bottom = `${sheetH - 26}px`;
+  callFab.style.bottom = `${sheetH + 4}px`;
   callFab.style.transition = 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1), bottom 0.4s cubic-bezier(0.32,0.72,0,1), box-shadow 0.4s ease';
   callFab.classList.add('fab-top');
 
