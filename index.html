@@ -1798,7 +1798,7 @@ const ITEMS = [
 /* ================================================
    STATE
 ================================================ */
-let lang = 'fr';
+let lang = localStorage.getItem('mc_menu_lang') || 'fr';
 let activeCat = 'all';
 let theme = localStorage.getItem('mc_menu_theme') === 'dark' ? 'dark' : 'light';
 let showCallBtn = true;  // contrôlé depuis l'admin
@@ -2064,6 +2064,7 @@ function buildLangBtns() {
 
 function changeLang(l) {
   lang = l;
+  localStorage.setItem('mc_menu_lang', l);
   const isRTL = LANG_DIRS[l] === 'rtl';
   document.documentElement.lang = l;
   document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
