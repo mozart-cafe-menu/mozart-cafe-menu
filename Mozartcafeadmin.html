@@ -147,6 +147,29 @@
     }
     .btn-theme:hover { border-color:var(--gold); color:var(--gold); }
     .btn-theme svg { width:15px; height:15px; pointer-events:none; }
+    /* ── Boutons de visibilité (header) ── */
+    .adm-vis-btn {
+      display:flex; align-items:center; gap:5px;
+      padding:5px 10px; border-radius:8px;
+      border:1px solid var(--border); font-size:0.72rem;
+      color:var(--muted); transition:var(--tr); white-space:nowrap;
+      min-height:32px; cursor:pointer;
+    }
+    .adm-vis-btn .vis-dot {
+      width:7px; height:7px; border-radius:50%;
+      background:var(--muted); transition:background 0.2s; flex-shrink:0;
+    }
+    .adm-vis-btn.on { border-color:var(--green); color:var(--green); }
+    .adm-vis-btn.on .vis-dot { background:var(--green); }
+    html.light .adm-vis-btn { border-color:rgba(0,0,0,0.15); color:#888; }
+    html.light .adm-vis-btn.on { border-color:#4a8c3f; color:#4a8c3f; }
+    html.light .adm-vis-btn.on .vis-dot { background:#4a8c3f; }
+    /* ── Toggle visibilité photo (par produit) ── */
+    .photo-show-row {
+      display:flex; align-items:center; gap:7px;
+      margin-top:9px; font-size:0.76rem; color:var(--muted); cursor:pointer;
+    }
+    .photo-show-chk { accent-color:var(--green); width:15px; height:15px; cursor:pointer; flex-shrink:0; }
     @media(max-width:600px) {
       .adm-sub { display:none; }
       .btn-preview { padding:7px 8px; font-size:0.9rem; }
@@ -425,6 +448,30 @@
 
     /* ── CATEGORIES ── */
     .cats-list { display:flex; flex-direction:column; gap:8px; }
+    /* ── Drag & drop ── */
+    .drag-handle {
+      cursor:grab; color:var(--muted); flex-shrink:0; padding:2px 4px;
+      opacity:0.5; transition:opacity 0.2s; touch-action:none;
+    }
+    .drag-handle:hover { opacity:1; color:var(--gold); }
+    .drag-handle svg { width:16px; height:16px; pointer-events:none; }
+    .dragging { opacity:0.4; }
+    .drag-over { outline:2px solid var(--gold); outline-offset:2px; border-radius:14px; }
+    .drag-over-cat { background:rgba(200,164,78,0.07); outline:2px dashed var(--gold); outline-offset:3px; border-radius:14px; }
+    .move-cat-row { display:flex; align-items:center; gap:8px; }
+    .move-cat-sel { flex:1; }
+    .btn-move-cat {
+      padding:7px 12px; border-radius:8px; font-size:0.8rem;
+      background:rgba(200,164,78,0.1); border:1px solid var(--gold);
+      color:var(--gold); cursor:pointer; transition:var(--tr); white-space:nowrap;
+    }
+    .btn-move-cat:hover { background:rgba(200,164,78,0.22); }
+    .btn-copy-cat {
+      padding:7px 12px; border-radius:8px; font-size:0.8rem;
+      background:rgba(126,189,106,0.1); border:1px solid var(--green);
+      color:var(--green); cursor:pointer; transition:var(--tr); white-space:nowrap;
+    }
+    .btn-copy-cat:hover { background:rgba(126,189,106,0.22); }
     .cat-row {
       background:var(--card); border:1px solid var(--border); border-radius:14px;
       padding:12px 14px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;
@@ -592,7 +639,8 @@
       transition:var(--tr); cursor:pointer; font-family:inherit;
     }
     .badge-toggle:hover { border-color:var(--gold-lt); color:var(--gold-lt); }
-    .badge-toggle.active { border-color:var(--gold); color:var(--gold); background:rgba(200,164,78,0.1); }
+    .badge-toggle.active { border-color:var(--gold); color:var(--gold); background:rgba(200,164,78,0.18); font-weight:600; }
+    html.light .badge-toggle.active { background:var(--gold); color:#0c0a08; border-color:var(--gold); font-weight:600; }
 
     /* Product action buttons */
     .prod-actions { display:flex; gap:8px; margin-top:16px; }
@@ -668,7 +716,9 @@
       color:var(--green); font-size:0.76rem; padding:6px 10px; outline:none; cursor:pointer;
       min-height:32px;
     }
-    .global-src-sel option { background:#181612; color:var(--cream); }
+    .global-src-sel option { background:#181612; color:#e8d9c0; }
+    html.light .global-src-sel { background:#f5ede4; border-color:rgba(74,140,63,0.4); color:#3a6b33; }
+    html.light .global-src-sel option { background:#f5ede4; color:#2a1a0e; }
     .global-progress {
       font-size:0.73rem; color:var(--green); white-space:nowrap;
       max-width:260px; overflow:hidden; text-overflow:ellipsis;
@@ -715,6 +765,18 @@
   <script>
     firebase.initializeApp(FIREBASE_CONFIG);
     const _db = firebase.database();
+    /* ── Cloudinary (hébergement images) ── */
+    const CLOUDINARY_CLOUD  = 'dty1cz8et';
+    const CLOUDINARY_PRESET = 'menu_photos';
+    async function uploadToCloudinary(blob) {
+      const fd = new FormData();
+      fd.append('file', blob);
+      fd.append('upload_preset', CLOUDINARY_PRESET);
+      const res  = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, { method: 'POST', body: fd });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error?.message || 'Upload échoué');
+      return json.secure_url;
+    }
   </script>
 </head>
 <body>
@@ -747,6 +809,12 @@
       <option value="en">🇬🇧 English</option>
       <option value="ar">🇸🇦 العربية</option>
     </select>
+    <button class="adm-vis-btn" id="toggle-call-btn" title="Afficher/cacher le bouton 'Appeler le serveur' dans le menu">
+      <span class="vis-dot"></span>Bouton serveur
+    </button>
+    <button class="adm-vis-btn" id="toggle-photos-btn" title="Afficher/cacher toutes les photos dans le menu">
+      <span class="vis-dot"></span>Photos (tout)
+    </button>
     <div class="global-progress" id="global-progress"></div>
   </div>
   <div class="adm-right">
@@ -940,8 +1008,10 @@ const DEFAULT_INFO = {
   wifi_val:   { fr:'MozartCafe_Free · Mozart2026', en:'MozartCafe_Free · Mozart2026', ar:'MozartCafe_Free · Mozart2026' },
   hours_name: { fr:'Horaires', en:'Hours', ar:'أوقات العمل' },
   hours_val:  { fr:'Tous les jours 7h00 – 00h00', en:'Every day 7:00 AM – midnight', ar:'كل يوم 7:00 صباحاً – منتصف الليل' },
-  addr_name:  { fr:'Adresse', en:'Address', ar:'العنوان' },
-  addr_val:   { fr:'Radès, Tunis, Tunisie', en:'Radès, Tunis, Tunisia', ar:'رادس، تونس، تونس' },
+  addr_name:   { fr:'Adresse', en:'Address', ar:'العنوان' },
+  addr_val:    { fr:'Radès, Tunis, Tunisie', en:'Radès, Tunis, Tunisia', ar:'رادس، تونس، تونس' },
+  showCallBtn: true,
+  showPhotos:  true,
 };
 
 /* ═══════════════════════════════════════════
@@ -1103,6 +1173,9 @@ const ADMIN_UI = {
 let adminData = null;  // { cats, items, info }
 let currentLang = localStorage.getItem('mc_admin_lang') || 'fr';
 let unsaved = false;
+const pendingPhotos = new Map();
+let _dragCatIdx  = null;  // index catégorie en cours de drag
+let _dragItemId  = null;  // id produit en cours de drag // item.id → Firebase Storage download URL (en attente de sauvegarde)
 
 /* ═══════════════════════════════════════════
    LOGIN
@@ -1228,6 +1301,7 @@ function sanitizeItems(items) {
     cat:       item.cat ?? 0,
     price:     item.price ?? '',
     photo:     item.photo ?? '',
+    showPhoto: item.showPhoto !== false,
     type:      item.type  || '',
     temp:      item.temp  || '',
     badges:    Array.isArray(item.badges) ? item.badges : [],
@@ -1284,7 +1358,37 @@ function renderAll() {
   renderInfoSection();
   renderCatsSection();
   renderProductsSection();
+  syncVisToggles();
 }
+
+/* ── Synchronise les boutons de visibilité avec adminData.info ── */
+function syncVisToggles() {
+  const callBtn   = document.getElementById('toggle-call-btn');
+  const photosBtn = document.getElementById('toggle-photos-btn');
+  if (!callBtn || !photosBtn || !adminData?.info) return;
+  const showCall   = adminData.info.showCallBtn !== false;
+  const showPhotos = adminData.info.showPhotos  !== false;
+  callBtn.classList.toggle('on', showCall);
+  photosBtn.classList.toggle('on', showPhotos);
+}
+
+/* ── Initialisation des listeners des boutons de visibilité ── */
+(function() {
+  document.getElementById('toggle-call-btn').addEventListener('click', () => {
+    if (!adminData) return;
+    if (!adminData.info) adminData.info = {};
+    adminData.info.showCallBtn = adminData.info.showCallBtn === false ? true : false;
+    syncVisToggles();
+    markUnsaved();
+  });
+  document.getElementById('toggle-photos-btn').addEventListener('click', () => {
+    if (!adminData) return;
+    if (!adminData.info) adminData.info = {};
+    adminData.info.showPhotos = adminData.info.showPhotos === false ? true : false;
+    syncVisToggles();
+    markUnsaved();
+  });
+})();
 
 /* ─── SECTION HERO IMAGE ─── */
 function renderHeroImageSection() {
@@ -1309,10 +1413,12 @@ function renderHeroImageSection() {
   // Afficher l'image actuelle dans le mockup
   setPhoneBg(adminData.heroImage || '');
 
-  // Upload fichier → compression canvas → base64
+  // Upload fichier → compression canvas → Cloudinary
   fileInput.addEventListener('change', () => {
     const file = fileInput.files[0];
     if (!file) return;
+    const uploadLabel = document.querySelector('.hero-upload-btn');
+    const origLabel   = uploadLabel ? uploadLabel.innerHTML : '';
     const reader = new FileReader();
     reader.onload = e => {
       const img = new Image();
@@ -1323,10 +1429,27 @@ function renderHeroImageSection() {
         const canvas = document.createElement('canvas');
         canvas.width = w; canvas.height = h;
         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        const compressed = canvas.toDataURL('image/jpeg', 0.82);
-        adminData.heroImage = compressed;
-        setPhoneBg(compressed);
-        markUnsaved();
+
+        // Aperçu local immédiat
+        const localPreview = canvas.toDataURL('image/jpeg', 0.82);
+        setPhoneBg(localPreview);
+
+        if (uploadLabel) { uploadLabel.innerHTML = `<span style="opacity:.6">⏳ Upload…</span>`; uploadLabel.style.pointerEvents = 'none'; }
+
+        canvas.toBlob(blob => {
+          uploadToCloudinary(blob)
+            .then(url => {
+              adminData.heroImage = url;
+              setPhoneBg(url);
+              markUnsaved();
+              if (uploadLabel) { uploadLabel.innerHTML = origLabel; uploadLabel.style.pointerEvents = ''; }
+            })
+            .catch(err => {
+              console.error('Hero upload error:', err);
+              if (uploadLabel) { uploadLabel.innerHTML = origLabel; uploadLabel.style.pointerEvents = ''; }
+              showToast('❌ Erreur upload image — réessayez');
+            });
+        }, 'image/jpeg', 0.82);
       };
       img.src = e.target.result;
     };
@@ -1541,9 +1664,7 @@ function applyAdminUI(l) {
     const ph = inp.dataset.uiph;
     if (ph && t[ph]) inp.placeholder = t[ph];
   });
-  document.querySelectorAll('.photo-help').forEach(el => { el.innerHTML = t.lblPhotoHelp; });
   document.querySelectorAll('.btn-upload-photo').forEach(btn => {
-    // Keep the file input inside
     const fi = btn.querySelector('input');
     const svg = btn.querySelector('svg');
     btn.innerHTML = '';
@@ -1551,7 +1672,6 @@ function applyAdminUI(l) {
     btn.appendChild(document.createTextNode(' ' + t.lblFromDevice));
     if (fi) btn.appendChild(fi);
   });
-  document.querySelectorAll('[data-orlbl]').forEach(el => { el.textContent = t.lblOrUnsplash; });
 
   // Labels catégories
   document.querySelectorAll('.inline-input[data-ci]').forEach(inp => {
@@ -1599,11 +1719,37 @@ function switchInfoLang(l) {
 }
 
 /* ─── SECTION CATÉGORIES ─── */
-const ICONS = ['ico-coffee','ico-cold','ico-food','ico-cake','ico-sunrise','ico-hookah','ico-star','ico-bell','ico-clock','ico-diamond','ico-wifi','ico-pin'];
+const ICONS = [
+  'ico-coffee','ico-cold','ico-food','ico-cake','ico-sunrise','ico-hookah',
+  'ico-star','ico-bell','ico-clock','ico-diamond','ico-wifi','ico-pin',
+  'ico-glass','ico-pizza','ico-burger','ico-salad','ico-heart',
+  'ico-fire','ico-leaf','ico-crown','ico-gift','ico-cocktail',
+];
 const ICON_LABELS = {
-  fr: { 'ico-coffee':'☕ Café chaud', 'ico-cold':'🧊 Froid',   'ico-food':'🍽 Cuisine', 'ico-cake':'🍰 Sucré',   'ico-sunrise':'🌅 Matin',  'ico-hookah':'💨 Hookah',  'ico-star':'⭐ Spécial',  'ico-bell':'🔔 Bell', 'ico-clock':'🕐 Clock', 'ico-diamond':'💎 Diamond', 'ico-wifi':'📶 WiFi', 'ico-pin':'📍 Pin' },
-  en: { 'ico-coffee':'☕ Hot drink', 'ico-cold':'🧊 Cold',    'ico-food':'🍽 Food',    'ico-cake':'🍰 Sweet',   'ico-sunrise':'🌅 Morning','ico-hookah':'💨 Hookah',  'ico-star':'⭐ Special',  'ico-bell':'🔔 Bell', 'ico-clock':'🕐 Clock', 'ico-diamond':'💎 Diamond', 'ico-wifi':'📶 WiFi', 'ico-pin':'📍 Pin' },
-  ar: { 'ico-coffee':'☕ قهوة ساخنة','ico-cold':'🧊 بارد',   'ico-food':'🍽 طعام',   'ico-cake':'🍰 حلويات',  'ico-sunrise':'🌅 الصباح','ico-hookah':'💨 شيشة',    'ico-star':'⭐ مميز',    'ico-bell':'🔔 Bell', 'ico-clock':'🕐 Clock', 'ico-diamond':'💎 Diamond', 'ico-wifi':'📶 WiFi', 'ico-pin':'📍 Pin' },
+  fr: {
+    'ico-coffee':'☕ Café chaud', 'ico-cold':'🧊 Froid', 'ico-food':'🍽 Cuisine', 'ico-cake':'🍰 Sucré',
+    'ico-sunrise':'🌅 Matin', 'ico-hookah':'💨 Hookah', 'ico-star':'⭐ Spécial', 'ico-bell':'🔔 Cloche',
+    'ico-clock':'🕐 Horaires', 'ico-diamond':'💎 Premium', 'ico-wifi':'📶 WiFi', 'ico-pin':'📍 Lieu',
+    'ico-glass':'🥤 Jus / Verre', 'ico-pizza':'🍕 Pizza', 'ico-burger':'🍔 Burger', 'ico-salad':'🥗 Salade',
+    'ico-heart':'❤️ Favoris', 'ico-fire':'🔥 Tendance', 'ico-leaf':'🌿 Végétarien', 'ico-crown':'👑 VIP',
+    'ico-gift':'🎁 Promo', 'ico-cocktail':'🍹 Cocktail',
+  },
+  en: {
+    'ico-coffee':'☕ Hot drink', 'ico-cold':'🧊 Cold', 'ico-food':'🍽 Food', 'ico-cake':'🍰 Sweet',
+    'ico-sunrise':'🌅 Morning', 'ico-hookah':'💨 Hookah', 'ico-star':'⭐ Special', 'ico-bell':'🔔 Bell',
+    'ico-clock':'🕐 Hours', 'ico-diamond':'💎 Premium', 'ico-wifi':'📶 WiFi', 'ico-pin':'📍 Location',
+    'ico-glass':'🥤 Juice / Glass', 'ico-pizza':'🍕 Pizza', 'ico-burger':'🍔 Burger', 'ico-salad':'🥗 Salad',
+    'ico-heart':'❤️ Favorites', 'ico-fire':'🔥 Trending', 'ico-leaf':'🌿 Vegetarian', 'ico-crown':'👑 VIP',
+    'ico-gift':'🎁 Promo', 'ico-cocktail':'🍹 Cocktail',
+  },
+  ar: {
+    'ico-coffee':'☕ قهوة ساخنة', 'ico-cold':'🧊 بارد', 'ico-food':'🍽 طعام', 'ico-cake':'🍰 حلويات',
+    'ico-sunrise':'🌅 الصباح', 'ico-hookah':'💨 شيشة', 'ico-star':'⭐ مميز', 'ico-bell':'🔔 جرس',
+    'ico-clock':'🕐 أوقات', 'ico-diamond':'💎 بريميوم', 'ico-wifi':'📶 واي فاي', 'ico-pin':'📍 موقع',
+    'ico-glass':'🥤 عصير', 'ico-pizza':'🍕 بيتزا', 'ico-burger':'🍔 برغر', 'ico-salad':'🥗 سلطة',
+    'ico-heart':'❤️ المفضلة', 'ico-fire':'🔥 رائج', 'ico-leaf':'🌿 نباتي', 'ico-crown':'👑 VIP',
+    'ico-gift':'🎁 عروض', 'ico-cocktail':'🍹 كوكتيل',
+  },
 };
 function getIconLabel(ico) { return (ICON_LABELS[currentLang]||ICON_LABELS.fr)[ico]||ico; }
 
@@ -1627,6 +1773,9 @@ function renderCatsSection() {
       : '— Aucune —';
 
     row.innerHTML = `
+      <div class="drag-handle" title="Déplacer" draggable="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="9" y1="6" x2="15" y2="6"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
+      </div>
       <div class="cat-row-ico" id="cat-ico-preview-${ci}">
         ${currentIco ? `<svg width="18" height="18"><use href="#${currentIco}"/></svg>` : '<span style="width:18px;height:18px;display:inline-block;opacity:0.3">—</span>'}
       </div>
@@ -1652,6 +1801,38 @@ function renderCatsSection() {
       <button class="btn-del" data-ci="${ci}" title="Supprimer">✕</button>
     `;
     list.appendChild(row);
+
+    // ── Drag & drop catégorie ──
+    row.setAttribute('draggable', 'true');
+    row.addEventListener('dragstart', e => {
+      _dragCatIdx = ci;
+      e.dataTransfer.effectAllowed = 'move';
+      setTimeout(() => row.classList.add('dragging'), 0);
+    });
+    row.addEventListener('dragend', () => {
+      row.classList.remove('dragging');
+      document.querySelectorAll('.cat-row').forEach(r => r.classList.remove('drag-over'));
+      _dragCatIdx = null;
+    });
+    row.addEventListener('dragover', e => {
+      if (_dragCatIdx === null || _dragCatIdx === ci) return;
+      e.preventDefault(); row.classList.add('drag-over');
+    });
+    row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
+    row.addEventListener('drop', e => {
+      e.preventDefault(); row.classList.remove('drag-over');
+      if (_dragCatIdx === null || _dragCatIdx === ci) return;
+      const from = _dragCatIdx, to = ci;
+      // Mettre à jour les refs item.cat avant de réordonner les cats
+      adminData.items.forEach(item => {
+        if (item.cat === from) item.cat = to;
+        else if (from < to && item.cat > from && item.cat <= to) item.cat--;
+        else if (from > to && item.cat >= to && item.cat < from) item.cat++;
+      });
+      const [removed] = adminData.cats.splice(from, 1);
+      adminData.cats.splice(to, 0, removed);
+      markUnsaved(); renderCatsSection(); renderProductsSection();
+    });
 
     // Nom
     row.querySelector('.inline-input').addEventListener('input', e => {
@@ -1750,6 +1931,25 @@ function renderProductsSection() {
       const cIdx = parseInt(e.target.dataset.ci);
       addProduct(cIdx);
     });
+
+    // ── Catégorie comme zone de dépôt (déplacer produit entre catégories) ──
+    sec.addEventListener('dragover', e => {
+      if (_dragItemId === null) return;
+      e.preventDefault(); sec.classList.add('drag-over-cat');
+    });
+    sec.addEventListener('dragleave', e => {
+      if (!sec.contains(e.relatedTarget)) sec.classList.remove('drag-over-cat');
+    });
+    sec.addEventListener('drop', e => {
+      sec.classList.remove('drag-over-cat');
+      if (_dragItemId === null) return;
+      e.preventDefault();
+      const item = adminData.items.find(it => it.id === _dragItemId);
+      if (item && item.cat !== ci) {
+        item.cat = ci;
+        markUnsaved(); renderProductsSection();
+      }
+    });
   });
 
   // Inject SVG icons if needed
@@ -1762,7 +1962,7 @@ function renderProdCard(container, item, ci) {
   card.dataset.id = item.id;
 
   const imgSrc = item.photo
-    ? (item.photo.startsWith('data:') ? item.photo : `https://images.unsplash.com/${item.photo}?w=200&h=200&fit=crop`)
+    ? (item.photo.startsWith('data:') || item.photo.startsWith('http') ? item.photo : `https://images.unsplash.com/${item.photo}?w=200&h=200&fit=crop`)
     : 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=200&h=200&fit=crop';
 
   card.innerHTML = `
@@ -1794,48 +1994,127 @@ function renderProdCard(container, item, ci) {
     });
   });
 
-  // Photo ID/URL input → update preview (Unsplash only)
-  card.querySelector('.photo-id-input').addEventListener('input', e => {
-    const val = e.target.value.trim();
-    if (!val) { card.querySelector('.photo-preview').style.display = 'none'; return; }
-    const id = val.replace('https://images.unsplash.com/','').split('?')[0];
-    const src = `https://images.unsplash.com/${id}?w=600&h=400&fit=crop`;
-    const prev = card.querySelector('.photo-preview');
-    prev.src = src; prev.style.display = '';
-    card.querySelector('.prod-thumb').src = `https://images.unsplash.com/${id}?w=200&h=200&fit=crop`;
-    // Clear any stored base64 when user types an Unsplash ID
-    item._photoBase64 = null;
-  });
-
-  // Upload depuis l'appareil → base64
+  // Upload depuis l'appareil → Cloudinary
   card.querySelector('.photo-file-input').addEventListener('change', e => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const uploadBtn = card.querySelector('.btn-upload-photo');
+    const prev      = card.querySelector('.photo-preview');
+    const thumb     = card.querySelector('.prod-thumb');
+    const origLabel = uploadBtn.innerHTML;
+
     const reader = new FileReader();
     reader.onload = ev => {
-      const b64 = ev.target.result;
-      item._photoBase64 = b64;
-      const prev = card.querySelector('.photo-preview');
-      prev.src = b64; prev.style.display = '';
-      card.querySelector('.prod-thumb').src = b64;
-      card.querySelector('.photo-id-input').value = '';
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1200;
+        let w = img.width, h = img.height;
+        if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+
+        // Aperçu local immédiat
+        const localPreview = canvas.toDataURL('image/jpeg', 0.82);
+        prev.src = localPreview; prev.style.display = '';
+        thumb.src = localPreview;
+
+        uploadBtn.innerHTML = `<span style="opacity:.6">⏳ Upload…</span>`;
+        uploadBtn.style.pointerEvents = 'none';
+
+        canvas.toBlob(blob => {
+          uploadToCloudinary(blob)
+            .then(url => {
+              pendingPhotos.set(item.id, url);
+              prev.src = url; thumb.src = url;
+              uploadBtn.innerHTML = origLabel;
+              uploadBtn.style.pointerEvents = '';
+              markUnsaved();
+            })
+            .catch(err => {
+              console.error('Cloudinary upload error:', err);
+              uploadBtn.innerHTML = origLabel;
+              uploadBtn.style.pointerEvents = '';
+              showToast('❌ Erreur upload image — réessayez');
+            });
+        }, 'image/jpeg', 0.82);
+      };
+      img.src = ev.target.result;
     };
     reader.readAsDataURL(file);
+    e.target.value = '';
   });
 
   // Clear photo
   card.querySelector('.btn-clear-photo').addEventListener('click', () => {
-    item._photoBase64 = null;
-    card.dataset.photoClear = '1';   // ← marque intention explicite de suppression
-    card.querySelector('.photo-id-input').value = '';
+    pendingPhotos.delete(item.id);
+    card.dataset.photoClear = '1';
     const prev = card.querySelector('.photo-preview');
     prev.src = ''; prev.style.display = 'none';
     card.querySelector('.prod-thumb').src = 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=200&h=200&fit=crop';
   });
 
+  // Marquer non-sauvegardé dès qu'un champ change (carte ouverte ou fermée)
+  card.addEventListener('input', markUnsaved);
+  card.addEventListener('change', markUnsaved);
+
   // Badge toggles
   card.querySelectorAll('.badge-toggle').forEach(btn => {
     btn.addEventListener('click', () => { btn.classList.toggle('active'); markUnsaved(); });
+  });
+
+  // ── Déplacer / Copier vers une autre catégorie ──
+  card.querySelector('.btn-move-cat').addEventListener('click', () => {
+    const sel = card.querySelector('.move-cat-sel');
+    const targetCat = parseInt(sel.value);
+    if (isNaN(targetCat) || targetCat === item.cat) return;
+    collectProdForm(card, item);
+    item.cat = targetCat;
+    markUnsaved(); renderProductsSection();
+  });
+  card.querySelector('.btn-copy-cat').addEventListener('click', () => {
+    const sel = card.querySelector('.move-cat-sel');
+    const targetCat = parseInt(sel.value);
+    if (isNaN(targetCat)) return;
+    collectProdForm(card, item);
+    const copy = JSON.parse(JSON.stringify(item));
+    copy.id = Date.now();
+    copy.cat = targetCat;
+    adminData.items.push(copy);
+    markUnsaved(); renderProductsSection();
+  });
+
+  // ── Drag & drop produit ──
+  card.setAttribute('draggable', 'true');
+  card.addEventListener('dragstart', e => {
+    _dragItemId = item.id;
+    e.dataTransfer.effectAllowed = 'move';
+    setTimeout(() => card.classList.add('dragging'), 0);
+    e.stopPropagation();
+  });
+  card.addEventListener('dragend', () => {
+    card.classList.remove('dragging');
+    document.querySelectorAll('.prod-card').forEach(c => c.classList.remove('drag-over'));
+    document.querySelectorAll('.cat-products').forEach(s => s.classList.remove('drag-over-cat'));
+    _dragItemId = null;
+  });
+  card.addEventListener('dragover', e => {
+    if (_dragItemId === null || _dragItemId === item.id) return;
+    e.preventDefault(); e.stopPropagation(); card.classList.add('drag-over');
+  });
+  card.addEventListener('dragleave', e => {
+    if (!card.contains(e.relatedTarget)) card.classList.remove('drag-over');
+  });
+  card.addEventListener('drop', e => {
+    e.preventDefault(); e.stopPropagation(); card.classList.remove('drag-over');
+    if (_dragItemId === null || _dragItemId === item.id) return;
+    const fromIdx = adminData.items.findIndex(it => it.id === _dragItemId);
+    const toIdx   = adminData.items.findIndex(it => it.id === item.id);
+    if (fromIdx === -1 || toIdx === -1) return;
+    adminData.items[fromIdx].cat = item.cat; // déplacer vers la même catégorie
+    const [moved] = adminData.items.splice(fromIdx, 1);
+    adminData.items.splice(fromIdx < toIdx ? toIdx : toIdx, 0, moved);
+    markUnsaved(); renderProductsSection();
   });
 
   // Delete product
@@ -1844,7 +2123,6 @@ function renderProdCard(container, item, ci) {
     const idx = adminData.items.findIndex(it => it.id === item.id);
     if (idx > -1) adminData.items.splice(idx, 1);
     card.remove();
-    // Update count
     renderCatsSection();
     renderProductsSection();
     markUnsaved();
@@ -1907,11 +2185,18 @@ function buildProdForm(item) {
 
   const photoId = item.photo || '';
   const photoSrc = photoId
-    ? (photoId.startsWith('data:') ? photoId : `https://images.unsplash.com/${photoId}?w=600&h=300&fit=crop`)
+    ? (photoId.startsWith('data:') || photoId.startsWith('http') ? photoId : `https://images.unsplash.com/${photoId}?w=600&h=300&fit=crop`)
     : '';
 
   return `
     <div class="form-grid">
+
+      <div>
+        ${langFields}
+      </div>
+
+      <div class="form-divider"></div>
+
       <div class="form-grid-2">
         <div class="form-group">
           <div class="form-lbl" data-uitxt="lblPrice">${t1.lblPrice}</div>
@@ -1933,22 +2218,25 @@ function buildProdForm(item) {
           </label>
           <button type="button" class="btn-clear-photo" title="✕">✕</button>
         </div>
-        <div class="form-lbl" style="margin-top:10px;" data-orlbl="">${t1.lblOrUnsplash}</div>
-        <input class="form-input photo-id-input" value="${photoId.startsWith('data:') ? '' : esc(photoId)}"
-          placeholder="photo-1509042239860-f550ce710b93">
         <img class="photo-preview" src="${photoSrc}" alt="Aperçu de la photo"
           onerror="this.style.display='none'" ${photoSrc?'':'style="display:none"'}>
-        <div class="photo-help">${t1.lblPhotoHelp}</div>
+        <label class="photo-show-row">
+          <input type="checkbox" class="photo-show-chk" ${item.showPhoto !== false ? 'checked' : ''}>
+          Afficher dans le menu
+        </label>
       </div>
 
-      <div class="form-divider"></div>
-
-      <div>
-        ${langFields}
-      </div>
     </div>
 
     <div class="prod-actions">
+      <div class="move-cat-row">
+        <select class="form-select move-cat-sel">
+          <option value="">— Changer de catégorie —</option>
+          ${adminData.cats.map((c,i) => `<option value="${i}"${i===item.cat?' disabled':''} ${i===item.cat?'style="opacity:.4"':''}>${esc(c.names?.[currentLang] || c.names?.fr || 'Cat '+i)}</option>`).join('')}
+        </select>
+        <button class="btn-move-cat">Déplacer</button>
+        <button class="btn-copy-cat">Copier</button>
+      </div>
       <button class="btn-del-prod">${t1.btnDelProd}</button>
     </div>
   `;
@@ -1959,27 +2247,19 @@ function collectProdForm(card, item) {
   const priceEl = card.querySelector('[data-field="price"]');
   if (priceEl) item.price = priceEl.value.trim();
 
-  // Photo : priorité au base64 uploadé, sinon ID Unsplash
-  if (item._photoBase64) {
-    // Photo uploadée depuis l'appareil → stocker le base64
-    item.photo = item._photoBase64;
-    item._photoBase64 = null;
+  // Photo
+  if (pendingPhotos.has(item.id)) {
+    item.photo = pendingPhotos.get(item.id);
+    pendingPhotos.delete(item.id);
   } else if (card.dataset.photoClear === '1') {
-    // L'utilisateur a cliqué explicitement "Supprimer" → effacer
     item.photo = '';
     delete card.dataset.photoClear;
-  } else {
-    const photoEl = card.querySelector('.photo-id-input');
-    if (photoEl) {
-      let val = photoEl.value.trim();
-      val = val.replace('https://images.unsplash.com/','').split('?')[0];
-      if (val) {
-        // ID Unsplash renseigné → l'utiliser
-        item.photo = val;
-      }
-      // Si vide et pas de flag clear → photo base64 existante, ne pas toucher item.photo
-    }
   }
+  // Sinon → conserver la photo existante
+
+  // Visibilité de la photo
+  const showChk = card.querySelector('.photo-show-chk');
+  if (showChk) item.showPhoto = showChk.checked;
 
   // Badges — dropdowns
   const typeEl = card.querySelector('[data-bdg-select="type"]');
@@ -2206,6 +2486,16 @@ function injectSVG() {
     <symbol id="ico-cake" viewBox="0 0 24 24"><path d="M20 21v-8a2 2 0 00-2-2H6a2 2 0 00-2 2v8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2 1 2 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><line x1="16" y1="5" x2="16" y2="11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8 11V5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 3v8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
     <symbol id="ico-sunrise" viewBox="0 0 24 24"><path d="M17 18a5 5 0 00-10 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><line x1="12" y1="2" x2="12" y2="9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="4.22" y1="10.22" x2="5.64" y2="11.64" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="1" y1="18" x2="3" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="21" y1="18" x2="23" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="18.36" y1="11.64" x2="19.78" y2="10.22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="23" y1="22" x2="1" y2="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><polyline points="8,6 12,2 16,6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
     <symbol id="ico-hookah" viewBox="0 0 24 24"><path d="M12 3v5M9 8h6M10 13c0 2.5-3 4-3 7h10c0-3-3-4.5-3-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M8 8c0 2.2 1.8 4 4 4s4-1.8 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M5 20c.5-1.5 2-2 4-2h6c2 0 3.5.5 4 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></symbol>
+    <symbol id="ico-glass" viewBox="0 0 24 24"><path d="M8 2h8l-1 10H9L8 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M9 12c0 4 6 4 6 8H9c0-4 0-4 0-8z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><line x1="6" y1="22" x2="18" y2="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="ico-pizza" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M12 2L4.93 18.07M12 2l7.07 16.07M4.93 18.07h14.14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="10" cy="10" r="1" fill="currentColor"/><circle cx="14" cy="13" r="1" fill="currentColor"/></symbol>
+    <symbol id="ico-burger" viewBox="0 0 24 24"><line x1="3" y1="8" x2="21" y2="8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3 12h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="3" y1="16" x2="21" y2="16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M5 8c0-2 1.5-4 7-4s7 2 7 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M5 16c0 2 1.5 4 7 4s7-2 7-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></symbol>
+    <symbol id="ico-salad" viewBox="0 0 24 24"><path d="M12 2a9 9 0 00-9 9h18a9 9 0 00-9-9z" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M3 11c0 5.52 4.48 10 9 10s9-4.48 9-10" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M8 11c1 2 2 4 4 4s3-2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></symbol>
+    <symbol id="ico-heart" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke="currentColor" stroke-width="1.8" fill="none"/></symbol>
+    <symbol id="ico-fire" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 01-7 7c-2.42 0-4.57-1.04-6.07-2.71" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+    <symbol id="ico-leaf" viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 22M9.68 10.84C13 7 17 6 21 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M21 2c0 8-6 14-18 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></symbol>
+    <symbol id="ico-crown" viewBox="0 0 24 24"><path d="M2 20h20M5 20L3 8l4.5 4L12 4l4.5 8L21 8l-2 12H5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+    <symbol id="ico-gift" viewBox="0 0 24 24"><path d="M20 12v10H4V12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M2 7h20v5H2z" stroke="currentColor" stroke-width="1.8" fill="none"/><line x1="12" y1="22" x2="12" y2="7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></symbol>
+    <symbol id="ico-cocktail" viewBox="0 0 24 24"><path d="M8 22h8M12 11v11M3 3l9 8 9-8H3z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M6 6l2.5 2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
   `;
   document.body.appendChild(svg);
 }
