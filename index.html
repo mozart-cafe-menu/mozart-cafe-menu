@@ -1803,6 +1803,16 @@ let activeCat = 'all';
 let theme = localStorage.getItem('mc_menu_theme') === 'dark' ? 'dark' : 'light';
 let showCallBtn = true;  // contrôlé depuis l'admin
 let showPhotos  = true;  // contrôlé depuis l'admin (global)
+let _adminInfo  = null;  // copie des infos admin pour la barre de note
+
+function updateNoteBar() {
+  const nb = document.getElementById('note-bar');
+  if (!nb || !_adminInfo) return;
+  const nt   = _adminInfo.noteText;
+  const text = ((nt?.[lang] || '').trim() ? nt[lang] : (nt?.fr || '')).trim();
+  nb.textContent = text;
+  nb.classList.toggle('visible', _adminInfo.showNote === true && text !== '');
+}
 // Appliquer immédiatement pour éviter le flash
 if (theme === 'light') document.documentElement.classList.add('light');
 let sheetItem = null;
@@ -1903,13 +1913,8 @@ function applyAdminData(data) {
       showPhotos = data.info.showPhotos !== false;
 
       // Barre de note / annonce
-      const noteBar = document.getElementById('note-bar');
-      if (noteBar) {
-        const noteText = data.info.noteText?.[lang] || data.info.noteText?.fr || '';
-        const noteVisible = data.info.showNote === true && noteText.trim() !== '';
-        noteBar.textContent = noteText;
-        noteBar.classList.toggle('visible', noteVisible);
-      }
+      _adminInfo = data.info;
+      updateNoteBar();
     }
   } catch(e) {
     console.warn('Admin data load error:', e);
@@ -2069,20 +2074,7 @@ function changeLang(l) {
   applyTranslations();
   renderMenu();
   filterItems();
-  // Mettre à jour la barre de note dans la nouvelle langue
-  try {
-    const raw = localStorage.getItem('mc_admin_data_v1');
-    if (raw) {
-      const data = JSON.parse(raw);
-      const noteBar = document.getElementById('note-bar');
-      if (noteBar && data?.info) {
-        const noteText = data.info.noteText?.[l] || data.info.noteText?.fr || '';
-        const noteVisible = data.info.showNote === true && noteText.trim() !== '';
-        noteBar.textContent = noteText;
-        noteBar.classList.toggle('visible', noteVisible);
-      }
-    }
-  } catch(_) {}
+  updateNoteBar();
 }
 
 function applyTranslations() {

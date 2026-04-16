@@ -1393,6 +1393,11 @@ function loadData() {
         const savedHashes = localStorage.getItem('mc_tx_hashes');
         if (savedHashes) adminData._txHashes = JSON.parse(savedHashes);
       } catch(_) {}
+      // Restaurer les verrous de traduction manuelle
+      try {
+        const savedLock = localStorage.getItem('mc_tx_lock');
+        if (savedLock) adminData._txLock = JSON.parse(savedLock);
+      } catch(_) {}
       renderAll();
       applyAdminUI(currentLang);
     })
@@ -1430,12 +1435,13 @@ function sanitizeItems(items) {
 
 function saveData() {
   adminData.items = sanitizeItems(adminData.items);
-  // Exclure _txHashes de Firebase (usage interne uniquement)
-  const { _txHashes, ...dataForDb } = adminData;
+  // Exclure _txHashes et _txLock de Firebase (usage interne uniquement)
+  const { _txHashes, _txLock, ...dataForDb } = adminData;
   _db.ref('menu').set(dataForDb)
     .then(() => {
       localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
       localStorage.setItem('mc_tx_hashes', JSON.stringify(adminData._txHashes || {}));
+      localStorage.setItem('mc_tx_lock',   JSON.stringify(adminData._txLock   || {}));
       unsaved = false;
       document.getElementById('fab-save').classList.remove('unsaved');
       showToast((ADMIN_UI[currentLang]||ADMIN_UI.fr).toastSaved);
@@ -1443,6 +1449,7 @@ function saveData() {
     .catch(() => {
       localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
       localStorage.setItem('mc_tx_hashes', JSON.stringify(adminData._txHashes || {}));
+      localStorage.setItem('mc_tx_lock',   JSON.stringify(adminData._txLock   || {}));
       unsaved = false;
       document.getElementById('fab-save').classList.remove('unsaved');
       showToast('⚠️ Sauvegarde locale uniquement (pas de connexion)');
@@ -1568,6 +1575,7 @@ function renderNoteSection() {
       const l = ta.dataset.lang;
       if (!adminData.info.noteText) adminData.info.noteText = {};
       adminData.info.noteText[l] = ta.value;
+      if (l !== 'fr') setTxLock(`info-noteText-${l}`, ta.value.trim() !== '');
       markUnsaved();
     });
   });
@@ -1741,6 +1749,7 @@ function renderInfoSection() {
       const { field, lang } = e.target.dataset;
       if (!adminData.info[field]) adminData.info[field] = {};
       adminData.info[field][lang] = e.target.value;
+      if (lang !== 'fr') setTxLock(`info-${field}-${lang}`, e.target.value.trim() !== '');
       markUnsaved();
     });
   });
@@ -2009,6 +2018,7 @@ function renderCatsSection() {
       const i = parseInt(e.target.dataset.ci);
       if (!adminData.cats[i].names) adminData.cats[i].names = {};
       adminData.cats[i].names[currentLang] = e.target.value;
+      if (currentLang !== 'fr') setTxLock(`cat-${i}-${currentLang}`, e.target.value.trim() !== '');
       markUnsaved();
       renderProductsSection();
     });
@@ -2179,6 +2189,13 @@ function renderProdCard(container, item, ci) {
   // Toggle expand
   card.querySelector('.prod-card-top').addEventListener('click', () => {
     card.classList.toggle('open');
+  });
+
+  // Verrou traduction : champ modifié manuellement en EN/AR
+  card.addEventListener('input', e => {
+    const { field, lang: fieldLang } = e.target.dataset;
+    if (!field || !fieldLang || fieldLang === 'fr') return;
+    setTxLock(`item-${item.id}-${field}-${fieldLang}`, e.target.value.trim() !== '');
   });
 
   // Lang tabs inside product
@@ -2557,6 +2574,14 @@ document.getElementById('fab-save').addEventListener('click', () => doSaveAll())
 /* ═══════════════════════════════════════════
    SAVE ALL — collecte + traduit FR→EN/AR + sauvegarde
 ═══════════════════════════════════════════ */
+// ── Verrou de traduction manuelle ──
+// Empêche l'écrasement d'un champ modifié manuellement en EN/AR
+function setTxLock(key, locked) {
+  if (!adminData._txLock) adminData._txLock = {};
+  if (locked) adminData._txLock[key] = true;
+  else delete adminData._txLock[key];
+}
+
 // Hash simple pour détecter les changements de texte FR
 function simpleHash(str) {
   let h = 0;
@@ -2586,12 +2611,12 @@ async function doSaveAll() {
   const infoFields = ['wifi_name','wifi_val','hours_name','hours_val','addr_name','addr_val','noteText'];
   const prodFields = ['name','desc','full'];
   if (!adminData._txHashes) adminData._txHashes = {};
+  if (!adminData._txLock)   adminData._txLock   = {};
   const hashes = adminData._txHashes;
+  const locks  = adminData._txLock;
 
-  const hasContent = currentLang === 'fr' && (
-    adminData.cats.some(c => (c.names?.fr || '').trim()) ||
-    adminData.items.some(it => (it.name?.fr || '').trim())
-  );
+  // Lancer la traduction si on est en FR (peu importe s'il y a des produits)
+  const hasContent = currentLang === 'fr';
 
   if (hasContent) {
     let totalDone = 0;
@@ -2608,6 +2633,7 @@ async function doSaveAll() {
         if (!srcName) continue;
         const hashKey = `cat-${ci}-${toLang}`;
         const curHash = simpleHash(srcName);
+        if (locks[hashKey]) { skipped++; continue; } // modifié manuellement
         if (hashes[hashKey] === curHash && (cat.names?.[toLang] || '').trim()) { skipped++; continue; }
         try {
           const tx = await translateText(srcName, 'fr', toLang);
@@ -2625,6 +2651,7 @@ async function doSaveAll() {
           if (!srcText) continue;
           const hashKey = `item-${item.id}-${field}-${toLang}`;
           const curHash = simpleHash(srcText);
+          if (locks[hashKey]) { skipped++; continue; } // modifié manuellement
           if (hashes[hashKey] === curHash && (item[field]?.[toLang] || '').trim()) { skipped++; continue; }
           try {
             const tx = await translateText(srcText, 'fr', toLang);
@@ -2638,7 +2665,8 @@ async function doSaveAll() {
         if (srcAl.trim()) {
           const hashKey = `item-${item.id}-al-${toLang}`;
           const curHash = simpleHash(srcAl);
-          if (!(hashes[hashKey] === curHash && (item.allergens?.[toLang]||[]).length)) {
+          if (locks[hashKey]) { skipped++; }
+          else if (!(hashes[hashKey] === curHash && (item.allergens?.[toLang]||[]).length)) {
             try {
               const tx = await translateText(srcAl, 'fr', toLang);
               if (tx) {
@@ -2659,6 +2687,7 @@ async function doSaveAll() {
         if (!srcText) continue;
         const hashKey = `info-${field}-${toLang}`;
         const curHash = simpleHash(srcText);
+        if (locks[hashKey]) { skipped++; continue; } // modifié manuellement
         if (hashes[hashKey] === curHash && (adminData.info[field]?.[toLang] || '').trim()) { skipped++; continue; }
         try {
           const tx = await translateText(srcText, 'fr', toLang);
