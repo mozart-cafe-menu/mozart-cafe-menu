@@ -480,12 +480,6 @@
       color:var(--gold); cursor:pointer; transition:var(--tr); white-space:nowrap;
     }
     .btn-move-cat:hover { background:rgba(200,164,78,0.22); }
-    .btn-copy-cat {
-      padding:7px 12px; border-radius:8px; font-size:0.8rem;
-      background:rgba(126,189,106,0.1); border:1px solid var(--green);
-      color:var(--green); cursor:pointer; transition:var(--tr); white-space:nowrap;
-    }
-    .btn-copy-cat:hover { background:rgba(126,189,106,0.22); }
     .cat-row {
       background:var(--card); border:1px solid var(--border); border-radius:14px;
       padding:12px 14px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;
@@ -513,11 +507,12 @@
     .ico-picker-btn .ico-pb-label { font-size:0.7rem; color:var(--muted); }
 
     .ico-picker-popup {
-      display:none; position:absolute; z-index:500;
+      display:none; position:fixed; z-index:600;
       background:var(--bg3); border:1px solid var(--bord2);
       border-radius:14px; padding:12px;
       box-shadow:0 12px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(212,149,107,0.08);
-      width:260px;
+      width:min(264px, calc(100vw - 16px));
+      max-height:80vh; overflow-y:auto;
     }
     .ico-picker-popup.open { display:block; }
     .ico-picker-grid {
@@ -2008,9 +2003,26 @@ function renderCatsSection() {
       e.stopPropagation();
       const popup = document.getElementById(`ico-popup-${ci}`);
       const isOpen = popup.classList.contains('open');
-      // Fermer tous les popups ouverts
       document.querySelectorAll('.ico-picker-popup.open').forEach(p => p.classList.remove('open'));
-      if (!isOpen) popup.classList.add('open');
+      if (!isOpen) {
+        popup.classList.add('open');
+        // Positionnement intelligent — reste dans le viewport
+        const rect = e.currentTarget.getBoundingClientRect();
+        const vw = window.innerWidth, vh = window.innerHeight;
+        const pw = Math.min(264, vw - 16);
+        // Hauteur réelle du popup (limité à 80vh)
+        const popupH = Math.min(popup.scrollHeight || 360, vh * 0.8);
+        let top  = rect.bottom + 6;
+        let left = rect.left;
+        // Déborde à droite ?
+        if (left + pw > vw - 8) left = vw - pw - 8;
+        if (left < 8) left = 8;
+        // Déborde en bas ? → afficher au-dessus
+        if (top + popupH > vh - 8) top = rect.top - popupH - 6;
+        if (top < 8) top = 8;
+        popup.style.top  = top  + 'px';
+        popup.style.left = left + 'px';
+      }
     });
 
     // Sélectionner une icône
@@ -2232,17 +2244,6 @@ function renderProdCard(container, item, ci) {
     item.cat = targetCat;
     markUnsaved(); renderProductsSection();
   });
-  card.querySelector('.btn-copy-cat').addEventListener('click', () => {
-    const sel = card.querySelector('.move-cat-sel');
-    const targetCat = parseInt(sel.value);
-    if (isNaN(targetCat)) return;
-    collectProdForm(card, item);
-    const copy = JSON.parse(JSON.stringify(item));
-    copy.id = Date.now();
-    copy.cat = targetCat;
-    adminData.items.push(copy);
-    markUnsaved(); renderProductsSection();
-  });
 
   // ── Drag & drop produit ──
   card.setAttribute('draggable', 'true');
@@ -2395,7 +2396,6 @@ function buildProdForm(item) {
           ${adminData.cats.map((c,i) => `<option value="${i}"${i===item.cat?' disabled':''} ${i===item.cat?'style="opacity:.4"':''}>${esc(c.names?.[currentLang] || c.names?.fr || 'Cat '+i)}</option>`).join('')}
         </select>
         <button class="btn-move-cat">Déplacer</button>
-        <button class="btn-copy-cat">Copier</button>
       </div>
       <button class="btn-del-prod">${t1.btnDelProd}</button>
     </div>
