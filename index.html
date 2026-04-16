@@ -823,6 +823,26 @@
     .cat-pills { padding-bottom:13px; }
     .nav-fixed { position:fixed !important; top:0; left:0; right:0; width:100%; z-index:100; }
 
+    /* ── NOTE BAR ── */
+    #note-bar {
+      display:none;
+      background:rgba(200,164,78,0.08);
+      border-top:1px solid rgba(200,164,78,0.18);
+      border-bottom:1px solid rgba(200,164,78,0.18);
+      padding:10px 18px;
+      font-size:0.82rem;
+      color:var(--gold);
+      text-align:center;
+      line-height:1.55;
+      letter-spacing:0.02em;
+    }
+    #note-bar.visible { display:block; }
+    html.light #note-bar {
+      background:rgba(139,94,60,0.07);
+      border-color:rgba(139,94,60,0.22);
+      color:var(--gold);
+    }
+
     /* Card focus outline for accessibility */
     .card:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
     #call-fab:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
@@ -1195,6 +1215,9 @@
   </div>
   <div class="cat-pills" id="cat-pills"></div>
 </nav>
+
+<!-- ── NOTE BAR ── -->
+<div id="note-bar"></div>
 
 <!-- ================================================
      MENU CONTENT
@@ -1878,6 +1901,15 @@ function applyAdminData(data) {
 
       // Visibilité globale des photos
       showPhotos = data.info.showPhotos !== false;
+
+      // Barre de note / annonce
+      const noteBar = document.getElementById('note-bar');
+      if (noteBar) {
+        const noteText = data.info.noteText?.[lang] || data.info.noteText?.fr || '';
+        const noteVisible = data.info.showNote === true && noteText.trim() !== '';
+        noteBar.textContent = noteText;
+        noteBar.classList.toggle('visible', noteVisible);
+      }
     }
   } catch(e) {
     console.warn('Admin data load error:', e);
@@ -2037,6 +2069,20 @@ function changeLang(l) {
   applyTranslations();
   renderMenu();
   filterItems();
+  // Mettre à jour la barre de note dans la nouvelle langue
+  try {
+    const raw = localStorage.getItem('mc_admin_data_v1');
+    if (raw) {
+      const data = JSON.parse(raw);
+      const noteBar = document.getElementById('note-bar');
+      if (noteBar && data?.info) {
+        const noteText = data.info.noteText?.[l] || data.info.noteText?.fr || '';
+        const noteVisible = data.info.showNote === true && noteText.trim() !== '';
+        noteBar.textContent = noteText;
+        noteBar.classList.toggle('visible', noteVisible);
+      }
+    }
+  } catch(_) {}
 }
 
 function applyTranslations() {

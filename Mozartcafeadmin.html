@@ -147,6 +147,34 @@
     }
     .btn-theme:hover { border-color:var(--gold); color:var(--gold); }
     .btn-theme svg { width:15px; height:15px; pointer-events:none; }
+    /* ── Section Note clients ── */
+    .note-card {
+      background:var(--bg2); border:1px solid var(--border); border-radius:16px; padding:18px; display:flex; flex-direction:column; gap:14px;
+    }
+    html.light .note-card { background:var(--bg3); }
+    .note-status {
+      display:flex; align-items:center; gap:8px;
+      padding:8px 12px; border-radius:8px;
+      font-size:0.8rem; color:var(--muted);
+      background:rgba(255,255,255,0.03); border:1px solid var(--border);
+    }
+    .note-status .vis-dot { width:8px; height:8px; border-radius:50%; background:var(--muted); flex-shrink:0; transition:background 0.2s; }
+    .note-status.on { color:var(--green); border-color:var(--green); }
+    .note-status.on .vis-dot { background:var(--green); }
+    html.light .note-status.on { color:#4a8c3f; border-color:#4a8c3f; }
+    html.light .note-status.on .vis-dot { background:#4a8c3f; }
+    .note-lang-tabs { display:flex; gap:4px; }
+    .note-textarea {
+      width:100%; min-height:80px; resize:vertical;
+      background:rgba(255,255,255,0.05); border:1px solid var(--bord2); border-radius:10px;
+      padding:12px 14px; color:var(--cream); font-size:0.9rem; font-family:inherit;
+      outline:none; transition:border-color 0.2s; line-height:1.55;
+    }
+    .note-textarea:focus { border-color:var(--gold); }
+    .note-textarea::placeholder { color:var(--muted); }
+    html.light .note-textarea { background:rgba(255,255,255,0.7); color:var(--cream); }
+    .note-hint { font-size:0.72rem; color:var(--muted); letter-spacing:0.03em; }
+
     /* ── Boutons de visibilité (header) ── */
     .adm-vis-btn {
       display:flex; align-items:center; gap:5px;
@@ -309,19 +337,6 @@
       white-space:nowrap; flex-shrink:0;
     }
     .hero-upload-btn:hover { opacity:0.85; }
-    .hero-or { color:var(--muted); font-size:0.78rem; flex-shrink:0; }
-    .hero-url-input {
-      flex:1; min-width:160px; background:var(--bg3); border:1px solid var(--border);
-      border-radius:9px; padding:8px 12px; color:var(--cream);
-      font-size:0.82rem; font-family:inherit; outline:none; transition:border-color 0.2s;
-    }
-    .hero-url-input:focus { border-color:var(--gold); }
-    .hero-url-btn {
-      background:none; border:1px solid var(--border); color:var(--gold);
-      font-size:0.8rem; padding:8px 14px; border-radius:9px; cursor:pointer;
-      transition:border-color 0.2s, background 0.2s; white-space:nowrap;
-    }
-    .hero-url-btn:hover { border-color:var(--gold); background:rgba(212,149,107,0.08); }
     .hero-del-btn {
       display:flex; align-items:center; gap:5px;
       background:rgba(224,82,82,0.08); border:1px solid rgba(224,82,82,0.25);
@@ -331,7 +346,6 @@
     .hero-del-btn:hover { background:rgba(224,82,82,0.15); }
     .hero-hint { font-size:0.72rem; color:var(--muted); letter-spacing:0.03em; }
     html.light .hero-img-card { background:var(--bg3); }
-    html.light .hero-url-input { color:var(--cream); background:rgba(255,255,255,0.7); }
     html.light .phone-mockup { border-color:#bbb; box-shadow:0 0 0 1px #aaa, 0 16px 40px rgba(0,0,0,0.15); }
     html.light .phone-notch { background:#ddd; }
 
@@ -756,6 +770,90 @@
     .btn-save-prod { padding:13px; min-height:46px; }
     .btn-del-prod { padding:13px 18px; min-height:46px; }
     .btn-add-prod { min-height:46px; padding:13px; }
+
+    /* ══════════════════════════════════════
+       DESKTOP — breakpoints ≥ 768px / 1024px
+       ══════════════════════════════════════ */
+    @media(min-width:768px) {
+      /* Wrap plus large */
+      .adm-wrap { max-width:1100px; padding:32px 40px 100px; }
+
+      /* Header : une seule rangée, bords délimités */
+      .adm-header { padding:10px 32px; gap:12px; flex-wrap:nowrap; }
+      .adm-logo { font-size:1.25rem; }
+      .adm-sub  { display:block !important; }
+      .adm-center { flex-wrap:nowrap; justify-content:flex-start; gap:10px; }
+      .btn-preview { font-size:0.8rem; }
+      .btn-logout  { font-size:0.8rem; }
+
+      /* Hero : mockup à gauche, contrôles à droite */
+      .hero-img-card {
+        display:grid;
+        grid-template-columns:220px 1fr;
+        grid-template-rows:auto auto;
+        gap:24px 32px;
+        align-items:start;
+      }
+      .phone-mockup-wrap {
+        grid-row:1 / 3;
+        align-self:start;
+      }
+      .hero-controls { align-self:end; }
+      .hero-hint { grid-column:2; }
+
+      /* Info card : label colonne plus large */
+      .info-row { grid-template-columns:180px 1fr; }
+
+      /* Produits en 2 colonnes */
+      .products-list {
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:10px;
+        align-items:start;
+      }
+      /* Carte ouverte prend les 2 colonnes */
+      .prod-card.open {
+        grid-column:1 / -1;
+      }
+
+      /* FABs décalés pour ne pas couvrir le contenu */
+      #fab-save  { bottom:36px; right:36px; width:64px; height:64px; }
+      #fab-notif { bottom:116px; right:36px; }
+
+      /* Form grid : 3 colonnes sur desktop large */
+      .form-grid-2 { grid-template-columns:1fr 1fr; }
+
+      /* Section header plus aéré */
+      .sec-hd { font-size:1.3rem; padding-bottom:14px; margin-bottom:20px; }
+
+      /* Cat row plus large */
+      .cat-row { padding:14px 18px; border-radius:16px; }
+
+      /* Badges plus aérés */
+      .badge-toggles { gap:10px; }
+
+      /* Sauvegarder catégories */
+      .btn-save-cats { padding:14px; border-radius:16px; }
+
+      /* Login box légèrement plus large */
+      .login-box { max-width:420px; padding:44px 36px; }
+    }
+
+    @media(min-width:1100px) {
+      .adm-wrap { max-width:1200px; }
+      .adm-header { padding:10px 48px; }
+
+      /* Hero mockup un peu plus grand */
+      .phone-mockup { width:230px; }
+
+      /* Produits en 3 colonnes sur très grand écran */
+      .products-list {
+        grid-template-columns:1fr 1fr 1fr;
+      }
+      .prod-card.open {
+        grid-column:1 / -1;
+      }
+    }
   </style>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -814,6 +912,9 @@
     </button>
     <button class="adm-vis-btn" id="toggle-photos-btn" title="Afficher/cacher toutes les photos dans le menu">
       <span class="vis-dot"></span>Photos (tout)
+    </button>
+    <button class="adm-vis-btn" id="toggle-note-btn" title="Afficher/cacher la barre de note dans le menu">
+      <span class="vis-dot"></span>Note clients
     </button>
     <div class="global-progress" id="global-progress"></div>
   </div>
@@ -882,9 +983,6 @@
           Choisir une photo
         </label>
         <input type="file" id="hero-file-input" accept="image/*" style="display:none">
-        <span class="hero-or">ou</span>
-        <input type="url" class="hero-url-input" id="hero-url-input" placeholder="Coller une URL d'image…">
-        <button class="hero-url-btn" id="hero-url-btn">Appliquer</button>
         <button class="hero-del-btn" id="hero-del-btn" style="display:none">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           Supprimer
@@ -900,6 +998,12 @@
     <div class="info-card" id="info-card">
       <!-- Rempli par JS -->
     </div>
+  </div>
+
+  <!-- ── NOTE CLIENTS ── -->
+  <div class="adm-section">
+    <div class="sec-hd">Note pour les clients <span class="sec-badge">Annonce</span></div>
+    <div class="note-card" id="note-card"></div>
   </div>
 
   <!-- ── CATÉGORIES ── -->
@@ -1012,6 +1116,8 @@ const DEFAULT_INFO = {
   addr_val:    { fr:'Radès, Tunis, Tunisie', en:'Radès, Tunis, Tunisia', ar:'رادس، تونس، تونس' },
   showCallBtn: true,
   showPhotos:  true,
+  showNote:    false,
+  noteText:    { fr: '', en: '', ar: '' },
 };
 
 /* ═══════════════════════════════════════════
@@ -1356,6 +1462,7 @@ function showToast(msg) {
 function renderAll() {
   renderHeroImageSection();
   renderInfoSection();
+  renderNoteSection();
   renderCatsSection();
   renderProductsSection();
   syncVisToggles();
@@ -1365,11 +1472,18 @@ function renderAll() {
 function syncVisToggles() {
   const callBtn   = document.getElementById('toggle-call-btn');
   const photosBtn = document.getElementById('toggle-photos-btn');
-  if (!callBtn || !photosBtn || !adminData?.info) return;
-  const showCall   = adminData.info.showCallBtn !== false;
-  const showPhotos = adminData.info.showPhotos  !== false;
-  callBtn.classList.toggle('on', showCall);
-  photosBtn.classList.toggle('on', showPhotos);
+  const noteBtn   = document.getElementById('toggle-note-btn');
+  if (!adminData?.info) return;
+  if (callBtn)   callBtn.classList.toggle('on',   adminData.info.showCallBtn !== false);
+  if (photosBtn) photosBtn.classList.toggle('on', adminData.info.showPhotos  !== false);
+  if (noteBtn)   noteBtn.classList.toggle('on',   adminData.info.showNote    === true);
+  // Synchro aussi le statut dans la section note
+  const noteStatus = document.querySelector('.note-status');
+  if (noteStatus) {
+    const on = adminData.info.showNote === true;
+    noteStatus.classList.toggle('on', on);
+    noteStatus.querySelector('.note-status-txt').textContent = on ? 'Affichée dans le menu' : 'Masquée dans le menu';
+  }
 }
 
 /* ── Initialisation des listeners des boutons de visibilité ── */
@@ -1388,14 +1502,71 @@ function syncVisToggles() {
     syncVisToggles();
     markUnsaved();
   });
+  document.getElementById('toggle-note-btn').addEventListener('click', () => {
+    if (!adminData) return;
+    if (!adminData.info) adminData.info = {};
+    adminData.info.showNote = !adminData.info.showNote;
+    syncVisToggles();
+    markUnsaved();
+  });
 })();
+
+/* ─── SECTION NOTE CLIENTS ─── */
+function renderNoteSection() {
+  const card = document.getElementById('note-card');
+  if (!card) return;
+
+  const info = adminData.info || {};
+  const noteText = info.noteText || { fr: '', en: '', ar: '' };
+  const isOn = info.showNote === true;
+
+  let html = `
+    <div class="note-status${isOn ? ' on' : ''}">
+      <span class="vis-dot"></span>
+      <span class="note-status-txt">${isOn ? 'Affichée dans le menu' : 'Masquée dans le menu'}</span>
+    </div>
+    <div class="lang-tabs note-lang-tabs">
+      ${LANGS.map(l => `<button class="lang-tab${l===currentLang?' on':''}" data-note-lang="${l}">${LANG_LABELS[l]}</button>`).join('')}
+    </div>
+    ${LANGS.map(l => `
+      <textarea class="note-textarea note-ta-${l}${l===currentLang?'':' hide'}"
+        style="${l!==currentLang?'display:none':''}"
+        data-lang="${l}"
+        placeholder="Texte de la note en ${l.toUpperCase()} — ex: Bienvenue ! Notre terrasse est ouverte ce weekend."
+        maxlength="300">${esc(noteText[l] || '')}</textarea>
+    `).join('')}
+    <div class="note-hint">Le texte s'affiche sous les catégories du menu — max 300 caractères par langue.</div>
+  `;
+  card.innerHTML = html;
+
+  // Tabs langue
+  card.querySelectorAll('[data-note-lang]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const l = btn.dataset.noteLang;
+      card.querySelectorAll('.lang-tab').forEach(t => t.classList.toggle('on', t.dataset.noteLang === l));
+      card.querySelectorAll('.note-textarea').forEach(ta => {
+        const show = ta.dataset.lang === l;
+        ta.style.display = show ? '' : 'none';
+        ta.classList.toggle('hide', !show);
+      });
+    });
+  });
+
+  // Saisie
+  card.querySelectorAll('.note-textarea').forEach(ta => {
+    ta.addEventListener('input', () => {
+      const l = ta.dataset.lang;
+      if (!adminData.info.noteText) adminData.info.noteText = {};
+      adminData.info.noteText[l] = ta.value;
+      markUnsaved();
+    });
+  });
+}
 
 /* ─── SECTION HERO IMAGE ─── */
 function renderHeroImageSection() {
   const delBtn    = document.getElementById('hero-del-btn');
   const fileInput = document.getElementById('hero-file-input');
-  const urlInput  = document.getElementById('hero-url-input');
-  const urlBtn    = document.getElementById('hero-url-btn');
   const phoneBg   = document.getElementById('phone-hero-bg');
 
   function setPhoneBg(src) {
@@ -1456,17 +1627,6 @@ function renderHeroImageSection() {
     reader.readAsDataURL(file);
     fileInput.value = '';
   });
-
-  // URL directe
-  urlBtn.addEventListener('click', () => {
-    const url = urlInput.value.trim();
-    if (!url) return;
-    adminData.heroImage = url;
-    setPhoneBg(url);
-    urlInput.value = '';
-    markUnsaved();
-  });
-  urlInput.addEventListener('keydown', e => { if (e.key === 'Enter') urlBtn.click(); });
 
   // Supprimer
   delBtn.addEventListener('click', () => {
@@ -2356,7 +2516,7 @@ async function doSaveAll() {
 
   // 2. Auto-traduire FR → EN et FR → AR uniquement si on est en mode français
   const targets    = ['en', 'ar'];
-  const infoFields = ['wifi_name','wifi_val','hours_name','hours_val','addr_name','addr_val'];
+  const infoFields = ['wifi_name','wifi_val','hours_name','hours_val','addr_name','addr_val','noteText'];
   const prodFields = ['name','desc','full'];
   if (!adminData._txHashes) adminData._txHashes = {};
   const hashes = adminData._txHashes;
