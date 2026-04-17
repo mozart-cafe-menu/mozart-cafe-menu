@@ -1837,8 +1837,9 @@ const ITEMS = [
    STATE
 ================================================ */
 let lang = localStorage.getItem('mc_menu_lang') || 'fr';
-let activeCat = 'all';
+let activeCat  = 'all';
 let _catAnim   = false;
+let _catAbort  = null;
 let theme = localStorage.getItem('mc_menu_theme') === 'dark' ? 'dark' : 'light';
 let showCallBtn = true;  // contrôlé depuis l'admin
 let showPhotos  = true;  // contrôlé depuis l'admin (global)
@@ -1989,47 +1990,68 @@ function init() {
 ================================================ */
 /* ── Swipe 3D animé entre catégories ── */
 function swipeCat(newCat, dir) {
-  if (_catAnim) return;
-  // Capturer la section sortante AVANT de changer activeCat
+  // Interrompre immédiatement l'animation en cours (swipes rapides)
+  if (_catAbort) { _catAbort(); _catAbort = null; }
+  _catAnim = false;
+
+  // Capturer la section actuellement visible APRÈS l'interruption éventuelle
   const outSec = activeCat === 'all' ? null : document.querySelector('.cat-sec:not(.hide)');
   activeCat = newCat;
+
   // Mettre à jour les pills ET faire défiler la pill active dans la barre
   document.querySelectorAll('.cat-pill').forEach(p => {
     p.classList.toggle('on', p.dataset.cat === activeCat);
     if (p.dataset.cat === activeCat) p.scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
   });
+
   const scrollToSection = () => requestAnimationFrame(() => requestAnimationFrame(() => {
     const s = document.querySelector('.cat-sec:not(.hide)');
     if (!s) return;
-    s.style.scrollMarginTop = (document.getElementById('nav').getBoundingClientRect().height + 8) + 'px';
+    const navH = document.getElementById('nav').getBoundingClientRect().height;
+    s.style.scrollMarginTop = (navH + 12) + 'px';
     s.scrollIntoView({ behavior:'smooth', block:'start' });
   }));
+
   // Pas d'animation si pas de section sortante, pas de direction, ou retour à "tout"
   if (!outSec || !dir || newCat === 'all') {
     filterItems();
     if (newCat !== 'all') scrollToSection();
     return;
   }
+
   _catAnim = true;
-  // Retirer les classes d'animation existantes pour éviter les conflits de cascade CSS
+  // Nettoyer les classes d'animation existantes pour éviter les conflits
   outSec.classList.remove('cr', 'si-r', 'si-l');
   outSec.classList.add(dir === 'left' ? 'so-l' : 'so-r');
-  // Utiliser animationend + timeout de sécurité pour éviter le gel
+
   let done = false;
+
+  // Interruption propre : retire l'animation sans appeler filterItems
+  // La section reste visible (pas de .hide) pour que le prochain swipeCat la trouve
+  _catAbort = () => {
+    if (done) return;
+    done = true;
+    _catAnim = false;
+    outSec.classList.remove('so-l', 'so-r', 'cr', 'si-r', 'si-l');
+  };
+
+  // Fin normale : affiche la nouvelle section avec animation d'entrée
   const finish = () => {
     if (done) return;
     done = true;
+    _catAbort = null;
+    _catAnim = false;
     outSec.classList.remove('so-l', 'so-r');
     filterItems(dir);
-    _catAnim = false;
     scrollToSection();
   };
+
   outSec.addEventListener('animationend', function h(e) {
     if (e.target !== outSec) return;
     outSec.removeEventListener('animationend', h);
     finish();
   });
-  setTimeout(finish, 400); // sécurité si animationend ne se déclenche pas
+  setTimeout(finish, 380); // sécurité si animationend ne se déclenche pas
 }
 
 function setupSwipe() {
