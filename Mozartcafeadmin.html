@@ -247,17 +247,10 @@
     }
     .phone-hero-bg {
       position:absolute; inset:0;
-      background-size:cover; background-position:42% 30%;
+      background-size:cover; background-position:50% 40%;
       opacity:0; transition:opacity 1s ease;
     }
-    .phone-hero-bg.flow {
-      opacity:1;
-      animation:phoneBgFlow 24s ease-in-out infinite;
-    }
-    @keyframes phoneBgFlow {
-      0%,100% { transform:scale(1.10) translate(0%,0%); }
-      50%      { transform:scale(1.13) translate(-1%,-0.8%); }
-    }
+    .phone-hero-bg.flow { opacity:1; }
     .phone-overlay {
       position:absolute; inset:0; z-index:1;
       background:linear-gradient(to bottom,
