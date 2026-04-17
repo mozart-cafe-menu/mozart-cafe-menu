@@ -1154,6 +1154,16 @@
     <line x1="23" y1="22" x2="1" y2="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
     <polyline points="8,6 12,2 16,6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   </symbol>
+  <symbol id="ico-glass" viewBox="0 0 24 24"><path d="M8 2h8l-1 10H9L8 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M9 12c0 4 6 4 6 8H9c0-4 0-4 0-8z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><line x1="6" y1="22" x2="18" y2="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="ico-pizza" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M12 2L4.93 18.07M12 2l7.07 16.07M4.93 18.07h14.14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="10" cy="10" r="1" fill="currentColor"/><circle cx="14" cy="13" r="1" fill="currentColor"/></symbol>
+  <symbol id="ico-burger" viewBox="0 0 24 24"><line x1="3" y1="8" x2="21" y2="8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3 12h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="3" y1="16" x2="21" y2="16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M5 8c0-2 1.5-4 7-4s7 2 7 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M5 16c0 2 1.5 4 7 4s7-2 7-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></symbol>
+  <symbol id="ico-salad" viewBox="0 0 24 24"><path d="M12 2a9 9 0 00-9 9h18a9 9 0 00-9-9z" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M3 11c0 5.52 4.48 10 9 10s9-4.48 9-10" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M8 11c1 2 2 4 4 4s3-2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></symbol>
+  <symbol id="ico-heart" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke="currentColor" stroke-width="1.8" fill="none"/></symbol>
+  <symbol id="ico-fire" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 01-7 7c-2.42 0-4.57-1.04-6.07-2.71" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+  <symbol id="ico-leaf" viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 22M9.68 10.84C13 7 17 6 21 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M21 2c0 8-6 14-18 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></symbol>
+  <symbol id="ico-crown" viewBox="0 0 24 24"><path d="M2 20h20M5 20L3 8l4.5 4L12 4l4.5 8L21 8l-2 12H5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+  <symbol id="ico-gift" viewBox="0 0 24 24"><path d="M20 12v10H4V12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M2 7h20v5H2z" stroke="currentColor" stroke-width="1.8" fill="none"/><line x1="12" y1="22" x2="12" y2="7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></symbol>
+  <symbol id="ico-cocktail" viewBox="0 0 24 24"><path d="M8 22h8M12 11v11M3 3l9 8 9-8H3z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M6 6l2.5 2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
 </svg>
 
 <!-- ================================================
@@ -1961,26 +1971,46 @@ function init() {
 /* ── Swipe 3D animé entre catégories ── */
 function swipeCat(newCat, dir) {
   if (_catAnim) return;
+  // Capturer la section sortante AVANT de changer activeCat
   const outSec = activeCat === 'all' ? null : document.querySelector('.cat-sec:not(.hide)');
   activeCat = newCat;
-  document.querySelectorAll('.cat-pill').forEach(p => p.classList.toggle('on', p.dataset.cat === activeCat));
-  const scrollToFirst = () => requestAnimationFrame(() => requestAnimationFrame(() => {
+  // Mettre à jour les pills ET faire défiler la pill active dans la barre
+  document.querySelectorAll('.cat-pill').forEach(p => {
+    p.classList.toggle('on', p.dataset.cat === activeCat);
+    if (p.dataset.cat === activeCat) p.scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
+  });
+  const scrollToSection = () => requestAnimationFrame(() => requestAnimationFrame(() => {
     const s = document.querySelector('.cat-sec:not(.hide)');
-    if (s) { s.style.scrollMarginTop = (document.getElementById('nav').getBoundingClientRect().height + 4) + 'px'; s.scrollIntoView({ behavior:'smooth', block:'start' }); }
+    if (!s) return;
+    s.style.scrollMarginTop = (document.getElementById('nav').getBoundingClientRect().height + 8) + 'px';
+    s.scrollIntoView({ behavior:'smooth', block:'start' });
   }));
+  // Pas d'animation si pas de section sortante, pas de direction, ou retour à "tout"
   if (!outSec || !dir || newCat === 'all') {
     filterItems();
-    if (newCat !== 'all') scrollToFirst();
+    if (newCat !== 'all') scrollToSection();
     return;
   }
   _catAnim = true;
+  // Retirer les classes d'animation existantes pour éviter les conflits de cascade CSS
+  outSec.classList.remove('cr', 'si-r', 'si-l');
   outSec.classList.add(dir === 'left' ? 'so-l' : 'so-r');
-  setTimeout(() => {
+  // Utiliser animationend + timeout de sécurité pour éviter le gel
+  let done = false;
+  const finish = () => {
+    if (done) return;
+    done = true;
     outSec.classList.remove('so-l', 'so-r');
     filterItems(dir);
     _catAnim = false;
-    scrollToFirst();
-  }, 240);
+    scrollToSection();
+  };
+  outSec.addEventListener('animationend', function h(e) {
+    if (e.target !== outSec) return;
+    outSec.removeEventListener('animationend', h);
+    finish();
+  });
+  setTimeout(finish, 400); // sécurité si animationend ne se déclenche pas
 }
 
 function setupSwipe() {
@@ -1992,32 +2022,8 @@ function setupSwipe() {
     startY = e.touches[0].clientY;
     moved = false;
   }, { passive: true });
-  wrap.addEventListener('touchmove', e => {
-    moved = true;
-    if (_catAnim || activeCat === 'all') return;
-    const dx = e.touches[0].clientX - startX;
-    const dy = e.touches[0].clientY - startY;
-    if (Math.abs(dx) > Math.abs(dy) * 1.2 && Math.abs(dx) > 10) {
-      const sec = document.querySelector('.cat-sec:not(.hide)');
-      if (sec) {
-        const pct = Math.min(Math.abs(dx) / 160, 1);
-        sec.style.transform = `translateX(${dx * 0.22}px) rotateY(${(dx < 0 ? -1 : 1) * pct * 9}deg)`;
-        sec.style.opacity   = String(1 - pct * 0.28);
-        sec.style.transition = 'none';
-      }
-    }
-  }, { passive: true });
+  wrap.addEventListener('touchmove', () => { moved = true; }, { passive: true });
   wrap.addEventListener('touchend', e => {
-    const sec = document.querySelector('.cat-sec:not(.hide)');
-    if (sec) {
-      if (Math.abs(e.changedTouches[0].clientX - startX) >= 55) {
-        sec.style.transform = ''; sec.style.opacity = ''; sec.style.transition = '';
-      } else {
-        sec.style.transition = 'transform 0.2s cubic-bezier(0,0,0.2,1), opacity 0.2s ease';
-        sec.style.transform = ''; sec.style.opacity = '';
-        setTimeout(() => { sec.style.transition = ''; }, 220);
-      }
-    }
     if (!moved) return;
     const dx = e.changedTouches[0].clientX - startX;
     const dy = e.changedTouches[0].clientY - startY;
