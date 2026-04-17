@@ -1887,6 +1887,8 @@ function applyAdminUI(l) {
 function setGlobalLang(l) {
   currentLang = l;
   localStorage.setItem('mc_admin_lang', l);
+  // Flush DOM edits back to adminData BEFORE re-rendering so manual EN/AR edits are not lost
+  if (adminData) collectAllForms();
   // Sync header select
   const sel = document.getElementById('global-src-lang');
   if (sel && sel.value !== l) sel.value = l;
@@ -2102,6 +2104,14 @@ document.getElementById('btn-save-cats').addEventListener('click', () => {
 
 /* ─── SECTION PRODUITS ─── */
 function renderProductsSection() {
+  // Preserve any unsaved DOM edits before wiping the cards
+  if (adminData) {
+    document.querySelectorAll('.prod-card').forEach(card => {
+      const itemId = parseInt(card.dataset.id);
+      const item = adminData.items.find(it => it.id === itemId);
+      if (item) collectProdForm(card, item);
+    });
+  }
   const area = document.getElementById('products-area');
   area.innerHTML = '';
   const badge = document.getElementById('prod-count-badge');
