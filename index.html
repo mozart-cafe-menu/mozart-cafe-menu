@@ -181,15 +181,15 @@
       opacity:0; transition:opacity 1.4s ease;
       transform-origin:center;
     }
-    /* Fondu d'entrée → puis Ken Burns très doux, mobile inclus */
+    /* Fondu d'entrée → dérive douce sans zoom (évite l'effet zoom/dézoom au scroll) */
     .hero-bg-img.loaded {
       opacity:1;
-      animation:heroDrift 28s ease-in-out infinite;
+      animation:heroDrift 30s ease-in-out infinite;
     }
     @keyframes heroDrift {
-      0%,100% { transform:scale(1) translate(0%,0%); }
-      33%     { transform:scale(1.04) translate(-0.8%,-0.5%); }
-      66%     { transform:scale(1.03) translate(0.6%, 0.4%); }
+      0%,100% { transform:translate(0%,    0%);    }
+      33%     { transform:translate(-1.2%, -0.8%); }
+      66%     { transform:translate(0.8%,  0.6%);  }
     }
 
     /* Logo dans le hero */
@@ -537,15 +537,15 @@
       padding:14px; cursor:pointer;
       position:relative; overflow:hidden;
       box-shadow:var(--shadow);
-      opacity:0; transform:translateY(32px) scale(0.96);
-      transition:opacity 0.6s cubic-bezier(0.22,1,0.36,1),
-                 transform 0.6s cubic-bezier(0.22,1,0.36,1),
+      opacity:0; transform:translateY(28px);
+      transition:opacity 0.55s cubic-bezier(0.22,1,0.36,1),
+                 transform 0.55s cubic-bezier(0.22,1,0.36,1),
                  box-shadow 0.32s ease, border-color 0.32s ease;
       -webkit-tap-highlight-color:transparent;
       touch-action:manipulation;
       will-change:transform, opacity;
     }
-    .card.rv { opacity:1; transform:translateY(0) scale(1); }
+    .card.rv { opacity:1; transform:translateY(0); }
     .card::before {
       content:''; position:absolute; inset:0; border-radius:inherit;
       background:radial-gradient(280px circle at var(--mx,50%) var(--my,50%),rgba(200,164,78,0.07),transparent 70%);
