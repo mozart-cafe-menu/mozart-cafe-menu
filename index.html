@@ -171,25 +171,29 @@
       display:flex; flex-direction:column;
       align-items:center; justify-content:center;
       overflow:hidden;
-      transform:translateZ(0);
+      isolation:isolate;
       background: radial-gradient(ellipse at 60% 40%, #2a1208 0%, #160d08 45%, #0f0906 100%);
     }
     .hero-bg-img {
-      position:absolute; inset:-6%;
+      position:absolute; inset:-10%;
       background-size:cover;
       background-position:50% 40%;
       opacity:0; transition:opacity 1.4s ease;
       transform-origin:center;
+      will-change:transform;
     }
-    /* Fondu d'entrée → dérive douce sans zoom (évite l'effet zoom/dézoom au scroll) */
     .hero-bg-img.loaded {
       opacity:1;
-      animation:heroDrift 30s ease-in-out infinite;
+      animation:heroDrift 22s linear infinite;
     }
+    /* Dérive fluide : linear + 5 paliers équidistants = vitesse constante, zéro à-coup */
     @keyframes heroDrift {
-      0%,100% { transform:translate(0%,    0%);    }
-      33%     { transform:translate(-1.2%, -0.8%); }
-      66%     { transform:translate(0.8%,  0.6%);  }
+      0%   { transform:translate( 0%,    0%   ); }
+      20%  { transform:translate(-3%,   -2%   ); }
+      40%  { transform:translate(-2%,    2.5% ); }
+      60%  { transform:translate( 3%,    1.5% ); }
+      80%  { transform:translate( 1.5%, -2.5% ); }
+      100% { transform:translate( 0%,    0%   ); }
     }
 
     /* Logo dans le hero */
