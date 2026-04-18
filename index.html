@@ -465,23 +465,10 @@
     /* ================================================
        MENU CONTENT
     ================================================ */
-    #menu-wrap { max-width:560px; margin:0 auto; padding:0 14px 72px; perspective:1200px; overflow:hidden; contain:paint; }
-    .cat-sec { margin-bottom:28px; backface-visibility:hidden; will-change:transform,opacity; }
-    @keyframes catReveal {
-      from { opacity:0; transform:translateY(20px); }
-      to { opacity:1; transform:translateY(0); }
-    }
+    #menu-wrap { max-width:560px; margin:0 auto; padding:0 14px 72px; overflow:hidden; contain:paint; }
+    .cat-sec { margin-bottom:28px; }
     .cat-sec { opacity:0; }
-    .cat-sec.cr { animation:catReveal 0.3s ease forwards; }
-    /* ── Animations swipe 3D entre catégories ── */
-    @keyframes swipeOutLeft  { from{opacity:1;transform:translateX(0) rotateY(0deg) scale(1)} to{opacity:0;transform:translateX(-40%) rotateY(16deg) scale(0.88)} }
-    @keyframes swipeOutRight { from{opacity:1;transform:translateX(0) rotateY(0deg) scale(1)} to{opacity:0;transform:translateX(40%) rotateY(-16deg) scale(0.88)} }
-    @keyframes swipeInRight  { from{opacity:0;transform:translateX(40%) rotateY(-16deg) scale(0.88)} to{opacity:1;transform:translateX(0) rotateY(0deg) scale(1)} }
-    @keyframes swipeInLeft   { from{opacity:0;transform:translateX(-40%) rotateY(16deg) scale(0.88)} to{opacity:1;transform:translateX(0) rotateY(0deg) scale(1)} }
-    .cat-sec.so-l { animation:swipeOutLeft  0.24s cubic-bezier(0.4,0,1,1)   forwards; pointer-events:none; }
-    .cat-sec.so-r { animation:swipeOutRight 0.24s cubic-bezier(0.4,0,1,1)   forwards; pointer-events:none; }
-    .cat-sec.si-r { animation:swipeInRight  0.32s cubic-bezier(0,0,0.2,1) forwards; }
-    .cat-sec.si-l { animation:swipeInLeft   0.32s cubic-bezier(0,0,0.2,1) forwards; }
+    .cat-sec.cr { opacity:1; }
     .cat-hd {
       display:flex; align-items:flex-start; gap:13px;
       padding:22px 0 14px;
@@ -1812,8 +1799,7 @@ const ITEMS = [
 ================================================ */
 let lang = localStorage.getItem('mc_menu_lang') || 'fr';
 let activeCat  = 'all';
-let _catAnim   = false;
-let _catAbort  = null;
+
 let theme = localStorage.getItem('mc_menu_theme') === 'dark' ? 'dark' : 'light';
 let showCallBtn = true;  // contrôlé depuis l'admin
 let showPhotos  = true;  // contrôlé depuis l'admin (global)
@@ -1962,70 +1948,26 @@ function init() {
 /* ================================================
    SWIPE — basculer entre catégories
 ================================================ */
-/* ── Swipe 3D animé entre catégories ── */
-function swipeCat(newCat, dir) {
-  // Interrompre immédiatement l'animation en cours (swipes rapides)
-  if (_catAbort) { _catAbort(); _catAbort = null; }
-  _catAnim = false;
-
-  // Capturer la section actuellement visible APRÈS l'interruption éventuelle
-  const outSec = activeCat === 'all' ? null : document.querySelector('.cat-sec:not(.hide)');
+function swipeCat(newCat) {
   activeCat = newCat;
 
-  // Mettre à jour les pills ET faire défiler la pill active dans la barre
+  // Mettre à jour les pills et faire défiler la pill active dans la barre
   document.querySelectorAll('.cat-pill').forEach(p => {
     p.classList.toggle('on', p.dataset.cat === activeCat);
     if (p.dataset.cat === activeCat) p.scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
   });
 
-  const scrollToSection = () => requestAnimationFrame(() => requestAnimationFrame(() => {
-    const s = document.querySelector('.cat-sec:not(.hide)');
-    if (!s) return;
-    const navH = document.getElementById('nav').getBoundingClientRect().height;
-    s.style.scrollMarginTop = (navH + 12) + 'px';
-    s.scrollIntoView({ behavior:'smooth', block:'start' });
-  }));
+  filterItems();
 
-  // Pas d'animation si pas de section sortante, pas de direction, ou retour à "tout"
-  if (!outSec || !dir || newCat === 'all') {
-    filterItems();
-    if (newCat !== 'all') scrollToSection();
-    return;
+  if (newCat !== 'all') {
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const s = document.querySelector('.cat-sec:not(.hide)');
+      if (!s) return;
+      const navH = document.getElementById('nav').getBoundingClientRect().height;
+      s.style.scrollMarginTop = (navH + 12) + 'px';
+      s.scrollIntoView({ behavior:'smooth', block:'start' });
+    }));
   }
-
-  _catAnim = true;
-  // Nettoyer les classes d'animation existantes pour éviter les conflits
-  outSec.classList.remove('cr', 'si-r', 'si-l');
-  outSec.classList.add(dir === 'left' ? 'so-l' : 'so-r');
-
-  let done = false;
-
-  // Interruption propre : retire l'animation sans appeler filterItems
-  // La section reste visible (pas de .hide) pour que le prochain swipeCat la trouve
-  _catAbort = () => {
-    if (done) return;
-    done = true;
-    _catAnim = false;
-    outSec.classList.remove('so-l', 'so-r', 'cr', 'si-r', 'si-l');
-  };
-
-  // Fin normale : affiche la nouvelle section avec animation d'entrée
-  const finish = () => {
-    if (done) return;
-    done = true;
-    _catAbort = null;
-    _catAnim = false;
-    outSec.classList.remove('so-l', 'so-r');
-    filterItems(dir);
-    scrollToSection();
-  };
-
-  outSec.addEventListener('animationend', function h(e) {
-    if (e.target !== outSec) return;
-    outSec.removeEventListener('animationend', h);
-    finish();
-  });
-  setTimeout(finish, 380); // sécurité si animationend ne se déclenche pas
 }
 
 function setupSwipe() {
@@ -2211,15 +2153,8 @@ function buildCatPills() {
 }
 
 function filterCat(cat) {
-  const prev = activeCat;
   const next = activeCat === cat ? 'all' : cat;
-  let dir = null;
-  if (prev !== 'all' && next !== 'all') {
-    dir = parseInt(next) > parseInt(prev) ? 'left' : 'right';
-  } else if (prev === 'all' && next !== 'all') {
-    dir = 'left';
-  }
-  swipeCat(next, dir);
+  swipeCat(next);
 }
 
 /* ================================================
@@ -2322,7 +2257,7 @@ function setupSearch() {
   document.getElementById('search').addEventListener('input', filterItems);
 }
 
-function filterItems(swipeDir = null) {
+function filterItems() {
   const q = document.getElementById('search').value.toLowerCase().trim();
   const secs = document.querySelectorAll('.cat-sec');
   let total = 0;
@@ -2346,13 +2281,8 @@ function filterItems(swipeDir = null) {
 
     if (secHits === 0) { sec.classList.add('hide'); }
     else {
-      sec.classList.remove('hide', 'si-r', 'si-l', 'cr');
-      void sec.offsetWidth;
-      if (swipeDir) {
-        sec.classList.add(swipeDir === 'left' ? 'si-r' : 'si-l');
-      } else {
-        requestAnimationFrame(() => sec.classList.add('cr'));
-      }
+      sec.classList.remove('hide');
+      sec.classList.add('cr');
       total += secHits;
     }
   });
