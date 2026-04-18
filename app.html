@@ -518,13 +518,24 @@ function registerFCM() {
   if (Date.now() - lastReg < 6 * 60 * 60 * 1000) return;
 
   navigator.serviceWorker.ready.then(swReg => {
-    _msg.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: swReg })
-      .then(token => {
-        if (!token) return;
-        _db.ref('fcm_tokens/' + deviceId).set({ token, ts: Date.now(), lang })
-          .then(() => localStorage.setItem('mc_fcm_last_reg', String(Date.now())));
-      })
-      .catch(() => {});
+    // Supprimer le token FCM en cache avant d'en demander un nouveau si le TTL était réinitialisé
+    const prevToken = localStorage.getItem('mc_fcm_token');
+    const forceNew  = !localStorage.getItem('mc_fcm_last_reg') && prevToken;
+    const doGetToken = () => {
+      _msg.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: swReg })
+        .then(token => {
+          if (!token) return;
+          localStorage.setItem('mc_fcm_token', token);
+          _db.ref('fcm_tokens/' + deviceId).set({ token, ts: Date.now(), lang })
+            .then(() => localStorage.setItem('mc_fcm_last_reg', String(Date.now())));
+        })
+        .catch(() => {});
+    };
+    if (forceNew) {
+      _msg.deleteToken().then(doGetToken).catch(doGetToken);
+    } else {
+      doGetToken();
+    }
   }).catch(() => {});
 
   _msg.onMessage(() => {});
@@ -532,24 +543,36 @@ function registerFCM() {
 
 function registerSW() {
   if (!('serviceWorker' in navigator)) return;
-  // Supprimer tout ancien SW (service-worker.js) qui pourrait bloquer FCM
   navigator.serviceWorker.getRegistrations().then(regs => {
     regs.forEach(reg => {
       const script = (reg.active || reg.installing || reg.waiting || {}).scriptURL || '';
       if (!script.includes('firebase-messaging-sw.js')) reg.unregister();
     });
   });
-  navigator.serviceWorker.register('/firebase-messaging-sw.js')
-    .then(() => navigator.serviceWorker.ready)
-    .then(() => registerFCM())
-    .catch(() => {});
 
-  // Surveiller si le token est supprimé de Firebase (token invalide côté serveur)
-  // → forcer un re-enregistrement immédiat
   const deviceId = getDeviceId();
+
+  // Au démarrage : vérifier si le token existe encore dans Firebase
+  // (cas où l'app était fermée quand le serveur a supprimé le token 404)
+  _db.ref('fcm_tokens/' + deviceId).once('value').then(snap => {
+    if (snap.val() === null) {
+      localStorage.removeItem('mc_fcm_last_reg');
+    }
+    // Enregistrer le SW puis le token
+    navigator.serviceWorker.register('/firebase-messaging-sw.js')
+      .then(() => navigator.serviceWorker.ready)
+      .then(() => registerFCM())
+      .catch(() => {});
+  }).catch(() => {
+    navigator.serviceWorker.register('/firebase-messaging-sw.js')
+      .then(() => navigator.serviceWorker.ready)
+      .then(() => registerFCM())
+      .catch(() => {});
+  });
+
+  // Surveiller en temps réel les suppressions de token (app ouverte)
   _db.ref('fcm_tokens/' + deviceId).on('value', snap => {
     if (snap.val() === null) {
-      // Token supprimé par le serveur → effacer le TTL et re-enregistrer
       localStorage.removeItem('mc_fcm_last_reg');
       registerFCM();
     }
