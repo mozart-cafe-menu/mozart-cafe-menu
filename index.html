@@ -175,12 +175,22 @@
       background: radial-gradient(ellipse at 60% 40%, #2a1208 0%, #160d08 45%, #0f0906 100%);
     }
     .hero-bg-img {
-      position:absolute; inset:0;
+      position:absolute; inset:-6%;
       background-size:cover;
       background-position:50% 40%;
-      opacity:0; transition:opacity 1.2s ease;
+      opacity:0; transition:opacity 1.4s ease;
+      transform-origin:center;
     }
-    .hero-bg-img.loaded { opacity:1; }
+    /* Fondu d'entrée → puis Ken Burns très doux, mobile inclus */
+    .hero-bg-img.loaded {
+      opacity:1;
+      animation:heroDrift 28s ease-in-out infinite;
+    }
+    @keyframes heroDrift {
+      0%,100% { transform:scale(1) translate(0%,0%); }
+      33%     { transform:scale(1.04) translate(-0.8%,-0.5%); }
+      66%     { transform:scale(1.03) translate(0.6%, 0.4%); }
+    }
 
     /* Logo dans le hero */
     .hero-logo {
@@ -467,8 +477,26 @@
     ================================================ */
     #menu-wrap { max-width:560px; margin:0 auto; padding:0 14px 72px; overflow:hidden; contain:paint; }
     .cat-sec { margin-bottom:28px; }
-    .cat-sec { opacity:0; }
-    .cat-sec.cr { opacity:1; }
+    /* Reveal catégorie : monte + fondu */
+    .cat-sec {
+      opacity:0;
+      transform:translateY(20px);
+      transition:opacity 0.5s cubic-bezier(0.22,1,0.36,1),
+                 transform 0.5s cubic-bezier(0.22,1,0.36,1);
+    }
+    .cat-sec.cr { opacity:1; transform:translateY(0); }
+    /* En-tête catégorie : glisse depuis la gauche avec léger retard */
+    .cat-hd {
+      opacity:0; transform:translateX(-14px);
+      transition:opacity 0.45s ease 0.12s, transform 0.45s ease 0.12s;
+    }
+    .cat-sec.cr .cat-hd { opacity:1; transform:translateX(0); }
+    /* Ligne de séparation : se dessine de gauche à droite */
+    .cat-div {
+      transform:scaleX(0); transform-origin:left center;
+      transition:transform 0.55s cubic-bezier(0.22,1,0.36,1) 0.22s;
+    }
+    .cat-sec.cr .cat-div { transform:scaleX(1); }
     .cat-hd {
       display:flex; align-items:flex-start; gap:13px;
       padding:22px 0 14px;
@@ -509,14 +537,15 @@
       padding:14px; cursor:pointer;
       position:relative; overflow:hidden;
       box-shadow:var(--shadow);
-      opacity:0; transform:translateY(18px);
-      transition:opacity 0.35s ease, transform 0.35s ease,
-        box-shadow 0.32s ease, border-color 0.32s ease;
+      opacity:0; transform:translateY(32px) scale(0.96);
+      transition:opacity 0.6s cubic-bezier(0.22,1,0.36,1),
+                 transform 0.6s cubic-bezier(0.22,1,0.36,1),
+                 box-shadow 0.32s ease, border-color 0.32s ease;
       -webkit-tap-highlight-color:transparent;
       touch-action:manipulation;
       will-change:transform, opacity;
     }
-    .card.rv { opacity:1; transform:translateY(0); }
+    .card.rv { opacity:1; transform:translateY(0) scale(1); }
     .card::before {
       content:''; position:absolute; inset:0; border-radius:inherit;
       background:radial-gradient(280px circle at var(--mx,50%) var(--my,50%),rgba(200,164,78,0.07),transparent 70%);
@@ -996,10 +1025,12 @@
 
     /* Respecter les préférences d'accessibilité (réduction de mouvement) */
     @media(prefers-reduced-motion:reduce) {
-      .cat-sec.so-l, .cat-sec.so-r { animation:none !important; opacity:0; }
-      .cat-sec.si-r, .cat-sec.si-l { animation:none !important; opacity:1; }
-      .cat-sec.cr  { animation:none !important; opacity:1; }
-      .card        { transition:none !important; opacity:1; transform:none !important; }
+      .cat-sec      { transition:none !important; opacity:1; transform:none !important; }
+      .cat-sec.cr   { opacity:1; transform:none; }
+      .cat-hd       { transition:none !important; opacity:1; transform:none !important; }
+      .cat-div      { transition:none !important; transform:none !important; }
+      .card         { transition:none !important; opacity:1; transform:none !important; }
+      .hero-bg-img.loaded { animation:none !important; }
     }
 
     /* ── Desktop : hero-scroll visible, séparé du contenu ── */
@@ -2198,7 +2229,7 @@ function createCard(item, idx) {
   const card = document.createElement('div');
   card.className = 'card';
   card.dataset.item = item.id;
-  card.style.transitionDelay = `${Math.min(idx * 0.025, 0.12)}s`;
+  card.style.transitionDelay = '0s'; // géré dynamiquement par setupScrollObserver
 
   const bdgParts = [];
   if (item.type) {
@@ -2462,15 +2493,31 @@ function setupScrollObserver() {
   const cats  = document.querySelectorAll('.cat-sec:not(.cr)');
   if (!cards.length && !cats.length) return;
 
+  // Compteur de batch pour le stagger : réinitialisé à chaque "vague" d'entrées
+  let batchTimer = null;
+  let batchIdx   = 0;
+
   const obs = new IntersectionObserver((entries) => {
+    // Reset le stagger si les entrées arrivent espacées dans le temps
+    if (batchTimer) clearTimeout(batchTimer);
+    batchTimer = setTimeout(() => { batchIdx = 0; }, 400);
+
     entries.forEach(entry => {
       if (!entry.isIntersecting) return;
-      entry.target.classList.add(entry.target.classList.contains('card') ? 'rv' : 'cr');
+      if (entry.target.classList.contains('card')) {
+        // Stagger élégant : chaque carte de la vague décalée de 60ms
+        const delay = Math.min(batchIdx * 0.06, 0.28);
+        entry.target.style.transitionDelay = `${delay}s`;
+        entry.target.classList.add('rv');
+        batchIdx++;
+      } else {
+        entry.target.classList.add('cr');
+      }
       obs.unobserve(entry.target);
     });
-  }, { threshold: 0.01, rootMargin: '0px 0px 60px 0px' });
+  }, { threshold: 0.04, rootMargin: '0px 0px 40px 0px' });
 
-  // Reveal immediately anything already in viewport
+  // Révéler immédiatement ce qui est déjà dans le viewport (sans délai)
   cards.forEach(card => {
     const r = card.getBoundingClientRect();
     if (r.top < window.innerHeight) { card.classList.add('rv'); }
