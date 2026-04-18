@@ -166,7 +166,6 @@
     ================================================ */
     #hero {
       position:relative;
-      height:100vh; height:100svh; height:100dvh;
       min-height:500px;
       display:flex; flex-direction:column;
       align-items:center; justify-content:center;
@@ -2629,6 +2628,19 @@ function setupTableModal() {
 // Force scroll to top on every page load (prevents black nav bar on reload)
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 window.scrollTo(0, 0);
+
+// Lock hero height to initial viewport — prevents jump when mobile browser chrome shows/hides
+(function lockHeroHeight() {
+  const hero = document.getElementById('hero');
+  function setH() {
+    if (hero) hero.style.height = window.innerHeight + 'px';
+  }
+  setH();
+  window.addEventListener('orientationchange', function() {
+    setTimeout(setH, 300);
+  });
+})();
+
 document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
