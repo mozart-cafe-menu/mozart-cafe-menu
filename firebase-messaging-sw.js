@@ -57,7 +57,7 @@ self.addEventListener('notificationclick', e => {
 });
 
 /* ── Cache offline ── */
-const CACHE  = 'mozart-cafe-v12';
+const CACHE  = 'mozart-cafe-v13';
 const ASSETS = ['app.html', 'manifest.json'];
 
 self.addEventListener('install', e => {
