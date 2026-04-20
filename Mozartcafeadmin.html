@@ -1410,12 +1410,14 @@ function loadData() {
           items: getDefaultItems()
         };
       }
-      // Restaurer le cache de hashes depuis localStorage (exclu de Firebase)
+      // Restaurer hashes depuis localStorage si Firebase ne les a pas encore
       try {
-        const savedHashes = localStorage.getItem('mc_tx_hashes');
-        if (savedHashes) adminData._txHashes = JSON.parse(savedHashes);
+        if (!adminData._txHashes) {
+          const savedHashes = localStorage.getItem('mc_tx_hashes');
+          if (savedHashes) adminData._txHashes = JSON.parse(savedHashes);
+        }
       } catch(_) {}
-      // Restaurer les verrous de traduction manuelle (localStorage uniquement si absent de Firebase)
+      // Restaurer les verrous depuis localStorage si Firebase ne les a pas encore
       try {
         if (!adminData._txLock) {
           const savedLock = localStorage.getItem('mc_tx_lock');
@@ -1461,9 +1463,7 @@ function sanitizeItems(items) {
 
 function saveData() {
   adminData.items = sanitizeItems(adminData.items);
-  // Exclure _txHashes de Firebase (cache local) mais inclure _txLock (verrous inter-appareils)
-  const { _txHashes, ...dataForDb } = adminData;
-  _db.ref('menu').set(dataForDb)
+  _db.ref('menu').set(adminData)
     .then(() => {
       localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
       localStorage.setItem('mc_tx_hashes', JSON.stringify(adminData._txHashes || {}));
