@@ -15,10 +15,6 @@
   </defs>
   <!-- Background circle -->
   <circle cx="256" cy="256" r="200" fill="url(#bg)" stroke="#c8a44e" stroke-width="2" stroke-opacity="0.3"/>
-  <!-- Ornament top -->
-  <line x1="180" y1="140" x2="220" y2="140" stroke="#c8a44e" stroke-width="1.5" stroke-opacity="0.5"/>
-  <circle cx="256" cy="140" r="4" fill="#c8a44e" opacity="0.6"/>
-  <line x1="292" y1="140" x2="332" y2="140" stroke="#c8a44e" stroke-width="1.5" stroke-opacity="0.5"/>
   <!-- Bell shape -->
   <path d="M256 170 C220 170 180 200 175 248 C170 280 165 305 152 320 L360 320 C347 305 342 280 337 248 C332 200 292 170 256 170 Z"
         fill="url(#g)"/>
@@ -30,8 +26,4 @@
   <path d="M230 355 Q256 370 282 355" fill="none" stroke="url(#g)" stroke-width="8" stroke-linecap="round"/>
   <!-- Shine effect -->
   <path d="M210 200 Q220 185 235 195" fill="none" stroke="#fff" stroke-width="3" stroke-opacity="0.25" stroke-linecap="round"/>
-  <!-- Bottom ornament -->
-  <line x1="190" y1="390" x2="230" y2="390" stroke="#c8a44e" stroke-width="1" stroke-opacity="0.35"/>
-  <line x1="282" y1="390" x2="322" y2="390" stroke="#c8a44e" stroke-width="1" stroke-opacity="0.35"/>
-  <circle cx="256" cy="390" r="3" fill="#c8a44e" opacity="0.4"/>
 </svg>
