@@ -1034,28 +1034,6 @@
 
     /* Large tablet / desktop: wider layout */
     @media(min-width:1024px) {
-      /* Hero plein écran */
-      #hero { min-height:100vh; justify-content:flex-start; }
-      .hero-logo {
-        position:absolute; top:32px;
-        left:50%; transform:translateX(-50%);
-      }
-      .hero-content {
-        flex:1; min-height:0;
-        justify-content:flex-start;
-        padding-top:180px; padding-bottom:100px; width:100%;
-        gap:10px;
-      }
-      .hero-ornament { margin-top:0; }
-      .hero-title { font-size:3rem; }
-      .hero-tagline { font-size:1rem; }
-      .hero-sub { font-size:0.78rem; }
-      .social-bar { margin-top:4px; }
-      .hero-scroll {
-        position:absolute; bottom:36px;
-        left:0; right:0;
-        z-index:3;
-      }
       /* Contenu centré */
       #menu-wrap { max-width:1100px; padding:0 32px 80px; }
       .cards { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
@@ -1076,6 +1054,9 @@
       #sheet.on { transform:translate(-50%,-50%) scale(1); opacity:1; pointer-events:auto; }
       .sh-handle { display:none; }
       .sh-img-w { height:280px; }
+      /* MENU : plus bas et plus petit */
+      .hero-scroll { bottom:16px; }
+      .hero-scroll-text { font-size:0.9rem; letter-spacing:0.2em; }
     }
 
     /* Très grand écran (≥1400px) */
