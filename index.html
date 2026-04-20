@@ -1019,13 +1019,13 @@
       .cat-hd { padding:26px 0 16px; }
       /* Sheet : modal centré sur tablette */
       #sheet {
-        bottom:auto; top:50%; left:50%; right:auto;
-        transform:translate(-50%,-40%) scale(0.96);
+        bottom:auto; top:50%; left:50%; right:auto; margin:0;
+        transform:translate(-50%,-50%) scale(0.94);
+        opacity:0; pointer-events:none;
         max-width:560px; width:90%;
-        border-radius:28px;
-        max-height:85vh;
+        border-radius:28px; max-height:85vh;
       }
-      #sheet.on { transform:translate(-50%,-50%) scale(1); }
+      #sheet.on { transform:translate(-50%,-50%) scale(1); opacity:1; pointer-events:auto; }
       .sh-handle { display:none; }
       /* Nav centré */
       .nav-top { max-width:900px; margin:0 auto; }
@@ -1054,15 +1054,15 @@
       .cat-pills { max-width:1100px; margin:0 auto; padding:0 28px 14px; }
       /* Footer */
       #footer { max-width:1100px; padding:48px 32px 80px; }
-      /* Sheet → modal centré */
+      /* Sheet → modal centré, caché par défaut */
       #sheet {
-        bottom:auto; top:50%; left:50%; right:auto;
-        transform:translate(-50%,-40%) scale(0.96);
+        bottom:auto; top:50%; left:50%; right:auto; margin:0;
+        transform:translate(-50%,-50%) scale(0.94);
+        opacity:0; pointer-events:none;
         max-width:660px; width:85%;
-        border-radius:28px;
-        max-height:85vh;
+        border-radius:28px; max-height:85vh;
       }
-      #sheet.on { transform:translate(-50%,-50%) scale(1); }
+      #sheet.on { transform:translate(-50%,-50%) scale(1); opacity:1; pointer-events:auto; }
       .sh-handle { display:none; }
       .sh-img-w { height:280px; }
     }
