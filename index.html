@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
   <meta charset="UTF-8">
@@ -13,19 +13,19 @@
        CSS VARIABLES
     ================================================ */
     :root {
-      --bg: #0f0906;
-      --bg2: #160d08;
+      --bg: #0c0a08;
+      --bg2: #111009;
       --bg-card: rgba(255,255,255,0.05);
-      --bg-nav: rgba(15,9,6,0.93);
-      --gold: #d4956b;
-      --gold-lt: #e8b48a;
-      --gold-dk: #a86840;
-      --cream: #f5e8d4;
-      --muted: rgba(245,232,212,0.52);
-      --border: rgba(212,149,107,0.18);
-      --border2: rgba(212,149,107,0.36);
+      --bg-nav: rgba(12,10,8,0.88);
+      --gold: #c8a44e;
+      --gold-lt: #e2c278;
+      --gold-dk: #9a7a35;
+      --cream: #f4ead2;
+      --muted: rgba(244,234,210,0.52);
+      --border: rgba(200,164,78,0.18);
+      --border2: rgba(200,164,78,0.36);
       --shadow: 0 4px 24px rgba(0,0,0,0.55);
-      --shadow-h: 0 12px 40px rgba(212,149,107,0.22), 0 4px 20px rgba(0,0,0,0.65);
+      --shadow-h: 0 12px 40px rgba(200,164,78,0.22), 0 4px 20px rgba(0,0,0,0.65);
       --tr: 0.3s cubic-bezier(0.4,0,0.2,1);
       --r-card: 20px;
       --r-pill: 50px;
@@ -34,19 +34,19 @@
       --badge-veg: #7ebd6a;
     }
     html.light {
-      --bg: #f0e4d2;
-      --bg2: #e5d4bc;
-      --bg-card: rgba(255,255,255,0.88);
-      --bg-nav: rgba(240,228,210,0.96);
-      --gold: #8b5e3c;
-      --gold-lt: #b07a52;
-      --gold-dk: #6b4428;
-      --cream: #1c1007;
-      --muted: rgba(28,16,7,0.52);
-      --border: rgba(139,94,60,0.18);
-      --border2: rgba(139,94,60,0.38);
+      --bg: #f5f0e8;
+      --bg2: #ede8df;
+      --bg-card: rgba(255,255,255,0.72);
+      --bg-nav: rgba(245,240,232,0.9);
+      --gold: #a86840;
+      --gold-lt: #d4a47a;
+      --gold-dk: #7d5130;
+      --cream: #1c1710;
+      --muted: rgba(28,23,16,0.52);
+      --border: rgba(168,104,64,0.18);
+      --border2: rgba(168,104,64,0.38);
       --shadow: 0 4px 24px rgba(0,0,0,0.08);
-      --shadow-h: 0 12px 40px rgba(139,94,60,0.18), 0 4px 16px rgba(0,0,0,0.12);
+      --shadow-h: 0 12px 40px rgba(168,104,64,0.18), 0 4px 16px rgba(0,0,0,0.12);
     }
 
     /* ================================================
@@ -114,7 +114,7 @@
       opacity:0; transform:scale(0.5) translateY(30px);
       /* Délai 0.05s → visible dès l'ouverture, durée 1s pour effet élégant */
       animation:preLogoIn 1s cubic-bezier(0.34,1.2,0.64,1) 0.05s forwards;
-      filter:drop-shadow(0 6px 32px rgba(212,149,107,0.6));
+      filter:drop-shadow(0 6px 32px rgba(200,164,78,0.6));
       margin-bottom:6px;
     }
     @keyframes preLogoIn {
@@ -126,9 +126,9 @@
     }
     .pre-orn-line {
       width:60px; height:1px;
-      background:linear-gradient(90deg,transparent,rgba(212,149,107,0.6));
+      background:linear-gradient(90deg,transparent,rgba(200,164,78,0.6));
     }
-    .pre-orn-line:last-child { background:linear-gradient(270deg,transparent,rgba(212,149,107,0.6)); }
+    .pre-orn-line:last-child { background:linear-gradient(270deg,transparent,rgba(200,164,78,0.6)); }
     .pre-orn-diamond { width:10px; height:10px; background:var(--gold); transform:rotate(45deg); }
     .pre-title {
       font-family:'Cormorant',serif;
@@ -143,7 +143,7 @@
       font-family:'Cormorant',serif;
       font-style:italic;
       font-size:clamp(0.8rem,2.8vw,1rem);
-      color:rgba(212,149,107,0.65);
+      color:rgba(200,164,78,0.65);
       letter-spacing:0.22em;
       text-transform:uppercase;
       opacity:0; transform:translateY(10px);
@@ -212,7 +212,7 @@
     }
     /* Preloader logo — même blanc */
     .pre-logo {
-      filter:grayscale(1) brightness(6) drop-shadow(0 6px 32px rgba(212,149,107,0.5)) !important;
+      filter:grayscale(1) brightness(6) drop-shadow(0 6px 32px rgba(200,164,78,0.5)) !important;
     }
 
     /* Boutons sociaux */
@@ -427,7 +427,7 @@
     }
     html[dir="rtl"] .s-input { padding:8px 30px 8px 12px; text-align:right; }
     .s-input::placeholder { color:var(--muted); }
-    .s-input:focus { border-color:var(--gold); background:rgba(212,149,107,0.05); }
+    .s-input:focus { border-color:var(--gold); background:rgba(200,164,78,0.05); }
     .nav-controls { display:flex; align-items:center; gap:3px; flex-shrink:0; }
     .lang-wrap { display:flex; gap:2px; }
     .lang-btn {
@@ -438,7 +438,7 @@
       display:flex; align-items:center; justify-content:center;
       transition:var(--tr);
     }
-    .lang-btn.on { border-color:var(--border2); background:rgba(212,149,107,0.10); opacity:1; }
+    .lang-btn.on { border-color:var(--border2); background:rgba(200,164,78,0.10); opacity:1; }
     .lang-btn:not(.on) { opacity:0.55; }
     .theme-btn {
       width:44px; height:44px;
@@ -700,7 +700,7 @@
     html[dir="rtl"] .ft-txt { font-family:'Noto Sans Arabic',sans-serif; text-align:right; }
     .ft-txt strong { color:var(--cream); font-weight:500; display:block; margin-bottom:1px; }
     .ft-cr { text-align:center; font-size:0.72rem; color:rgba(244,234,210,0.2); margin-top:22px; letter-spacing:0.08em; }
-    .ft-logo-img { display:block; margin:0 auto 20px; height:260px; width:auto; object-fit:contain; filter:drop-shadow(0 2px 18px rgba(212,149,107,0.35)); }
+    .ft-logo-img { display:block; margin:0 auto 20px; height:260px; width:auto; object-fit:contain; filter:drop-shadow(0 2px 18px rgba(200,164,78,0.35)); }
     .ft-social-bar { display:flex; justify-content:center; gap:12px; margin-top:20px; margin-bottom:8px; }
     .ft-social-btn {
       display:flex; align-items:center; gap:6px;
@@ -851,8 +851,8 @@
     }
     #note-bar.visible { display:block; }
     html.light #note-bar {
-      background:rgba(139,94,60,0.07);
-      border-color:rgba(139,94,60,0.22);
+      background:rgba(168,104,64,0.07);
+      border-color:rgba(168,104,64,0.22);
       color:var(--gold);
     }
 
@@ -1188,7 +1188,7 @@
   <div class="pre-ornament">
     <div class="pre-orn-line"></div>
     <div class="pre-orn-diamond"></div>
-    <div class="pre-orn-line" style="background:linear-gradient(270deg,transparent,rgba(212,149,107,0.6))"></div>
+    <div class="pre-orn-line" style="background:linear-gradient(270deg,transparent,rgba(200,164,78,0.6))"></div>
   </div>
   <div class="pre-title">Café &amp; Restaurant</div>
   <div class="pre-tagline" id="pre-tag">Une expérience café exceptionnelle</div>
@@ -1834,7 +1834,7 @@ const ITEMS = [
 let lang = localStorage.getItem('mc_menu_lang') || 'fr';
 let activeCat  = 'all';
 
-let theme = localStorage.getItem('mc_menu_theme') === 'dark' ? 'dark' : 'light';
+let theme = localStorage.getItem('mc_menu_theme') || 'dark';
 let showCallBtn = true;  // contrôlé depuis l'admin
 let showPhotos  = true;  // contrôlé depuis l'admin (global)
 let _adminInfo  = null;  // copie des infos admin pour la barre de note

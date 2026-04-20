@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
@@ -9,55 +9,55 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant:wght@300;400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:     #0f0906;
-      --bg2:    #160d08;
-      --bg3:    #1e1009;
+      --bg:     #0c0a08;
+      --bg2:    #111009;
+      --bg3:    #161208;
       --card:   rgba(255,255,255,0.05);
-      --gold:   #d4956b;
-      --gold-l: #e8b48a;
-      --gold-d: #a86840;
-      --cream:  #f5e8d4;
-      --muted:  rgba(245,232,212,0.50);
-      --border: rgba(212,149,107,0.18);
-      --bord2:  rgba(212,149,107,0.36);
-      --border2: rgba(212,149,107,0.36);
+      --gold:   #c8a44e;
+      --gold-l: #e2c278;
+      --gold-d: #9a7a35;
+      --cream:  #f4ead2;
+      --muted:  rgba(244,234,210,0.52);
+      --border: rgba(200,164,78,0.18);
+      --bord2:  rgba(200,164,78,0.36);
+      --border2: rgba(200,164,78,0.36);
       --green:  #7ebd6a;
       --red:    #e05252;
       --tr:     0.25s cubic-bezier(0.4,0,0.2,1);
       --r:      16px;
     }
     html.light {
-      --bg:     #f0e4d2;
-      --bg2:    #e5d4bc;
+      --bg:     #f5f0e8;
+      --bg2:    #ede8df;
       --bg3:    #fdf6ed;
       --card:   rgba(255,255,255,0.92);
-      --gold:   #8b5e3c;
-      --gold-l: #b07a52;
-      --gold-d: #6b4428;
-      --cream:  #1c1007;
-      --muted:  rgba(28,16,7,0.72);
-      --border: rgba(139,94,60,0.22);
-      --bord2:  rgba(139,94,60,0.42);
-      --border2: rgba(139,94,60,0.42);
+      --gold:   #a86840;
+      --gold-l: #d4a47a;
+      --gold-d: #7d5130;
+      --cream:  #1c1710;
+      --muted:  rgba(28,23,16,0.52);
+      --border: rgba(168,104,64,0.22);
+      --bord2:  rgba(168,104,64,0.42);
+      --border2: rgba(168,104,64,0.42);
     }
     html.light body { background:var(--bg); color:var(--cream); }
-    html.light .adm-header { background:rgba(240,228,210,0.98) !important; }
+    html.light .adm-header { background:rgba(245,240,232,0.98) !important; }
     /* Textes et inputs */
     html.light .inline-input,
     html.light .info-input,
     html.light .login-input { color:var(--cream); background:transparent; }
     html.light .inline-input::placeholder,
-    html.light .info-input::placeholder { color:rgba(28,16,7,0.40); }
+    html.light .info-input::placeholder { color:rgba(28,23,16,0.40); }
     html.light .ico-pb-label { color:var(--cream) !important; }
     html.light .ico-picker-btn { background:var(--bg3); border-color:var(--bord2); color:var(--cream); }
     /* Popups et cards */
     html.light .ico-picker-popup {
       background:var(--bg3);
-      box-shadow:0 8px 32px rgba(0,0,0,0.15), 0 0 0 1px rgba(139,94,60,0.12);
+      box-shadow:0 8px 32px rgba(0,0,0,0.15), 0 0 0 1px rgba(168,104,64,0.12);
     }
     html.light .ico-picker-item { color:var(--cream); }
     html.light .ico-picker-item svg { color:var(--cream); }
-    html.light .ico-picker-item.selected { background:rgba(139,94,60,0.12); border-color:var(--gold); }
+    html.light .ico-picker-item.selected { background:rgba(168,104,64,0.12); border-color:var(--gold); }
     html.light .ico-picker-none { color:var(--red); background:rgba(224,82,82,0.06); border-color:rgba(224,82,82,0.25); }
     html.light .login-box { background:var(--bg3); }
     html.light .cat-row { background:rgba(255,255,255,0.95); }
@@ -70,11 +70,11 @@
     html.light .prod-name::placeholder,
     html.light .prod-price::placeholder,
     html.light .prod-desc-input::placeholder,
-    html.light .prod-full-input::placeholder { color:rgba(28,16,7,0.38); }
+    html.light .prod-full-input::placeholder { color:rgba(28,23,16,0.38); }
     /* Toast */
     html.light #toast { background:var(--bg3); color:#2a7a2a; border-color:rgba(80,160,80,0.4); }
     /* Save FAB */
-    html.light .save-fab { box-shadow:0 4px 20px rgba(139,94,60,0.35); }
+    html.light .save-fab { box-shadow:0 4px 20px rgba(168,104,64,0.35); }
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     html { overflow-x:hidden; }
     body { background:var(--bg); color:var(--cream); font-family:'Outfit',sans-serif; font-weight:300; min-height:100vh; }
@@ -246,11 +246,23 @@
       background:radial-gradient(ellipse at 60% 40%, #2a1208 0%, #160d08 45%, #0f0906 100%);
     }
     .phone-hero-bg {
-      position:absolute; inset:0;
+      position:absolute; inset:-8%;
       background-size:cover; background-position:50% 40%;
       opacity:0; transition:opacity 1s ease;
+      transform-origin:center; will-change:transform;
     }
-    .phone-hero-bg.flow { opacity:1; }
+    .phone-hero-bg.flow {
+      opacity:1;
+      animation:phoneDrift 22s linear infinite;
+    }
+    @keyframes phoneDrift {
+      0%   { transform:translate( 0%,    0%   ); }
+      20%  { transform:translate(-3%,   -2%   ); }
+      40%  { transform:translate(-2%,    2.5% ); }
+      60%  { transform:translate( 3%,    1.5% ); }
+      80%  { transform:translate( 1.5%, -2.5% ); }
+      100% { transform:translate( 0%,    0%   ); }
+    }
     .phone-overlay {
       position:absolute; inset:0; z-index:1;
       background:linear-gradient(to bottom,
@@ -292,7 +304,7 @@
     .phone-social-btn {
       display:flex; align-items:center; gap:2px;
       font-size:0.38rem; padding:3px 7px; border-radius:20px;
-      border:1px solid rgba(212,149,107,0.35); color:rgba(212,149,107,0.85);
+      border:1px solid rgba(200,164,78,0.35); color:rgba(200,164,78,0.85);
       letter-spacing:0.03em;
     }
     .phone-scroll {
@@ -503,7 +515,7 @@
       display:none; position:fixed; z-index:600;
       background:var(--bg3); border:1px solid var(--bord2);
       border-radius:14px; padding:12px;
-      box-shadow:0 12px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(212,149,107,0.08);
+      box-shadow:0 12px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(200,164,78,0.08);
       width:min(264px, calc(100vw - 16px));
       max-height:80vh; overflow-y:auto;
     }
@@ -954,12 +966,8 @@
                 <div class="phone-orn-line phone-orn-line-r"></div>
               </div>
               <div class="phone-title" id="pm-title">Café &amp; Restaurant</div>
-              <div class="phone-tagline" id="pm-tagline">Une expérience culinaire raffinée</div>
-              <div class="phone-sub" id="pm-sub">
-                <span>Cafés d'exception</span><span class="phone-sub-dot">·</span>
-                <span>Plats gourmets</span><span class="phone-sub-dot">·</span>
-                <span>Ambiance élégante</span>
-              </div>
+              <div class="phone-tagline" id="pm-tagline"></div>
+              <div class="phone-sub" id="pm-sub"></div>
               <div class="phone-socials">
                 <span class="phone-social-btn">
                   <svg width="7" height="7" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
@@ -972,7 +980,7 @@
               </div>
             </div>
             <div class="phone-scroll">
-              <div class="phone-scroll-lbl">Menu</div>
+              <div class="phone-scroll-lbl"></div>
               <div class="phone-capsule"><div class="phone-capsule-dot"></div></div>
             </div>
           </div>
@@ -1277,6 +1285,27 @@ const ADMIN_UI = {
 };
 
 /* ═══════════════════════════════════════════
+   HERO MOCKUP TEXTS
+═══════════════════════════════════════════ */
+const HERO_TEXTS = {
+  fr: { tagline:"Une expérience culinaire raffinée", sub:["Cafés d'exception","Plats gourmets","Ambiance élégante"], explore:'Menu' },
+  en: { tagline:'A refined culinary experience',     sub:['Exceptional coffees','Gourmet dishes','Elegant atmosphere'],   explore:'Menu' },
+  ar: { tagline:'تجربة طهي راقية',                   sub:['قهوة استثنائية','أطباق راقية','أجواء فاخرة'],                 explore:'القائمة' },
+};
+
+function updateMockupText() {
+  const h = HERO_TEXTS[currentLang] || HERO_TEXTS.fr;
+  const tagEl  = document.getElementById('pm-tagline');
+  const subEl  = document.getElementById('pm-sub');
+  const scrlEl = document.querySelector('.phone-scroll-lbl');
+  if (tagEl)  tagEl.textContent = h.tagline;
+  if (subEl)  subEl.innerHTML   = h.sub.map((s,i) =>
+    `<span>${s}</span>${i < h.sub.length - 1 ? '<span class="phone-sub-dot">·</span>' : ''}`
+  ).join('');
+  if (scrlEl) scrlEl.textContent = h.explore;
+}
+
+/* ═══════════════════════════════════════════
    STATE
 ═══════════════════════════════════════════ */
 let adminData = null;  // { cats, items, info }
@@ -1395,6 +1424,7 @@ function loadData() {
       } catch(_) {}
       renderAll();
       applyAdminUI(currentLang);
+      updateMockupText();
     })
     .catch(() => {
       try {
@@ -1408,6 +1438,7 @@ function loadData() {
       };
       renderAll();
       applyAdminUI(currentLang);
+      updateMockupText();
     });
 }
 
@@ -1888,6 +1919,7 @@ function setGlobalLang(l) {
   // Re-render complet dans la nouvelle langue
   renderAll();
   applyAdminUI(l);
+  updateMockupText();
 }
 
 function switchInfoLang(l) {
