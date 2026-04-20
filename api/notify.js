@@ -127,7 +127,6 @@ async function sendFCM(projectId, accessToken, tokenObjs, table, lang, customMes
     const payload = JSON.stringify({
       message: {
         token,
-        notification: { title: title_text, body: body_text },
         data: {
           table: String(table),
           lang:  deviceLang,
@@ -137,7 +136,7 @@ async function sendFCM(projectId, accessToken, tokenObjs, table, lang, customMes
         android: { priority: 'high' },
         apns: {
           headers: { 'apns-priority': '10' },
-          payload: { aps: { sound: 'default' } }
+          payload: { aps: { sound: 'default', 'content-available': 1 } }
         }
       }
     });
