@@ -104,7 +104,7 @@
     ================================================ */
     #preloader {
       position:fixed; inset:0;
-      background:#0f0906;
+      background:#0c0a08;
       z-index:9999;
       display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
     }
@@ -134,7 +134,7 @@
       font-family:'Cormorant',serif;
       font-size:clamp(2.2rem,9vw,3.8rem);
       font-weight:300;
-      color:#d4956b;
+      color:var(--gold);
       letter-spacing:0.14em;
       opacity:0; transform:translateY(18px);
       animation:preUp 0.55s cubic-bezier(0.4,0,0.2,1) 0.88s forwards;
@@ -151,7 +151,7 @@
     }
     .pre-shimmer {
       width:140px; height:1px;
-      background:linear-gradient(90deg,transparent,#d4956b,transparent);
+      background:linear-gradient(90deg,transparent,var(--gold),transparent);
       background-size:200% 100%;
       opacity:0;
       animation:preUp 0.45s ease 1.25s forwards, shimmer 2.4s ease 1.25s infinite;
@@ -171,7 +171,7 @@
       align-items:center; justify-content:center;
       overflow:hidden;
       isolation:isolate;
-      background: radial-gradient(ellipse at 60% 40%, #2a1208 0%, #160d08 45%, #0f0906 100%);
+      background: radial-gradient(ellipse at 60% 40%, #1a1208 0%, #111009 45%, #0c0a08 100%);
     }
     .hero-bg-img {
       position:absolute; inset:-10%;
