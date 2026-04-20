@@ -513,29 +513,18 @@ function registerFCM() {
 
   const deviceId = getDeviceId();
 
-  // Si token déjà enregistré depuis moins de 6h → on ne re-enregistre pas
-  const lastReg = parseInt(localStorage.getItem('mc_fcm_last_reg') || '0');
-  if (Date.now() - lastReg < 6 * 60 * 60 * 1000) return;
-
   navigator.serviceWorker.ready.then(swReg => {
-    // Supprimer le token FCM en cache avant d'en demander un nouveau si le TTL était réinitialisé
-    const prevToken = localStorage.getItem('mc_fcm_token');
-    const forceNew  = !localStorage.getItem('mc_fcm_last_reg') && prevToken;
     const doGetToken = () => {
       _msg.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: swReg })
         .then(token => {
           if (!token) return;
           localStorage.setItem('mc_fcm_token', token);
-          _db.ref('fcm_tokens/' + deviceId).set({ token, ts: Date.now(), lang })
-            .then(() => localStorage.setItem('mc_fcm_last_reg', String(Date.now())));
+          _db.ref('fcm_tokens/' + deviceId).set({ token, ts: Date.now(), lang });
         })
         .catch(() => {});
     };
-    if (forceNew) {
-      _msg.deleteToken().then(doGetToken).catch(doGetToken);
-    } else {
-      doGetToken();
-    }
+    // Toujours supprimer l'ancien token et en demander un nouveau
+    _msg.deleteToken().then(doGetToken).catch(doGetToken);
   }).catch(() => {});
 
   _msg.onMessage(() => {});
