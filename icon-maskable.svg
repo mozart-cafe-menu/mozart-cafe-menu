@@ -1,17 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" fill="#09080f"/>
+  <rect width="512" height="512" fill="#0c0a08"/>
   <defs>
     <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#e0c070"/>
-      <stop offset="50%" style="stop-color:#c9a84c"/>
-      <stop offset="100%" style="stop-color:#9b7c30"/>
+      <stop offset="0%" style="stop-color:#e2c278"/>
+      <stop offset="50%" style="stop-color:#c8a44e"/>
+      <stop offset="100%" style="stop-color:#9a7a35"/>
     </linearGradient>
   </defs>
   <!-- Safe zone: center 256x256 (from 128,128 to 384,384) -->
-  <!-- Musical note stem -->
-  <rect x="246" y="155" width="20" height="140" rx="4" fill="url(#g)"/>
-  <!-- Musical note flag -->
-  <path d="M266 155 Q316 175 314 220 Q312 240 266 238" fill="none" stroke="url(#g)" stroke-width="11" stroke-linecap="round"/>
-  <!-- Musical note head -->
-  <ellipse cx="228" cy="295" rx="36" ry="24" transform="rotate(-15,228,295)" fill="url(#g)"/>
+  <path d="M256 155 C218 155 175 187 170 238 C165 272 160 298 146 314 L366 314 C352 298 347 272 342 238 C337 187 294 155 256 155 Z" fill="url(#g)"/>
+  <circle cx="256" cy="153" r="13" fill="none" stroke="url(#g)" stroke-width="7"/>
+  <circle cx="256" cy="334" r="15" fill="url(#g)"/>
+  <path d="M232 348 Q256 362 280 348" fill="none" stroke="url(#g)" stroke-width="7" stroke-linecap="round"/>
 </svg>
