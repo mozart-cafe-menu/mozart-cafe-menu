@@ -22,7 +22,7 @@ messaging.onBackgroundMessage(payload => {
   const data  = payload.data || {};
   const table = data.table || payload.notification?.body?.match(/\d+/)?.[0] || '?';
   const title = data.title || payload.notification?.title || '🔔 Mozart Café';
-  const body  = data.body  || payload.notification?.body  || 'Table ' + table + ' demande un serveur';
+  const body  = data.body  || payload.notification?.body  || 'Appel : Table ' + table;
 
   const tag = 'mc-call-' + table + '-' + Date.now();
 

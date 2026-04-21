@@ -48,7 +48,7 @@ self.addEventListener('fetch', e => {
 /* ── PUSH : notification système même app fermée ── */
 self.addEventListener('push', e => {
   let title = '🔔 Mozart Café';
-  let body  = 'Un client demande un serveur';
+  let body  = 'Appel : Table ?';
   let table = '?';
 
   try {
