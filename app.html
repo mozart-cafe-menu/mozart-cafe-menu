@@ -170,8 +170,9 @@
     .call-item {
       background:var(--card); border:1px solid var(--border); border-radius:14px;
       padding:12px 14px; display:flex; align-items:center; gap:12px;
-      animation:slideIn 0.4s ease;
+      animation:slideIn 0.4s ease; cursor:pointer;
     }
+    .call-item:active { opacity:0.75; }
     html[dir="rtl"] .call-item { flex-direction:row-reverse; }
     @keyframes slideIn { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
     .call-item.fresh { border-color:var(--bord2); background:rgba(200,164,78,0.04); }
@@ -189,8 +190,16 @@
     html[dir="rtl"] .call-msg, html[dir="rtl"] .call-time { text-align:right; font-family:'Noto Sans Arabic',sans-serif; }
     .call-tag {
       font-size:0.67rem; font-weight:500; padding:3px 9px; border-radius:10px; flex-shrink:0;
-      background:rgba(126,189,106,0.1); color:var(--green); border:1px solid rgba(126,189,106,0.25);
+      border:1px solid transparent; transition:var(--tr);
     }
+    .call-tag.received { background:rgba(212,160,23,0.12); color:#d4a017; border-color:rgba(212,160,23,0.3); }
+    .call-tag.done    { background:rgba(126,189,106,0.1); color:var(--green); border-color:rgba(126,189,106,0.25); }
+    .day-sep {
+      font-size:0.63rem; font-weight:500; letter-spacing:0.14em; text-transform:uppercase;
+      color:var(--muted); text-align:center; padding:8px 0 2px;
+      display:flex; align-items:center; gap:10px;
+    }
+    .day-sep::before, .day-sep::after { content:''; flex:1; height:1px; background:var(--border); }
 
     /* Theme button */
     .theme-btn {
@@ -299,25 +308,28 @@ const T = {
     hdrSub:'Interface Serveur', connWait:'En attente…', connOn:'Connecté',
     secHistory:'Appels récents',
     alertTitle:'Appel entrant', alertSub:'Table {n} demande un serveur',
-    callMsg:'Table {n} — Serveur demandé', received:'Reçu',
+    callMsg:'Table {n} — Serveur demandé', received:'Reçu', done:'Terminé',
     noCalls:'Aucun appel reçu pour le moment', ftMenu:'Voir le menu',
     ago0:'À l\'instant', agoMin:'Il y a {n} min', agoH:'Il y a {n}h',
+    today:'Aujourd\'hui', yesterday:'Hier',
   },
   en: {
     hdrSub:'Waiter Interface', connWait:'Waiting…', connOn:'Connected',
     secHistory:'Recent calls',
     alertTitle:'Incoming call', alertSub:'Table {n} needs a waiter',
-    callMsg:'Table {n} — Waiter needed', received:'Received',
+    callMsg:'Table {n} — Waiter needed', received:'Received', done:'Done',
     noCalls:'No calls received yet', ftMenu:'View menu',
     ago0:'Just now', agoMin:'{n} min ago', agoH:'{n}h ago',
+    today:'Today', yesterday:'Yesterday',
   },
   ar: {
     hdrSub:'واجهة النادل', connWait:'في انتظار…', connOn:'متصل',
     secHistory:'المكالمات الأخيرة',
     alertTitle:'نداء وارد', alertSub:'طاولة {n} تطلب نادلاً',
-    callMsg:'طاولة {n} — النادل مطلوب', received:'استُلم',
+    callMsg:'طاولة {n} — النادل مطلوب', received:'استُلم', done:'منتهي',
     noCalls:'لم تُستلم أي نداءات بعد', ftMenu:'عرض القائمة',
     ago0:'الآن', agoMin:'منذ {n} دق', agoH:'منذ {n}س',
+    today:'اليوم', yesterday:'أمس',
   }
 };
 
@@ -368,7 +380,7 @@ function saveCalls() {
 function loadCalls() {
   try {
     calls = JSON.parse(localStorage.getItem(CALLS_KEY) || '[]')
-      .map(c => ({ ...c, ts: new Date(c.ts) }));
+      .map(c => ({ ...c, ts: new Date(c.ts), status: c.status || 'received' }));
   } catch(_) { calls = []; }
 }
 
@@ -391,7 +403,7 @@ function showAlert(table) {
 }
 
 function addCallToHistory(table) {
-  calls.unshift({ table, ts: new Date(), id: Date.now() });
+  calls.unshift({ table, ts: new Date(), id: Date.now(), status: 'received' });
   if (calls.length > 50) calls.pop();
   saveCalls();
   renderCalls();
@@ -406,16 +418,45 @@ function timeAgo(d) {
   return t.agoH.replace('{n}', Math.floor(s / 3600));
 }
 
+function formatDay(date, t) {
+  const now = new Date();
+  const yest = new Date(now); yest.setDate(now.getDate() - 1);
+  if (date.toDateString() === now.toDateString()) return t.today;
+  if (date.toDateString() === yest.toDateString()) return t.yesterday;
+  const loc = lang === 'ar' ? 'ar' : lang === 'en' ? 'en-GB' : 'fr-FR';
+  return date.toLocaleDateString(loc, { day:'numeric', month:'long' });
+}
+
+function toggleStatus(id) {
+  const c = calls.find(x => x.id === id);
+  if (!c) return;
+  c.status = c.status === 'done' ? 'received' : 'done';
+  saveCalls();
+  renderCalls();
+}
+
 function renderCalls() {
   const list = document.getElementById('calls-list');
   const noEl = document.getElementById('no-calls-msg');
-  list.querySelectorAll('.call-item').forEach(e => e.remove());
+  list.querySelectorAll('.call-item, .day-sep').forEach(e => e.remove());
   if (calls.length === 0) { noEl.style.display = ''; return; }
   noEl.style.display = 'none';
   const t = T[lang];
+  let lastDay = null;
   calls.forEach((c, i) => {
+    const d = c.ts instanceof Date ? c.ts : new Date(c.ts);
+    const dayKey = d.toDateString();
+    if (dayKey !== lastDay) {
+      lastDay = dayKey;
+      const sep = document.createElement('div');
+      sep.className = 'day-sep';
+      sep.textContent = formatDay(d, t);
+      list.appendChild(sep);
+    }
+    const isDone = c.status === 'done';
     const el = document.createElement('div');
     el.className = 'call-item' + (i === 0 ? ' fresh' : '');
+    el.dataset.id = String(c.id);
     el.innerHTML = `
       <div class="call-badge">
         <div class="call-badge-lbl">Table</div>
@@ -425,8 +466,9 @@ function renderCalls() {
         <div class="call-msg">${t.callMsg.replace('{n}', c.table)}</div>
         <div class="call-time">${timeAgo(c.ts)}</div>
       </div>
-      <div class="call-tag">${t.received}</div>
+      <div class="call-tag ${isDone ? 'done' : 'received'}">${isDone ? t.done : t.received}</div>
     `;
+    el.addEventListener('click', () => toggleStatus(c.id));
     list.appendChild(el);
   });
 }
