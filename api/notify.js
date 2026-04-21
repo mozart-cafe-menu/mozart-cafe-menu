@@ -105,9 +105,9 @@ async function storeAdminMessage(projectId, accessToken, message) {
 
 async function sendFCM(projectId, accessToken, tokenObjs, table, lang, customMessage) {
   const WAITER_MESSAGES = {
-    fr: `Table ${table} demande un serveur`,
-    en: `Table ${table} needs a waiter`,
-    ar: `الطاولة ${table} تطلب نادلاً`,
+    fr: `Appel : Table ${table}`,
+    en: `Call : Table ${table}`,
+    ar: `نداء : طاولة ${table}`,
   };
   let sent = 0;
   let lastError = null;
