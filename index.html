@@ -1672,6 +1672,176 @@
     html[data-menu-theme="santorin"] .hero-orn-line:last-child { background:linear-gradient(270deg,transparent,var(--gold)); }
 
     /* ================================================
+       THÈMES — UI étendue
+       (pills, search, lang, toggle, social, FAB)
+    ================================================ */
+
+    /* ── NEON PULSE — carré cyberpunk ── */
+    html[data-menu-theme="neon-tokyo"] .lang-btn.on {
+      border-color:var(--gold); background:rgba(0,245,212,0.12);
+    }
+    html[data-menu-theme="neon-tokyo"] .theme-btn:hover {
+      box-shadow:0 0 14px rgba(0,245,212,0.3);
+    }
+    html[data-menu-theme="neon-tokyo"] .social-link {
+      border-radius:0; border:1px solid var(--border2);
+      background:rgba(0,245,212,0.06); color:var(--cream); animation:none;
+    }
+    html[data-menu-theme="neon-tokyo"] .social-link:hover {
+      background:rgba(0,245,212,0.14); border-color:var(--gold);
+      box-shadow:0 0 20px rgba(0,245,212,0.32); color:var(--gold);
+    }
+    html[data-menu-theme="neon-tokyo"] #call-fab { border-radius:4px; }
+    html[data-menu-theme="neon-tokyo"] #call-fab.show {
+      box-shadow:0 0 24px rgba(0,245,212,0.5), 0 4px 14px rgba(0,0,0,0.5);
+    }
+
+    /* ── BOTANICAL FOREST — organique arrondi ── */
+    html[data-menu-theme="botanical"] .cat-pill.on {
+      background:var(--gold); color:var(--bg); animation:none;
+      box-shadow:0 2px 12px rgba(122,204,90,0.4);
+    }
+    html[data-menu-theme="botanical"] .s-input { border-radius:10px; }
+    html[data-menu-theme="botanical"] .s-input:focus {
+      border-color:var(--gold); background:rgba(122,204,90,0.06);
+    }
+    html[data-menu-theme="botanical"] .lang-btn { border-radius:10px; }
+    html[data-menu-theme="botanical"] .lang-btn.on {
+      border-color:var(--gold); background:rgba(122,204,90,0.12);
+    }
+    html[data-menu-theme="botanical"] .theme-btn { border-radius:10px; }
+    html[data-menu-theme="botanical"] #nav { border-bottom:1px solid rgba(122,204,90,0.14); }
+    html[data-menu-theme="botanical"] .social-link {
+      border-radius:10px; border:1px solid var(--border2);
+      background:rgba(122,204,90,0.06); color:var(--cream); animation:none;
+    }
+    html[data-menu-theme="botanical"] .social-link:hover {
+      background:rgba(122,204,90,0.16); border-color:var(--gold);
+      box-shadow:0 4px 16px rgba(122,204,90,0.28); color:var(--gold);
+    }
+    html[data-menu-theme="botanical"] #call-fab { border-radius:14px; }
+
+    /* ── ROSE PARISIEN — romantique circulaire ── */
+    html[data-menu-theme="rose-parisien"] .cat-pill.on {
+      background:var(--gold); color:var(--bg); animation:none;
+      box-shadow:0 2px 12px rgba(232,144,176,0.45);
+    }
+    html[data-menu-theme="rose-parisien"] .s-input:focus {
+      border-color:var(--gold); background:rgba(232,144,176,0.06);
+      box-shadow:0 4px 16px rgba(232,144,176,0.14);
+    }
+    html[data-menu-theme="rose-parisien"] .lang-btn { border-radius:28px; }
+    html[data-menu-theme="rose-parisien"] .lang-btn.on {
+      border-color:var(--gold); background:rgba(232,144,176,0.12);
+    }
+    html[data-menu-theme="rose-parisien"] .theme-btn { border-radius:50%; }
+    html[data-menu-theme="rose-parisien"] #nav { border-bottom:1px solid rgba(232,144,176,0.14); }
+    html[data-menu-theme="rose-parisien"] .social-link {
+      border-radius:28px; border:1px solid var(--border2);
+      background:rgba(232,144,176,0.07); color:var(--cream); animation:none;
+    }
+    html[data-menu-theme="rose-parisien"] .social-link:hover {
+      background:rgba(232,144,176,0.18); border-color:var(--gold);
+      box-shadow:0 4px 18px rgba(232,144,176,0.3); color:var(--gold);
+    }
+    html[data-menu-theme="rose-parisien"] #call-fab { border-radius:50%; }
+
+    /* ── ENSEIGNE (midnight-luxe) — architectural ── */
+    html[data-menu-theme="midnight-luxe"] .cat-pill { border-radius:6px; }
+    html[data-menu-theme="midnight-luxe"] .cat-pill.on {
+      background:var(--gold); color:var(--bg); animation:none;
+      box-shadow:0 2px 12px rgba(240,208,96,0.35);
+    }
+    html[data-menu-theme="midnight-luxe"] .s-input { border-radius:6px; }
+    html[data-menu-theme="midnight-luxe"] .s-input:focus {
+      border-color:var(--gold); background:rgba(240,208,96,0.05);
+    }
+    html[data-menu-theme="midnight-luxe"] .lang-btn { border-radius:6px; }
+    html[data-menu-theme="midnight-luxe"] .lang-btn.on {
+      border-color:var(--gold); background:rgba(240,208,96,0.10);
+    }
+    html[data-menu-theme="midnight-luxe"] .theme-btn { border-radius:6px; }
+    html[data-menu-theme="midnight-luxe"] #nav { border-bottom:1px solid rgba(240,208,96,0.14); }
+    html[data-menu-theme="midnight-luxe"] .social-link {
+      border-radius:6px; border:1px solid var(--border2);
+      background:rgba(240,208,96,0.05); color:var(--cream); animation:none;
+    }
+    html[data-menu-theme="midnight-luxe"] .social-link:hover {
+      background:rgba(240,208,96,0.13); border-color:var(--gold);
+      box-shadow:0 4px 16px rgba(240,208,96,0.22); color:var(--gold);
+    }
+    html[data-menu-theme="midnight-luxe"] #call-fab { border-radius:8px; }
+
+    /* ── VELVET LUXE — tranchant éditorial ── */
+    html[data-menu-theme="velvet-luxe"] .cat-pill.on {
+      background:var(--gold); color:var(--bg); animation:none;
+      box-shadow:0 2px 10px rgba(212,175,55,0.4), inset 0 0 0 1px rgba(196,30,58,0.18);
+    }
+    html[data-menu-theme="velvet-luxe"] .s-input { border-radius:4px; }
+    html[data-menu-theme="velvet-luxe"] .s-input:focus {
+      border-color:var(--gold); background:rgba(212,175,55,0.06);
+    }
+    html[data-menu-theme="velvet-luxe"] .lang-btn { border-radius:4px; }
+    html[data-menu-theme="velvet-luxe"] .lang-btn.on {
+      border-color:var(--gold); background:rgba(212,175,55,0.10);
+    }
+    html[data-menu-theme="velvet-luxe"] .theme-btn { border-radius:4px; }
+    html[data-menu-theme="velvet-luxe"] #nav { border-bottom:1px solid rgba(196,30,58,0.22); }
+    html[data-menu-theme="velvet-luxe"] .social-link {
+      border-radius:4px; border:1px solid var(--border2);
+      background:rgba(212,175,55,0.05); color:var(--cream); animation:none;
+    }
+    html[data-menu-theme="velvet-luxe"] .social-link:hover {
+      background:rgba(212,175,55,0.12); border-color:var(--gold);
+      box-shadow:0 4px 16px rgba(212,175,55,0.26); color:var(--gold);
+    }
+    html[data-menu-theme="velvet-luxe"] #call-fab { border-radius:4px; }
+
+    /* ── SANTORIN — méditerranéen fluide ── */
+    html[data-menu-theme="santorin"] .cat-pill.on {
+      background:var(--gold); color:var(--bg); animation:none;
+      box-shadow:0 2px 14px rgba(77,184,255,0.45);
+    }
+    html[data-menu-theme="santorin"] .s-input { border-radius:20px; }
+    html[data-menu-theme="santorin"] .s-input:focus {
+      border-color:var(--gold); background:rgba(77,184,255,0.06);
+      box-shadow:0 4px 16px rgba(77,184,255,0.14);
+    }
+    html[data-menu-theme="santorin"] .lang-btn { border-radius:20px; }
+    html[data-menu-theme="santorin"] .lang-btn.on {
+      border-color:var(--gold); background:rgba(77,184,255,0.12);
+    }
+    html[data-menu-theme="santorin"] .theme-btn { border-radius:20px; }
+    html[data-menu-theme="santorin"] #nav { border-bottom:1px solid rgba(77,184,255,0.2); }
+    html[data-menu-theme="santorin"] .social-link {
+      border-radius:20px; border:1px solid var(--border2);
+      background:rgba(77,184,255,0.07); color:var(--cream); animation:none;
+    }
+    html[data-menu-theme="santorin"] .social-link:hover {
+      background:rgba(77,184,255,0.16); border-color:var(--gold);
+      box-shadow:0 4px 18px rgba(77,184,255,0.3); color:var(--gold);
+    }
+    html[data-menu-theme="santorin"] #call-fab { border-radius:50%; }
+    html[data-menu-theme="santorin"] #call-fab.show {
+      box-shadow:0 4px 22px rgba(77,184,255,0.5), 0 2px 10px rgba(0,0,0,0.4);
+    }
+
+    /* ── Light mode : texte lisible sur cat-pill.on coloré ── */
+    html[data-menu-theme="botanical"].light .cat-pill.on,
+    html[data-menu-theme="rose-parisien"].light .cat-pill.on,
+    html[data-menu-theme="midnight-luxe"].light .cat-pill.on,
+    html[data-menu-theme="velvet-luxe"].light .cat-pill.on,
+    html[data-menu-theme="santorin"].light .cat-pill.on { color:#ffffff; }
+
+    /* ── Light mode : couleur texte social-link ── */
+    html[data-menu-theme="neon-tokyo"].light .social-link,
+    html[data-menu-theme="botanical"].light .social-link,
+    html[data-menu-theme="rose-parisien"].light .social-link,
+    html[data-menu-theme="midnight-luxe"].light .social-link,
+    html[data-menu-theme="velvet-luxe"].light .social-link,
+    html[data-menu-theme="santorin"].light .social-link { color:var(--cream); }
+
+    /* ================================================
        THÈMES — Mode Light (correctifs hero)
     ================================================ */
 
