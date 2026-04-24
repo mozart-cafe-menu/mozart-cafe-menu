@@ -282,6 +282,9 @@
       isolation:isolate;
       background: radial-gradient(ellipse at 60% 40%, #1a1208 0%, #111009 45%, #0c0a08 100%);
     }
+    html.light #hero {
+      background: linear-gradient(160deg, #f5f0e8 0%, #ede8df 55%, #e8e0d2 100%);
+    }
     .hero-bg-img {
       position:absolute; inset:-10%;
       background-size:cover;
@@ -357,19 +360,6 @@
       animation: lightFlow 5s ease infinite;
       color: #fdf6ed;
       box-shadow: 0 2px 12px rgba(168,104,64,0.25);
-    }
-    html.light #call-fab {
-      background: linear-gradient(135deg, #d4a47a, #a86840, #cc9060, #b87448);
-      background-size: 250% 250%;
-      animation: lightFlow 5s ease infinite, callFabPulse 4s ease-in-out 2s infinite;
-      color: #fdf6ed;
-      box-shadow: 0 4px 18px rgba(168,104,64,0.45);
-    }
-    html.light #call-fab.show {
-      animation: lightFlow 5s ease infinite, callFabPulse 4s ease-in-out 2s infinite;
-    }
-    html.light #call-fab.fab-top {
-      animation: lightFlow 5s ease infinite, fabShine 0.65s ease 0.32s forwards !important;
     }
     html.light .social-link {
       background: linear-gradient(135deg, #d4a47a, #a86840, #cc9060, #b87448);
@@ -854,58 +844,6 @@
     #fab:active { transform:scale(0.92); }
     #fab svg { width:18px; height:18px; }
 
-    /* ================================================
-       CALL FAB — Appeler le serveur (toujours visible)
-    ================================================ */
-    #call-fab {
-      position:fixed;
-      bottom:calc(74px + env(safe-area-inset-bottom, 0px));
-      right:14px;
-      z-index:202;
-      width:52px; height:52px;
-      display:flex; align-items:center; justify-content:center;
-      background:linear-gradient(135deg, var(--gold-lt), var(--gold), var(--gold-dk), var(--gold), var(--gold-lt));
-      background-size:250% 250%;
-      animation:lightFlow 5s ease infinite;
-      border-radius:50%;
-      color:#0c0a08;
-      cursor:pointer; border:none;
-      box-shadow:0 4px 18px rgba(200,164,78,0.5);
-      /* Caché au départ */
-      opacity:0; transform:scale(0.6);
-      pointer-events:none;
-      transition:opacity 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.4s ease;
-      -webkit-tap-highlight-color:transparent;
-      touch-action:manipulation;
-    }
-    #call-fab.show {
-      opacity:1; transform:scale(1);
-      pointer-events:auto;
-      animation:lightFlow 5s ease infinite, callFabPulse 4s ease-in-out 2s infinite;
-    }
-    #call-fab.fab-top {
-      animation:lightFlow 5s ease infinite, fabShine 0.65s ease 0.32s forwards !important;
-    }
-    @keyframes fabShine {
-      0%   { transform:scale(1); box-shadow:0 6px 28px rgba(200,164,78,0.75); }
-      40%  { transform:scale(1.22); box-shadow:0 10px 42px rgba(200,164,78,0.95),0 0 0 14px rgba(200,164,78,0.18); }
-      65%  { transform:scale(0.93); }
-      82%  { transform:scale(1.07); }
-      100% { transform:scale(1); box-shadow:0 6px 24px rgba(200,164,78,0.65),0 0 0 0 rgba(200,164,78,0); }
-    }
-    #call-fab .cfab-ico { width:22px; height:22px; flex-shrink:0; }
-    @keyframes callFabPulse {
-      0%,50%,100% { transform:scale(1); box-shadow:0 4px 18px rgba(200,164,78,0.5); }
-      55% { transform:scale(1.18); box-shadow:0 6px 28px rgba(200,164,78,0.85), 0 0 0 10px rgba(200,164,78,0.1); }
-      65% { transform:scale(0.95); }
-      72% { transform:scale(1.07); }
-      80% { transform:scale(1); }
-    }
-    @media(hover:hover) {
-      #call-fab:hover { transform:scale(1.1) !important; box-shadow:0 8px 28px rgba(200,164,78,0.7); }
-    }
-    #call-fab:active { transform:scale(0.88) !important; }
-    html[dir="rtl"] #call-fab { right:auto; left:14px; }
     html[dir="rtl"] #fab { right:auto; left:14px; }
 
     /* ================================================
@@ -968,106 +906,8 @@
 
     /* Card focus outline for accessibility */
     .card:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
-    #call-fab:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
-
     /* Smooth image loading */
     .c-img, .sh-img { background:var(--bg-card); }
-
-    /* ================================================
-       TABLE NUMBER MODAL
-    ================================================ */
-    #table-modal {
-      position:fixed; inset:0;
-      background:rgba(12,10,8,0.9);
-      backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
-      z-index:400;
-      display:flex; align-items:center; justify-content:center;
-      padding:20px;
-      opacity:0; pointer-events:none;
-      transition:opacity 0.3s ease;
-    }
-    #table-modal.on { opacity:1; pointer-events:auto; }
-    .table-box {
-      background:var(--bg2);
-      border:1px solid var(--border2);
-      border-radius:24px;
-      padding:32px 26px 26px;
-      max-width:340px; width:100%;
-      text-align:center;
-      box-shadow:0 28px 72px rgba(0,0,0,0.6), 0 0 0 1px rgba(200,164,78,0.1);
-      transform:scale(0.88) translateY(28px);
-      transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    #table-modal.on .table-box { transform:scale(1) translateY(0); }
-    .table-box-ico {
-      width:54px; height:54px;
-      background:rgba(200,164,78,0.1);
-      border:1px solid var(--border2);
-      border-radius:50%;
-      display:flex; align-items:center; justify-content:center;
-      margin:0 auto 16px;
-      color:var(--gold);
-    }
-    .table-box-ico svg { width:24px; height:24px; }
-    .table-box-title {
-      font-family:'Cormorant',serif;
-      font-size:1.55rem; font-weight:600;
-      color:var(--cream); margin-bottom:6px; line-height:1.2;
-    }
-    .table-box-sub {
-      font-size:0.8rem; color:var(--muted);
-      margin-bottom:22px; line-height:1.55;
-    }
-    .table-num-input {
-      width:100%;
-      background:var(--bg-card);
-      border:1.5px solid var(--border2);
-      border-radius:14px;
-      padding:16px 18px;
-      color:var(--cream);
-      font-family:'Outfit',sans-serif;
-      font-size:2.2rem; font-weight:300;
-      text-align:center;
-      letter-spacing:0.18em;
-      outline:none;
-      transition:border-color 0.25s, box-shadow 0.25s;
-      -moz-appearance:textfield;
-      margin-bottom:20px;
-    }
-    .table-num-input::-webkit-inner-spin-button,
-    .table-num-input::-webkit-outer-spin-button { -webkit-appearance:none; }
-    .table-num-input:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(200,164,78,0.14); }
-    .table-num-input.err { border-color:#e8854a; animation:shake 0.4s ease; }
-    @keyframes shake {
-      0%,100%{transform:translateX(0)}
-      20%{transform:translateX(-7px)}
-      40%{transform:translateX(7px)}
-      60%{transform:translateX(-4px)}
-      80%{transform:translateX(4px)}
-    }
-    .table-modal-btns { display:flex; gap:10px; }
-    .table-cancel-btn {
-      flex:1; padding:13px;
-      border:1px solid var(--border2);
-      border-radius:12px;
-      color:var(--muted);
-      font-family:'Outfit',sans-serif;
-      font-size:0.88rem; font-weight:400;
-      transition:all 0.25s; cursor:pointer; background:none;
-    }
-    .table-cancel-btn:hover { border-color:var(--cream); color:var(--cream); }
-    .table-confirm-btn {
-      flex:2; padding:13px;
-      background:linear-gradient(135deg,var(--gold-lt),var(--gold),var(--gold-dk));
-      border-radius:12px;
-      color:#0c0a08;
-      font-family:'Outfit',sans-serif;
-      font-size:0.9rem; font-weight:600;
-      transition:all 0.28s; cursor:pointer; border:none;
-      letter-spacing:0.04em;
-    }
-    .table-confirm-btn:hover { transform:translateY(-1px); box-shadow:0 8px 22px rgba(200,164,78,0.4); }
-    html.light #table-modal { background:rgba(242,238,232,0.9); }
 
     /* ================================================
        MOBILE FINE-TUNING
@@ -1109,8 +949,6 @@
       .ft-social-btn { padding:8px 14px; font-size:0.74rem; }
       /* FABs : légèrement plus petit */
       #fab { width:40px; height:40px; }
-      #call-fab { width:48px; height:48px; }
-      #call-fab .cfab-ico { width:20px; height:20px; }
     }
 
     /* ── Très petits écrans ── */
@@ -1796,11 +1634,6 @@
       background:rgba(0,245,212,0.14); border-color:var(--gold);
       box-shadow:0 0 20px rgba(0,245,212,0.32); color:var(--gold);
     }
-    html[data-menu-theme="neon-tokyo"] #call-fab { border-radius:4px; }
-    html[data-menu-theme="neon-tokyo"] #call-fab.show {
-      box-shadow:0 0 24px rgba(0,245,212,0.5), 0 4px 14px rgba(0,0,0,0.5);
-    }
-
     /* ── BOTANICAL FOREST — organique arrondi ── */
     html[data-menu-theme="botanical"] .cat-pill.on {
       background:var(--gold); color:var(--bg); animation:none;
@@ -1824,8 +1657,6 @@
       background:rgba(122,204,90,0.16); border-color:var(--gold);
       box-shadow:0 4px 16px rgba(122,204,90,0.28); color:var(--gold);
     }
-    html[data-menu-theme="botanical"] #call-fab { border-radius:14px; }
-
     /* ── ROSE PARISIEN — romantique circulaire ── */
     html[data-menu-theme="rose-parisien"] .cat-pill.on {
       background:var(--gold); color:var(--bg); animation:none;
@@ -1849,8 +1680,6 @@
       background:rgba(232,144,176,0.18); border-color:var(--gold);
       box-shadow:0 4px 18px rgba(232,144,176,0.3); color:var(--gold);
     }
-    html[data-menu-theme="rose-parisien"] #call-fab { border-radius:50%; }
-
     /* ── ENSEIGNE (midnight-luxe) — architectural ── */
     html[data-menu-theme="midnight-luxe"] .cat-pill { border-radius:6px; }
     html[data-menu-theme="midnight-luxe"] .cat-pill.on {
@@ -1875,8 +1704,6 @@
       background:rgba(240,208,96,0.13); border-color:var(--gold);
       box-shadow:0 4px 16px rgba(240,208,96,0.22); color:var(--gold);
     }
-    html[data-menu-theme="midnight-luxe"] #call-fab { border-radius:8px; }
-
     /* ── VELVET LUXE — tranchant éditorial ── */
     html[data-menu-theme="velvet-luxe"] .cat-pill.on {
       background:var(--gold); color:var(--bg); animation:none;
@@ -1900,8 +1727,6 @@
       background:rgba(212,175,55,0.12); border-color:var(--gold);
       box-shadow:0 4px 16px rgba(212,175,55,0.26); color:var(--gold);
     }
-    html[data-menu-theme="velvet-luxe"] #call-fab { border-radius:4px; }
-
     /* ── SANTORIN — méditerranéen fluide ── */
     html[data-menu-theme="santorin"] .cat-pill.on {
       background:var(--gold); color:var(--bg); animation:none;
@@ -1926,11 +1751,6 @@
       background:rgba(77,184,255,0.16); border-color:var(--gold);
       box-shadow:0 4px 18px rgba(77,184,255,0.3); color:var(--gold);
     }
-    html[data-menu-theme="santorin"] #call-fab { border-radius:50%; }
-    html[data-menu-theme="santorin"] #call-fab.show {
-      box-shadow:0 4px 22px rgba(77,184,255,0.5), 0 2px 10px rgba(0,0,0,0.4);
-    }
-
     /* ── ISLAMIC — UI étendue ── */
     html[data-menu-theme="islamic"] .cat-pill { border-radius:6px; }
     html[data-menu-theme="islamic"] .cat-pill.on {
@@ -1949,10 +1769,6 @@
       border-radius:6px; background:rgba(200,168,80,0.08); animation:none;
     }
     html[data-menu-theme="islamic"] .social-link:hover { box-shadow:0 0 14px rgba(200,168,80,0.28); }
-    html[data-menu-theme="islamic"] #call-fab { border-radius:50%; }
-    html[data-menu-theme="islamic"] #call-fab.show {
-      box-shadow:0 4px 22px rgba(200,168,80,0.45), 0 2px 10px rgba(0,0,0,0.4);
-    }
 
     /* ── Light mode : texte lisible sur cat-pill.on coloré ── */
     html[data-menu-theme="botanical"].light .cat-pill.on,
@@ -2107,26 +1923,6 @@
     html[data-menu-theme="islamic"].light .cat-hd .cat-sub { color:rgba(255,255,255,0.82); }
     html[data-menu-theme="islamic"].light .cat-ico-box { background:rgba(255,255,255,0.2); border-color:rgba(255,255,255,0.35); }
     html[data-menu-theme="islamic"].light .cat-ico-box svg { color:#ffffff; }
-    /* ── Light mode : FAB couleur par thème ── */
-    html[data-menu-theme="neon-tokyo"].light #call-fab,
-    html[data-menu-theme="botanical"].light #call-fab,
-    html[data-menu-theme="rose-parisien"].light #call-fab,
-    html[data-menu-theme="midnight-luxe"].light #call-fab,
-    html[data-menu-theme="velvet-luxe"].light #call-fab,
-    html[data-menu-theme="santorin"].light #call-fab,
-    html[data-menu-theme="islamic"].light #call-fab {
-      background: linear-gradient(135deg, var(--gold-lt), var(--gold), var(--gold-dk), var(--gold), var(--gold-lt));
-      background-size: 250% 250%;
-      animation: lightFlow 5s ease infinite;
-      color: #ffffff;
-    }
-    html[data-menu-theme="neon-tokyo"].light #call-fab { box-shadow:0 4px 18px rgba(0,160,138,0.5); }
-    html[data-menu-theme="botanical"].light #call-fab { box-shadow:0 4px 18px rgba(58,122,42,0.5); }
-    html[data-menu-theme="rose-parisien"].light #call-fab { box-shadow:0 4px 18px rgba(184,80,128,0.5); }
-    html[data-menu-theme="midnight-luxe"].light #call-fab { box-shadow:0 4px 18px rgba(168,104,64,0.45); }
-    html[data-menu-theme="velvet-luxe"].light #call-fab { box-shadow:0 4px 18px rgba(168,139,26,0.5); }
-    html[data-menu-theme="santorin"].light #call-fab { box-shadow:0 4px 20px rgba(21,101,192,0.5); }
-    html[data-menu-theme="islamic"].light #call-fab { box-shadow:0 4px 20px rgba(30,107,42,0.5); }
   </style>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -2386,34 +2182,11 @@
   <div class="ft-cr">© 2026 Mozart Coffee Lounge · Radès, Tunis</div>
 </footer>
 
-<!-- CALL FAB — Appeler le serveur -->
-<button id="call-fab" aria-label="Appeler le serveur">
-  <svg class="cfab-ico"><use href="#ico-bell"/></svg>
-</button>
-
 <!-- FAB -->
 <button id="fab" aria-label="Scroll to top">
   <svg><use href="#ico-up"/></svg>
 </button>
 
-<!-- ================================================
-     TABLE NUMBER MODAL
-================================================ -->
-<div id="table-modal" role="dialog" aria-modal="true" aria-labelledby="tbl-title">
-  <div class="table-box">
-    <div class="table-box-ico">
-      <svg width="24" height="24"><use href="#ico-bell"/></svg>
-    </div>
-    <div class="table-box-title" id="tbl-title">Appeler le serveur</div>
-    <div class="table-box-sub" id="tbl-desc">Veuillez entrer votre numéro de table</div>
-    <input type="number" class="table-num-input" id="table-num"
-           placeholder="1" min="1" max="99" inputmode="numeric">
-    <div class="table-modal-btns">
-      <button class="table-cancel-btn" id="tbl-cancel">Annuler</button>
-      <button class="table-confirm-btn" id="tbl-confirm">Confirmer</button>
-    </div>
-  </div>
-</div>
 
 <script>
 /* ================================================
@@ -2441,13 +2214,6 @@ const UI = {
     badgeN:'Nouveau', badgeP:'Populaire', badgeV:'Vegan', badgeL:'Offre limitée', badgeM:'Le Matin',
     bdgBoisson:'Boisson', bdgCuisine:'Cuisine', bdgSucre:'Sucré', bdgHookah:'Hookah',
     bdgChaud:'Chaud', bdgFroid:'Froid', bdgGlace:'Glacé',
-    callBtn:'Appeler le serveur',
-    notified:'Serveur notifié ✓',
-    notifiedTable:'Serveur notifié · Table {n} ✓',
-    tableTitle:'Appeler le serveur',
-    tableDesc:'Entrez votre numéro de table',
-    tableConfirm:'Confirmer',
-    tableCancel:'Annuler',
     alLabel:'Détails',
     noRes:'Aucun résultat pour votre recherche',
     wifiN:'WiFi ', wifiV:'MozartCafe_Free · Mozart2026',
@@ -2465,13 +2231,6 @@ const UI = {
     badgeN:'New', badgeP:'Popular', badgeV:'Vegan', badgeL:'Limited offer', badgeM:'Morning',
     bdgBoisson:'Drink', bdgCuisine:'Food', bdgSucre:'Sweet', bdgHookah:'Hookah',
     bdgChaud:'Hot', bdgFroid:'Cold', bdgGlace:'Iced',
-    callBtn:'Call the waiter',
-    notified:'Waiter notified ✓',
-    notifiedTable:'Waiter notified · Table {n} ✓',
-    tableTitle:'Call the waiter',
-    tableDesc:'Enter your table number',
-    tableConfirm:'Confirm',
-    tableCancel:'Cancel',
     alLabel:'Details',
     noRes:'No results for your search',
     wifiN:'WiFi ', wifiV:'MozartCafe_Free · Mozart2026',
@@ -2489,13 +2248,6 @@ const UI = {
     badgeN:'جديد', badgeP:'الأكثر طلباً', badgeV:'نباتي', badgeL:'عرض محدود', badgeM:'الصباح',
     bdgBoisson:'مشروب', bdgCuisine:'أكل', bdgSucre:'حلو', bdgHookah:'شيشة',
     bdgChaud:'ساخن', bdgFroid:'بارد', bdgGlace:'مثلج',
-    callBtn:'استدعاء النادل',
-    notified:'تم إخطار النادل ✓',
-    notifiedTable:'تم إخطار النادل · طاولة {n} ✓',
-    tableTitle:'استدعاء النادل',
-    tableDesc:'أدخل رقم طاولتك',
-    tableConfirm:'تأكيد',
-    tableCancel:'إلغاء',
     alLabel:'التفاصيل',
     noRes:'لا توجد نتائج لبحثك',
     wifiN:'واي فاي ', wifiV:'MozartCafe_Free · Mozart2026',
@@ -2920,7 +2672,6 @@ try {
 let theme = localStorage.getItem('mc_menu_theme_locked')
   ? (localStorage.getItem('mc_menu_theme') || 'dark')
   : _defaultThemeMode(_cachedVisualTheme);
-let showCallBtn = true;  // contrôlé depuis l'admin
 let showPhotos  = true;  // contrôlé depuis l'admin (global)
 let _adminInfo  = null;  // copie des infos admin pour la barre de note
 
@@ -2945,8 +2696,6 @@ const LANG_LABELS = { fr:'FR', en:'EN', ar:'عر' };
    on écrase CATS et ITEMS avec ses données.
 ================================================ */
 function loadAdminData() {
-  // Ne pas afficher hero-bg.jpg par défaut — le cache ou Firebase fournira la bonne image
-
   // Afficher d'abord avec les données en cache (instantané)
   try {
     const raw = localStorage.getItem('mc_admin_data_v1');
@@ -3026,8 +2775,7 @@ function applyAdminData(data) {
       });
     }
 
-    // Photo d'accueil hero (fallback → hero-bg.jpg si rien dans Firebase)
-    applyHeroImage(data.heroImage || 'hero-bg.jpg');
+    applyHeroImage(data.heroImage || '');
 
     // Mettre à jour les infos du footer
     if (data.info) {
@@ -3039,11 +2787,6 @@ function applyAdminData(data) {
         if (data.info.addr_name?.[l])  UI[l].addrN   = data.info.addr_name[l];
         if (data.info.addr_val?.[l])   UI[l].addrV   = data.info.addr_val[l];
       });
-
-      // Visibilité bouton serveur
-      showCallBtn = data.info.showCallBtn !== false;
-      const fab = document.getElementById('call-fab');
-      if (fab) fab.style.display = showCallBtn ? '' : 'none';
 
       // Visibilité globale des photos
       showPhotos = data.info.showPhotos !== false;
@@ -3075,7 +2818,6 @@ function init() {
   setupSheet();
   setupFAB();
   setupStickyNav();
-  setupTableModal();
   setupSwipe();
   // Charger les données depuis JSONBin, puis construire le menu
   loadAdminData();
@@ -3735,14 +3477,6 @@ function openSheet(item) {
   document.getElementById('sheet').classList.add('on');
   document.body.style.overflow = 'hidden';
 
-  // FAB se positionne sur le bord supérieur du sheet avec animation spring
-  const callFab = document.getElementById('call-fab');
-  const sheetEl  = document.getElementById('sheet');
-  const sheetH   = Math.min(sheetEl.scrollHeight, window.innerHeight * 0.92);
-  callFab.style.bottom = `${sheetH + 4}px`;
-  callFab.style.transition = 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1), bottom 0.4s cubic-bezier(0.32,0.72,0,1), box-shadow 0.4s ease';
-  callFab.classList.add('fab-top');
-
   // Intercepter le bouton retour Android : pousser un état dans l'historique
   history.pushState({ sheetOpen: true }, '');
 }
@@ -3751,13 +3485,6 @@ function closeSheet() {
   document.getElementById('overlay').classList.remove('on');
   document.getElementById('sheet').classList.remove('on');
   document.body.style.overflow = '';
-
-  // FAB redescend avec animation fluide
-  const callFab = document.getElementById('call-fab');
-  callFab.style.transition = 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1), bottom 0.5s cubic-bezier(0.4,0,0.2,1), box-shadow 0.4s ease';
-  callFab.classList.remove('fab-top');
-  callFab.style.bottom = '';
-  setTimeout(() => { callFab.style.transition = ''; callFab.style.bottom = ''; }, 550);
 
   // Si on ferme via code (overlay, swipe, escape), retirer l'état qu'on avait poussé
   if (history.state && history.state.sheetOpen) {
@@ -3771,12 +3498,6 @@ window.addEventListener('popstate', e => {
     document.getElementById('overlay').classList.remove('on');
     document.getElementById('sheet').classList.remove('on');
     document.body.style.overflow = '';
-    // FAB redescend
-    const callFab = document.getElementById('call-fab');
-    callFab.style.transition = 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1), bottom 0.5s cubic-bezier(0.4,0,0.2,1), box-shadow 0.4s ease';
-    callFab.classList.remove('fab-top');
-    callFab.style.bottom = '';
-    setTimeout(() => { callFab.style.transition = ''; callFab.style.bottom = ''; }, 550);
     // Ne pas appeler closeSheet() pour éviter une boucle history.back()
   }
 });
@@ -3832,28 +3553,12 @@ function setupStickyNav() {
    FAB
 ================================================ */
 function setupFAB() {
-  const fab     = document.getElementById('fab');
-  const callFab = document.getElementById('call-fab');
-
-  function checkCallFab() {
-    if (callFab.classList.contains('show')) return;
-    const first = document.querySelector('.card');
-    if (!first) return;
-    const rect = first.getBoundingClientRect();
-    // Apparaît dès que le haut de la première card est dans l'écran
-    if (rect.top < window.innerHeight) callFab.classList.add('show');
-  }
+  const fab = document.getElementById('fab');
 
   // Vérifier au scroll
   window.addEventListener('scroll', () => {
     fab.classList.toggle('show', window.scrollY > 400);
-    checkCallFab();
   }, { passive: true });
-
-  // Vérifier après chaque rendu du menu (layout terminé au prochain frame)
-  document.addEventListener('menuRendered', () => {
-    requestAnimationFrame(() => requestAnimationFrame(checkCallFab));
-  });
 
   fab.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 }
@@ -3900,95 +3605,6 @@ function setupScrollObserver() {
     const r = cat.getBoundingClientRect();
     if (r.top < window.innerHeight) { cat.classList.add('cr'); }
     else obs.observe(cat);
-  });
-}
-
-/* ================================================
-   TABLE NUMBER MODAL
-================================================ */
-function openTableModal() {
-  const t = UI[lang];
-  document.getElementById('tbl-title').textContent = t.tableTitle;
-  document.getElementById('tbl-desc').textContent = t.tableDesc;
-  document.getElementById('tbl-confirm').textContent = t.tableConfirm;
-  document.getElementById('tbl-cancel').textContent = t.tableCancel;
-  const inp = document.getElementById('table-num');
-  inp.value = '';
-  inp.classList.remove('err');
-  document.getElementById('table-modal').classList.add('on');
-  setTimeout(() => inp.focus(), 380);
-}
-
-function closeTableModal() {
-  document.getElementById('table-modal').classList.remove('on');
-}
-
-function confirmTableCall() {
-  const inp = document.getElementById('table-num');
-  const raw = inp.value.trim();
-  const num = parseInt(raw, 10);
-  if (!raw || isNaN(num) || num < 1 || num > 99) {
-    inp.classList.add('err');
-    setTimeout(() => inp.classList.remove('err'), 500);
-    inp.focus();
-    return;
-  }
-  closeTableModal();
-
-  // Feedback visuel sur le FAB (icône check verte pendant 4s)
-  const fab = document.getElementById('call-fab');
-  if (fab) {
-    fab.style.background = 'linear-gradient(135deg,#7ebd6a,#5a9e4a)';
-    fab.style.color = '#fff';
-    fab.disabled = true;
-    const ico = fab.querySelector('use');
-    if (ico) ico.setAttribute('href', '#ico-check');
-    setTimeout(() => {
-      fab.style.background = '';
-      fab.style.color = '';
-      fab.disabled = false;
-      if (ico) ico.setAttribute('href', '#ico-bell');
-    }, 4000);
-  }
-  if (navigator.vibrate) navigator.vibrate([80, 40, 100]);
-
-  // 1. BroadcastChannel — même navigateur, même appareil
-  try {
-    const bc = new BroadcastChannel('mozart-cafe-waiter');
-    bc.postMessage({ type:'call_waiter', table: String(num), ts: Date.now() });
-    bc.close();
-  } catch(e) {}
-
-  // 2. Firebase Realtime Database — app ouverte (temps réel)
-  try {
-    _db.ref('calls/lastCall').set({
-      table: String(num),
-      ts: Date.now(),
-      lang: lang || 'fr'
-    });
-  } catch(e) {}
-
-  // 3. Netlify Function → FCM — app fermée (notification push)
-  fetch('/api/notify', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ table: String(num), lang: lang || 'fr' })
-  }).catch(() => {});
-}
-
-function setupTableModal() {
-  document.getElementById('call-fab').addEventListener('click', () => {
-    if (!document.getElementById('call-fab').disabled) openTableModal();
-  });
-  document.getElementById('tbl-cancel').addEventListener('click', closeTableModal);
-  document.getElementById('tbl-confirm').addEventListener('click', confirmTableCall);
-  document.getElementById('table-num').addEventListener('keydown', e => {
-    if (e.key === 'Enter') confirmTableCall();
-    if (e.key === 'Escape') closeTableModal();
-  });
-  // Clic sur le fond ferme le modal
-  document.getElementById('table-modal').addEventListener('click', e => {
-    if (e.target.id === 'table-modal') closeTableModal();
   });
 }
 

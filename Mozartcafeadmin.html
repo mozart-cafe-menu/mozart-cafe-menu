@@ -158,7 +158,10 @@
       padding:8px 12px; border-radius:8px;
       font-size:0.8rem; color:var(--muted);
       background:rgba(255,255,255,0.03); border:1px solid var(--border);
+      cursor:pointer; transition:border-color 0.2s, color 0.2s;
+      font-family:inherit; text-align:left; width:100%;
     }
+    .note-status:hover { border-color:var(--bord2); }
     .note-status .vis-dot { width:8px; height:8px; border-radius:50%; background:var(--muted); flex-shrink:0; transition:background 0.2s; }
     .note-status.on { color:var(--green); border-color:var(--green); }
     .note-status.on .vis-dot { background:var(--green); }
@@ -354,76 +357,6 @@
     html.light .hero-img-card { background:var(--bg3); }
     html.light .phone-mockup { border-color:#bbb; box-shadow:0 0 0 1px #aaa, 0 16px 40px rgba(0,0,0,0.15); }
     html.light .phone-notch { background:#ddd; }
-
-    /* ── FAB NOTIFICATION ── */
-    #fab-notif {
-      position:fixed; bottom:100px; right:20px;
-      width:52px; height:52px; border-radius:50%;
-      background:linear-gradient(135deg,#5a9e4a,#7ebd6a);
-      color:#fff; display:flex; align-items:center; justify-content:center;
-      box-shadow:0 4px 18px rgba(126,189,106,0.5), 0 2px 8px rgba(0,0,0,0.3);
-      z-index:200; cursor:pointer;
-      transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s;
-    }
-    #fab-notif:hover { transform:translateY(-3px) scale(1.06); box-shadow:0 8px 28px rgba(126,189,106,0.65); }
-    #fab-notif:active { transform:scale(0.93); }
-    #fab-notif svg { width:22px; height:22px; }
-    #fab-notif::before {
-      content:'Envoyer une notification';
-      position:absolute; right:60px; top:50%; transform:translateY(-50%);
-      background:var(--bg3); border:1px solid var(--bord2); border-radius:8px;
-      padding:6px 12px; font-size:0.76rem; color:var(--cream); white-space:nowrap;
-      opacity:0; pointer-events:none; transition:opacity 0.2s;
-    }
-    #fab-notif:hover::before { opacity:1; }
-
-    /* ── MODAL NOTIFICATION ── */
-    #notif-modal {
-      position:fixed; inset:0; background:rgba(0,0,0,0.65);
-      display:flex; align-items:center; justify-content:center;
-      z-index:500; padding:20px; opacity:0; pointer-events:none;
-      transition:opacity 0.25s ease;
-    }
-    #notif-modal.on { opacity:1; pointer-events:auto; }
-    .notif-box {
-      background:var(--bg3); border:1px solid var(--bord2); border-radius:22px;
-      padding:28px 24px; width:100%; max-width:420px;
-      box-shadow:0 20px 60px rgba(0,0,0,0.6);
-      transform:translateY(20px); transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    #notif-modal.on .notif-box { transform:translateY(0); }
-    .notif-title {
-      font-family:'Cormorant',serif; font-size:1.3rem; font-weight:600;
-      color:var(--cream); margin-bottom:6px;
-    }
-    .notif-sub { font-size:0.78rem; color:var(--muted); margin-bottom:18px; }
-    .notif-textarea {
-      width:100%; min-height:90px; resize:vertical;
-      background:var(--bg2); border:1px solid var(--border); border-radius:12px;
-      padding:12px 14px; color:var(--cream); font-size:0.9rem; font-family:inherit;
-      outline:none; transition:border-color 0.2s; line-height:1.55;
-    }
-    .notif-textarea:focus { border-color:var(--gold); }
-    .notif-textarea::placeholder { color:var(--muted); }
-    .notif-actions { display:flex; gap:10px; margin-top:14px; justify-content:flex-end; }
-    .notif-cancel {
-      padding:10px 18px; border-radius:12px; font-size:0.85rem;
-      border:1px solid var(--border); color:var(--muted);
-      cursor:pointer; transition:border-color 0.2s, color 0.2s;
-    }
-    .notif-cancel:hover { border-color:var(--bord2); color:var(--cream); }
-    .notif-send {
-      padding:10px 22px; border-radius:12px; font-size:0.85rem; font-weight:500;
-      background:linear-gradient(135deg,#5a9e4a,#7ebd6a); color:#fff;
-      cursor:pointer; transition:opacity 0.2s, transform 0.15s;
-      display:flex; align-items:center; gap:7px;
-    }
-    .notif-send:hover { opacity:0.9; }
-    .notif-send:active { transform:scale(0.96); }
-    .notif-send svg { width:15px; height:15px; }
-    .notif-send:disabled { opacity:0.5; cursor:not-allowed; }
-    html.light .notif-box { background:var(--bg3); }
-    html.light .notif-textarea { background:rgba(255,255,255,0.7); color:var(--cream); }
 
     /* ── SECTION ── */
     .adm-section { margin-bottom:32px; }
@@ -834,7 +767,6 @@
 
       /* FABs décalés pour ne pas couvrir le contenu */
       #fab-save  { bottom:36px; right:36px; width:64px; height:64px; }
-      #fab-notif { bottom:116px; right:36px; }
 
       /* Form grid : 3 colonnes sur desktop large */
       .form-grid-2 { grid-template-columns:1fr 1fr; }
@@ -878,35 +810,51 @@
     }
     @media(max-width:560px) { .theme-grid { grid-template-columns:1fr 1fr; } }
     .theme-card {
-      background:var(--card); border:2px solid var(--border);
-      border-radius:14px; padding:14px 12px;
-      cursor:pointer; transition:border-color 0.2s, transform 0.15s;
-      display:flex; flex-direction:column; gap:7px; align-items:center;
-      text-align:center; position:relative;
+      border-radius:14px; border:2px solid rgba(255,255,255,0.1);
+      overflow:hidden; cursor:pointer;
+      transition:border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+      position:relative; display:flex; flex-direction:column; padding:0;
     }
-    .theme-card:hover { border-color:var(--gold); transform:translateY(-2px); }
+    .theme-card:hover { border-color:var(--tc-accent, var(--gold)); transform:translateY(-2px); }
     .theme-card.active {
-      border-color:var(--gold);
-      background:rgba(200,164,78,0.08);
+      border-color:var(--tc-accent, var(--gold));
+      box-shadow:0 0 0 1px var(--tc-accent, var(--gold));
     }
+    .tc-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:7px 9px; background:rgba(0,0,0,0.45);
+    }
+    .tc-name { font-size:0.72rem; font-weight:700; color:#fff; letter-spacing:0.02em; }
     .theme-card .tc-check {
-      position:absolute; top:8px; right:8px;
-      width:18px; height:18px; border-radius:50%;
-      background:var(--gold); display:none;
-      align-items:center; justify-content:center;
+      width:16px; height:16px; border-radius:50%;
+      background:var(--tc-accent, var(--gold));
+      display:none; align-items:center; justify-content:center; flex-shrink:0;
     }
     .theme-card.active .tc-check { display:flex; }
-    .theme-card .tc-check svg { width:10px; height:10px; stroke:#000; stroke-width:2.5; }
-    .theme-card .tc-swatch {
-      width:48px; height:48px; border-radius:10px;
-      border:1px solid rgba(255,255,255,0.1);
-      flex-shrink:0;
+    .theme-card .tc-check svg { width:9px; height:9px; stroke:#000; stroke-width:3; }
+    .tc-preview {
+      display:flex; align-items:center; gap:7px;
+      padding:8px 9px 11px; flex:1;
     }
-    .theme-card .tc-name {
-      font-size:0.78rem; font-weight:500; color:var(--cream); line-height:1.3;
+    .tc-prev-img {
+      width:42px; height:42px; border-radius:8px; flex-shrink:0;
+      border:1px solid rgba(255,255,255,0.10);
     }
-    .theme-card .tc-sub {
-      font-size:0.68rem; color:var(--muted);
+    .tc-prev-body { flex:1; min-width:0; }
+    .tc-prev-item-name {
+      font-size:0.69rem; font-weight:700; color:rgba(255,255,255,0.92);
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .tc-prev-badges { display:flex; gap:3px; margin-top:4px; flex-wrap:wrap; }
+    .tc-prev-badge {
+      font-size:0.54rem; padding:1px 5px; border-radius:20px;
+      color:rgba(255,255,255,0.82); border:1px solid rgba(255,255,255,0.18);
+    }
+    .tc-prev-price {
+      font-size:0.62rem; font-weight:700;
+      background:var(--tc-accent, var(--gold)); color:#0a0a0a;
+      border-radius:20px; padding:2px 7px;
+      white-space:nowrap; flex-shrink:0; align-self:center;
     }
   </style>
   <!-- Firebase SDK -->
@@ -961,14 +909,8 @@
       <option value="en">🇬🇧 English</option>
       <option value="ar">🇸🇦 العربية</option>
     </select>
-    <button class="adm-vis-btn" id="toggle-call-btn" title="Afficher/cacher le bouton 'Appeler le serveur' dans le menu">
-      <span class="vis-dot"></span>Bouton serveur
-    </button>
-    <button class="adm-vis-btn" id="toggle-photos-btn" title="Afficher/cacher toutes les photos dans le menu">
+<button class="adm-vis-btn" id="toggle-photos-btn" title="Afficher/cacher toutes les photos dans le menu">
       <span class="vis-dot"></span>Photos (tout)
-    </button>
-    <button class="adm-vis-btn" id="toggle-note-btn" title="Afficher/cacher la barre de note dans le menu">
-      <span class="vis-dot"></span>Note clients
     </button>
     <div class="global-progress" id="global-progress"></div>
   </div>
@@ -1101,31 +1043,6 @@
   </svg>
 </button>
 
-<!-- FAB Notification serveurs -->
-<button id="fab-notif" style="display:none" title="Envoyer une notification">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-    <path d="M13.73 21a2 2 0 01-3.46 0"/>
-    <line x1="12" y1="3" x2="12" y2="1"/>
-  </svg>
-</button>
-
-<!-- Modal notification -->
-<div id="notif-modal">
-  <div class="notif-box">
-    <div class="notif-title">Notifier les serveurs</div>
-    <div class="notif-sub">Le message sera envoyé en notification push à tous les appareils connectés.</div>
-    <textarea class="notif-textarea" id="notif-textarea" placeholder="" maxlength="200"></textarea>
-    <div class="notif-actions">
-      <button class="notif-cancel" id="notif-cancel">Annuler</button>
-      <button class="notif-send" id="notif-send">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        Envoyer
-      </button>
-    </div>
-  </div>
-</div>
-
 <!-- Toast -->
 <div id="toast">✓ Modifications sauvegardées avec succès</div>
 
@@ -1170,7 +1087,6 @@ const DEFAULT_INFO = {
   hours_val:  { fr:'Tous les jours 7h00 – 00h00', en:'Every day 7:00 AM – midnight', ar:'كل يوم 7:00 صباحاً – منتصف الليل' },
   addr_name:   { fr:'Adresse', en:'Address', ar:'العنوان' },
   addr_val:    { fr:'Radès, Tunis, Tunisie', en:'Radès, Tunis, Tunisia', ar:'رادس، تونس، تونس' },
-  showCallBtn: true,
   showPhotos:  true,
   showNote:    false,
   noteText:    { fr: '', en: '', ar: '' },
@@ -1421,7 +1337,6 @@ function showAdmin() {
   document.getElementById('adm-header').style.display = '';
   document.getElementById('adm-wrap').style.display   = '';
   document.getElementById('fab-save').style.display   = '';
-  document.getElementById('fab-notif').style.display  = '';
   // Sync dropdown avec la langue mémorisée
   const sel = document.getElementById('global-src-lang');
   if (sel) sel.value = currentLang;
@@ -1432,7 +1347,6 @@ function showAdmin() {
   // loadData() est async — renderAll() et applyAdminUI() sont appelés à l'intérieur
   loadData();
   loadMenuTheme();
-  setupNotifFab();
 }
 
 /* ═══════════════════════════════════════════
@@ -1559,14 +1473,10 @@ function renderAll() {
 
 /* ── Synchronise les boutons de visibilité avec adminData.info ── */
 function syncVisToggles() {
-  const callBtn   = document.getElementById('toggle-call-btn');
   const photosBtn = document.getElementById('toggle-photos-btn');
-  const noteBtn   = document.getElementById('toggle-note-btn');
   if (!adminData?.info) return;
-  if (callBtn)   callBtn.classList.toggle('on',   adminData.info.showCallBtn !== false);
-  if (photosBtn) photosBtn.classList.toggle('on', adminData.info.showPhotos  !== false);
-  if (noteBtn)   noteBtn.classList.toggle('on',   adminData.info.showNote    === true);
-  // Synchro aussi le statut dans la section note
+  if (photosBtn) photosBtn.classList.toggle('on', adminData.info.showPhotos !== false);
+  // Synchro statut dans la section note
   const noteStatus = document.querySelector('.note-status');
   if (noteStatus) {
     const on = adminData.info.showNote === true;
@@ -1575,28 +1485,16 @@ function syncVisToggles() {
   }
 }
 
-/* ── Initialisation des listeners des boutons de visibilité ── */
+/* ── Listeners des boutons de visibilité (sauvegarde instantanée) ── */
 (function() {
-  document.getElementById('toggle-call-btn').addEventListener('click', () => {
-    if (!adminData) return;
-    if (!adminData.info) adminData.info = {};
-    adminData.info.showCallBtn = adminData.info.showCallBtn === false ? true : false;
-    syncVisToggles();
-    markUnsaved();
-  });
   document.getElementById('toggle-photos-btn').addEventListener('click', () => {
     if (!adminData) return;
     if (!adminData.info) adminData.info = {};
-    adminData.info.showPhotos = adminData.info.showPhotos === false ? true : false;
+    const newVal = adminData.info.showPhotos === false ? true : false;
+    adminData.info.showPhotos = newVal;
+    _db.ref('menu/info/showPhotos').set(newVal);
+    localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
     syncVisToggles();
-    markUnsaved();
-  });
-  document.getElementById('toggle-note-btn').addEventListener('click', () => {
-    if (!adminData) return;
-    if (!adminData.info) adminData.info = {};
-    adminData.info.showNote = !adminData.info.showNote;
-    syncVisToggles();
-    markUnsaved();
   });
 })();
 
@@ -1610,10 +1508,10 @@ function renderNoteSection() {
   const isOn = info.showNote === true;
 
   let html = `
-    <div class="note-status${isOn ? ' on' : ''}">
+    <button class="note-status${isOn ? ' on' : ''}">
       <span class="vis-dot"></span>
       <span class="note-status-txt">${isOn ? 'Affichée dans le menu' : 'Masquée dans le menu'}</span>
-    </div>
+    </button>
     <div class="lang-tabs note-lang-tabs">
       ${LANGS.map(l => `<button class="lang-tab${l===currentLang?' on':''}" data-note-lang="${l}">${LANG_LABELS[l]}</button>`).join('')}
     </div>
@@ -1627,6 +1525,16 @@ function renderNoteSection() {
     <div class="note-hint">Le texte s'affiche sous les catégories du menu — max 300 caractères par langue.</div>
   `;
   card.innerHTML = html;
+
+  // Bouton Afficher dans le menu — sauvegarde instantanée
+  card.querySelector('.note-status').addEventListener('click', () => {
+    if (!adminData.info) adminData.info = {};
+    const newVal = !adminData.info.showNote;
+    adminData.info.showNote = newVal;
+    _db.ref('menu/info/showNote').set(newVal);
+    localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
+    syncVisToggles();
+  });
 
   // Tabs langue
   card.querySelectorAll('[data-note-lang]').forEach(btn => {
@@ -1723,58 +1631,6 @@ function renderHeroImageSection() {
     adminData.heroImage = '';
     setPhoneBg('');
     markUnsaved();
-  });
-}
-
-/* ─── FAB NOTIFICATION SERVEURS ─── */
-function setupNotifFab() {
-  const fab      = document.getElementById('fab-notif');
-  const modal    = document.getElementById('notif-modal');
-  const textarea = document.getElementById('notif-textarea');
-  const sendBtn  = document.getElementById('notif-send');
-  const cancelBtn= document.getElementById('notif-cancel');
-
-  fab.addEventListener('click', () => {
-    textarea.value = '';
-    modal.classList.add('on');
-    setTimeout(() => textarea.focus(), 300);
-  });
-
-  function closeModal() { modal.classList.remove('on'); }
-  cancelBtn.addEventListener('click', closeModal);
-  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
-
-  sendBtn.addEventListener('click', async () => {
-    const msg = textarea.value.trim();
-    if (!msg) { textarea.focus(); return; }
-
-    sendBtn.disabled = true;
-    sendBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="15" height="15"><circle cx="12" cy="12" r="10"/></svg> Envoi…';
-
-    try {
-      const res = await fetch('/api/notify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ table: 'info', message: msg, lang: currentLang || 'fr' })
-      });
-      const data = await res.json();
-
-      if (data.sent > 0) {
-        closeModal();
-        showToastMsg('✓ Notification envoyée à ' + data.sent + ' appareil(s)');
-      } else if (data.error) {
-        showToastMsg('✗ Erreur serveur : ' + data.error, true);
-      } else if (data.reason === 'no_tokens') {
-        showToastMsg('⚠ Aucun token enregistré', true);
-      } else {
-        showToastMsg('⚠ Envoi échoué — ' + JSON.stringify(data), true);
-      }
-    } catch(e) {
-      showToastMsg('✗ Erreur réseau : ' + e.message, true);
-    }
-
-    sendBtn.disabled = false;
-    sendBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="15" height="15"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Envoyer';
   });
 }
 
@@ -3338,11 +3194,24 @@ function renderThemeSelector() {
   THEMES_DATA.forEach(th => {
     const card = document.createElement('div');
     card.className = 'theme-card' + (th.id === currentMenuTheme ? ' active' : '');
+    card.style.background = th.dark;
+    card.style.setProperty('--tc-accent', th.accent);
     card.innerHTML = `
-      <div class="tc-check"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,6 9,17 4,12"/></svg></div>
-      <div class="tc-swatch" style="background:linear-gradient(135deg,${th.dark} 50%,${th.accent} 100%)"></div>
-      <div class="tc-name">${th.name}</div>
-      <div class="tc-sub">${th.sub}</div>`;
+      <div class="tc-header">
+        <span class="tc-name">${th.name}</span>
+        <div class="tc-check"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,6 9,17 4,12"/></svg></div>
+      </div>
+      <div class="tc-preview">
+        <div class="tc-prev-img" style="background:linear-gradient(135deg,${th.accent}44,${th.accent}16)"></div>
+        <div class="tc-prev-body">
+          <div class="tc-prev-item-name">Espresso</div>
+          <div class="tc-prev-badges">
+            <span class="tc-prev-badge" style="background:${th.accent}22;border-color:${th.accent}55">Boisson</span>
+            <span class="tc-prev-badge" style="background:${th.accent}18;border-color:${th.accent}40">Chaud</span>
+          </div>
+        </div>
+        <div class="tc-prev-price">2.800 DT</div>
+      </div>`;
     card.addEventListener('click', () => saveMenuTheme(th.id));
     grid.appendChild(card);
   });
