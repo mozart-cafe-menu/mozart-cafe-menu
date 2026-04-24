@@ -803,51 +803,23 @@
       }
     }
 
-    .theme-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
-    @media(max-width:560px) { .theme-grid { grid-template-columns:1fr 1fr; } }
+    .theme-grid { display:flex; flex-wrap:wrap; gap:8px; }
     .theme-card {
-      border-radius:14px; border:2px solid rgba(255,255,255,0.1);
-      overflow:hidden; cursor:pointer;
-      transition:border-color 0.2s, transform 0.15s, box-shadow 0.2s;
-      display:flex; flex-direction:column; min-height:130px;
+      display:flex; align-items:center; gap:9px;
+      padding:8px 14px 8px 10px;
+      border-radius:10px;
+      border:2px solid rgba(255,255,255,0.08);
+      background:rgba(255,255,255,0.03);
+      cursor:pointer;
+      transition:border-color 0.18s, background 0.18s;
     }
-    .theme-card:hover { border-color:var(--tc-accent,var(--gold)); transform:translateY(-2px); }
-    .theme-card.active { border-color:var(--tc-accent,var(--gold)); box-shadow:0 0 0 1px var(--tc-accent,var(--gold)); }
-    .tc-bar { display:flex; align-items:center; justify-content:space-between; padding:6px 9px; background:rgba(0,0,0,0.45); flex-shrink:0; }
-    .tc-name { font-size:0.7rem; font-weight:700; color:#fff; letter-spacing:0.02em; }
-    .theme-card .tc-check { width:15px; height:15px; border-radius:50%; background:var(--tc-accent,var(--gold)); display:none; align-items:center; justify-content:center; flex-shrink:0; }
-    .theme-card.active .tc-check { display:flex; }
-    .theme-card .tc-check svg { width:8px; height:8px; stroke:#000; stroke-width:3; }
-    .tc-scene { flex:1; padding:8px; display:flex; align-items:stretch; }
-    .tc-mc { width:100%; border-radius:8px; overflow:hidden; background:rgba(255,255,255,0.05); display:flex; position:relative; min-height:72px; }
-    .tc-mc-cinema { flex-direction:column; }
-    .tc-mc-cinema .tc-mc-img { flex:1; background:rgba(255,255,255,0.07); }
-    .tc-mc-cinema .tc-mc-foot { padding:5px 7px; background:rgba(0,0,0,0.78); display:flex; align-items:center; justify-content:space-between; }
-    .tc-mc-strip { flex-direction:row; border-left:3px solid var(--tc-accent,#00f5d4); align-items:stretch; }
-    .tc-mc-strip .tc-mc-img { width:30px; background:rgba(255,255,255,0.06); flex-shrink:0; }
-    .tc-mc-strip .tc-mc-body { flex:1; padding:6px 7px; display:flex; flex-direction:column; justify-content:center; gap:4px; }
-    .tc-mc-strip .tc-mc-right { display:flex; align-items:center; padding:0 7px; flex-shrink:0; }
-    .tc-mc-forest { flex-direction:row; align-items:stretch; }
-    .tc-mc-forest .tc-mc-img { width:38%; background:rgba(255,255,255,0.07); flex-shrink:0; }
-    .tc-mc-forest .tc-mc-body { flex:1; padding:6px 8px; display:flex; flex-direction:column; justify-content:center; gap:4px; border-left:2px dashed rgba(255,255,255,0.12); }
-    .tc-mc-portrait { flex-direction:column; align-items:center; justify-content:center; padding:8px 6px; gap:5px; }
-    .tc-mc-portrait .tc-mc-circle { width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,0.08); border:2px solid var(--tc-accent,#e890b0); flex-shrink:0; }
-    .tc-mc-enseigne { flex-direction:row; align-items:stretch; }
-    .tc-mc-enseigne .tc-mc-left { width:38%; background:rgba(255,255,255,0.04); display:flex; align-items:center; justify-content:center; padding:4px; border-right:1px solid rgba(255,255,255,0.08); flex-shrink:0; }
-    .tc-mc-enseigne .tc-mc-body { flex:1; padding:6px 8px; display:flex; flex-direction:column; justify-content:center; gap:3px; }
-    .tc-mc-velvet { flex-direction:row; align-items:stretch; }
-    .tc-mc-velvet .tc-mc-body { flex:1; padding:6px 8px; display:flex; flex-direction:column; justify-content:center; gap:4px; position:relative; overflow:hidden; }
-    .tc-mc-velvet .tc-mc-num { position:absolute; top:50%; left:4px; transform:translateY(-50%); font-size:1.8rem; font-weight:900; color:rgba(255,255,255,0.06); pointer-events:none; line-height:1; }
-    .tc-mc-velvet .tc-mc-band { width:4px; background:var(--tc-accent,#d4af37); flex-shrink:0; }
-    .tc-mc-santorin { flex-direction:row; align-items:stretch; gap:6px; padding:6px; background:transparent; }
-    .tc-mc-santorin .tc-mc-panel { width:36%; background:var(--tc-accent,#4db8ff); border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0; opacity:0.85; }
-    .tc-mc-santorin .tc-mc-body { flex:1; display:flex; flex-direction:column; justify-content:center; gap:4px; }
-    .tc-mc-islamic { flex-direction:column; align-items:center; justify-content:center; padding:6px; gap:5px; }
-    .tc-mc-islamic .tc-mc-arch { width:36px; height:36px; border-radius:50% 50% 50% 50% / 60% 60% 40% 40%; background:rgba(255,255,255,0.07); border:2px solid var(--tc-accent,#c8a850); flex-shrink:0; }
-    .tc-mc-name { font-size:0.58rem; font-weight:700; color:rgba(255,255,255,0.88); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
-    .tc-mc-price { font-size:0.54rem; font-weight:700; background:var(--tc-accent,#c8a44e); color:#080808; border-radius:20px; padding:1px 5px; white-space:nowrap; display:inline-block; }
-    .tc-mc-price-lg { font-size:0.62rem; font-weight:700; color:var(--tc-accent,#c8a44e); text-align:center; line-height:1.2; }
-    .tc-mc-badge { font-size:0.48rem; padding:1px 4px; border-radius:20px; color:rgba(255,255,255,0.72); border:1px solid rgba(255,255,255,0.18); display:inline-block; }
+    .theme-card:hover { border-color:var(--tc-accent,var(--gold)); background:rgba(255,255,255,0.06); }
+    .theme-card.active { border-color:var(--tc-accent,var(--gold)); background:rgba(255,255,255,0.06); box-shadow:0 0 0 1px var(--tc-accent,var(--gold)); }
+    .tc-dot { width:11px; height:11px; border-radius:50%; background:var(--tc-accent,var(--gold)); flex-shrink:0; }
+    .tc-name { font-size:0.78rem; font-weight:600; color:rgba(255,255,255,0.9); letter-spacing:0.01em; }
+    .theme-card.active .tc-name { color:#fff; }
+    .tc-check { font-size:0.7rem; color:var(--tc-accent,var(--gold)); margin-left:2px; display:none; }
+    .theme-card.active .tc-check { display:block; }
   </style>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -3185,39 +3157,14 @@ function renderThemeSelector() {
   const grid = document.getElementById('theme-grid');
   if (!grid) return;
   grid.innerHTML = '';
-  const TC_INNER = {
-    cinema:   `<div class="tc-mc tc-mc-cinema"><div class="tc-mc-img"></div><div class="tc-mc-foot"><span class="tc-mc-name">Espresso</span><span class="tc-mc-price">2.80 DT</span></div></div>`,
-    strip:    `<div class="tc-mc tc-mc-strip"><div class="tc-mc-img"></div><div class="tc-mc-body"><span class="tc-mc-name">Espresso</span><span class="tc-mc-badge">Boisson</span></div><div class="tc-mc-right"><span class="tc-mc-price">2.80 DT</span></div></div>`,
-    forest:   `<div class="tc-mc tc-mc-forest"><div class="tc-mc-img"></div><div class="tc-mc-body"><span class="tc-mc-name">Espresso</span><span class="tc-mc-badge">Boisson</span><span class="tc-mc-price">2.80 DT</span></div></div>`,
-    portrait: `<div class="tc-mc tc-mc-portrait"><div class="tc-mc-circle"></div><span class="tc-mc-name">Espresso</span><span class="tc-mc-price">2.80 DT</span></div>`,
-    enseigne: `<div class="tc-mc tc-mc-enseigne"><div class="tc-mc-left"><span class="tc-mc-price-lg">2.80<br>DT</span></div><div class="tc-mc-body"><span class="tc-mc-name">Espresso</span><span class="tc-mc-badge">Boisson</span></div></div>`,
-    velvet:   `<div class="tc-mc tc-mc-velvet"><div class="tc-mc-body"><span class="tc-mc-num">01</span><span class="tc-mc-name">Espresso</span><span class="tc-mc-badge">Boisson</span><span class="tc-mc-price">2.80 DT</span></div><div class="tc-mc-band"></div></div>`,
-    santorin: `<div class="tc-mc tc-mc-santorin"><div class="tc-mc-panel"><span class="tc-mc-price">2.80 DT</span></div><div class="tc-mc-body"><span class="tc-mc-name">Espresso</span><span class="tc-mc-badge">Boisson</span></div></div>`,
-    islamic:  `<div class="tc-mc tc-mc-islamic"><div class="tc-mc-arch"></div><span class="tc-mc-name">Espresso</span><span class="tc-mc-price">2.80 DT</span></div>`,
-  };
-  const TC_STYLE = {
-    'gold-noir':     'cinema',
-    'prestige':      'cinema',
-    'neon-tokyo':    'strip',
-    'botanical':     'forest',
-    'rose-parisien': 'portrait',
-    'midnight-luxe': 'enseigne',
-    'velvet-luxe':   'velvet',
-    'santorin':      'santorin',
-    'islamic':       'islamic',
-  };
   THEMES_DATA.forEach(th => {
     const card = document.createElement('div');
     card.className = 'theme-card' + (th.id === currentMenuTheme ? ' active' : '');
-    card.style.background = th.dark;
     card.style.setProperty('--tc-accent', th.accent);
-    const style = TC_STYLE[th.id] || 'cinema';
     card.innerHTML = `
-      <div class="tc-bar">
-        <span class="tc-name">${th.name}</span>
-        <div class="tc-check"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20,6 9,17 4,12"/></svg></div>
-      </div>
-      <div class="tc-scene">${TC_INNER[style]}</div>`;
+      <span class="tc-dot"></span>
+      <span class="tc-name">${th.name}</span>
+      <span class="tc-check">✓</span>`;
     card.addEventListener('click', () => saveMenuTheme(th.id));
     grid.appendChild(card);
   });
