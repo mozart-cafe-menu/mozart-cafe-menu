@@ -143,6 +143,20 @@
       --muted:rgba(21,101,192,0.60); --border:rgba(21,101,192,0.14); --border2:rgba(21,101,192,0.30);
       --shadow:0 4px 16px rgba(21,101,192,0.12); --shadow-h:0 12px 32px rgba(21,101,192,0.20),0 4px 16px rgba(0,0,0,0.06);
     }
+    /* ── ISLAMIC (Vert & Or islamique) ── */
+    html[data-menu-theme="islamic"] {
+      --bg:#071407; --bg2:#0d2010; --bg-card:#0e2010; --bg-nav:rgba(7,20,7,0.95);
+      --gold:#c8a850; --gold-lt:#e8c870; --gold-dk:#9a7830; --cream:#f0e8d0;
+      --muted:rgba(200,168,80,0.55); --border:rgba(200,168,80,0.18); --border2:rgba(200,168,80,0.35);
+      --shadow:0 4px 20px rgba(0,0,0,0.6); --shadow-h:0 10px 36px rgba(200,168,80,0.15),0 4px 20px rgba(0,0,0,0.7);
+      --badge-new:#c8a850; --badge-pop:#c41e3a; --badge-veg:#4a9e4a;
+    }
+    html[data-menu-theme="islamic"].light {
+      --bg:#f5f0e8; --bg2:#ece6d8; --bg-card:#ffffff; --bg-nav:rgba(245,240,232,0.96);
+      --gold:#1e6b2a; --gold-lt:#2d8a3a; --gold-dk:#145020; --cream:#0f2010;
+      --muted:rgba(30,107,42,0.55); --border:rgba(30,107,42,0.18); --border2:rgba(30,107,42,0.32);
+      --shadow:0 4px 16px rgba(30,107,42,0.10); --shadow-h:0 10px 30px rgba(30,107,42,0.15),0 4px 16px rgba(0,0,0,0.05);
+    }
 
     /* ================================================
        RESET & BASE
@@ -1186,6 +1200,13 @@
       display:flex !important;
       flex-direction:column !important;
     }
+    /* Islamic: grille 2 colonnes séparées d'un liseré */
+    html[data-menu-theme="islamic"] .cards {
+      display:grid !important;
+      grid-template-columns:1fr 1fr !important;
+      gap:0 !important;
+      background:var(--border);
+    }
 
     /* ── 1. GOLD NOIR — Cinema (image plein fond) ── */
     .card-cinema {
@@ -1561,6 +1582,43 @@
     html[dir="rtl"] .card-santorin { flex-direction:row-reverse; }
     html[dir="rtl"] .card-santorin .san-shutter { border-radius:60px 0 0 60px; }
 
+    /* ── 9. ISLAMIC — Grille 2 colonnes, carte compacte ── */
+    .card-islamic {
+      display:flex; align-items:center; gap:8px;
+      padding:10px 9px; background:var(--bg-card);
+      cursor:pointer; transition:background 0.18s;
+      min-height:76px; position:relative;
+    }
+    .card-islamic:hover { background:var(--bg2); }
+    .card-islamic:active { transform:scale(0.99); }
+    .isl-img-wrap {
+      flex-shrink:0; width:50px; height:50px; border-radius:50%;
+      border:2px solid var(--gold);
+      box-shadow:0 0 0 2px var(--bg-card), 0 0 0 4px var(--gold-dk);
+      overflow:hidden;
+    }
+    .isl-img-wrap img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+    .isl-no-img {
+      flex-shrink:0; width:50px; height:50px; border-radius:50%;
+      border:2px solid var(--border2);
+      display:flex; align-items:center; justify-content:center; color:var(--muted);
+    }
+    .isl-no-img svg { width:18px; height:18px; }
+    .isl-body { flex:1; min-width:0; }
+    .isl-name {
+      font-size:0.75rem; font-weight:700; color:var(--cream);
+      line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .isl-desc {
+      font-size:0.64rem; color:var(--muted); margin-top:2px; line-height:1.3;
+      display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+    }
+    .isl-badges { margin-top:3px; }
+    .isl-price {
+      flex-shrink:0; font-size:0.76rem; font-weight:700; color:var(--gold);
+      white-space:nowrap; align-self:flex-start; padding-top:1px;
+    }
+
     /* ================================================
        THÈMES — UI globale (hero, nav, pills, search)
     ================================================ */
@@ -1670,6 +1728,53 @@
     html[data-menu-theme="santorin"] .hero-tagline { color:rgba(77,184,255,0.85); }
     html[data-menu-theme="santorin"] .hero-orn-line { background:linear-gradient(90deg,transparent,var(--gold)); }
     html[data-menu-theme="santorin"] .hero-orn-line:last-child { background:linear-gradient(270deg,transparent,var(--gold)); }
+
+    /* ── ISLAMIC — Hero, mosquée, lanternes, cat-hd ── */
+    html[data-menu-theme="islamic"] #hero {
+      background-color:#071407; overflow:hidden;
+      background-image:radial-gradient(ellipse 65% 50% at 50% 42%, rgba(30,90,35,0.22) 0%, transparent 70%);
+    }
+    html[data-menu-theme="islamic"] .hero-overlay {
+      background:linear-gradient(to bottom,
+        rgba(7,20,7,0.38) 0%, rgba(7,20,7,0.10) 30%,
+        rgba(7,20,7,0.18) 55%, rgba(7,20,7,0.68) 85%, rgba(7,20,7,0.94) 100%);
+    }
+    /* Anneaux arabesques concentriques derrière le logo */
+    html[data-menu-theme="islamic"] #hero::before {
+      content:''; position:absolute; width:300px; height:300px;
+      top:42%; left:50%; transform:translate(-50%,-50%);
+      border-radius:50%; border:1px solid rgba(200,168,80,0.35);
+      box-shadow:
+        0 0 0 16px rgba(200,168,80,0.04),0 0 0 32px rgba(200,168,80,0.10),
+        0 0 0 48px rgba(200,168,80,0.04),0 0 0 64px rgba(200,168,80,0.07),
+        0 0 0 80px rgba(200,168,80,0.03);
+      pointer-events:none; z-index:2;
+    }
+    /* Silhouette mosquée en bas */
+    html[data-menu-theme="islamic"] #hero::after {
+      content:''; position:absolute; bottom:0; left:0; right:0; height:130px;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 130'%3E%3Crect x='220' y='72' width='360' height='58' fill='%231a4a20'/%3E%3Cpath d='M240,72 Q400,8 560,72Z' fill='%231a4a20'/%3E%3Cpath d='M275,72 Q400,30 525,72Z' fill='%230d3015'/%3E%3Crect x='196' y='38' width='24' height='92' fill='%231a4a20'/%3E%3Cpath d='M196,38 Q208,10 220,38Z' fill='%231a4a20'/%3E%3Ccircle cx='208' cy='34' r='4' fill='%23c8a850' opacity='0.8'/%3E%3Crect x='580' y='38' width='24' height='92' fill='%231a4a20'/%3E%3Cpath d='M580,38 Q592,10 604,38Z' fill='%231a4a20'/%3E%3Ccircle cx='592' cy='34' r='4' fill='%23c8a850' opacity='0.8'/%3E%3Cpath d='M220,72 Q265,50 310,72Z' fill='%231a4a20'/%3E%3Cpath d='M490,72 Q535,50 580,72Z' fill='%231a4a20'/%3E%3Crect x='110' y='55' width='18' height='75' fill='%231a4a20'/%3E%3Cpath d='M110,55 Q119,36 128,55Z' fill='%231a4a20'/%3E%3Crect x='672' y='55' width='18' height='75' fill='%231a4a20'/%3E%3Cpath d='M672,55 Q681,36 690,55Z' fill='%231a4a20'/%3E%3Crect x='48' y='70' width='12' height='60' fill='%231a4a20'/%3E%3Cpath d='M48,70 Q54,56 60,70Z' fill='%231a4a20'/%3E%3Crect x='740' y='70' width='12' height='60' fill='%231a4a20'/%3E%3Cpath d='M740,70 Q746,56 752,70Z' fill='%231a4a20'/%3E%3C/svg%3E");
+      background-repeat:no-repeat; background-position:bottom center; background-size:100% 130px;
+      pointer-events:none; z-index:3;
+    }
+    /* Lanternes suspendues en haut */
+    html[data-menu-theme="islamic"] .hero-overlay::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:65px;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 65'%3E%3Cline x1='50' y1='0' x2='50' y2='12' stroke='%23c8a850' stroke-width='1' opacity='0.65'/%3E%3Cellipse cx='50' cy='24' rx='7' ry='11' fill='%231a4a20' stroke='%23c8a850' stroke-width='0.8' opacity='0.75'/%3E%3Cline x1='50' y1='35' x2='50' y2='42' stroke='%23c8a850' stroke-width='1' opacity='0.5'/%3E%3Cline x1='120' y1='0' x2='120' y2='16' stroke='%23c8a850' stroke-width='1' opacity='0.6'/%3E%3Cellipse cx='120' cy='30' rx='9' ry='13' fill='%231a4a20' stroke='%23c8a850' stroke-width='0.8' opacity='0.75'/%3E%3Cline x1='120' y1='43' x2='120' y2='52' stroke='%23c8a850' stroke-width='1' opacity='0.5'/%3E%3Cline x1='200' y1='0' x2='200' y2='12' stroke='%23c8a850' stroke-width='1.2' opacity='0.75'/%3E%3Cellipse cx='200' cy='26' rx='10' ry='15' fill='%231a4a20' stroke='%23c8a850' stroke-width='1' opacity='0.85'/%3E%3Cline x1='200' y1='41' x2='200' y2='50' stroke='%23c8a850' stroke-width='1' opacity='0.65'/%3E%3Cline x1='280' y1='0' x2='280' y2='16' stroke='%23c8a850' stroke-width='1' opacity='0.6'/%3E%3Cellipse cx='280' cy='30' rx='9' ry='13' fill='%231a4a20' stroke='%23c8a850' stroke-width='0.8' opacity='0.75'/%3E%3Cline x1='280' y1='43' x2='280' y2='52' stroke='%23c8a850' stroke-width='1' opacity='0.5'/%3E%3Cline x1='350' y1='0' x2='350' y2='12' stroke='%23c8a850' stroke-width='1' opacity='0.65'/%3E%3Cellipse cx='350' cy='24' rx='7' ry='11' fill='%231a4a20' stroke='%23c8a850' stroke-width='0.8' opacity='0.75'/%3E%3Cline x1='350' y1='35' x2='350' y2='42' stroke='%23c8a850' stroke-width='1' opacity='0.5'/%3E%3C/svg%3E");
+      background-repeat:repeat-x; background-position:top center; background-size:400px 65px;
+      pointer-events:none; z-index:4;
+    }
+    html[data-menu-theme="islamic"] .hero-title { color:#f0e8d0; }
+    html[data-menu-theme="islamic"] .hero-tagline { color:rgba(200,168,80,0.85); }
+    html[data-menu-theme="islamic"] .hero-orn-line { background:linear-gradient(90deg,transparent,var(--gold)); }
+    html[data-menu-theme="islamic"] .hero-orn-line:last-child { background:linear-gradient(270deg,transparent,var(--gold)); }
+    /* En-tête de catégorie : bandeau vert/or pleine largeur */
+    html[data-menu-theme="islamic"] .cat-hd { background:var(--gold); border-radius:6px; padding:8px 10px; }
+    html[data-menu-theme="islamic"] .cat-hd .cat-name { color:#0a1e0a; }
+    html[data-menu-theme="islamic"] .cat-hd .cat-sub { color:rgba(10,30,10,0.72); }
+    html[data-menu-theme="islamic"] .cat-ico-box { background:rgba(10,30,10,0.2); border-color:rgba(10,30,10,0.3); }
+    html[data-menu-theme="islamic"] .cat-ico-box svg { color:#0a1e0a; }
+    html[data-menu-theme="islamic"] .cat-div { opacity:0; margin:0; }
 
     /* ================================================
        THÈMES — UI étendue
@@ -1826,12 +1931,36 @@
       box-shadow:0 4px 22px rgba(77,184,255,0.5), 0 2px 10px rgba(0,0,0,0.4);
     }
 
+    /* ── ISLAMIC — UI étendue ── */
+    html[data-menu-theme="islamic"] .cat-pill { border-radius:6px; }
+    html[data-menu-theme="islamic"] .cat-pill.on {
+      background:var(--gold); color:#071407; animation:none;
+      box-shadow:0 2px 10px rgba(200,168,80,0.3);
+    }
+    html[data-menu-theme="islamic"] .s-input { border-radius:6px; }
+    html[data-menu-theme="islamic"] .s-input:focus {
+      border-color:var(--gold); box-shadow:0 0 0 2px rgba(200,168,80,0.15);
+    }
+    html[data-menu-theme="islamic"] .lang-btn { border-radius:6px; }
+    html[data-menu-theme="islamic"] .lang-btn.on { background:var(--gold); color:#071407; }
+    html[data-menu-theme="islamic"] .theme-btn { border-radius:6px; }
+    html[data-menu-theme="islamic"] #nav { border-bottom:1px solid rgba(200,168,80,0.22); }
+    html[data-menu-theme="islamic"] .social-link {
+      border-radius:6px; background:rgba(200,168,80,0.08); animation:none;
+    }
+    html[data-menu-theme="islamic"] .social-link:hover { box-shadow:0 0 14px rgba(200,168,80,0.28); }
+    html[data-menu-theme="islamic"] #call-fab { border-radius:50%; }
+    html[data-menu-theme="islamic"] #call-fab.show {
+      box-shadow:0 4px 22px rgba(200,168,80,0.45), 0 2px 10px rgba(0,0,0,0.4);
+    }
+
     /* ── Light mode : texte lisible sur cat-pill.on coloré ── */
     html[data-menu-theme="botanical"].light .cat-pill.on,
     html[data-menu-theme="rose-parisien"].light .cat-pill.on,
     html[data-menu-theme="midnight-luxe"].light .cat-pill.on,
     html[data-menu-theme="velvet-luxe"].light .cat-pill.on,
-    html[data-menu-theme="santorin"].light .cat-pill.on { color:#ffffff; }
+    html[data-menu-theme="santorin"].light .cat-pill.on,
+    html[data-menu-theme="islamic"].light .cat-pill.on { color:#ffffff; }
 
     /* ── Light mode : couleur texte social-link ── */
     html[data-menu-theme="neon-tokyo"].light .social-link,
@@ -1839,7 +1968,8 @@
     html[data-menu-theme="rose-parisien"].light .social-link,
     html[data-menu-theme="midnight-luxe"].light .social-link,
     html[data-menu-theme="velvet-luxe"].light .social-link,
-    html[data-menu-theme="santorin"].light .social-link { color:var(--cream); }
+    html[data-menu-theme="santorin"].light .social-link,
+    html[data-menu-theme="islamic"].light .social-link { color:var(--cream); }
 
     /* ================================================
        THÈMES — Mode Light (correctifs hero)
@@ -1947,6 +2077,56 @@
     html[data-menu-theme="santorin"].light .hero-scroll-text {
       color:#0d1428; text-shadow:0 1px 8px rgba(240,244,255,0.9);
     }
+    /* ── ISLAMIC — Mode Light ── */
+    html[data-menu-theme="islamic"].light #hero {
+      background-color:#f0ead8;
+      background-image:radial-gradient(ellipse 65% 50% at 50% 42%, rgba(200,225,200,0.35) 0%, transparent 70%);
+    }
+    html[data-menu-theme="islamic"].light .hero-overlay {
+      background:linear-gradient(to bottom,
+        rgba(240,234,216,0.22) 0%, rgba(240,234,216,0.06) 35%,
+        rgba(240,234,216,0.16) 60%, rgba(240,234,216,0.82) 88%, rgba(240,234,216,0.97) 100%);
+    }
+    html[data-menu-theme="islamic"].light #hero::before {
+      border-color:rgba(30,107,42,0.3);
+      box-shadow:
+        0 0 0 16px rgba(30,107,42,0.04),0 0 0 32px rgba(30,107,42,0.08),
+        0 0 0 48px rgba(30,107,42,0.03),0 0 0 64px rgba(30,107,42,0.06),
+        0 0 0 80px rgba(30,107,42,0.02);
+    }
+    html[data-menu-theme="islamic"].light #hero::after {
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 130'%3E%3Crect x='220' y='72' width='360' height='58' fill='%231e6b2a'/%3E%3Cpath d='M240,72 Q400,8 560,72Z' fill='%231e6b2a'/%3E%3Cpath d='M275,72 Q400,30 525,72Z' fill='%23145020'/%3E%3Crect x='196' y='38' width='24' height='92' fill='%231e6b2a'/%3E%3Cpath d='M196,38 Q208,10 220,38Z' fill='%231e6b2a'/%3E%3Ccircle cx='208' cy='34' r='4' fill='%23c8a850' opacity='0.9'/%3E%3Crect x='580' y='38' width='24' height='92' fill='%231e6b2a'/%3E%3Cpath d='M580,38 Q592,10 604,38Z' fill='%231e6b2a'/%3E%3Ccircle cx='592' cy='34' r='4' fill='%23c8a850' opacity='0.9'/%3E%3Cpath d='M220,72 Q265,50 310,72Z' fill='%231e6b2a'/%3E%3Cpath d='M490,72 Q535,50 580,72Z' fill='%231e6b2a'/%3E%3Crect x='110' y='55' width='18' height='75' fill='%231e6b2a'/%3E%3Cpath d='M110,55 Q119,36 128,55Z' fill='%231e6b2a'/%3E%3Crect x='672' y='55' width='18' height='75' fill='%231e6b2a'/%3E%3Cpath d='M672,55 Q681,36 690,55Z' fill='%231e6b2a'/%3E%3Crect x='48' y='70' width='12' height='60' fill='%231e6b2a'/%3E%3Cpath d='M48,70 Q54,56 60,70Z' fill='%231e6b2a'/%3E%3Crect x='740' y='70' width='12' height='60' fill='%231e6b2a'/%3E%3Cpath d='M740,70 Q746,56 752,70Z' fill='%231e6b2a'/%3E%3C/svg%3E");
+    }
+    html[data-menu-theme="islamic"].light .hero-overlay::before {
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 65'%3E%3Cline x1='50' y1='0' x2='50' y2='12' stroke='%231e6b2a' stroke-width='1' opacity='0.5'/%3E%3Cellipse cx='50' cy='24' rx='7' ry='11' fill='%231e6b2a' stroke='%231e6b2a' stroke-width='0.8' opacity='0.45'/%3E%3Cline x1='50' y1='35' x2='50' y2='42' stroke='%231e6b2a' stroke-width='1' opacity='0.35'/%3E%3Cline x1='120' y1='0' x2='120' y2='16' stroke='%231e6b2a' stroke-width='1' opacity='0.45'/%3E%3Cellipse cx='120' cy='30' rx='9' ry='13' fill='%231e6b2a' stroke='%231e6b2a' stroke-width='0.8' opacity='0.5'/%3E%3Cline x1='120' y1='43' x2='120' y2='52' stroke='%231e6b2a' stroke-width='1' opacity='0.35'/%3E%3Cline x1='200' y1='0' x2='200' y2='12' stroke='%231e6b2a' stroke-width='1.2' opacity='0.6'/%3E%3Cellipse cx='200' cy='26' rx='10' ry='15' fill='%231e6b2a' stroke='%231e6b2a' stroke-width='1' opacity='0.6'/%3E%3Cline x1='200' y1='41' x2='200' y2='50' stroke='%231e6b2a' stroke-width='1' opacity='0.5'/%3E%3Cline x1='280' y1='0' x2='280' y2='16' stroke='%231e6b2a' stroke-width='1' opacity='0.45'/%3E%3Cellipse cx='280' cy='30' rx='9' ry='13' fill='%231e6b2a' stroke='%231e6b2a' stroke-width='0.8' opacity='0.5'/%3E%3Cline x1='280' y1='43' x2='280' y2='52' stroke='%231e6b2a' stroke-width='1' opacity='0.35'/%3E%3Cline x1='350' y1='0' x2='350' y2='12' stroke='%231e6b2a' stroke-width='1' opacity='0.5'/%3E%3Cellipse cx='350' cy='24' rx='7' ry='11' fill='%231e6b2a' stroke='%231e6b2a' stroke-width='0.8' opacity='0.45'/%3E%3Cline x1='350' y1='35' x2='350' y2='42' stroke='%231e6b2a' stroke-width='1' opacity='0.35'/%3E%3C/svg%3E");
+    }
+    html[data-menu-theme="islamic"].light .hero-title { color:#0f2010; text-shadow:0 1px 12px rgba(245,240,232,0.8); }
+    html[data-menu-theme="islamic"].light .hero-tagline { color:rgba(30,107,42,0.85); }
+    html[data-menu-theme="islamic"].light .hero-scroll-text { color:#0f2010; }
+    html[data-menu-theme="islamic"].light .cat-hd .cat-name { color:#ffffff; }
+    html[data-menu-theme="islamic"].light .cat-hd .cat-sub { color:rgba(255,255,255,0.82); }
+    html[data-menu-theme="islamic"].light .cat-ico-box { background:rgba(255,255,255,0.2); border-color:rgba(255,255,255,0.35); }
+    html[data-menu-theme="islamic"].light .cat-ico-box svg { color:#ffffff; }
+    /* ── Light mode : FAB couleur par thème ── */
+    html[data-menu-theme="neon-tokyo"].light #call-fab,
+    html[data-menu-theme="botanical"].light #call-fab,
+    html[data-menu-theme="rose-parisien"].light #call-fab,
+    html[data-menu-theme="midnight-luxe"].light #call-fab,
+    html[data-menu-theme="velvet-luxe"].light #call-fab,
+    html[data-menu-theme="santorin"].light #call-fab,
+    html[data-menu-theme="islamic"].light #call-fab {
+      background: linear-gradient(135deg, var(--gold-lt), var(--gold), var(--gold-dk), var(--gold), var(--gold-lt));
+      background-size: 250% 250%;
+      animation: lightFlow 5s ease infinite;
+      color: #ffffff;
+    }
+    html[data-menu-theme="neon-tokyo"].light #call-fab { box-shadow:0 4px 18px rgba(0,160,138,0.5); }
+    html[data-menu-theme="botanical"].light #call-fab { box-shadow:0 4px 18px rgba(58,122,42,0.5); }
+    html[data-menu-theme="rose-parisien"].light #call-fab { box-shadow:0 4px 18px rgba(184,80,128,0.5); }
+    html[data-menu-theme="midnight-luxe"].light #call-fab { box-shadow:0 4px 18px rgba(168,104,64,0.45); }
+    html[data-menu-theme="velvet-luxe"].light #call-fab { box-shadow:0 4px 18px rgba(168,139,26,0.5); }
+    html[data-menu-theme="santorin"].light #call-fab { box-shadow:0 4px 20px rgba(21,101,192,0.5); }
+    html[data-menu-theme="islamic"].light #call-fab { box-shadow:0 4px 20px rgba(30,107,42,0.5); }
   </style>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -2730,7 +2910,16 @@ let lang = localStorage.getItem('mc_menu_lang') || 'fr';
 let activeCat  = 'all';
 let menuTheme  = 'prestige';
 
-let theme = localStorage.getItem('mc_menu_theme') || 'dark';
+const _LIGHT_DEFAULT_THEMES = ['botanical','santorin','islamic'];
+function _defaultThemeMode(vt) { return _LIGHT_DEFAULT_THEMES.includes(vt) ? 'light' : 'dark'; }
+let _cachedVisualTheme = 'prestige';
+try {
+  const _cr = localStorage.getItem('mc_admin_data_v1');
+  if (_cr) { const _cc = JSON.parse(_cr); if (_cc.menuTheme) _cachedVisualTheme = _cc.menuTheme; }
+} catch(_) {}
+let theme = localStorage.getItem('mc_menu_theme_locked')
+  ? (localStorage.getItem('mc_menu_theme') || 'dark')
+  : _defaultThemeMode(_cachedVisualTheme);
 let showCallBtn = true;  // contrôlé depuis l'admin
 let showPhotos  = true;  // contrôlé depuis l'admin (global)
 let _adminInfo  = null;  // copie des infos admin pour la barre de note
@@ -2780,6 +2969,12 @@ function loadAdminData() {
     if (data.menuTheme && data.menuTheme !== menuTheme) {
       menuTheme = data.menuTheme;
       document.documentElement.dataset.menuTheme = menuTheme;
+      if (!localStorage.getItem('mc_menu_theme_locked')) {
+        theme = _defaultThemeMode(menuTheme);
+        document.documentElement.classList.toggle('light', theme === 'light');
+        const _ico = document.getElementById('theme-ico');
+        if (_ico) _ico.innerHTML = `<use href="${theme === 'light' ? '#ico-moon' : '#ico-sun'}"/>`;
+      }
     }
     applyAdminData(data);
     buildCatPills();
@@ -3416,6 +3611,33 @@ function _cardSantorin(item) {
   return card;
 }
 
+/* ── Thème : Islamic — Grille 2 colonnes, image circulaire ── */
+function _cardIslamic(item) {
+  const card = document.createElement('div');
+  const photoEnabled = showPhotos && (item.showPhoto !== false);
+  const src = photoEnabled ? _getPhotoSrc(item) : '';
+  const badges = _getBadges(item);
+  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  card.className = 'card card-islamic';
+  card.dataset.item = item.id;
+  card.style.transitionDelay = '0s';
+  const imgBlock = src
+    ? `<div class="isl-img-wrap"><img src="${src}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
+    : photoEnabled
+      ? `<div class="isl-no-img">${_camSvg}</div>`
+      : '';
+  card.innerHTML = `
+    ${imgBlock}
+    <div class="isl-body">
+      <div class="isl-name">${item.name[lang]||item.name.fr||''}</div>
+      ${desc ? `<div class="isl-desc">${desc}</div>` : ''}
+      ${badges ? `<div class="isl-badges">${badges}</div>` : ''}
+    </div>
+    <div class="isl-price">${item.price}</div>`;
+  _setupCardEvents(card, item);
+  return card;
+}
+
 /* ── Dispatcher principal ── */
 function createCard(item, idx) {
   switch (menuTheme) {
@@ -3426,6 +3648,7 @@ function createCard(item, idx) {
     case 'velvet-luxe':    return _cardVelvet(item, idx);
     case 'gold-noir':      return _cardCinema(item);
     case 'santorin':       return _cardSantorin(item);
+    case 'islamic':        return _cardIslamic(item);
     default:               return _cardPrestige(item); // prestige + fallback
   }
 }
@@ -3571,6 +3794,7 @@ function setupTheme() {
     document.documentElement.classList.toggle('light', theme === 'light');
     ico.innerHTML = `<use href="${theme === 'light' ? '#ico-moon' : '#ico-sun'}"/>`;
     localStorage.setItem('mc_menu_theme', theme);
+    localStorage.setItem('mc_menu_theme_locked', '1');
   });
 }
 
