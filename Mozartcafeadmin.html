@@ -1441,29 +1441,32 @@ function renderAll() {
 function syncVisToggles() {
   const photosBtn = document.getElementById('toggle-photos-btn');
   if (!adminData?.info) return;
-  if (photosBtn) photosBtn.classList.toggle('on', adminData.info.showPhotos !== false);
-  // Synchro statut dans la section note
+  const photosOn = adminData.info.showPhotos !== false;
+  if (photosBtn) {
+    if (photosOn) photosBtn.classList.add('on');
+    else photosBtn.classList.remove('on');
+  }
   const noteStatus = document.querySelector('.note-status');
   if (noteStatus) {
     const on = adminData.info.showNote === true;
-    noteStatus.classList.toggle('on', on);
+    if (on) noteStatus.classList.add('on');
+    else noteStatus.classList.remove('on');
     noteStatus.querySelector('.note-status-txt').textContent = on ? 'Affichée dans le menu' : 'Masquée dans le menu';
   }
 }
 
-/* ── Listeners des boutons de visibilité (sauvegarde instantanée) ── */
-(function() {
-  const photosBtn = document.getElementById('toggle-photos-btn');
-  photosBtn.addEventListener('click', () => {
-    if (!adminData) return;
-    if (!adminData.info) adminData.info = {};
-    const newVal = adminData.info.showPhotos !== false ? false : true;
-    adminData.info.showPhotos = newVal;
-    _db.ref('menu/info/showPhotos').set(newVal);
-    localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
-    photosBtn.classList.toggle('on', newVal);
-  });
-})();
+/* ── Listener bouton visibilité photos ── */
+document.getElementById('toggle-photos-btn').addEventListener('click', () => {
+  if (!adminData) return;
+  if (!adminData.info) adminData.info = {};
+  const newVal = adminData.info.showPhotos !== false ? false : true;
+  adminData.info.showPhotos = newVal;
+  _db.ref('menu/info/showPhotos').set(newVal);
+  localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
+  const btn = document.getElementById('toggle-photos-btn');
+  if (newVal) btn.classList.add('on');
+  else btn.classList.remove('on');
+});
 
 /* ─── SECTION NOTE CLIENTS ─── */
 function renderNoteSection() {
@@ -1500,7 +1503,8 @@ function renderNoteSection() {
     adminData.info.showNote = newVal;
     _db.ref('menu/info/showNote').set(newVal);
     localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
-    this.classList.toggle('on', newVal);
+    if (newVal) this.classList.add('on');
+    else this.classList.remove('on');
     this.querySelector('.note-status-txt').textContent = newVal ? 'Affichée dans le menu' : 'Masquée dans le menu';
   });
 
