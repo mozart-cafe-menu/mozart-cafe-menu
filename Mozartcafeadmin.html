@@ -1459,13 +1459,10 @@ function syncVisToggles() {
 document.getElementById('toggle-photos-btn').addEventListener('click', () => {
   if (!adminData) return;
   if (!adminData.info) adminData.info = {};
-  const newVal = adminData.info.showPhotos !== false ? false : true;
-  adminData.info.showPhotos = newVal;
-  _db.ref('menu/info/showPhotos').set(newVal);
+  adminData.info.showPhotos = adminData.info.showPhotos === false ? true : false;
+  _db.ref('menu/info/showPhotos').set(adminData.info.showPhotos);
   localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
-  const btn = document.getElementById('toggle-photos-btn');
-  if (newVal) btn.classList.add('on');
-  else btn.classList.remove('on');
+  syncVisToggles();
 });
 
 /* ─── SECTION NOTE CLIENTS ─── */
@@ -1499,13 +1496,10 @@ function renderNoteSection() {
   // Bouton Afficher dans le menu — sauvegarde instantanée
   card.querySelector('.note-status').addEventListener('click', function() {
     if (!adminData.info) adminData.info = {};
-    const newVal = !adminData.info.showNote;
-    adminData.info.showNote = newVal;
-    _db.ref('menu/info/showNote').set(newVal);
+    adminData.info.showNote = !adminData.info.showNote;
+    _db.ref('menu/info/showNote').set(adminData.info.showNote);
     localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
-    if (newVal) this.classList.add('on');
-    else this.classList.remove('on');
-    this.querySelector('.note-status-txt').textContent = newVal ? 'Affichée dans le menu' : 'Masquée dans le menu';
+    syncVisToggles();
   });
 
   // Tabs langue
