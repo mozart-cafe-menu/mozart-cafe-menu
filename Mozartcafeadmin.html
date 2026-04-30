@@ -1037,7 +1037,7 @@
    1. Calculer SHA-256 du nouveau mot de passe sur : sha256.online
    2. Remplacer la valeur de ADMIN_HASH ci-dessous
 ═══════════════════════════════════════════ */
-// SHA-256 hash du mot de passe — ne révèle pas le mot de passe en clair
+// SHA-256 hash local — utilisé uniquement si Firebase /config/adminHash est absent
 const ADMIN_HASH = '16cd9de849c3cfd4ce1234d0d50e91553576b3ae4bbeb9446d0edfb237389aa2';
 const STORE_KEY = 'mc_admin_data_v1';
 
@@ -1306,7 +1306,14 @@ document.getElementById('logout-btn').addEventListener('click', () => {
 async function doLogin() {
   const val = document.getElementById('pwd-input').value;
   const hash = await _hashPwd(val);
-  if (hash === ADMIN_HASH) {
+
+  let expectedHash = ADMIN_HASH;
+  try {
+    const snap = await _db.ref('/config/adminHash').get();
+    if (snap.exists()) expectedHash = snap.val();
+  } catch {}
+
+  if (hash === expectedHash) {
     sessionStorage.setItem('mc_admin_auth', 'ok');
     showAdmin();
   } else {
