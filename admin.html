@@ -120,6 +120,10 @@
       display:flex; align-items:center; justify-content:space-between; gap:8px;
       flex-wrap:wrap;
     }
+    @media(max-width:767px) {
+      .adm-header > :first-child { width:100%; }
+      .adm-center { justify-content:flex-start; }
+    }
     .adm-logo { font-family:'Cormorant',serif; font-size:1.1rem; color:var(--gold); letter-spacing:0.1em; }
     .adm-sub  { font-size:0.62rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--muted); }
     .adm-center {
@@ -1221,6 +1225,7 @@
             <div class="phone-overlay"></div>
             <div class="phone-content">
 
+              <img class="phone-logo" id="pm-logo" src="" alt="" style="display:none">
               <div class="phone-ornament">
                 <div class="phone-orn-line"></div>
                 <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:var(--gold)"><polygon points="12,2 22,9 18,20 6,20 2,9"/></svg>
@@ -1261,6 +1266,17 @@
         </button>
       </div>
       <div class="hero-hint" id="hero-hint-txt">Photo recommandée : format portrait, min. 900×1600 px</div>
+      <div class="logo-controls-row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
+        <label class="hero-upload-btn" for="logo-file-input" style="font-size:0.78rem;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span>Logo (optionnel)</span>
+        </label>
+        <input type="file" id="logo-file-input" accept="image/*" style="display:none">
+        <button class="hero-del-btn" id="logo-del-btn" style="display:none;font-size:0.78rem;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <span>Supprimer le logo</span>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -2136,6 +2152,7 @@ function showToast(msg) {
 ═══════════════════════════════════════════ */
 function renderAll() {
   renderHeroImageSection();
+  renderLogoSection();
   renderInfoSection();
   renderNoteSection();
   renderCatsSection();
@@ -2257,6 +2274,75 @@ function renderNoteSection() {
       if (l !== PRIMARY_LANG) setTxLock(`info-noteText-${l}`, ta.value.trim() !== '');
       markUnsaved();
     });
+  });
+}
+
+/* ─── SECTION LOGO ─── */
+function renderLogoSection() {
+  const logoImg   = document.getElementById('pm-logo');
+  const logoInput = document.getElementById('logo-file-input');
+  const logoDelBtn= document.getElementById('logo-del-btn');
+  if (!logoImg || !logoInput || !logoDelBtn) return;
+
+  function setLogo(src) {
+    if (src) {
+      logoImg.src = src; logoImg.style.display = '';
+      logoDelBtn.style.display = 'flex';
+    } else {
+      logoImg.src = ''; logoImg.style.display = 'none';
+      logoDelBtn.style.display = 'none';
+    }
+  }
+
+  setLogo(adminData.logoUrl || adminData.info?.logoUrl || '');
+
+  logoInput.addEventListener('change', () => {
+    const file = logoInput.files[0]; if (!file) return;
+    const uploadLabel = logoInput.previousElementSibling;
+    const origLabel = uploadLabel ? uploadLabel.innerHTML : '';
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 800;
+        let w = img.width, h = img.height;
+        if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        setLogo(canvas.toDataURL('image/png', 0.9));
+        if (uploadLabel) { uploadLabel.innerHTML = '<span style="opacity:.6">⏳ Upload…</span>'; uploadLabel.style.pointerEvents = 'none'; }
+        canvas.toBlob(blob => {
+          const fd = new FormData();
+          fd.append('file', blob);
+          fd.append('upload_preset', CLOUDINARY_PRESET);
+          fd.append('public_id', 'logo');
+          fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, { method:'POST', body:fd })
+            .then(r => r.json()).then(json => {
+              if (!json.secure_url) throw new Error('Upload failed');
+              adminData.logoUrl = json.secure_url;
+              _db.ref('menu/logoUrl').set(json.secure_url);
+              setLogo(json.secure_url);
+              if (uploadLabel) { uploadLabel.innerHTML = origLabel; uploadLabel.style.pointerEvents = ''; }
+              showToast('✅ Logo mis à jour');
+            }).catch(err => {
+              console.error('Logo upload error:', err);
+              if (uploadLabel) { uploadLabel.innerHTML = origLabel; uploadLabel.style.pointerEvents = ''; }
+              showToast('❌ Erreur upload logo');
+            });
+        }, 'image/png', 0.9);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+    logoInput.value = '';
+  });
+
+  logoDelBtn.addEventListener('click', () => {
+    adminData.logoUrl = '';
+    _db.ref('menu/logoUrl').set('');
+    setLogo('');
+    showToast('✅ Logo supprimé');
   });
 }
 

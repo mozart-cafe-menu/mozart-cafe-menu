@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
   <meta charset="UTF-8">
@@ -220,6 +220,7 @@
       font-weight:300;
       color:#c8a44e;
       letter-spacing:0.14em;
+      text-align:center;
       opacity:0; transform:translateY(18px);
       animation:preUp 0.55s cubic-bezier(0.4,0,0.2,1) 0.88s forwards;
     }
@@ -1236,6 +1237,10 @@
     html[data-menu-theme="neon-tokyo"] .card-strip:hover {
       box-shadow:inset 5px 0 0 var(--gold), 0 0 22px rgba(0,245,212,0.18), 0 4px 20px rgba(0,0,0,0.7) !important;
     }
+    html[data-menu-theme="neon-tokyo"] .card-strip { min-height:82px; }
+    html[data-menu-theme="neon-tokyo"] .card-strip .strip-body { flex-direction:column; align-items:flex-start; gap:3px; justify-content:center; }
+    html[data-menu-theme="neon-tokyo"] .card-strip .strip-right { width:100%; justify-content:space-between; }
+    html[data-menu-theme="neon-tokyo"] .card-strip .strip-name { white-space:normal; }
 
     /* ── 3. BOTANICAL FOREST — Forêt organique ── */
     html[data-menu-theme="botanical"] .cards { padding-left:0; }
@@ -2546,6 +2551,10 @@
     <path d="M8.53 16.11a6 6 0 016.95 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
     <line x1="12" y1="20" x2="12.01" y2="20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
   </symbol>
+  <symbol id="ico-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+  </symbol>
   <symbol id="ico-clock" viewBox="0 0 24 24">
     <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8" fill="none"/>
     <polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
@@ -2720,6 +2729,10 @@
   <div class="ft-row">
     <svg class="ft-ico"><use href="#ico-wifi"/></svg>
     <div class="ft-txt" id="ft-wifi"></div>
+  </div>
+  <div class="ft-row" id="ft-wifi-pw-row">
+    <svg class="ft-ico"><use href="#ico-lock"/></svg>
+    <div class="ft-txt" id="ft-wifi-pw"></div>
   </div>
   <div class="ft-row">
     <svg class="ft-ico"><use href="#ico-clock"/></svg>
@@ -4520,7 +4533,11 @@ function applyTranslations() {
   document.getElementById('no-res-txt').textContent = t.noRes;
   document.getElementById('al-lbl').textContent = t.alLabel;
   // Footer
-  document.getElementById('ft-wifi').innerHTML = `<strong>${t.wifiN}</strong>${t.wifiV}`;
+  document.getElementById('ft-wifi').innerHTML = `<strong>${t.wifiN}</strong>`;
+  const _pwEl = document.getElementById('ft-wifi-pw');
+  const _pwRow = document.getElementById('ft-wifi-pw-row');
+  if (t.wifiV) { _pwEl.textContent = t.wifiV; _pwRow.style.display = ''; }
+  else { _pwRow.style.display = 'none'; }
   document.getElementById('ft-hours').innerHTML = `<strong>${t.hoursN}</strong>${t.hoursV}`;
   document.getElementById('ft-addr').innerHTML = `<strong>${t.addrN}</strong>${t.addrV}`;
   // Cart modal translations (if open)
