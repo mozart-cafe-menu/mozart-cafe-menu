@@ -3422,7 +3422,7 @@ function buildFlipBook() {
 
     const itemsHtml = catItems.map(item => {
       const name = item.name[lang] || item.name.fr || '';
-      const desc = item.desc[lang] || item.desc.fr || '';
+      const desc = item.desc[lang] || item.desc.fr || item.full[lang] || item.full.fr || '';
       return `<div class="fp-item">
         <div class="fp-item-left">
           <div class="fp-item-name">${name}</div>
