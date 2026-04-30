@@ -1939,6 +1939,7 @@ function showAdmin() {
   loadData();
   loadMenuTheme();
   loadMenuMode();
+  loadFeatures();
   setupNotifFab();
 }
 
@@ -4372,6 +4373,35 @@ function saveMenuMode(mode) {
   syncModeAdminUI(mode);
 }
 
+const _MODE_PRIORITY = ['order','sonet','simple','paper'];
+let _currentFeatures = null;
+
+function applyFeatures(features) {
+  _currentFeatures = features;
+  const modes = features?.modes || {};
+
+  // Afficher/masquer les options de mode dans le sélecteur
+  ['order','sonet','simple','paper'].forEach(mode => {
+    const btn = document.getElementById(`mode-opt-${mode}`);
+    if (btn) btn.style.display = modes[mode] !== false ? '' : 'none';
+  });
+
+  // Si le mode actif n'est plus disponible, basculer sur le prochain
+  if (modes[currentMenuMode] === false) {
+    const next = _MODE_PRIORITY.find(m => modes[m] !== false);
+    if (next) saveMenuMode(next);
+  }
+
+  // Re-appliquer l'UI du mode pour prendre en compte les contraintes de licence
+  syncModeAdminUI(currentMenuMode);
+}
+
+function loadFeatures() {
+  _db.ref('/config/features').on('value', snap => {
+    applyFeatures(snap.val() || {});
+  });
+}
+
 function syncModeAdminUI(mode) {
   // Afficher/masquer la section commandes
   const ordersSection = document.getElementById('orders-admin-section');
@@ -4385,6 +4415,13 @@ function syncModeAdminUI(mode) {
   if (callBtn)   callBtn.style.display   = mode === 'sonet' ? '' : 'none';
   if (orderBtn)  orderBtn.style.display  = mode === 'order' ? '' : 'none';
   if (photosBtn) photosBtn.style.display = (mode === 'paper') ? 'none' : '';
+  // Contraintes de licence : masquer les boutons non licenciés
+  if (_currentFeatures?.buttons) {
+    const b = _currentFeatures.buttons;
+    if (callBtn   && b.callBtn === false) callBtn.style.display   = 'none';
+    if (photosBtn && b.photos  === false) photosBtn.style.display = 'none';
+    if (orderBtn  && b.orderUI === false) orderBtn.style.display  = 'none';
+  }
   // FAB notification visible uniquement en mode Sonnette ou Commande
   const fabNotif = document.getElementById('fab-notif');
   if (fabNotif) fabNotif.style.display = (mode === 'paper' || mode === 'simple') ? 'none' : '';
