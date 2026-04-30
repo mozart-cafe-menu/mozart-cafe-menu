@@ -1,0 +1,3209 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mozart Café — Administration</title>
+  <link rel="manifest" href="admin-manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant:wght@300;400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #0c0a08;
+      --bg2:    #111009;
+      --bg3:    #161208;
+      --card:   rgba(255,255,255,0.05);
+      --gold:   #c8a44e;
+      --gold-l: #e2c278;
+      --gold-d: #9a7a35;
+      --cream:  #f4ead2;
+      --muted:  rgba(244,234,210,0.52);
+      --border: rgba(200,164,78,0.18);
+      --bord2:  rgba(200,164,78,0.36);
+      --border2: rgba(200,164,78,0.36);
+      --green:  #7ebd6a;
+      --red:    #e05252;
+      --tr:     0.25s cubic-bezier(0.4,0,0.2,1);
+      --r:      16px;
+    }
+    html.light {
+      --bg:     #f5f0e8;
+      --bg2:    #ede8df;
+      --bg3:    #fdf6ed;
+      --card:   rgba(255,255,255,0.92);
+      --gold:   #a86840;
+      --gold-l: #d4a47a;
+      --gold-d: #7d5130;
+      --cream:  #1c1710;
+      --muted:  rgba(28,23,16,0.52);
+      --border: rgba(168,104,64,0.22);
+      --bord2:  rgba(168,104,64,0.42);
+      --border2: rgba(168,104,64,0.42);
+    }
+    html.light body { background:var(--bg); color:var(--cream); }
+    html.light .adm-header { background:rgba(245,240,232,0.98) !important; }
+    /* Textes et inputs */
+    html.light .inline-input,
+    html.light .info-input,
+    html.light .login-input { color:var(--cream); background:transparent; }
+    html.light .inline-input::placeholder,
+    html.light .info-input::placeholder { color:rgba(28,23,16,0.40); }
+    html.light .ico-pb-label { color:var(--cream) !important; }
+    html.light .ico-picker-btn { background:var(--bg3); border-color:var(--bord2); color:var(--cream); }
+    /* Popups et cards */
+    html.light .ico-picker-popup {
+      background:var(--bg3);
+      box-shadow:0 8px 32px rgba(0,0,0,0.15), 0 0 0 1px rgba(168,104,64,0.12);
+    }
+    html.light .ico-picker-item { color:var(--cream); }
+    html.light .ico-picker-item svg { color:var(--cream); }
+    html.light .ico-picker-item.selected { background:rgba(168,104,64,0.12); border-color:var(--gold); }
+    html.light .ico-picker-none { color:var(--red); background:rgba(224,82,82,0.06); border-color:rgba(224,82,82,0.25); }
+    html.light .login-box { background:var(--bg3); }
+    html.light .cat-row { background:rgba(255,255,255,0.95); }
+    /* Produit cards */
+    html.light .prod-card { background:rgba(255,255,255,0.95); }
+    html.light .prod-name,
+    html.light .prod-price,
+    html.light .prod-desc-input,
+    html.light .prod-full-input { color:var(--cream); }
+    html.light .prod-name::placeholder,
+    html.light .prod-price::placeholder,
+    html.light .prod-desc-input::placeholder,
+    html.light .prod-full-input::placeholder { color:rgba(28,23,16,0.38); }
+    /* Toast */
+    html.light #toast { background:var(--bg3); color:#2a7a2a; border-color:rgba(80,160,80,0.4); }
+    /* Save FAB */
+    html.light .save-fab { box-shadow:0 4px 20px rgba(168,104,64,0.35); }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { overflow-x:hidden; }
+    body { background:var(--bg); color:var(--cream); font-family:'Outfit',sans-serif; font-weight:300; min-height:100vh; }
+    button { font-family:inherit; cursor:pointer; border:none; background:none; }
+    input, textarea, select { font-family:inherit; }
+    ::-webkit-scrollbar { width:3px; }
+    ::-webkit-scrollbar-thumb { background:var(--gold); border-radius:2px; }
+
+    /* ── LOGIN ── */
+    #login-screen {
+      position:fixed; inset:0; background:var(--bg);
+      display:flex; align-items:center; justify-content:center;
+      z-index:9999; padding:24px;
+    }
+    #login-screen.hidden { display:none; }
+    .login-box {
+      width:100%; max-width:360px;
+      background:var(--bg3); border:1px solid var(--bord2); border-radius:24px;
+      padding:36px 28px; text-align:center;
+    }
+    .login-logo { font-family:'Cormorant',serif; font-size:1.8rem; color:var(--gold); letter-spacing:0.12em; margin-bottom:4px; }
+    .login-sub  { font-size:0.75rem; color:var(--muted); letter-spacing:0.2em; text-transform:uppercase; margin-bottom:28px; }
+    .login-input {
+      width:100%; background:var(--card); border:1px solid var(--bord2); border-radius:12px;
+      padding:13px 16px; color:var(--cream); font-size:1rem; outline:none; transition:border-color 0.2s;
+      margin-bottom:14px; letter-spacing:0.1em;
+    }
+    .login-input:focus { border-color:var(--gold); }
+    .login-btn {
+      width:100%; padding:14px;
+      background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));
+      border-radius:12px; color:#0c0a08; font-size:0.9rem; font-weight:600; letter-spacing:0.06em;
+      transition:all 0.28s;
+    }
+    .login-btn:hover { transform:translateY(-1px); box-shadow:0 8px 24px rgba(200,164,78,0.38); }
+    .login-err { font-size:0.78rem; color:var(--red); margin-top:10px; min-height:18px; }
+
+    /* ── HEADER ── */
+    .adm-header {
+      background:rgba(15,9,6,0.96); backdrop-filter:blur(20px);
+      border-bottom:1px solid var(--border);
+      padding:8px 16px; position:sticky; top:0; z-index:100;
+      display:flex; align-items:center; justify-content:space-between; gap:8px;
+      flex-wrap:wrap;
+    }
+    .adm-logo { font-family:'Cormorant',serif; font-size:1.1rem; color:var(--gold); letter-spacing:0.1em; }
+    .adm-sub  { font-size:0.62rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--muted); }
+    .adm-center {
+      display:flex; align-items:center; gap:8px; flex:1;
+      justify-content:center; flex-wrap:wrap;
+    }
+    .adm-right { display:flex; gap:6px; align-items:center; flex-shrink:0; }
+    .btn-preview {
+      padding:7px 12px; border:1px solid var(--bord2); border-radius:10px;
+      color:var(--muted); font-size:0.75rem; transition:var(--tr); white-space:nowrap;
+      min-height:34px;
+    }
+    .btn-preview:hover { border-color:var(--gold); color:var(--gold); }
+    .btn-logout {
+      padding:7px 12px; border:1px solid rgba(224,82,82,0.3); border-radius:10px;
+      color:var(--red); font-size:0.75rem; opacity:0.7; transition:var(--tr); white-space:nowrap;
+      min-height:34px;
+    }
+    .btn-logout:hover { opacity:1; border-color:var(--red); }
+    .btn-theme {
+      width:34px; height:34px;
+      border:1px solid var(--border); border-radius:8px;
+      color:var(--muted); display:flex; align-items:center; justify-content:center;
+      transition:var(--tr); flex-shrink:0;
+    }
+    .btn-theme:hover { border-color:var(--gold); color:var(--gold); }
+    .btn-theme svg { width:15px; height:15px; pointer-events:none; }
+    /* ── Section Note clients ── */
+    .note-card {
+      background:var(--bg2); border:1px solid var(--border); border-radius:16px; padding:18px; display:flex; flex-direction:column; gap:14px;
+    }
+    html.light .note-card { background:var(--bg3); }
+    .note-status {
+      display:flex; align-items:center; gap:8px;
+      padding:8px 12px; border-radius:8px;
+      font-size:0.8rem; color:var(--muted);
+      background:rgba(255,255,255,0.03); border:1px solid var(--border);
+      cursor:pointer; transition:border-color 0.2s, color 0.2s;
+      font-family:inherit; text-align:left; width:100%;
+    }
+    .note-status:hover { border-color:var(--bord2); }
+    .note-status.on { color:var(--green); border-color:var(--green); }
+    html.light .note-status.on { color:#4a8c3f; border-color:#4a8c3f; }
+    .note-lang-tabs { display:flex; gap:4px; }
+    .note-textarea {
+      width:100%; min-height:80px; resize:vertical;
+      background:rgba(255,255,255,0.05); border:1px solid var(--bord2); border-radius:10px;
+      padding:12px 14px; color:var(--cream); font-size:0.9rem; font-family:inherit;
+      outline:none; transition:border-color 0.2s; line-height:1.55;
+    }
+    .note-textarea:focus { border-color:var(--gold); }
+    .note-textarea::placeholder { color:var(--muted); }
+    html.light .note-textarea { background:rgba(255,255,255,0.7); color:var(--cream); }
+    .note-hint { font-size:0.72rem; color:var(--muted); letter-spacing:0.03em; }
+
+    /* ── Boutons de visibilité (header) ── */
+    .adm-vis-btn {
+      display:flex; align-items:center; gap:5px;
+      padding:5px 10px; border-radius:8px;
+      border:1px solid var(--border); font-size:0.72rem;
+      color:var(--muted); transition:var(--tr); white-space:nowrap;
+      min-height:32px; cursor:pointer;
+    }
+    .adm-vis-btn.on { border-color:var(--green); color:var(--green); }
+    html.light .adm-vis-btn { border-color:rgba(0,0,0,0.15); color:#888; }
+    html.light .adm-vis-btn.on { border-color:#4a8c3f; color:#4a8c3f; }
+
+    /* ── Case à cocher animée (remplace vis-dot) ── */
+    .vis-check { width:16px; height:16px; flex-shrink:0; display:inline-flex; }
+    .vis-check svg { width:16px; height:16px; overflow:visible; }
+    .vis-check .chk-box {
+      fill:none; stroke:var(--muted); stroke-width:1.6;
+      transition:stroke 0.22s ease, fill 0.22s ease;
+    }
+    .vis-check .chk-mark {
+      fill:none; stroke:var(--green); stroke-width:2;
+      stroke-linecap:round; stroke-linejoin:round;
+      pathLength:1; stroke-dasharray:1; stroke-dashoffset:1;
+      transition:stroke-dashoffset 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.22s;
+      opacity:0;
+    }
+    /* État ON : case verte + coche dessinée */
+    .adm-vis-btn.on .vis-check .chk-box,
+    .note-status.on .vis-check .chk-box { stroke:var(--green); fill:rgba(126,189,106,0.12); }
+    .adm-vis-btn.on .vis-check .chk-mark,
+    .note-status.on .vis-check .chk-mark { stroke-dashoffset:0; opacity:1; }
+    /* Mode clair */
+    html.light .vis-check .chk-box { stroke:rgba(0,0,0,0.3); }
+    html.light .adm-vis-btn.on .vis-check .chk-box,
+    html.light .note-status.on .vis-check .chk-box { stroke:#4a8c3f; fill:rgba(74,140,63,0.1); }
+    html.light .vis-check .chk-mark,
+    html.light .adm-vis-btn.on .vis-check .chk-mark,
+    html.light .note-status.on .vis-check .chk-mark { stroke:#4a8c3f; }
+    /* ── Toggle visibilité photo (par produit) ── */
+    .photo-show-row {
+      display:flex; align-items:center; gap:7px;
+      margin-top:9px; font-size:0.76rem; color:var(--muted); cursor:pointer;
+    }
+    .photo-show-chk { accent-color:var(--green); width:15px; height:15px; cursor:pointer; flex-shrink:0; }
+    @media(max-width:600px) {
+      .adm-sub { display:none; }
+      .btn-preview { padding:7px 8px; font-size:0.9rem; }
+      .adm-center { order:3; width:100%; justify-content:flex-start; }
+    }
+
+    /* ── SAVED TOAST ── */
+    #toast {
+      position:fixed; bottom:110px; left:50%;
+      transform:translateX(-50%) translateY(0);
+      background:var(--bg3); border:1px solid var(--bord2); border-radius:12px;
+      padding:12px 22px; font-size:0.84rem; color:var(--green);
+      box-shadow:0 8px 32px rgba(0,0,0,0.5); z-index:8000;
+      display:flex; align-items:center; gap:8px; white-space:nowrap;
+      max-width:calc(100vw - 32px);
+      opacity:0; pointer-events:none;
+      transition:opacity 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    #toast.show { opacity:1; pointer-events:none; transform:translateX(-50%) translateY(-8px); }
+
+    /* ── MAIN LAYOUT ── */
+    .adm-wrap { max-width:900px; margin:0 auto; padding:20px 16px 90px; }
+    @media(min-width:900px) { .adm-wrap { padding:28px 24px 90px; } }
+
+    /* ── HERO IMAGE SECTION ── */
+    .hero-img-card {
+      background:var(--bg2); border:1px solid var(--border);
+      border-radius:16px; padding:16px; display:flex; flex-direction:column; gap:20px;
+    }
+
+    /* ── Mockup téléphone ── */
+    .phone-mockup-wrap { display:flex; justify-content:center; }
+    .phone-mockup {
+      position:relative; width:200px; flex-shrink:0;
+      background:#111; border-radius:34px;
+      border:3px solid #2a2a2a;
+      box-shadow:0 0 0 1px #000, 0 20px 60px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,255,255,0.05);
+      overflow:hidden;
+    }
+    .phone-notch {
+      position:absolute; top:0; left:50%; transform:translateX(-50%);
+      width:56px; height:16px; background:#111; border-radius:0 0 12px 12px; z-index:10;
+    }
+    .phone-screen {
+      width:100%; aspect-ratio:9/19.5; overflow:hidden; position:relative;
+      background:radial-gradient(ellipse at 60% 40%, #2a1208 0%, #160d08 45%, #0f0906 100%);
+    }
+    .phone-hero-bg {
+      position:absolute; inset:-8%;
+      background-size:cover; background-position:50% 40%;
+      opacity:0; transition:opacity 1s ease;
+      transform-origin:center; will-change:transform;
+    }
+    .phone-hero-bg.flow {
+      opacity:1;
+      animation:phoneDrift 22s linear infinite;
+    }
+    @keyframes phoneDrift {
+      0%   { transform:translate( 0%,    0%   ); }
+      20%  { transform:translate(-3%,   -2%   ); }
+      40%  { transform:translate(-2%,    2.5% ); }
+      60%  { transform:translate( 3%,    1.5% ); }
+      80%  { transform:translate( 1.5%, -2.5% ); }
+      100% { transform:translate( 0%,    0%   ); }
+    }
+    .phone-overlay {
+      position:absolute; inset:0; z-index:1;
+      background:linear-gradient(to bottom,
+        rgba(10,6,4,0.25) 0%, rgba(10,6,4,0.50) 38%,
+        rgba(10,6,4,0.85) 68%, rgba(10,6,4,1) 100%);
+    }
+    .phone-content {
+      position:absolute; inset:0; z-index:2;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      padding:18px 10px 30px; gap:4px;
+    }
+    .phone-logo {
+      width:55%; filter:grayscale(1) brightness(6) drop-shadow(0 2px 8px rgba(0,0,0,0.8));
+      margin-bottom:3px;
+    }
+    .phone-ornament {
+      display:flex; align-items:center; gap:6px; color:var(--gold); margin-bottom:1px;
+    }
+    .phone-orn-line {
+      width:22px; height:1px; background:linear-gradient(90deg,transparent,var(--gold));
+    }
+    .phone-orn-line-r { background:linear-gradient(270deg,transparent,var(--gold)); }
+    .phone-title {
+      font-family:'Cormorant',serif; font-size:0.88rem; font-weight:600;
+      color:#f5e8d4; letter-spacing:0.04em; text-align:center; line-height:1.1;
+    }
+    .phone-tagline {
+      font-family:'Cormorant',serif; font-style:italic; font-size:0.54rem;
+      color:rgba(200,164,78,0.9); text-align:center; letter-spacing:0.04em;
+    }
+    .phone-sub {
+      font-family:'Cormorant',serif; font-size:0.4rem; letter-spacing:0.06em;
+      color:rgba(200,164,78,0.65); text-align:center;
+      display:flex; flex-wrap:wrap; justify-content:center; gap:2px;
+      line-height:1.4;
+    }
+    .phone-sub-dot { color:var(--gold); margin:0 2px; }
+    .phone-socials { display:flex; gap:4px; margin-top:3px; }
+    .phone-social-btn {
+      display:flex; align-items:center; gap:2px;
+      font-size:0.38rem; padding:3px 7px; border-radius:20px;
+      border:1px solid rgba(200,164,78,0.35); color:rgba(200,164,78,0.85);
+      letter-spacing:0.03em;
+    }
+    .phone-scroll {
+      position:absolute; bottom:8px; left:0; right:0;
+      display:flex; flex-direction:column; align-items:center; gap:3px; z-index:3;
+    }
+    .phone-scroll-lbl {
+      font-family:'Cormorant',serif; font-size:0.38rem; letter-spacing:0.12em;
+      color:rgba(200,164,78,0.7); text-transform:uppercase;
+    }
+    .phone-capsule {
+      width:7px; height:13px; border:1px solid rgba(200,164,78,0.5);
+      border-radius:5px; display:flex; align-items:flex-start;
+      justify-content:center; padding-top:2px;
+    }
+    .phone-capsule-dot {
+      width:2px; height:3px; background:rgba(200,164,78,0.85);
+      border-radius:1px; animation:pScroll 1.6s ease-in-out infinite;
+    }
+    @keyframes pScroll {
+      0%,100% { transform:translateY(0); opacity:1; }
+      80%      { transform:translateY(4px); opacity:0; }
+    }
+    /* Contrôles */
+    .hero-preview-empty {
+      display:flex; flex-direction:column; align-items:center; gap:10px;
+      color:var(--muted); font-size:0.82rem; letter-spacing:0.04em; padding:10px 0;
+    }
+    .hero-controls { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .hero-upload-btn {
+      display:flex; align-items:center; gap:6px; cursor:pointer;
+      background:var(--gold); color:#0c0a08;
+      font-size:0.8rem; font-weight:500; letter-spacing:0.03em;
+      padding:8px 14px; border-radius:10px; transition:opacity 0.2s;
+      white-space:nowrap; flex-shrink:0;
+    }
+    .hero-upload-btn:hover { opacity:0.85; }
+    .hero-del-btn {
+      display:flex; align-items:center; gap:5px;
+      background:rgba(224,82,82,0.08); border:1px solid rgba(224,82,82,0.25);
+      color:var(--red); font-size:0.78rem; padding:7px 12px; border-radius:9px;
+      cursor:pointer; transition:background 0.2s;
+    }
+    .hero-del-btn:hover { background:rgba(224,82,82,0.15); }
+    .hero-hint { font-size:0.72rem; color:var(--muted); letter-spacing:0.03em; }
+    html.light .hero-img-card { background:var(--bg3); }
+    html.light .phone-mockup { border-color:#bbb; box-shadow:0 0 0 1px #aaa, 0 16px 40px rgba(0,0,0,0.15); }
+    html.light .phone-notch { background:#ddd; }
+
+    /* ── SECTION ── */
+    .adm-section { margin-bottom:32px; }
+    .sec-hd {
+      font-family:'Cormorant',serif; font-size:1.2rem; font-weight:600;
+      color:var(--cream); padding-bottom:12px; margin-bottom:16px;
+      border-bottom:1px solid var(--border);
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    }
+    .sec-badge {
+      font-family:'Outfit',sans-serif; font-size:0.66rem; font-weight:500;
+      padding:4px 11px; border-radius:10px; letter-spacing:0.06em;
+      background:rgba(200,164,78,0.1); color:var(--gold); border:1px solid var(--bord2);
+    }
+
+    /* ── INFO CARD (WiFi, Horaires, Adresse) ── */
+    .info-card {
+      background:var(--card); border:1px solid var(--border); border-radius:var(--r);
+      overflow:hidden;
+    }
+    .info-row {
+      display:grid; grid-template-columns:140px 1fr;
+      border-bottom:1px solid var(--border);
+    }
+    .info-row:last-child { border-bottom:none; }
+    .info-lbl {
+      padding:14px 16px; font-size:0.78rem; color:var(--muted);
+      border-right:1px solid var(--border); display:flex; align-items:center;
+    }
+    .info-inputs { padding:8px 12px; display:flex; flex-direction:column; gap:6px; }
+    .info-input {
+      background:transparent; border:none; border-bottom:1px solid transparent;
+      color:var(--cream); font-size:0.84rem; padding:8px 4px; outline:none;
+      transition:border-color 0.2s; width:100%; min-height:38px;
+    }
+    .info-input:focus { border-color:var(--gold); }
+    @media(max-width:560px) {
+      .info-row { grid-template-columns:1fr; }
+      .info-lbl { border-right:none; border-bottom:1px solid var(--border); padding:10px 14px 8px; font-size:0.72rem; }
+      .info-inputs { padding:6px 14px 10px; }
+    }
+
+    /* ── CATEGORIES ── */
+    .cats-list { display:flex; flex-direction:column; gap:8px; }
+    /* ── Drag & drop ── */
+    .drag-handle {
+      cursor:grab; color:var(--muted); flex-shrink:0; padding:2px 4px;
+      opacity:0.5; transition:opacity 0.2s; touch-action:none;
+    }
+    .drag-handle:hover { opacity:1; color:var(--gold); }
+    .drag-handle svg { width:16px; height:16px; pointer-events:none; }
+    .dragging { opacity:0.4; }
+    .drag-over { outline:2px solid var(--gold); outline-offset:2px; border-radius:14px; }
+    .drag-over-cat { background:rgba(200,164,78,0.07); outline:2px dashed var(--gold); outline-offset:3px; border-radius:14px; }
+    .move-cat-row { display:flex; align-items:center; gap:8px; }
+    .move-cat-sel { flex:1; }
+    .btn-move-cat {
+      padding:7px 12px; border-radius:8px; font-size:0.8rem;
+      background:rgba(200,164,78,0.1); border:1px solid var(--gold);
+      color:var(--gold); cursor:pointer; transition:var(--tr); white-space:nowrap;
+    }
+    .btn-move-cat:hover { background:rgba(200,164,78,0.22); }
+    .cat-row {
+      background:var(--card); border:1px solid var(--border); border-radius:14px;
+      padding:12px 14px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    }
+    .cat-row-ico { color:var(--gold); flex-shrink:0; }
+    .cat-row-ico svg { width:18px; height:18px; }
+    .inline-input {
+      flex:1; min-width:100px; background:transparent; border:none; border-bottom:1px solid transparent;
+      color:var(--cream); font-size:0.88rem; padding:6px 2px; outline:none; transition:border-color 0.2s;
+    }
+    .inline-input:focus { border-color:var(--gold); }
+    .icon-select { display:none; } /* remplacé par le picker visuel */
+
+    /* ── Icon Picker ── */
+    .ico-picker-btn {
+      display:flex; align-items:center; gap:6px;
+      padding:7px 10px; border-radius:8px;
+      background:var(--bg3); border:1px solid var(--border);
+      color:var(--gold); font-size:0.75rem; cursor:pointer;
+      transition:border-color 0.2s, background 0.2s;
+      white-space:nowrap; flex-shrink:0;
+    }
+    .ico-picker-btn:hover { border-color:var(--gold); background:rgba(201,168,76,0.08); }
+    .ico-picker-btn svg { width:16px; height:16px; flex-shrink:0; }
+    .ico-picker-btn .ico-pb-label { font-size:0.7rem; color:var(--muted); }
+
+    .ico-picker-popup {
+      display:none; position:fixed; z-index:600;
+      background:var(--bg3); border:1px solid var(--bord2);
+      border-radius:14px; padding:12px;
+      box-shadow:0 12px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(200,164,78,0.08);
+      width:min(264px, calc(100vw - 16px));
+      max-height:80vh; overflow-y:auto;
+    }
+    .ico-picker-popup.open { display:block; }
+    .ico-picker-grid {
+      display:grid; grid-template-columns:repeat(5,1fr); gap:6px;
+      margin-bottom:8px;
+    }
+    .ico-picker-item {
+      display:flex; flex-direction:column; align-items:center; gap:3px;
+      padding:8px 4px; border-radius:8px; cursor:pointer;
+      border:1px solid transparent;
+      transition:background 0.15s, border-color 0.15s;
+      font-size:0.58rem; color:var(--muted); text-align:center;
+    }
+    .ico-picker-item svg { width:18px; height:18px; color:var(--cream); }
+    .ico-picker-item:hover { background:rgba(201,168,76,0.1); border-color:rgba(201,168,76,0.3); }
+    .ico-picker-item.selected { background:rgba(201,168,76,0.15); border-color:var(--gold); }
+    .ico-picker-item.selected svg { color:var(--gold); }
+    .ico-picker-none {
+      width:100%; padding:7px; border-radius:8px; font-size:0.75rem;
+      background:rgba(224,82,82,0.08); border:1px solid rgba(224,82,82,0.2);
+      color:var(--red); cursor:pointer; text-align:center;
+      transition:background 0.15s;
+    }
+    .ico-picker-none:hover { background:rgba(224,82,82,0.15); }
+    .btn-del {
+      width:36px; height:36px; flex-shrink:0;
+      border:1px solid rgba(224,82,82,0.3); border-radius:8px;
+      color:var(--red); opacity:0.6; font-size:1.1rem; font-weight:300;
+      display:flex; align-items:center; justify-content:center; transition:var(--tr);
+    }
+    .btn-del:hover { opacity:1; border-color:var(--red); background:rgba(224,82,82,0.06); }
+    .btn-add {
+      width:100%; padding:14px; margin-top:8px;
+      border:1px dashed var(--bord2); border-radius:14px;
+      color:var(--gold); font-size:0.84rem; letter-spacing:0.04em;
+      display:flex; align-items:center; justify-content:center; gap:6px;
+      transition:var(--tr); min-height:48px;
+    }
+    .btn-add:hover { background:rgba(200,164,78,0.04); border-color:var(--gold); }
+
+    /* ── PRODUCTS ── */
+    .cat-products { margin-bottom:28px; }
+    .cat-products-hd {
+      display:flex; align-items:center; gap:10px; padding:16px 0 10px;
+    }
+    .cat-products-name {
+      font-family:'Cormorant',serif; font-size:1.05rem; font-weight:600; color:var(--cream);
+    }
+    .products-list { display:flex; flex-direction:column; gap:10px; }
+
+    /* Product card in admin */
+    .prod-card {
+      background:var(--card); border:1px solid var(--border); border-radius:14px;
+      overflow:hidden;
+    }
+    .prod-card-top {
+      display:flex; align-items:center; gap:12px; padding:14px;
+      cursor:pointer; user-select:none; min-height:70px;
+    }
+    .prod-thumb {
+      width:56px; height:56px; border-radius:10px; object-fit:cover; flex-shrink:0;
+      background:var(--bg3);
+    }
+    .prod-thumb-empty {
+      width:56px; height:56px; border-radius:10px; flex-shrink:0;
+      background:var(--bg3); border:1px dashed var(--border);
+      display:flex; align-items:center; justify-content:center;
+      color:var(--muted);
+    }
+    .prod-thumb-empty svg { width:22px; height:22px; opacity:0.5; }
+    .prod-top-info { flex:1; min-width:0; }
+    .prod-top-name { font-size:0.92rem; font-weight:400; color:var(--cream); }
+    .prod-top-price { font-size:0.78rem; color:var(--gold); margin-top:3px; }
+    .prod-expand-ico { color:var(--muted); transition:transform 0.3s; flex-shrink:0; }
+    .prod-expand-ico svg { width:18px; height:18px; }
+    .prod-card.open .prod-expand-ico { transform:rotate(180deg); }
+    .prod-card-body {
+      display:none; padding:0 14px 18px;
+      border-top:1px solid var(--border);
+    }
+    .prod-card.open .prod-card-body { display:block; }
+
+    /* Form grid */
+    .form-grid { display:grid; gap:14px; padding-top:14px; }
+    .form-grid-2 { grid-template-columns:1fr 1fr; gap:12px; }
+    @media(max-width:480px) { .form-grid-2 { grid-template-columns:1fr; } }
+    .form-group { display:flex; flex-direction:column; gap:6px; }
+    .form-lbl { font-size:0.71rem; color:var(--muted); letter-spacing:0.08em; text-transform:uppercase; }
+    .form-input, .form-textarea, .form-select {
+      background:rgba(255,255,255,0.05); border:1px solid var(--bord2); border-radius:10px;
+      color:var(--cream); font-size:0.9rem; padding:12px 14px; outline:none; transition:border-color 0.2s; width:100%;
+    }
+    .form-input:focus, .form-textarea:focus, .form-select:focus { border-color:var(--gold); }
+    .form-textarea { resize:vertical; min-height:86px; line-height:1.6; }
+    .form-select option { background:#181612; }
+
+    /* Photo preview */
+    .photo-preview {
+      width:100%; height:160px; border-radius:12px; object-fit:cover;
+      border:1px solid var(--bord2); background:var(--bg3); margin-top:6px;
+    }
+    .photo-preview-empty {
+      width:100%; height:160px; border-radius:12px; margin-top:6px;
+      border:1px dashed var(--bord2); background:var(--bg3);
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      gap:8px; color:var(--muted);
+    }
+    .photo-preview-empty svg { width:32px; height:32px; opacity:0.4; }
+    .photo-preview-empty span { font-size:0.75rem; letter-spacing:0.04em; }
+    .photo-help { font-size:0.72rem; color:var(--muted); margin-top:6px; line-height:1.55; }
+    .photo-help a { color:var(--gold); }
+
+    /* Photo upload button */
+    .photo-upload-row { display:flex; gap:8px; margin-top:8px; }
+    .btn-upload-photo {
+      flex:1; padding:10px 14px; border-radius:10px;
+      border:1px solid var(--bord2); background:rgba(255,255,255,0.04);
+      color:var(--muted); font-size:0.82rem;
+      display:flex; align-items:center; justify-content:center; gap:7px;
+      transition:var(--tr); cursor:pointer; min-height:42px;
+    }
+    .btn-upload-photo:hover { border-color:var(--gold); color:var(--gold); background:rgba(200,164,78,0.05); }
+    .btn-clear-photo {
+      width:42px; height:42px; border-radius:10px;
+      border:1px solid rgba(224,82,82,0.3); background:none;
+      color:var(--red); font-size:1rem; opacity:0.7;
+      display:flex; align-items:center; justify-content:center;
+      transition:var(--tr); cursor:pointer; flex-shrink:0;
+    }
+    .btn-clear-photo:hover { opacity:1; border-color:var(--red); background:rgba(224,82,82,0.06); }
+    input.photo-file-input { display:none; }
+
+    /* Badges */
+    .badges-wrap { display:flex; flex-direction:column; gap:8px; }
+    .badge-selects { display:flex; gap:8px; flex-wrap:wrap; }
+    .badge-select {
+      flex:1; min-width:120px; padding:8px 10px; border-radius:10px;
+      border:1px solid var(--border); background:var(--bg2);
+      color:var(--cream); font-size:0.78rem; cursor:pointer;
+      transition:var(--tr); outline:none; font-family:inherit;
+    }
+    .badge-select:focus { border-color:var(--gold); }
+    .badge-select option { background:var(--bg2); }
+    .badge-toggles { display:flex; flex-wrap:wrap; gap:8px; }
+    .badge-toggle {
+      font-size:0.74rem; font-weight:500; padding:7px 13px; border-radius:20px;
+      border:1px solid var(--border); color:var(--muted); background:transparent;
+      transition:var(--tr); cursor:pointer; font-family:inherit;
+    }
+    .badge-toggle:hover { border-color:var(--gold-lt); color:var(--gold-lt); }
+    .badge-toggle.active { border-color:var(--gold); color:var(--gold); background:rgba(200,164,78,0.18); font-weight:600; }
+    html.light .badge-toggle.active { background:var(--gold); color:#0c0a08; border-color:var(--gold); font-weight:600; }
+
+    /* Product action buttons */
+    .prod-actions { display:flex; gap:8px; margin-top:16px; }
+    .btn-save-prod {
+      flex:1; padding:10px;
+      background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));
+      border-radius:10px; color:#0c0a08; font-size:0.84rem; font-weight:600;
+      transition:all 0.25s;
+    }
+    .btn-save-prod:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(200,164,78,0.35); }
+    .btn-del-prod {
+      padding:10px 16px;
+      border:1px solid rgba(224,82,82,0.35); border-radius:10px;
+      color:var(--red); font-size:0.84rem; opacity:0.75; transition:var(--tr);
+    }
+    .btn-del-prod:hover { opacity:1; border-color:var(--red); background:rgba(224,82,82,0.05); }
+
+    /* Add product */
+    .btn-add-prod {
+      width:100%; padding:11px; margin-top:8px;
+      border:1px dashed var(--bord2); border-radius:12px;
+      color:var(--gold); font-size:0.82rem;
+      display:flex; align-items:center; justify-content:center; gap:6px;
+      transition:var(--tr);
+    }
+    .btn-add-prod:hover { background:rgba(200,164,78,0.04); border-color:var(--gold); }
+
+    /* ── SAVE FAB (remplace save-bar) ── */
+    .save-bar { display:none; } /* gardé pour compatibilité JS, masqué visuellement */
+    #fab-save {
+      position:fixed; bottom:28px; right:20px;
+      width:60px; height:60px; border-radius:50%;
+      background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--gold-d));
+      color:#0c0a08;
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 6px 24px rgba(200,164,78,0.45), 0 2px 8px rgba(0,0,0,0.4);
+      z-index:200; border:none; cursor:pointer;
+      transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s;
+    }
+    #fab-save:hover { transform:translateY(-3px) scale(1.06); box-shadow:0 12px 32px rgba(200,164,78,0.55); }
+    #fab-save:active { transform:scale(0.93); }
+    #fab-save svg { width:26px; height:26px; }
+    /* Pulse quand il y a des modifs non sauvegardées */
+    #fab-save.unsaved { animation:fab-pulse 2s ease-in-out infinite; }
+    @keyframes fab-pulse {
+      0%,100%{ box-shadow:0 6px 24px rgba(200,164,78,0.45); }
+      50%{ box-shadow:0 6px 32px rgba(200,164,78,0.8), 0 0 0 8px rgba(200,164,78,0.12); }
+    }
+    /* Tooltip au survol */
+    #fab-save::before {
+      content:attr(title);
+      position:absolute; right:68px; top:50%; transform:translateY(-50%);
+      background:var(--bg3); border:1px solid var(--bord2); border-radius:8px;
+      padding:6px 12px; font-size:0.76rem; color:var(--cream); white-space:nowrap;
+      opacity:0; pointer-events:none; transition:opacity 0.2s;
+    }
+    #fab-save:hover::before { opacity:1; }
+
+    /* ── BOUTON SAUVEGARDE CATÉGORIES ── */
+    .btn-save-cats {
+      width:100%; padding:13px; margin-top:10px;
+      background:rgba(200,164,78,0.08); border:1px solid var(--bord2); border-radius:14px;
+      color:var(--gold); font-size:0.86rem; font-weight:500; letter-spacing:0.04em;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      transition:var(--tr); min-height:48px;
+    }
+    .btn-save-cats:hover { background:rgba(200,164,78,0.14); border-color:var(--gold); }
+    .btn-save-cats:active { transform:scale(0.97); }
+
+    /* ── GLOBAL TRANSLATE BAR ── */
+    .global-src-sel {
+      background:var(--bg3); border:1px solid rgba(126,189,106,0.3); border-radius:8px;
+      color:var(--green); font-size:0.76rem; padding:6px 10px; outline:none; cursor:pointer;
+      min-height:32px;
+    }
+    .global-src-sel option { background:#181612; color:#e8d9c0; }
+    html.light .global-src-sel { background:#f5ede4; border-color:rgba(74,140,63,0.4); color:#3a6b33; }
+    html.light .global-src-sel option { background:#f5ede4; color:#2a1a0e; }
+    .global-progress {
+      font-size:0.73rem; color:var(--green); white-space:nowrap;
+      max-width:260px; overflow:hidden; text-overflow:ellipsis;
+      transition:opacity 0.3s;
+    }
+    .global-progress.err { color:var(--red); }
+
+    /* Lang tabs */
+    .lang-tabs {
+      display:flex; gap:4px; margin-bottom:12px;
+      overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none;
+      padding-bottom:2px;
+    }
+    .lang-tabs::-webkit-scrollbar { display:none; }
+    .lang-tab {
+      padding:7px 13px; border-radius:8px; border:1px solid var(--border);
+      color:var(--muted); font-size:0.74rem; transition:var(--tr);
+      white-space:nowrap; flex-shrink:0; min-height:34px;
+    }
+    .lang-tab.on { border-color:var(--gold); color:var(--gold); background:rgba(200,164,78,0.08); }
+
+    @keyframes tl-pulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
+
+    .lang-fields { display:none; }
+    .lang-fields.on { display:block; }
+
+    /* Divider */
+    .form-divider { height:1px; background:var(--border); margin:14px 0; }
+
+    /* Form inputs larger touch targets */
+    .form-input, .form-textarea, .form-select { padding:12px 14px; }
+    .form-input { min-height:44px; }
+
+    /* Product actions larger */
+    .btn-save-prod { padding:13px; min-height:46px; }
+    .btn-del-prod { padding:13px 18px; min-height:46px; }
+    .btn-add-prod { min-height:46px; padding:13px; }
+
+    /* ══════════════════════════════════════
+       DESKTOP — breakpoints ≥ 768px / 1024px
+       ══════════════════════════════════════ */
+    @media(min-width:768px) {
+      /* Wrap plus large */
+      .adm-wrap { max-width:1100px; padding:32px 40px 100px; }
+
+      /* Header : une seule rangée, bords délimités */
+      .adm-header { padding:10px 32px; gap:12px; flex-wrap:nowrap; }
+      .adm-logo { font-size:1.25rem; }
+      .adm-sub  { display:block !important; }
+      .adm-center { flex-wrap:nowrap; justify-content:flex-start; gap:10px; }
+      .btn-preview { font-size:0.8rem; }
+      .btn-logout  { font-size:0.8rem; }
+
+      /* Hero : mockup à gauche, contrôles à droite */
+      .hero-img-card {
+        display:grid;
+        grid-template-columns:220px 1fr;
+        grid-template-rows:auto auto;
+        gap:24px 32px;
+        align-items:start;
+      }
+      .phone-mockup-wrap {
+        grid-row:1 / 3;
+        align-self:start;
+      }
+      .hero-controls { align-self:end; }
+      .hero-hint { grid-column:2; }
+
+      /* Info card : label colonne plus large */
+      .info-row { grid-template-columns:180px 1fr; }
+
+      /* Produits en 2 colonnes */
+      .products-list {
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:10px;
+        align-items:start;
+      }
+      /* Carte ouverte prend les 2 colonnes */
+      .prod-card.open {
+        grid-column:1 / -1;
+      }
+
+      /* FABs décalés pour ne pas couvrir le contenu */
+      #fab-save  { bottom:36px; right:36px; width:64px; height:64px; }
+
+      /* Form grid : 3 colonnes sur desktop large */
+      .form-grid-2 { grid-template-columns:1fr 1fr; }
+
+      /* Section header plus aéré */
+      .sec-hd { font-size:1.3rem; padding-bottom:14px; margin-bottom:20px; }
+
+      /* Cat row plus large */
+      .cat-row { padding:14px 18px; border-radius:16px; }
+
+      /* Badges plus aérés */
+      .badge-toggles { gap:10px; }
+
+      /* Sauvegarder catégories */
+      .btn-save-cats { padding:14px; border-radius:16px; }
+
+      /* Login box légèrement plus large */
+      .login-box { max-width:420px; padding:44px 36px; }
+    }
+
+    @media(min-width:1100px) {
+      .adm-wrap { max-width:1200px; }
+      .adm-header { padding:10px 48px; }
+
+      /* Hero mockup un peu plus grand */
+      .phone-mockup { width:230px; }
+
+      /* Produits en 3 colonnes sur très grand écran */
+      .products-list {
+        grid-template-columns:1fr 1fr 1fr;
+      }
+      .prod-card.open {
+        grid-column:1 / -1;
+      }
+    }
+
+    .theme-grid { display:flex; flex-wrap:wrap; gap:8px; }
+    .theme-card {
+      display:flex; align-items:center; gap:9px;
+      padding:8px 14px 8px 10px;
+      border-radius:10px;
+      border:2px solid rgba(255,255,255,0.08);
+      background:rgba(255,255,255,0.03);
+      cursor:pointer;
+      transition:border-color 0.18s, background 0.18s;
+    }
+    .theme-card:hover { border-color:var(--tc-accent,var(--gold)); background:rgba(255,255,255,0.06); }
+    .theme-card.active { border-color:var(--tc-accent,var(--gold)); background:rgba(255,255,255,0.06); box-shadow:0 0 0 1px var(--tc-accent,var(--gold)); }
+    .tc-dot { width:11px; height:11px; border-radius:50%; background:var(--tc-accent,var(--gold)); flex-shrink:0; }
+    .tc-name { font-size:0.78rem; font-weight:600; color:rgba(255,255,255,0.9); letter-spacing:0.01em; }
+    .theme-card.active .tc-name { color:#fff; }
+    html.light .tc-name { color:rgba(20,15,10,0.85); }
+    html.light .theme-card.active .tc-name { color:#1a1208; }
+    .tc-check { font-size:0.7rem; color:var(--tc-accent,var(--gold)); margin-left:2px; display:none; }
+    .theme-card.active .tc-check { display:block; }
+  </style>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+  <!-- ✅ Configuration centralisée — modifier uniquement firebase-config.js -->
+  <script src="firebase-config.js"></script>
+  <script>
+    firebase.initializeApp(FIREBASE_CONFIG);
+    const _db = firebase.database();
+    /* ── Cloudinary (hébergement images) ── */
+    const CLOUDINARY_CLOUD  = 'dty1cz8et';
+    const CLOUDINARY_PRESET = 'menu_photos';
+    async function uploadToCloudinary(blob) {
+      const fd = new FormData();
+      fd.append('file', blob);
+      fd.append('upload_preset', CLOUDINARY_PRESET);
+      const res  = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, { method: 'POST', body: fd });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error?.message || 'Upload échoué');
+      return json.secure_url;
+    }
+  </script>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     LOGIN SCREEN
+══════════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">Mozart Café</div>
+    <div class="login-sub">Administration</div>
+    <input type="password" class="login-input" id="pwd-input"
+           placeholder="Mot de passe" autocomplete="current-password">
+    <button class="login-btn" id="login-btn">Connexion</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     ADMIN INTERFACE
+══════════════════════════════════════ -->
+<header class="adm-header" id="adm-header" style="display:none">
+  <div>
+    <div class="adm-logo">Café &amp; Restaurant</div>
+    <div class="adm-sub">Administration du menu</div>
+  </div>
+  <div class="adm-center">
+    <select class="global-src-sel" id="global-src-lang">
+      <option value="fr">🇫🇷 Français</option>
+      <option value="en">🇬🇧 English</option>
+      <option value="ar">🇸🇦 العربية</option>
+    </select>
+<button class="adm-vis-btn" id="toggle-photos-btn" title="Afficher/cacher toutes les photos dans le menu">
+      <span class="vis-check"><svg viewBox="0 0 16 16" fill="none"><rect class="chk-box" x="1.5" y="1.5" width="13" height="13" rx="2.5"/><path class="chk-mark" d="M3.5,8.5 L6.5,11.5 L12.5,4.5" pathLength="1"/></svg></span>Photos (tout)
+    </button>
+    <div class="global-progress" id="global-progress"></div>
+  </div>
+  <div class="adm-right">
+    <button class="btn-theme" id="adm-theme-btn" title="Changer le thème">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <path id="adm-theme-ico-path" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+      </svg>
+    </button>
+    <button class="btn-preview" onclick="window.open('index.html','_blank')">👁 Voir le menu</button>
+    <button class="btn-logout" id="logout-btn">Déconnexion</button>
+  </div>
+</header>
+
+<div class="adm-wrap" id="adm-wrap" style="display:none">
+
+  <!-- ── THÈME VISUEL ── -->
+  <div class="adm-section">
+    <div class="sec-hd">Thème visuel <span class="sec-badge">Design</span></div>
+    <div class="theme-grid" id="theme-grid"></div>
+  </div>
+
+  <!-- ── PHOTO D'ACCUEIL ── -->
+  <div class="adm-section">
+    <div class="sec-hd">Photo d'accueil <span class="sec-badge">Hero</span></div>
+    <div class="hero-img-card" id="hero-img-card">
+
+      <!-- Mockup téléphone -->
+      <div class="phone-mockup-wrap">
+        <div class="phone-mockup">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="phone-hero-bg" id="phone-hero-bg"></div>
+            <div class="phone-overlay"></div>
+            <div class="phone-content">
+              <img src="logo.png" class="phone-logo" alt="Mozart">
+              <div class="phone-ornament">
+                <div class="phone-orn-line"></div>
+                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:var(--gold)"><polygon points="12,2 22,9 18,20 6,20 2,9"/></svg>
+                <div class="phone-orn-line phone-orn-line-r"></div>
+              </div>
+              <div class="phone-title" id="pm-title">Café &amp; Restaurant</div>
+              <div class="phone-tagline" id="pm-tagline"></div>
+              <div class="phone-sub" id="pm-sub"></div>
+              <div class="phone-socials">
+                <span class="phone-social-btn">
+                  <svg width="7" height="7" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+                  Facebook
+                </span>
+                <span class="phone-social-btn">
+                  <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+                  Instagram
+                </span>
+              </div>
+            </div>
+            <div class="phone-scroll">
+              <div class="phone-scroll-lbl"></div>
+              <div class="phone-capsule"><div class="phone-capsule-dot"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contrôles -->
+      <div class="hero-controls">
+        <label class="hero-upload-btn" for="hero-file-input">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Choisir une photo
+        </label>
+        <input type="file" id="hero-file-input" accept="image/*" style="display:none">
+        <button class="hero-del-btn" id="hero-del-btn" style="display:none">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Supprimer
+        </button>
+      </div>
+      <div class="hero-hint">Photo recommandée : format portrait, min. 900×1600 px</div>
+    </div>
+  </div>
+
+  <!-- ── INFORMATIONS DU CAFÉ ── -->
+  <div class="adm-section">
+    <div class="sec-hd">Informations du café <span class="sec-badge">Footer</span></div>
+    <div class="info-card" id="info-card">
+      <!-- Rempli par JS -->
+    </div>
+  </div>
+
+  <!-- ── NOTE CLIENTS ── -->
+  <div class="adm-section">
+    <div class="sec-hd">Note pour les clients <span class="sec-badge">Annonce</span></div>
+    <div class="note-card" id="note-card"></div>
+  </div>
+
+  <!-- ── CATÉGORIES ── -->
+  <div class="adm-section">
+    <div class="sec-hd">Catégories <span class="sec-badge" id="cat-count">0</span></div>
+    <div class="cats-list" id="cats-list"></div>
+    <button class="btn-add" id="btn-add-cat">＋ Ajouter une catégorie</button>
+    <button class="btn-save-cats" id="btn-save-cats" style="display:none">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+        <polyline points="17,21 17,13 7,13 7,21"/>
+        <polyline points="7,3 7,8 15,8"/>
+      </svg>
+      Sauvegarder les catégories
+    </button>
+  </div>
+
+  <!-- ── PRODUITS PAR CATÉGORIE ── -->
+  <div class="adm-section">
+    <div class="sec-hd" id="sec-hd-produits">Produits <span class="sec-badge" id="prod-count-badge">0</span></div>
+    <div id="products-area"></div>
+  </div>
+
+</div>
+
+<!-- Save bar (caché, gardé pour compatibilité) -->
+<div class="save-bar" id="save-bar" style="display:none">
+  <button class="btn-save-all" id="btn-save-all">Sauvegarder</button>
+</div>
+
+<!-- FAB Enregistrer tout -->
+<button id="fab-save" style="display:none" title="Enregistrer tout">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+    <polyline points="17,21 17,13 7,13 7,21"/>
+    <polyline points="7,3 7,8 15,8"/>
+  </svg>
+</button>
+
+<!-- Toast -->
+<div id="toast">✓ Modifications sauvegardées avec succès</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   CONFIGURATION — MOT DE PASSE (SHA-256)
+   Pour changer le mot de passe :
+   1. Calculer SHA-256 du nouveau mot de passe sur : sha256.online
+   2. Remplacer la valeur de ADMIN_HASH ci-dessous
+═══════════════════════════════════════════ */
+// SHA-256 hash local — utilisé uniquement si Firebase /config/adminHash est absent
+const ADMIN_HASH = '16cd9de849c3cfd4ce1234d0d50e91553576b3ae4bbeb9446d0edfb237389aa2';
+const STORE_KEY = 'mc_admin_data_v1';
+
+async function _hashPwd(pwd) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pwd));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+/* ═══════════════════════════════════════════
+   LANGUES DISPONIBLES
+═══════════════════════════════════════════ */
+const LANGS = ['fr', 'en', 'ar'];
+const LANG_LABELS = { fr:'🇫🇷 FR', en:'🇬🇧 EN', ar:'🇸🇦 AR' };
+
+/* ═══════════════════════════════════════════
+   DONNÉES PAR DÉFAUT (chargées depuis index.html)
+═══════════════════════════════════════════ */
+const DEFAULT_CATS = [
+  { key:'hot',     ico:'ico-coffee',  names:{ fr:'Boissons Chaudes', en:'Hot Drinks',    ar:'مشروبات ساخنة' } },
+  { key:'cold',    ico:'ico-cold',    names:{ fr:'Boissons Froides', en:'Cold Drinks',   ar:'مشروبات باردة' } },
+  { key:'food',    ico:'ico-food',    names:{ fr:'Cuisine',          en:'Food',           ar:'الأكل'         } },
+  { key:'sweet',   ico:'ico-cake',    names:{ fr:'Sucré',            en:'Sweet',          ar:'حلويات'        } },
+  { key:'morning', ico:'ico-sunrise', names:{ fr:'Le Matin',         en:'Breakfast',      ar:'الصباح'        } },
+  { key:'hookah',  ico:'ico-hookah',  names:{ fr:'Hookah',           en:'Hookah',         ar:'الشيشة'        } },
+];
+
+const DEFAULT_INFO = {
+  wifi_name:  { fr:'WiFi', en:'WiFi', ar:'واي فاي' },
+  wifi_val:   { fr:'MozartCafe_Free · Mozart2026', en:'MozartCafe_Free · Mozart2026', ar:'MozartCafe_Free · Mozart2026' },
+  hours_name: { fr:'Horaires', en:'Hours', ar:'أوقات العمل' },
+  hours_val:  { fr:'Tous les jours 7h00 – 00h00', en:'Every day 7:00 AM – midnight', ar:'كل يوم 7:00 صباحاً – منتصف الليل' },
+  addr_name:   { fr:'Adresse', en:'Address', ar:'العنوان' },
+  addr_val:    { fr:'Radès, Tunis, Tunisie', en:'Radès, Tunis, Tunisia', ar:'رادس، تونس، تونس' },
+  showPhotos:  true,
+  showNote:    false,
+  noteText:    { fr: '', en: '', ar: '' },
+};
+
+/* ═══════════════════════════════════════════
+   TRADUCTIONS UI ADMIN
+═══════════════════════════════════════════ */
+const ADMIN_UI = {
+  fr: {
+    admSub:        'Administration du menu',
+    btnPreview:    '👁 Voir le menu',
+    btnLogout:     'Déconnexion',
+    secInfo:       'Informations du café',
+    secCats:       'Catégories',
+    secProds:      'Produits',
+    btnAddCat:     '＋ Ajouter une catégorie',
+    btnSaveCats:   'Sauvegarder les catégories',
+    btnAddProd:    '＋ Ajouter un produit',
+    btnSaveProd:   'Enregistrer ce produit',
+    btnDelProd:    'Supprimer',
+    lblCatName:    'Nom',
+    lblPrice:      'Prix',
+    lblBadges:     'Badges',
+    lblPhoto:      'Photo',
+    lblFromDevice: 'Depuis l\'appareil',
+    lblOrUnsplash: 'Ou ID / URL Unsplash',
+    lblPhotoHelp:  'ID depuis <a href="https://unsplash.com" target="_blank">unsplash.com</a> (ex: <em>photo-1234567890</em>) ou upload direct depuis votre téléphone/ordinateur.',
+    lblName:       'Nom',
+    lblShortDesc:  'Description courte',
+    lblFullDesc:   'Détails',
+    lblAllergens:  'Allergènes — séparés par des virgules',
+    phName:        'Nom du produit',
+    phShortDesc:   'Description courte affichée dans la liste',
+    phFullDesc:    'Texte complet affiché quand on clique sur le produit',
+    phAllergens:   'ex: Lait, Gluten, Œufs',
+    phPrice:       '0.000 DT',
+    produits:      'produit(s)',
+    toastSaved:    '✓ Modifications sauvegardées avec succès',
+    toastProd:     '✓ Produit mis à jour',
+    fabTitle:      'Enregistrer tout',
+    fabTooltip:    'Enregistrer tout',
+    infoWifiName:  'WiFi — Nom',
+    infoWifiVal:   'WiFi — Mot de passe',
+    infoHoursName: 'Horaires — Titre',
+    infoHoursVal:  'Horaires — Valeur',
+    infoAddrName:  'Adresse — Titre',
+    infoAddrVal:   'Adresse — Valeur',
+    badgeType:     '— Type —',
+    badgeTemp:     '— Température —',
+    bdgBoisson:'🥤 Boisson', bdgCuisine:'🍽 Cuisine', bdgSucre:'🧁 Sucré', bdgHookah:'💨 HOOKAH',
+    bdgChaud:'🔥 Chaud', bdgFroid:'❄ Froid', bdgGlace:'🧊 Glacé',
+    badgeMorning:  '☀ Le Matin',
+    badgeVegan:    '🌱 Vegan',
+    badgeLimited:  '⏳ Offre limitée',
+    badgeNew:      '✨ Nouveau',
+    badgePopular:  '🔥 Populaire',
+  },
+  en: {
+    admSub:        'Menu administration',
+    btnPreview:    '👁 View menu',
+    btnLogout:     'Logout',
+    secInfo:       'Café information',
+    secCats:       'Categories',
+    secProds:      'Products',
+    btnAddCat:     '＋ Add a category',
+    btnSaveCats:   'Save categories',
+    btnAddProd:    '＋ Add a product',
+    btnSaveProd:   'Save this product',
+    btnDelProd:    'Delete',
+    lblCatName:    'Name',
+    lblPrice:      'Price',
+    lblBadges:     'Badges',
+    lblPhoto:      'Photo',
+    lblFromDevice: 'From device',
+    lblOrUnsplash: 'Or Unsplash ID / URL',
+    lblPhotoHelp:  'ID from <a href="https://unsplash.com" target="_blank">unsplash.com</a> (e.g. <em>photo-1234567890</em>) or upload directly from your phone/computer.',
+    lblName:       'Name',
+    lblShortDesc:  'Short description',
+    lblFullDesc:   'Details',
+    lblAllergens:  'Allergens — comma separated',
+    phName:        'Product name',
+    phShortDesc:   'Short description shown in the list',
+    phFullDesc:    'Full text shown when the product is clicked',
+    phAllergens:   'e.g. Milk, Gluten, Eggs',
+    phPrice:       '0.000 DT',
+    produits:      'product(s)',
+    toastSaved:    '✓ Changes saved successfully',
+    toastProd:     '✓ Product updated',
+    fabTitle:      'Save all',
+    fabTooltip:    'Save all',
+    infoWifiName:  'WiFi — Name',
+    infoWifiVal:   'WiFi — Password',
+    infoHoursName: 'Hours — Title',
+    infoHoursVal:  'Hours — Value',
+    infoAddrName:  'Address — Title',
+    infoAddrVal:   'Address — Value',
+    badgeType:     '— Type —',
+    badgeTemp:     '— Temperature —',
+    bdgBoisson:'🥤 Drink', bdgCuisine:'🍽 Food', bdgSucre:'🧁 Sweet', bdgHookah:'💨 Hookah',
+    bdgChaud:'🔥 Hot', bdgFroid:'❄ Cold', bdgGlace:'🧊 Iced',
+    badgeMorning:  '☀ Morning',
+    badgeVegan:    '🌱 Vegan',
+    badgeLimited:  '⏳ Limited offer',
+    badgeNew:      '✨ New',
+    badgePopular:  '🔥 Popular',
+  },
+  ar: {
+    admSub:        'إدارة القائمة',
+    btnPreview:    '👁 عرض القائمة',
+    btnLogout:     'تسجيل الخروج',
+    secInfo:       'معلومات المقهى',
+    secCats:       'الفئات',
+    secProds:      'المنتجات',
+    btnAddCat:     '＋ إضافة فئة',
+    btnSaveCats:   'حفظ الفئات',
+    btnAddProd:    '＋ إضافة منتج',
+    btnSaveProd:   'حفظ هذا المنتج',
+    btnDelProd:    'حذف',
+    lblCatName:    'الاسم',
+    lblPrice:      'السعر',
+    lblBadges:     'الشارات',
+    lblPhoto:      'الصورة',
+    lblFromDevice: 'من الجهاز',
+    lblOrUnsplash: 'أو معرف / رابط Unsplash',
+    lblPhotoHelp:  'المعرف من <a href="https://unsplash.com" target="_blank">unsplash.com</a> أو رفع مباشر من جهازك.',
+    lblName:       'الاسم',
+    lblShortDesc:  'وصف مختصر',
+    lblFullDesc:   'التفاصيل',
+    lblAllergens:  'المواد المسببة للحساسية — مفصولة بفواصل',
+    phName:        'اسم المنتج',
+    phShortDesc:   'وصف مختصر يظهر في القائمة',
+    phFullDesc:    'النص الكامل عند النقر على المنتج',
+    phAllergens:   'مثال: حليب، غلوتين، بيض',
+    phPrice:       '0.000 DT',
+    produits:      'منتج(ات)',
+    toastSaved:    '✓ تم حفظ التغييرات بنجاح',
+    toastProd:     '✓ تم تحديث المنتج',
+    fabTitle:      'حفظ الكل',
+    fabTooltip:    'حفظ الكل',
+    infoWifiName:  'واي فاي — الاسم',
+    infoWifiVal:   'واي فاي — كلمة المرور',
+    infoHoursName: 'المواعيد — العنوان',
+    infoHoursVal:  'المواعيد — القيمة',
+    infoAddrName:  'العنوان — العنوان',
+    infoAddrVal:   'العنوان — القيمة',
+    badgeType:     '— النوع —',
+    badgeTemp:     '— الحرارة —',
+    bdgBoisson:'🥤 مشروب', bdgCuisine:'🍽 أكل', bdgSucre:'🧁 حلو', bdgHookah:'💨 شيشة',
+    bdgChaud:'🔥 ساخن', bdgFroid:'❄ بارد', bdgGlace:'🧊 مثلج',
+    badgeMorning:  '☀ الصباح',
+    badgeVegan:    '🌱 نباتي',
+    badgeLimited:  '⏳ عرض محدود',
+    badgeNew:      '✨ جديد',
+    badgePopular:  '🔥 الأكثر طلباً',
+  },
+};
+
+/* ═══════════════════════════════════════════
+   HERO MOCKUP TEXTS
+═══════════════════════════════════════════ */
+const HERO_TEXTS = {
+  fr: { tagline:"Une expérience culinaire raffinée", sub:["Cafés d'exception","Plats gourmets","Ambiance élégante"], explore:'Menu' },
+  en: { tagline:'A refined culinary experience',     sub:['Exceptional coffees','Gourmet dishes','Elegant atmosphere'],   explore:'Menu' },
+  ar: { tagline:'تجربة طهي راقية',                   sub:['قهوة استثنائية','أطباق راقية','أجواء فاخرة'],                 explore:'القائمة' },
+};
+
+function updateMockupText() {
+  const h = HERO_TEXTS[currentLang] || HERO_TEXTS.fr;
+  const tagEl  = document.getElementById('pm-tagline');
+  const subEl  = document.getElementById('pm-sub');
+  const scrlEl = document.querySelector('.phone-scroll-lbl');
+  if (tagEl)  tagEl.textContent = h.tagline;
+  if (subEl)  subEl.innerHTML   = h.sub.map((s,i) =>
+    `<span>${s}</span>${i < h.sub.length - 1 ? '<span class="phone-sub-dot">·</span>' : ''}`
+  ).join('');
+  if (scrlEl) scrlEl.textContent = h.explore;
+}
+
+/* ═══════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════ */
+let adminData = null;  // { cats, items, info }
+let currentLang = localStorage.getItem('mc_admin_lang') || 'fr';
+let unsaved = false;
+const pendingPhotos = new Map();
+let _dragCatIdx  = null;  // index catégorie en cours de drag
+let _dragItemId  = null;  // id produit en cours de drag // item.id → Firebase Storage download URL (en attente de sauvegarde)
+
+/* ═══════════════════════════════════════════
+   LOGIN
+═══════════════════════════════════════════ */
+function checkLogin() {
+  const saved = sessionStorage.getItem('mc_admin_auth');
+  if (saved === 'ok') showAdmin();
+}
+
+/* ── THÈME ── */
+(function() {
+  const saved = localStorage.getItem('mc_admin_theme');
+  const isLight = saved !== 'dark';
+  if (isLight) document.documentElement.classList.add('light');
+  // Init icône selon thème courant
+  const path = document.getElementById('adm-theme-ico-path');
+  if (path) {
+    if (isLight) {
+      path.setAttribute('d','M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z');
+    } else {
+      path.setAttribute('d','M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42');
+      path.setAttribute('stroke-linecap','round');
+    }
+  }
+})();
+document.getElementById('adm-theme-btn').addEventListener('click', () => {
+  const isLight = document.documentElement.classList.toggle('light');
+  localStorage.setItem('mc_admin_theme', isLight ? 'light' : 'dark');
+  const path = document.getElementById('adm-theme-ico-path');
+  if (isLight) {
+    path.setAttribute('d','M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z');
+  } else {
+    path.setAttribute('d','M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42');
+    path.setAttribute('stroke-linecap','round');
+  }
+});
+
+document.getElementById('login-btn').addEventListener('click', doLogin);
+document.getElementById('pwd-input').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('logout-btn').addEventListener('click', () => {
+  sessionStorage.removeItem('mc_admin_auth');
+  location.reload();
+});
+
+async function doLogin() {
+  const val = document.getElementById('pwd-input').value;
+  const hash = await _hashPwd(val);
+
+  let expectedHash = ADMIN_HASH;
+  try {
+    const snap = await _db.ref('/config/adminHash').get();
+    if (snap.exists()) expectedHash = snap.val();
+  } catch {}
+
+  if (hash === expectedHash) {
+    sessionStorage.setItem('mc_admin_auth', 'ok');
+    showAdmin();
+  } else {
+    document.getElementById('login-err').textContent = 'Mot de passe incorrect.';
+    document.getElementById('pwd-input').value = '';
+    document.getElementById('pwd-input').focus();
+  }
+}
+
+function showAdmin() {
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('adm-header').style.display = '';
+  document.getElementById('adm-wrap').style.display   = '';
+  document.getElementById('fab-save').style.display   = '';
+  // Sync dropdown avec la langue mémorisée
+  const sel = document.getElementById('global-src-lang');
+  if (sel) sel.value = currentLang;
+  // Brancher le sélecteur de langue global (dans le header)
+  sel.addEventListener('change', e => {
+    setGlobalLang(e.target.value);
+  });
+  // loadData() est async — renderAll() et applyAdminUI() sont appelés à l'intérieur
+  loadData();
+  loadMenuTheme();
+}
+
+/* ═══════════════════════════════════════════
+   DONNÉES
+═══════════════════════════════════════════ */
+function loadData() {
+  _db.ref('menu').once('value')
+    .then(snapshot => {
+      const data = snapshot.val();
+      // Auto-reset si les données Firebase viennent de l'ancienne démo (prix en €)
+      const hasOldData = data && data.items && data.items.length > 0 &&
+        (data.items[0].price||'').startsWith('€');
+      if (data && data.cats && data.cats.length > 0 && !hasOldData) {
+        adminData = data;
+        if (!adminData.info)  adminData.info  = JSON.parse(JSON.stringify(DEFAULT_INFO));
+        if (!adminData.items) adminData.items = getDefaultItems();
+      } else {
+        adminData = {
+          cats:  JSON.parse(JSON.stringify(DEFAULT_CATS)),
+          info:  JSON.parse(JSON.stringify(DEFAULT_INFO)),
+          items: getDefaultItems()
+        };
+      }
+      // Restaurer hashes depuis localStorage si Firebase ne les a pas encore
+      try {
+        if (!adminData._txHashes) {
+          const savedHashes = localStorage.getItem('mc_tx_hashes');
+          if (savedHashes) adminData._txHashes = JSON.parse(savedHashes);
+        }
+      } catch(_) {}
+      // Restaurer les verrous depuis localStorage si Firebase ne les a pas encore
+      try {
+        if (!adminData._txLock) {
+          const savedLock = localStorage.getItem('mc_tx_lock');
+          if (savedLock) adminData._txLock = JSON.parse(savedLock);
+        }
+      } catch(_) {}
+      renderAll();
+      applyAdminUI(currentLang);
+      updateMockupText();
+    })
+    .catch(() => {
+      try {
+        const raw = localStorage.getItem(STORE_KEY);
+        if (raw) adminData = JSON.parse(raw);
+      } catch(_) {}
+      if (!adminData.cats) adminData = {
+        cats:  JSON.parse(JSON.stringify(DEFAULT_CATS)),
+        info:  JSON.parse(JSON.stringify(DEFAULT_INFO)),
+        items: getDefaultItems()
+      };
+      renderAll();
+      applyAdminUI(currentLang);
+      updateMockupText();
+    });
+}
+
+function sanitizeItems(items) {
+  return (items || []).map(item => ({
+    id:        item.id ?? 0,
+    cat:       item.cat ?? 0,
+    price:     item.price ?? '',
+    photo:     item.photo ?? '',
+    showPhoto: item.showPhoto !== false,
+    type:      item.type  || '',
+    temp:      item.temp  || '',
+    badges:    Array.isArray(item.badges) ? item.badges : [],
+    name:      item.name      || { fr:'', en:'', ar:'' },
+    desc:      item.desc      || { fr:'', en:'', ar:'' },
+    full:      item.full      || { fr:'', en:'', ar:'' },
+    allergens: item.allergens || { fr:[], en:[], ar:[] },
+  }));
+}
+
+function saveData() {
+  adminData.items = sanitizeItems(adminData.items);
+  _db.ref('menu').set(adminData)
+    .then(() => {
+      localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
+      localStorage.setItem('mc_tx_hashes', JSON.stringify(adminData._txHashes || {}));
+      localStorage.setItem('mc_tx_lock',   JSON.stringify(adminData._txLock   || {}));
+      unsaved = false;
+      document.getElementById('fab-save').classList.remove('unsaved');
+      showToast((ADMIN_UI[currentLang]||ADMIN_UI.fr).toastSaved);
+    })
+    .catch(() => {
+      localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
+      localStorage.setItem('mc_tx_hashes', JSON.stringify(adminData._txHashes || {}));
+      localStorage.setItem('mc_tx_lock',   JSON.stringify(adminData._txLock   || {}));
+      unsaved = false;
+      document.getElementById('fab-save').classList.remove('unsaved');
+      showToast('⚠️ Sauvegarde locale uniquement (pas de connexion)');
+    });
+}
+
+function markUnsaved() {
+  unsaved = true;
+  document.getElementById('fab-save').classList.add('unsaved');
+}
+
+/* ═══════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════ */
+let _toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ═══════════════════════════════════════════
+   RENDER ALL
+═══════════════════════════════════════════ */
+function renderAll() {
+  renderHeroImageSection();
+  renderInfoSection();
+  renderNoteSection();
+  renderCatsSection();
+  renderProductsSection();
+  syncVisToggles();
+}
+
+/* ── Synchronise les boutons de visibilité avec adminData.info ── */
+function syncVisToggles() {
+  const photosBtn = document.getElementById('toggle-photos-btn');
+  if (!adminData?.info) return;
+  const photosOn = adminData.info.showPhotos !== false;
+  if (photosBtn) {
+    if (photosOn) photosBtn.classList.add('on');
+    else photosBtn.classList.remove('on');
+  }
+  const noteStatus = document.querySelector('.note-status');
+  if (noteStatus) {
+    const on = adminData.info.showNote === true;
+    if (on) noteStatus.classList.add('on');
+    else noteStatus.classList.remove('on');
+    noteStatus.querySelector('.note-status-txt').textContent = on ? 'Affichée dans le menu' : 'Masquée dans le menu';
+  }
+}
+
+/* ── Listener bouton visibilité photos ── */
+document.getElementById('toggle-photos-btn').addEventListener('click', () => {
+  if (!adminData) return;
+  if (!adminData.info) adminData.info = {};
+  adminData.info.showPhotos = adminData.info.showPhotos === false ? true : false;
+  _db.ref('menu/info/showPhotos').set(adminData.info.showPhotos);
+  localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
+  syncVisToggles();
+});
+
+/* ─── SECTION NOTE CLIENTS ─── */
+function renderNoteSection() {
+  const card = document.getElementById('note-card');
+  if (!card) return;
+
+  const info = adminData.info || {};
+  const noteText = info.noteText || { fr: '', en: '', ar: '' };
+  const isOn = info.showNote === true;
+
+  let html = `
+    <button class="note-status${isOn ? ' on' : ''}">
+      <span class="vis-check"><svg viewBox="0 0 16 16" fill="none"><rect class="chk-box" x="1.5" y="1.5" width="13" height="13" rx="2.5"/><path class="chk-mark" d="M3.5,8.5 L6.5,11.5 L12.5,4.5" pathLength="1"/></svg></span>
+      <span class="note-status-txt">${isOn ? 'Affichée dans le menu' : 'Masquée dans le menu'}</span>
+    </button>
+    <div class="lang-tabs note-lang-tabs">
+      ${LANGS.map(l => `<button class="lang-tab${l===currentLang?' on':''}" data-note-lang="${l}">${LANG_LABELS[l]}</button>`).join('')}
+    </div>
+    ${LANGS.map(l => `
+      <textarea class="note-textarea note-ta-${l}${l===currentLang?'':' hide'}"
+        style="${l!==currentLang?'display:none':''}"
+        data-lang="${l}"
+        placeholder="Texte de la note en ${l.toUpperCase()} — ex: Bienvenue ! Notre terrasse est ouverte ce weekend."
+        maxlength="300">${esc(noteText[l] || '')}</textarea>
+    `).join('')}
+    <div class="note-hint">Le texte s'affiche sous les catégories du menu — max 300 caractères par langue.</div>
+  `;
+  card.innerHTML = html;
+
+  // Bouton Afficher dans le menu — sauvegarde instantanée
+  card.querySelector('.note-status').addEventListener('click', function() {
+    if (!adminData.info) adminData.info = {};
+    adminData.info.showNote = !adminData.info.showNote;
+    _db.ref('menu/info/showNote').set(adminData.info.showNote);
+    localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
+    syncVisToggles();
+  });
+
+  // Tabs langue
+  card.querySelectorAll('[data-note-lang]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const l = btn.dataset.noteLang;
+      card.querySelectorAll('.lang-tab').forEach(t => t.classList.toggle('on', t.dataset.noteLang === l));
+      card.querySelectorAll('.note-textarea').forEach(ta => {
+        const show = ta.dataset.lang === l;
+        ta.style.display = show ? '' : 'none';
+        ta.classList.toggle('hide', !show);
+      });
+    });
+  });
+
+  // Saisie
+  card.querySelectorAll('.note-textarea').forEach(ta => {
+    ta.addEventListener('input', () => {
+      const l = ta.dataset.lang;
+      if (!adminData.info.noteText) adminData.info.noteText = {};
+      adminData.info.noteText[l] = ta.value;
+      if (l !== 'fr') setTxLock(`info-noteText-${l}`, ta.value.trim() !== '');
+      markUnsaved();
+    });
+  });
+}
+
+/* ─── SECTION HERO IMAGE ─── */
+function renderHeroImageSection() {
+  const delBtn    = document.getElementById('hero-del-btn');
+  const fileInput = document.getElementById('hero-file-input');
+  const phoneBg   = document.getElementById('phone-hero-bg');
+
+  function setPhoneBg(src) {
+    if (src) {
+      phoneBg.style.backgroundImage = `url('${src}')`;
+      requestAnimationFrame(() => requestAnimationFrame(() => phoneBg.classList.add('flow')));
+      delBtn.style.display = 'flex';
+    } else {
+      phoneBg.style.backgroundImage = '';
+      phoneBg.classList.remove('flow');
+      delBtn.style.display = 'none';
+    }
+  }
+
+  // Afficher l'image actuelle dans le mockup
+  setPhoneBg(adminData.heroImage || '');
+
+  // Upload fichier → compression canvas → Cloudinary
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+    const uploadLabel = document.querySelector('.hero-upload-btn');
+    const origLabel   = uploadLabel ? uploadLabel.innerHTML : '';
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1600;
+        let w = img.width, h = img.height;
+        if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+
+        // Aperçu local immédiat
+        const localPreview = canvas.toDataURL('image/jpeg', 0.82);
+        setPhoneBg(localPreview);
+
+        if (uploadLabel) { uploadLabel.innerHTML = `<span style="opacity:.6">⏳ Upload…</span>`; uploadLabel.style.pointerEvents = 'none'; }
+
+        canvas.toBlob(blob => {
+          uploadToCloudinary(blob)
+            .then(url => {
+              adminData.heroImage = url;
+              setPhoneBg(url);
+              markUnsaved();
+              if (uploadLabel) { uploadLabel.innerHTML = origLabel; uploadLabel.style.pointerEvents = ''; }
+            })
+            .catch(err => {
+              console.error('Hero upload error:', err);
+              if (uploadLabel) { uploadLabel.innerHTML = origLabel; uploadLabel.style.pointerEvents = ''; }
+              showToast('❌ Erreur upload image — réessayez');
+            });
+        }, 'image/jpeg', 0.82);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+    fileInput.value = '';
+  });
+
+  // Supprimer
+  delBtn.addEventListener('click', () => {
+    adminData.heroImage = '';
+    setPhoneBg('');
+    markUnsaved();
+  });
+}
+
+function showToastMsg(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.style.borderColor = isError ? 'rgba(224,82,82,0.4)' : '';
+  t.style.color       = isError ? '#e05252' : '';
+  showToast(msg);
+  if (!isError) { t.style.borderColor = ''; t.style.color = ''; }
+}
+
+/* ─── SECTION INFO ─── */
+function renderInfoSection() {
+  const card = document.getElementById('info-card');
+  const fields = [
+    { key:'wifi_name',  label:'WiFi — Nom' },
+    { key:'wifi_val',   label:'WiFi — Mot de passe' },
+    { key:'hours_name', label:'Horaires — Titre' },
+    { key:'hours_val',  label:'Horaires — Valeur' },
+    { key:'addr_name',  label:'Adresse — Titre' },
+    { key:'addr_val',   label:'Adresse — Valeur' },
+  ];
+
+  let html = `<div></div>`;
+
+  fields.forEach(f => {
+    html += `<div class="info-row">
+      <div class="info-lbl">${f.label}</div>
+      <div class="info-inputs">`;
+    LANGS.forEach(l => {
+      html += `<input class="info-input info-field-${l}${l===currentLang?'':' hide'}"
+        style="${l!==currentLang?'display:none':''}"
+        data-field="${f.key}" data-lang="${l}"
+        value="${esc(adminData.info[f.key]?.[l] || '')}"
+        placeholder="${f.label} (${l.toUpperCase()})">`;
+    });
+    html += `</div></div>`;
+  });
+
+  card.innerHTML = html;
+
+  card.querySelectorAll('.info-input').forEach(inp => {
+    inp.addEventListener('input', e => {
+      const { field, lang } = e.target.dataset;
+      if (!adminData.info[field]) adminData.info[field] = {};
+      adminData.info[field][lang] = e.target.value;
+      if (lang !== 'fr') setTxLock(`info-${field}-${lang}`, e.target.value.trim() !== '');
+      markUnsaved();
+    });
+  });
+
+}
+
+/* ─── APPLIQUER LES TEXTES UI DANS LA LANGUE CHOISIE ─── */
+function applyAdminUI(l) {
+  const t = ADMIN_UI[l] || ADMIN_UI.fr;
+  const $ = id => document.getElementById(id);
+
+  // Header
+  const sub = document.querySelector('.adm-sub');
+  if (sub) sub.textContent = t.admSub;
+  const preview = document.querySelector('.btn-preview');
+  if (preview) preview.innerHTML = t.btnPreview;
+  const logout = $('logout-btn');
+  if (logout) logout.textContent = t.btnLogout;
+  // Section titres
+  const secHds = document.querySelectorAll('.sec-hd');
+  secHds.forEach(hd => {
+    const badge = hd.querySelector('.sec-badge');
+    const txt = hd.childNodes[0]?.textContent?.trim();
+    // Identifier par mots-clés indépendants de la langue
+    if (hd.id === 'sec-info' || hd.querySelector('[id="sec-info"]') || (!badge?.id && badge?.textContent === 'Footer')) {
+      hd.childNodes[0].textContent = t.secInfo + ' ';
+    }
+  });
+  // Cibler par id pour fiabilité
+  const secInfoHd = document.querySelector('#info-card')?.closest('.adm-section')?.querySelector('.sec-hd');
+  if (secInfoHd) {
+    const badge = secInfoHd.querySelector('.sec-badge');
+    secInfoHd.firstChild.textContent = t.secInfo + ' ';
+  }
+  const secCatsHd = document.querySelector('#cats-list')?.closest('.adm-section')?.querySelector('.sec-hd');
+  if (secCatsHd) secCatsHd.firstChild.textContent = t.secCats + ' ';
+  const secProdsHd = document.getElementById('sec-hd-produits');
+  if (secProdsHd) secProdsHd.firstChild.textContent = t.secProds + ' ';
+
+  // Boutons statiques
+  const addCat = $('btn-add-cat');
+  if (addCat) addCat.textContent = t.btnAddCat;
+  const saveCats = $('btn-save-cats');
+  if (saveCats) {
+    const svg = saveCats.querySelector('svg');
+    saveCats.innerHTML = '';
+    if (svg) saveCats.appendChild(svg);
+    saveCats.appendChild(document.createTextNode(' ' + t.btnSaveCats));
+  }
+
+  // FAB tooltip
+  const fab = $('fab-save');
+  if (fab) fab.title = t.fabTitle;
+
+  // Info section labels
+  const infoKeys = ['wifi_name','wifi_val','hours_name','hours_val','addr_name','addr_val'];
+  const infoLblMap = {
+    wifi_name:  t.infoWifiName,
+    wifi_val:   t.infoWifiVal,
+    hours_name: t.infoHoursName,
+    hours_val:  t.infoHoursVal,
+    addr_name:  t.infoAddrName,
+    addr_val:   t.infoAddrVal,
+  };
+  document.querySelectorAll('.info-row').forEach(row => {
+    const inp = row.querySelector('.info-input');
+    if (!inp) return;
+    const field = inp.dataset.field;
+    const lbl = row.querySelector('.info-lbl');
+    if (lbl && infoLblMap[field]) lbl.textContent = infoLblMap[field];
+  });
+
+  // Placeholders info inputs
+  document.querySelectorAll('.info-input').forEach(inp => {
+    const field = inp.dataset.field;
+    const lang  = inp.dataset.lang;
+    if (infoLblMap[field]) inp.placeholder = infoLblMap[field] + ' (' + lang.toUpperCase() + ')';
+  });
+
+  // Produits : boutons add + labels dans les cartes déjà rendues
+  document.querySelectorAll('.btn-add-prod').forEach(b => b.textContent = t.btnAddProd);
+  document.querySelectorAll('.btn-save-prod').forEach(b => b.textContent = t.btnSaveProd);
+  document.querySelectorAll('.btn-del-prod').forEach(b => b.textContent = t.btnDelProd);
+
+  // Labels de formulaire produit
+  document.querySelectorAll('.form-lbl').forEach(lbl => {
+    const txt = lbl.dataset.uitxt;
+    if (txt && t[txt]) lbl.textContent = t[txt];
+  });
+  document.querySelectorAll('.form-input, .form-textarea').forEach(inp => {
+    const ph = inp.dataset.uiph;
+    if (ph && t[ph]) inp.placeholder = t[ph];
+  });
+  document.querySelectorAll('.btn-upload-photo').forEach(btn => {
+    const fi = btn.querySelector('input');
+    const svg = btn.querySelector('svg');
+    btn.innerHTML = '';
+    if (svg) btn.appendChild(svg);
+    btn.appendChild(document.createTextNode(' ' + t.lblFromDevice));
+    if (fi) btn.appendChild(fi);
+  });
+
+  // Labels catégories
+  document.querySelectorAll('.inline-input[data-ci]').forEach(inp => {
+    inp.placeholder = t.lblCatName + ' (' + l.toUpperCase() + ')';
+  });
+
+  // Badges — update toggle labels when language changes
+  const flagLabelMap = { morning: t.badgeMorning, vegan: t.badgeVegan, limited: t.badgeLimited, new: t.badgeNew, popular: t.badgePopular };
+  document.querySelectorAll('.badge-toggle[data-badge]').forEach(btn => {
+    const lbl = flagLabelMap[btn.dataset.badge];
+    if (lbl) btn.textContent = lbl;
+  });
+  // Dropdowns
+  document.querySelectorAll('[data-bdg-select="type"]').forEach(sel => {
+    const opts = sel.options;
+    if (opts[0]) opts[0].textContent = t.badgeType;
+    if (opts[1]) opts[1].textContent = t.bdgBoisson;
+    if (opts[2]) opts[2].textContent = t.bdgCuisine;
+    if (opts[3]) opts[3].textContent = t.bdgSucre;
+    if (opts[4]) opts[4].textContent = t.bdgHookah;
+  });
+  document.querySelectorAll('[data-bdg-select="temp"]').forEach(sel => {
+    const opts = sel.options;
+    if (opts[0]) opts[0].textContent = t.badgeTemp;
+    if (opts[1]) opts[1].textContent = t.bdgChaud;
+    if (opts[2]) opts[2].textContent = t.bdgFroid;
+    if (opts[3]) opts[3].textContent = t.bdgGlace;
+  });
+}
+
+/* ─── LANGUE GLOBALE : contrôle toute la page admin ─── */
+function setGlobalLang(l) {
+  currentLang = l;
+  localStorage.setItem('mc_admin_lang', l);
+  // Flush DOM edits back to adminData BEFORE re-rendering so manual EN/AR edits are not lost
+  if (adminData) collectAllForms();
+  // Sync header select
+  const sel = document.getElementById('global-src-lang');
+  if (sel && sel.value !== l) sel.value = l;
+  // Re-render complet dans la nouvelle langue
+  renderAll();
+  applyAdminUI(l);
+  updateMockupText();
+}
+
+function switchInfoLang(l) {
+  setGlobalLang(l);
+}
+
+/* ─── SECTION CATÉGORIES ─── */
+const ICONS = [
+  'ico-coffee','ico-cold','ico-food','ico-cake','ico-sunrise','ico-hookah',
+  'ico-star','ico-bell','ico-clock','ico-diamond','ico-wifi','ico-pin',
+  'ico-glass','ico-pizza','ico-burger','ico-salad','ico-heart',
+  'ico-fire','ico-leaf','ico-crown','ico-gift','ico-cocktail',
+];
+const ICON_LABELS = {
+  fr: {
+    'ico-coffee':'☕ Café chaud', 'ico-cold':'🧊 Froid', 'ico-food':'🍽 Cuisine', 'ico-cake':'🍰 Sucré',
+    'ico-sunrise':'🌅 Matin', 'ico-hookah':'💨 Hookah', 'ico-star':'⭐ Spécial', 'ico-bell':'🔔 Cloche',
+    'ico-clock':'🕐 Horaires', 'ico-diamond':'💎 Premium', 'ico-wifi':'📶 WiFi', 'ico-pin':'📍 Lieu',
+    'ico-glass':'🥤 Jus / Verre', 'ico-pizza':'🍕 Pizza', 'ico-burger':'🍔 Burger', 'ico-salad':'🥗 Salade',
+    'ico-heart':'❤️ Favoris', 'ico-fire':'🔥 Tendance', 'ico-leaf':'🌿 Végétarien', 'ico-crown':'👑 VIP',
+    'ico-gift':'🎁 Promo', 'ico-cocktail':'🍹 Cocktail',
+  },
+  en: {
+    'ico-coffee':'☕ Hot drink', 'ico-cold':'🧊 Cold', 'ico-food':'🍽 Food', 'ico-cake':'🍰 Sweet',
+    'ico-sunrise':'🌅 Morning', 'ico-hookah':'💨 Hookah', 'ico-star':'⭐ Special', 'ico-bell':'🔔 Bell',
+    'ico-clock':'🕐 Hours', 'ico-diamond':'💎 Premium', 'ico-wifi':'📶 WiFi', 'ico-pin':'📍 Location',
+    'ico-glass':'🥤 Juice / Glass', 'ico-pizza':'🍕 Pizza', 'ico-burger':'🍔 Burger', 'ico-salad':'🥗 Salad',
+    'ico-heart':'❤️ Favorites', 'ico-fire':'🔥 Trending', 'ico-leaf':'🌿 Vegetarian', 'ico-crown':'👑 VIP',
+    'ico-gift':'🎁 Promo', 'ico-cocktail':'🍹 Cocktail',
+  },
+  ar: {
+    'ico-coffee':'☕ قهوة ساخنة', 'ico-cold':'🧊 بارد', 'ico-food':'🍽 طعام', 'ico-cake':'🍰 حلويات',
+    'ico-sunrise':'🌅 الصباح', 'ico-hookah':'💨 شيشة', 'ico-star':'⭐ مميز', 'ico-bell':'🔔 جرس',
+    'ico-clock':'🕐 أوقات', 'ico-diamond':'💎 بريميوم', 'ico-wifi':'📶 واي فاي', 'ico-pin':'📍 موقع',
+    'ico-glass':'🥤 عصير', 'ico-pizza':'🍕 بيتزا', 'ico-burger':'🍔 برغر', 'ico-salad':'🥗 سلطة',
+    'ico-heart':'❤️ المفضلة', 'ico-fire':'🔥 رائج', 'ico-leaf':'🌿 نباتي', 'ico-crown':'👑 VIP',
+    'ico-gift':'🎁 عروض', 'ico-cocktail':'🍹 كوكتيل',
+  },
+};
+function getIconLabel(ico) { return (ICON_LABELS[currentLang]||ICON_LABELS.fr)[ico]||ico; }
+
+function renderCatsSection() {
+  const list = document.getElementById('cats-list');
+  document.getElementById('cat-count').textContent = adminData.cats.length;
+  list.innerHTML = '';
+
+  // Lignes de catégories
+  adminData.cats.forEach((cat, ci) => {
+    const row = document.createElement('div');
+    row.className = 'cat-row';
+    row.dataset.ci = ci;
+
+    const currentIco = cat.ico || '';
+    // Nom propre sans emoji (ex: "☕ Boissons Chaudes" → "Boissons Chaudes")
+    const icoLabelFull = currentIco ? getIconLabel(currentIco) : '';
+    const parts = icoLabelFull.split(' ');
+    const icoNameClean = currentIco
+      ? (parts.length > 1 ? parts.slice(1).join(' ') : icoLabelFull)
+      : '— Aucune —';
+
+    row.innerHTML = `
+      <div class="drag-handle" title="Déplacer" draggable="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="9" y1="6" x2="15" y2="6"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
+      </div>
+      <div class="cat-row-ico" id="cat-ico-preview-${ci}">
+        ${currentIco ? `<svg width="18" height="18"><use href="#${currentIco}"/></svg>` : '<span style="width:18px;height:18px;display:inline-block;opacity:0.3">—</span>'}
+      </div>
+      <input class="inline-input" value="${esc(cat.names?.[currentLang] || cat.names?.fr || '')}"
+        placeholder="Nom (${currentLang.toUpperCase()})"
+        data-ci="${ci}">
+      <div style="position:relative">
+        <button class="ico-picker-btn" data-ci="${ci}" title="Changer l'icône">
+          <span class="ico-pb-label">${currentIco ? icoNameClean : '— Aucune —'}</span>
+          <span>▾</span>
+        </button>
+        <div class="ico-picker-popup" id="ico-popup-${ci}">
+          <div class="ico-picker-grid">
+            ${ICONS.map(ic => `
+              <div class="ico-picker-item${ic===currentIco?' selected':''}" data-ico="${ic}" data-ci="${ci}" title="${getIconLabel(ic)}">
+                <svg width="18" height="18"><use href="#${ic}"/></svg>
+                <span>${getIconLabel(ic).replace(/^.+\s/,'')}</span>
+              </div>`).join('')}
+          </div>
+          <button class="ico-picker-none" data-ci="${ci}">✕ Supprimer l'icône</button>
+        </div>
+      </div>
+      <button class="btn-del" data-ci="${ci}" title="Supprimer">✕</button>
+    `;
+    list.appendChild(row);
+
+    // ── Drag & drop catégorie ──
+    row.setAttribute('draggable', 'true');
+    row.addEventListener('dragstart', e => {
+      _dragCatIdx = ci;
+      e.dataTransfer.effectAllowed = 'move';
+      setTimeout(() => row.classList.add('dragging'), 0);
+    });
+    row.addEventListener('dragend', () => {
+      row.classList.remove('dragging');
+      document.querySelectorAll('.cat-row').forEach(r => r.classList.remove('drag-over'));
+      _dragCatIdx = null;
+    });
+    row.addEventListener('dragover', e => {
+      if (_dragCatIdx === null || _dragCatIdx === ci) return;
+      e.preventDefault(); row.classList.add('drag-over');
+    });
+    row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
+    row.addEventListener('drop', e => {
+      e.preventDefault(); row.classList.remove('drag-over');
+      if (_dragCatIdx === null || _dragCatIdx === ci) return;
+      const from = _dragCatIdx, to = ci;
+      // Mettre à jour les refs item.cat avant de réordonner les cats
+      adminData.items.forEach(item => {
+        if (item.cat === from) item.cat = to;
+        else if (from < to && item.cat > from && item.cat <= to) item.cat--;
+        else if (from > to && item.cat >= to && item.cat < from) item.cat++;
+      });
+      const [removed] = adminData.cats.splice(from, 1);
+      adminData.cats.splice(to, 0, removed);
+      markUnsaved(); renderCatsSection(); renderProductsSection();
+    });
+
+    // Nom
+    row.querySelector('.inline-input').addEventListener('input', e => {
+      const i = parseInt(e.target.dataset.ci);
+      if (!adminData.cats[i].names) adminData.cats[i].names = {};
+      adminData.cats[i].names[currentLang] = e.target.value;
+      if (currentLang !== 'fr') setTxLock(`cat-${i}-${currentLang}`, e.target.value.trim() !== '');
+      markUnsaved();
+      renderProductsSection();
+    });
+
+    // Ouvrir/fermer le picker
+    row.querySelector('.ico-picker-btn').addEventListener('click', e => {
+      e.stopPropagation();
+      const popup = document.getElementById(`ico-popup-${ci}`);
+      const isOpen = popup.classList.contains('open');
+      document.querySelectorAll('.ico-picker-popup.open').forEach(p => p.classList.remove('open'));
+      if (!isOpen) {
+        popup.classList.add('open');
+        // Positionnement intelligent — reste dans le viewport
+        const rect = e.currentTarget.getBoundingClientRect();
+        const vw = window.innerWidth, vh = window.innerHeight;
+        const pw = Math.min(264, vw - 16);
+        // Hauteur réelle du popup (limité à 80vh)
+        const popupH = Math.min(popup.scrollHeight || 360, vh * 0.8);
+        let top  = rect.bottom + 6;
+        let left = rect.left;
+        // Déborde à droite ?
+        if (left + pw > vw - 8) left = vw - pw - 8;
+        if (left < 8) left = 8;
+        // Déborde en bas ? → afficher au-dessus
+        if (top + popupH > vh - 8) top = rect.top - popupH - 6;
+        if (top < 8) top = 8;
+        popup.style.top  = top  + 'px';
+        popup.style.left = left + 'px';
+      }
+    });
+
+    // Sélectionner une icône
+    row.querySelectorAll('.ico-picker-item').forEach(item => {
+      item.addEventListener('click', e => {
+        const i = parseInt(item.dataset.ci);
+        const ico = item.dataset.ico;
+        adminData.cats[i].ico = ico;
+        markUnsaved();
+        renderCatsSection();
+        renderProductsSection();
+      });
+    });
+
+    // Supprimer l'icône
+    row.querySelector('.ico-picker-none').addEventListener('click', e => {
+      const i = parseInt(e.target.dataset.ci);
+      adminData.cats[i].ico = '';
+      markUnsaved();
+      renderCatsSection();
+      renderProductsSection();
+    });
+
+    row.querySelector('.btn-del').addEventListener('click', e => {
+      const i = parseInt(e.target.dataset.ci);
+      if (!confirm(`Supprimer la catégorie "${adminData.cats[i].names?.fr || i}" et tous ses produits ?`)) return;
+      adminData.items = adminData.items.filter(it => it.cat !== i);
+      adminData.items.forEach(it => { if (it.cat > i) it.cat--; });
+      adminData.cats.splice(i, 1);
+      markUnsaved();
+      renderCatsSection();
+      renderProductsSection();
+    });
+  });
+}
+
+document.getElementById('btn-add-cat').addEventListener('click', () => {
+  const names = {};
+  LANGS.forEach(l => { names[l] = 'Nouvelle catégorie'; });
+  names.fr = 'Nouvelle catégorie';
+  adminData.cats.push({ key: 'cat_' + Date.now(), ico: 'ico-star', names });
+  markUnsaved();
+  renderCatsSection();
+  renderProductsSection();
+});
+
+document.getElementById('btn-save-cats').addEventListener('click', () => {
+  saveData();
+});
+
+/* ─── SECTION PRODUITS ─── */
+function renderProductsSection() {
+  // Preserve any unsaved DOM edits before wiping the cards
+  if (adminData) {
+    document.querySelectorAll('.prod-card').forEach(card => {
+      const itemId = parseInt(card.dataset.id);
+      const item = adminData.items.find(it => it.id === itemId);
+      if (item) collectProdForm(card, item);
+    });
+  }
+  const area = document.getElementById('products-area');
+  area.innerHTML = '';
+  const badge = document.getElementById('prod-count-badge');
+  if (badge) badge.textContent = adminData.items.length;
+
+  adminData.cats.forEach((cat, ci) => {
+    const catItems = adminData.items.filter(it => it.cat === ci);
+    const sec = document.createElement('div');
+    sec.className = 'cat-products';
+
+    sec.innerHTML = `
+      <div class="cat-products-hd">
+        ${cat.ico ? `<svg width="16" height="16" style="color:var(--gold)"><use href="#${cat.ico}"/></svg>` : ''}
+        <div class="cat-products-name">${esc(cat.names[currentLang] || cat.names.fr || 'Catégorie ' + ci)}</div>
+        <span style="font-size:0.72rem;color:var(--muted);margin-left:4px">${catItems.length} ${(ADMIN_UI[currentLang]||ADMIN_UI.fr).produits}</span>
+      </div>
+      <div class="products-list" id="prod-list-${ci}"></div>
+      <button class="btn-add-prod" data-ci="${ci}">${(ADMIN_UI[currentLang]||ADMIN_UI.fr).btnAddProd}</button>
+    `;
+    area.appendChild(sec);
+
+    const list = sec.querySelector(`#prod-list-${ci}`);
+    catItems.forEach(item => renderProdCard(list, item, ci));
+
+    sec.querySelector('.btn-add-prod').addEventListener('click', e => {
+      const cIdx = parseInt(e.target.dataset.ci);
+      addProduct(cIdx);
+    });
+
+    // ── Catégorie comme zone de dépôt (déplacer produit entre catégories) ──
+    sec.addEventListener('dragover', e => {
+      if (_dragItemId === null) return;
+      e.preventDefault(); sec.classList.add('drag-over-cat');
+    });
+    sec.addEventListener('dragleave', e => {
+      if (!sec.contains(e.relatedTarget)) sec.classList.remove('drag-over-cat');
+    });
+    sec.addEventListener('drop', e => {
+      sec.classList.remove('drag-over-cat');
+      if (_dragItemId === null) return;
+      e.preventDefault();
+      const item = adminData.items.find(it => it.id === _dragItemId);
+      if (item && item.cat !== ci) {
+        item.cat = ci;
+        markUnsaved(); renderProductsSection();
+      }
+    });
+  });
+
+  // Inject SVG icons if needed
+  injectSVG();
+}
+
+function renderProdCard(container, item, ci) {
+  const card = document.createElement('div');
+  card.className = 'prod-card';
+  card.dataset.id = item.id;
+
+  const imgSrc = item.photo && (item.photo.startsWith('data:') || item.photo.startsWith('http'))
+    ? item.photo : '';
+
+  const thumbHTML = imgSrc
+    ? `<img class="prod-thumb" src="${imgSrc}" alt="">`
+    : `<div class="prod-thumb-empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <rect x="3" y="5" width="18" height="14" rx="2"/>
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M8 5l1.5-2h5L16 5"/>
+        </svg>
+      </div>`;
+
+  card.innerHTML = `
+    <div class="prod-card-top">
+      ${thumbHTML}
+      <div class="prod-top-info">
+        <div class="prod-top-name">${esc(item.name?.[currentLang] || item.name?.fr || 'Produit')}</div>
+        <div class="prod-top-price">${esc(item.price || '')}</div>
+      </div>
+      <div class="prod-expand-ico"><svg><use href="#ico-up"/></svg></div>
+    </div>
+    <div class="prod-card-body">
+      ${buildProdForm(item)}
+    </div>
+  `;
+  container.appendChild(card);
+
+  // Toggle expand
+  card.querySelector('.prod-card-top').addEventListener('click', () => {
+    card.classList.toggle('open');
+  });
+
+  // Verrou traduction : champ modifié manuellement en EN/AR
+  card.addEventListener('input', e => {
+    const { field, lang: fieldLang } = e.target.dataset;
+    if (!field || !fieldLang || fieldLang === 'fr') return;
+    setTxLock(`item-${item.id}-${field}-${fieldLang}`, e.target.value.trim() !== '');
+  });
+
+  // Lang tabs inside product
+  card.querySelectorAll('.prod-lang-tab').forEach(tab => {
+    tab.addEventListener('click', e => {
+      const l = e.target.dataset.l;
+      card.querySelectorAll('.prod-lang-tab').forEach(t => t.classList.toggle('on', t.dataset.l === l));
+      card.querySelectorAll('.prod-lang-fields').forEach(f => f.classList.toggle('on', f.dataset.lang === l));
+    });
+  });
+
+  // Upload depuis l'appareil → Cloudinary
+  card.querySelector('.photo-file-input').addEventListener('change', e => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const uploadBtn = card.querySelector('.btn-upload-photo');
+    const origLabel = uploadBtn.innerHTML;
+
+    function setPreviewSrc(src) {
+      // Thumbnail (en-tête carte)
+      let thumb = card.querySelector('.prod-thumb');
+      if (!thumb) {
+        const ph = card.querySelector('.prod-thumb-empty');
+        if (ph) {
+          const newImg = document.createElement('img');
+          newImg.className = 'prod-thumb';
+          newImg.alt = '';
+          ph.replaceWith(newImg);
+          thumb = newImg;
+        }
+      }
+      if (thumb) thumb.src = src;
+      // Preview dans le formulaire
+      let prev = card.querySelector('.photo-preview');
+      if (!prev) {
+        const ph = card.querySelector('.photo-preview-empty');
+        if (ph) {
+          const newImg = document.createElement('img');
+          newImg.className = 'photo-preview';
+          newImg.alt = 'Aperçu de la photo';
+          ph.replaceWith(newImg);
+          prev = newImg;
+        }
+      }
+      if (prev) { prev.src = src; prev.style.display = ''; }
+    }
+
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1200;
+        let w = img.width, h = img.height;
+        if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+
+        // Aperçu local immédiat
+        const localPreview = canvas.toDataURL('image/jpeg', 0.82);
+        setPreviewSrc(localPreview);
+
+        uploadBtn.innerHTML = `<span style="opacity:.6">⏳ Upload…</span>`;
+        uploadBtn.style.pointerEvents = 'none';
+
+        canvas.toBlob(blob => {
+          uploadToCloudinary(blob)
+            .then(url => {
+              pendingPhotos.set(item.id, url);
+              setPreviewSrc(url);
+              uploadBtn.innerHTML = origLabel;
+              uploadBtn.style.pointerEvents = '';
+              markUnsaved();
+            })
+            .catch(err => {
+              console.error('Cloudinary upload error:', err);
+              uploadBtn.innerHTML = origLabel;
+              uploadBtn.style.pointerEvents = '';
+              showToast('❌ Erreur upload image — réessayez');
+            });
+        }, 'image/jpeg', 0.82);
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  });
+
+  // Clear photo
+  card.querySelector('.btn-clear-photo').addEventListener('click', () => {
+    pendingPhotos.delete(item.id);
+    card.dataset.photoClear = '1';
+    const placeholderSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+      <rect x="3" y="5" width="18" height="14" rx="2"/>
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M8 5l1.5-2h5L16 5"/>
+    </svg>`;
+    // Thumbnail
+    const thumbEl = card.querySelector('.prod-thumb, .prod-thumb-empty');
+    if (thumbEl) thumbEl.outerHTML = `<div class="prod-thumb-empty">${placeholderSVG}</div>`;
+    // Preview formulaire
+    const prevEl = card.querySelector('.photo-preview, .photo-preview-empty');
+    if (prevEl) prevEl.outerHTML = `<div class="photo-preview-empty">${placeholderSVG}<span>Aucune photo</span></div>`;
+  });
+
+  // Marquer non-sauvegardé dès qu'un champ change (carte ouverte ou fermée)
+  card.addEventListener('input', markUnsaved);
+  card.addEventListener('change', markUnsaved);
+
+  // Badge toggles
+  card.querySelectorAll('.badge-toggle').forEach(btn => {
+    btn.addEventListener('click', () => { btn.classList.toggle('active'); markUnsaved(); });
+  });
+
+  // ── Déplacer / Copier vers une autre catégorie ──
+  card.querySelector('.btn-move-cat').addEventListener('click', () => {
+    const sel = card.querySelector('.move-cat-sel');
+    const targetCat = parseInt(sel.value);
+    if (isNaN(targetCat) || targetCat === item.cat) return;
+    collectProdForm(card, item);
+    item.cat = targetCat;
+    markUnsaved(); renderProductsSection();
+  });
+
+  // ── Drag & drop produit ──
+  card.setAttribute('draggable', 'true');
+  card.addEventListener('dragstart', e => {
+    _dragItemId = item.id;
+    e.dataTransfer.effectAllowed = 'move';
+    setTimeout(() => card.classList.add('dragging'), 0);
+    e.stopPropagation();
+  });
+  card.addEventListener('dragend', () => {
+    card.classList.remove('dragging');
+    document.querySelectorAll('.prod-card').forEach(c => c.classList.remove('drag-over'));
+    document.querySelectorAll('.cat-products').forEach(s => s.classList.remove('drag-over-cat'));
+    _dragItemId = null;
+  });
+  card.addEventListener('dragover', e => {
+    if (_dragItemId === null || _dragItemId === item.id) return;
+    e.preventDefault(); e.stopPropagation(); card.classList.add('drag-over');
+  });
+  card.addEventListener('dragleave', e => {
+    if (!card.contains(e.relatedTarget)) card.classList.remove('drag-over');
+  });
+  card.addEventListener('drop', e => {
+    e.preventDefault(); e.stopPropagation(); card.classList.remove('drag-over');
+    if (_dragItemId === null || _dragItemId === item.id) return;
+    const fromIdx = adminData.items.findIndex(it => it.id === _dragItemId);
+    const toIdx   = adminData.items.findIndex(it => it.id === item.id);
+    if (fromIdx === -1 || toIdx === -1) return;
+    adminData.items[fromIdx].cat = item.cat; // déplacer vers la même catégorie
+    const [moved] = adminData.items.splice(fromIdx, 1);
+    adminData.items.splice(fromIdx < toIdx ? toIdx : toIdx, 0, moved);
+    markUnsaved(); renderProductsSection();
+  });
+
+  // Delete product
+  card.querySelector('.btn-del-prod').addEventListener('click', () => {
+    if (!confirm('Supprimer ce produit ?')) return;
+    const idx = adminData.items.findIndex(it => it.id === item.id);
+    if (idx > -1) adminData.items.splice(idx, 1);
+    card.remove();
+    renderCatsSection();
+    renderProductsSection();
+    markUnsaved();
+  });
+}
+
+function buildProdForm(item) {
+  const firstLang = currentLang;
+  const langTabs = LANGS.map(l =>
+    `<button class="lang-tab prod-lang-tab${l===firstLang?' on':''}" data-l="${l}">${LANG_LABELS[l]}</button>`
+  ).join('');
+
+  const srcOptions = LANGS.map(l =>
+    `<option value="${l}"${l===currentLang?' selected':''}>${LANG_LABELS[l]}</option>`
+  ).join('');
+
+  const t0 = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+  const langFields = LANGS.map(l => `
+    <div class="prod-lang-fields lang-fields${l===firstLang?' on':''}" data-lang="${l}">
+      <div class="form-group">
+        <div class="form-lbl" data-uitxt="lblName">${t0.lblName} (${l.toUpperCase()})</div>
+        <input class="form-input" data-field="name" data-lang="${l}" data-uiph="phName"
+          value="${esc(item.name?.[l] || '')}" placeholder="${t0.phName}">
+      </div>
+      <div class="form-group">
+        <div class="form-lbl" data-uitxt="lblFullDesc">${t0.lblFullDesc} (${l.toUpperCase()})</div>
+        <textarea class="form-textarea" data-field="full" data-lang="${l}" style="min-height:110px" data-uiph="phFullDesc"
+          placeholder="${t0.phFullDesc}">${esc(item.full?.[l] || '')}</textarea>
+      </div>
+    </div>
+  `).join('');
+
+  // Badges
+  const t1 = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+  const curType  = item.type  || '';
+  const curTemp  = item.temp  || '';
+  const curFlags = Array.isArray(item.badges) ? item.badges : [];
+  const typeOpts = [
+    ['', t1.badgeType],
+    ['boisson', t1.bdgBoisson], ['cuisine', t1.bdgCuisine],
+    ['sucre', t1.bdgSucre], ['hookah', t1.bdgHookah],
+  ].map(([v,l]) => `<option value="${v}"${curType===v?' selected':''}>${l}</option>`).join('');
+  const tempOpts = [
+    ['', t1.badgeTemp],
+    ['chaud', t1.bdgChaud], ['froid', t1.bdgFroid], ['glace', t1.bdgGlace],
+  ].map(([v,l]) => `<option value="${v}"${curTemp===v?' selected':''}>${l}</option>`).join('');
+  const toggleFlags = [
+    ['morning', t1.badgeMorning], ['vegan', t1.badgeVegan],
+    ['limited', t1.badgeLimited], ['new', t1.badgeNew], ['popular', t1.badgePopular],
+  ];
+  const badgesHtml = `
+    <div class="badge-selects">
+      <select class="badge-select" data-bdg-select="type">${typeOpts}</select>
+      <select class="badge-select" data-bdg-select="temp">${tempOpts}</select>
+    </div>
+    <div class="badge-toggles">
+      ${toggleFlags.map(([f,l]) => `<button type="button" class="badge-toggle${curFlags.includes(f)?' active':''}" data-badge="${f}">${l}</button>`).join('')}
+    </div>
+  `;
+
+  const photoId = item.photo || '';
+  const photoSrc = photoId
+    ? (photoId.startsWith('data:') || photoId.startsWith('http') ? photoId : `https://images.unsplash.com/${photoId}?w=600&h=300&fit=crop`)
+    : '';
+
+  return `
+    <div class="form-grid">
+
+      <div>
+        ${langFields}
+      </div>
+
+      <div class="form-divider"></div>
+
+      <div class="form-grid-2">
+        <div class="form-group">
+          <div class="form-lbl" data-uitxt="lblPrice">${t1.lblPrice}</div>
+          <input class="form-input" data-field="price" value="${esc(item.price||'')}" data-uiph="phPrice" placeholder="${t1.phPrice}">
+        </div>
+        <div class="form-group">
+          <div class="form-lbl" data-uitxt="lblBadges">${t1.lblBadges}</div>
+          <div class="badges-wrap">${badgesHtml}</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-lbl" data-uitxt="lblPhoto">${t1.lblPhoto}</div>
+        <div class="photo-upload-row">
+          <label class="btn-upload-photo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            ${t1.lblFromDevice}
+            <input type="file" class="photo-file-input" accept="image/*">
+          </label>
+          <button type="button" class="btn-clear-photo" title="✕">✕</button>
+        </div>
+        ${photoSrc
+          ? `<img class="photo-preview" src="${photoSrc}" alt="Aperçu de la photo">`
+          : `<div class="photo-preview-empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                <rect x="3" y="5" width="18" height="14" rx="2"/>
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M8 5l1.5-2h5L16 5"/>
+              </svg>
+              <span>Aucune photo</span>
+            </div>`
+        }
+        <label class="photo-show-row">
+          <input type="checkbox" class="photo-show-chk" ${item.showPhoto !== false ? 'checked' : ''}>
+          Afficher dans le menu
+        </label>
+      </div>
+
+    </div>
+
+    <div class="prod-actions">
+      <div class="move-cat-row">
+        <select class="form-select move-cat-sel">
+          <option value="">— Changer de catégorie —</option>
+          ${adminData.cats.map((c,i) => `<option value="${i}"${i===item.cat?' disabled':''} ${i===item.cat?'style="opacity:.4"':''}>${esc(c.names?.[currentLang] || c.names?.fr || 'Cat '+i)}</option>`).join('')}
+        </select>
+        <button class="btn-move-cat">Déplacer</button>
+      </div>
+      <button class="btn-del-prod">${t1.btnDelProd}</button>
+    </div>
+  `;
+}
+
+function collectProdForm(card, item) {
+  // Price
+  const priceEl = card.querySelector('[data-field="price"]');
+  if (priceEl) item.price = priceEl.value.trim();
+
+  // Photo
+  if (pendingPhotos.has(item.id)) {
+    item.photo = pendingPhotos.get(item.id);
+    pendingPhotos.delete(item.id);
+  } else if (card.dataset.photoClear === '1') {
+    item.photo = '';
+    delete card.dataset.photoClear;
+  }
+  // Sinon → conserver la photo existante
+
+  // Visibilité de la photo
+  const showChk = card.querySelector('.photo-show-chk');
+  if (showChk) item.showPhoto = showChk.checked;
+
+  // Badges — dropdowns
+  const typeEl = card.querySelector('[data-bdg-select="type"]');
+  if (typeEl) item.type = typeEl.value;
+  const tempEl = card.querySelector('[data-bdg-select="temp"]');
+  if (tempEl) item.temp = tempEl.value;
+  // Badges — toggle flags
+  item.badges = [];
+  card.querySelectorAll('.badge-toggle.active').forEach(btn => {
+    item.badges.push(btn.dataset.badge);
+  });
+
+  // Multilang fields
+  if (!item.name) item.name = {};
+  if (!item.desc) item.desc = {};
+  if (!item.full) item.full = {};
+  if (!item.allergens) item.allergens = {};
+
+  card.querySelectorAll('[data-field][data-lang]').forEach(el => {
+    const { field, lang } = el.dataset;
+    if (field === 'allergens') {
+      item.allergens[lang] = el.value.split(',').map(s => s.trim()).filter(Boolean);
+    } else {
+      if (!item[field]) item[field] = {};
+      item[field][lang] = el.value;
+    }
+  });
+}
+
+function addProduct(ci) {
+  const id = Date.now();
+  const newItem = {
+    id, cat: ci,
+    price: '0.000 DT',
+    photo: 'photo-1509042239860-f550ce710b93',
+    badges: [],
+    name: {}, full: {}
+  };
+  LANGS.forEach(l => {
+    newItem.name[l] = 'Nouveau produit';
+    newItem.full[l] = '';
+  });
+  adminData.items.push(newItem);
+  markUnsaved();
+  renderProductsSection();
+  // Scroll to new card and open it
+  setTimeout(() => {
+    const card = document.querySelector(`[data-id="${id}"]`);
+    if (card) { card.classList.add('open'); card.scrollIntoView({ behavior:'smooth', block:'center' }); }
+  }, 100);
+}
+
+/* ═══════════════════════════════════════════
+   SAVE ALL
+═══════════════════════════════════════════ */
+function collectAllForms() {
+  // Collecter toutes les cartes (ouvertes ET fermées) pour ne perdre aucune modification
+  document.querySelectorAll('.prod-card').forEach(card => {
+    const itemId = parseInt(card.dataset.id);
+    const item = adminData.items.find(it => it.id === itemId);
+    if (item) collectProdForm(card, item);
+  });
+}
+
+document.getElementById('btn-save-all').addEventListener('click', () => doSaveAll());
+document.getElementById('fab-save').addEventListener('click', () => doSaveAll());
+
+/* ═══════════════════════════════════════════
+   SAVE ALL — collecte + traduit FR→EN/AR + sauvegarde
+═══════════════════════════════════════════ */
+// ── Verrou de traduction manuelle ──
+// Empêche l'écrasement d'un champ modifié manuellement en EN/AR
+function setTxLock(key, locked) {
+  if (!adminData._txLock) adminData._txLock = {};
+  if (locked) adminData._txLock[key] = true;
+  else delete adminData._txLock[key];
+}
+
+// Hash simple pour détecter les changements de texte FR
+function simpleHash(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+  return h;
+}
+
+async function doSaveAll() {
+  const fab      = document.getElementById('fab-save');
+  const progress = document.getElementById('global-progress');
+  if (fab.dataset.saving) return;   // éviter double-clic
+  fab.dataset.saving = '1';
+
+  function setProgress(msg, isErr) {
+    progress.textContent = msg;
+    progress.classList.toggle('err', !!isErr);
+  }
+  function clearProgress(delay = 6000) {
+    setTimeout(() => { progress.textContent = ''; progress.classList.remove('err'); }, delay);
+  }
+
+  // 1. Collecter les formulaires ouverts
+  collectAllForms();
+
+  // 2. Auto-traduire FR → EN et FR → AR uniquement si on est en mode français
+  const targets    = ['en', 'ar'];
+  const infoFields = ['wifi_name','wifi_val','hours_name','hours_val','addr_name','addr_val','noteText'];
+  const prodFields = ['name','desc','full'];
+  if (!adminData._txHashes) adminData._txHashes = {};
+  if (!adminData._txLock)   adminData._txLock   = {};
+  const hashes = adminData._txHashes;
+  const locks  = adminData._txLock;
+
+  // Lancer la traduction si on est en FR (peu importe s'il y a des produits)
+  const hasContent = currentLang === 'fr';
+
+  if (hasContent) {
+    let totalDone = 0;
+    let translated = 0, skipped = 0, errors = 0;
+
+    for (const toLang of targets) {
+      totalDone++;
+
+      // ── Catégories ──
+      setProgress(`⏳ → ${LANG_LABELS[toLang]} (${totalDone}/${targets.length}) Catégories…`);
+      for (let ci = 0; ci < adminData.cats.length; ci++) {
+        const cat = adminData.cats[ci];
+        const srcName = (cat.names?.fr || '').trim();
+        if (!srcName) continue;
+        const hashKey = `cat-${ci}-${toLang}`;
+        const curHash = simpleHash(srcName);
+        if (locks[hashKey]) { skipped++; continue; } // modifié manuellement
+        if (hashes[hashKey] === curHash && (cat.names?.[toLang] || '').trim()) { skipped++; continue; }
+        try {
+          const tx = await translateText(srcName, 'fr', toLang);
+          if (tx) { if (!cat.names) cat.names = {}; cat.names[toLang] = tx; hashes[hashKey] = curHash; translated++; }
+          else errors++;
+        } catch(e) { errors++; console.warn('Traduction cat échouée:', e.message); }
+        await sleep(150);
+      }
+
+      // ── Produits ──
+      setProgress(`⏳ → ${LANG_LABELS[toLang]} (${totalDone}/${targets.length}) Produits…`);
+      for (const item of adminData.items) {
+        for (const field of prodFields) {
+          const srcText = (item[field]?.fr || '').trim();
+          if (!srcText) continue;
+          const hashKey = `item-${item.id}-${field}-${toLang}`;
+          const curHash = simpleHash(srcText);
+          if (locks[hashKey]) { skipped++; continue; } // modifié manuellement
+          if (hashes[hashKey] === curHash && (item[field]?.[toLang] || '').trim()) { skipped++; continue; }
+          try {
+            const tx = await translateText(srcText, 'fr', toLang);
+            if (tx) { if (!item[field]) item[field] = {}; item[field][toLang] = tx; hashes[hashKey] = curHash; translated++; }
+            else errors++;
+          } catch(e) { errors++; console.warn('Traduction produit échouée:', e.message); }
+          await sleep(200);
+        }
+        // Allergènes
+        const srcAl = (item.allergens?.fr || []).join(', ');
+        if (srcAl.trim()) {
+          const hashKey = `item-${item.id}-allergens-${toLang}`;
+          const curHash = simpleHash(srcAl);
+          if (locks[hashKey]) { skipped++; }
+          else if (!(hashes[hashKey] === curHash && (item.allergens?.[toLang]||[]).length)) {
+            try {
+              const tx = await translateText(srcAl, 'fr', toLang);
+              if (tx) {
+                if (!item.allergens) item.allergens = {};
+                item.allergens[toLang] = tx.split(',').map(s => s.trim()).filter(Boolean);
+                hashes[hashKey] = curHash; translated++;
+              } else errors++;
+            } catch(e) { errors++; console.warn('Traduction allergènes échouée:', e.message); }
+            await sleep(150);
+          } else { skipped++; }
+        }
+      }
+
+      // ── Infos café ──
+      setProgress(`⏳ → ${LANG_LABELS[toLang]} (${totalDone}/${targets.length}) Infos café…`);
+      for (const field of infoFields) {
+        const srcText = (adminData.info[field]?.fr || '').trim();
+        if (!srcText) continue;
+        const hashKey = `info-${field}-${toLang}`;
+        const curHash = simpleHash(srcText);
+        if (locks[hashKey]) { skipped++; continue; } // modifié manuellement
+        if (hashes[hashKey] === curHash && (adminData.info[field]?.[toLang] || '').trim()) { skipped++; continue; }
+        try {
+          const tx = await translateText(srcText, 'fr', toLang);
+          if (tx) {
+            if (!adminData.info[field]) adminData.info[field] = {};
+            adminData.info[field][toLang] = tx; hashes[hashKey] = curHash; translated++;
+          } else errors++;
+        } catch(e) { errors++; console.warn('Traduction info échouée:', e.message); }
+        await sleep(150);
+      }
+    }
+
+    if (errors > 0 && translated === 0) {
+      setProgress(`⚠ Traduction échouée (limite API atteinte ?) — données FR sauvegardées`, true);
+      clearProgress(10000);
+    } else if (errors > 0) {
+      setProgress(`⚠ ${translated} traduits, ${errors} erreurs — vérifiez EN/AR`, true);
+      clearProgress(8000);
+    } else if (translated > 0) {
+      setProgress(`✓ ${translated} champ(s) traduits automatiquement`);
+      clearProgress();
+    } else {
+      setProgress('');
+    }
+  }
+
+  // 3. Sauvegarder
+  delete fab.dataset.saving;
+  saveData();
+  renderAll();
+}
+
+/* ═══════════════════════════════════════════
+   SVG ICONS (copié depuis index.html pour les aperçus)
+═══════════════════════════════════════════ */
+function injectSVG() {
+  if (document.getElementById('svg-sprite')) return;
+  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.id = 'svg-sprite';
+  svg.style.display = 'none';
+  svg.innerHTML = `
+    <symbol id="ico-coffee" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 010 8h-1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" stroke="currentColor" stroke-width="1.8" fill="none"/><line x1="6" y1="1" x2="6" y2="4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="10" y1="1" x2="10" y2="4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="14" y1="1" x2="14" y2="4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="ico-cold" viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="19.07" y1="4.93" x2="4.93" y2="19.07" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="ico-food" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2" stroke="currentColor" stroke-width="1.8" fill="none"/><line x1="7" y1="2" x2="7" y2="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M21 15V2a5 5 0 00-5 5v6c0 1.1.9 2 2 2h3zm0 0v7" stroke="currentColor" stroke-width="1.8" fill="none"/></symbol>
+    <symbol id="ico-star" viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" stroke="currentColor" stroke-width="1.8" fill="none"/></symbol>
+    <symbol id="ico-bell" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" stroke-width="1.8" fill="none"/></symbol>
+    <symbol id="ico-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8" fill="none"/><polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="1.8" fill="none"/></symbol>
+    <symbol id="ico-diamond" viewBox="0 0 24 24"><path d="M12 2L2 9l10 13L22 9z" stroke="currentColor" stroke-width="1.8" fill="none"/><line x1="2" y1="9" x2="22" y2="9" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="ico-wifi" viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0114.08 0" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M1.42 9a16 16 0 0121.16 0" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M8.53 16.11a6 6 0 016.95 0" stroke="currentColor" stroke-width="1.8" fill="none"/><line x1="12" y1="20" x2="12.01" y2="20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></symbol>
+    <symbol id="ico-pin" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z" stroke="currentColor" stroke-width="1.8" fill="none"/><circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="1.8" fill="none"/></symbol>
+    <symbol id="ico-up" viewBox="0 0 24 24"><polyline points="18,15 12,9 6,15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></symbol>
+    <symbol id="ico-cake" viewBox="0 0 24 24"><path d="M20 21v-8a2 2 0 00-2-2H6a2 2 0 00-2 2v8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2 1 2 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><line x1="16" y1="5" x2="16" y2="11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M8 11V5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 3v8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="ico-sunrise" viewBox="0 0 24 24"><path d="M17 18a5 5 0 00-10 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><line x1="12" y1="2" x2="12" y2="9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="4.22" y1="10.22" x2="5.64" y2="11.64" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="1" y1="18" x2="3" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="21" y1="18" x2="23" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="18.36" y1="11.64" x2="19.78" y2="10.22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="23" y1="22" x2="1" y2="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><polyline points="8,6 12,2 16,6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+    <symbol id="ico-hookah" viewBox="0 0 24 24"><path d="M12 3v5M9 8h6M10 13c0 2.5-3 4-3 7h10c0-3-3-4.5-3-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M8 8c0 2.2 1.8 4 4 4s4-1.8 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M5 20c.5-1.5 2-2 4-2h6c2 0 3.5.5 4 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></symbol>
+    <symbol id="ico-glass" viewBox="0 0 24 24"><path d="M8 2h8l-1 10H9L8 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M9 12c0 4 6 4 6 8H9c0-4 0-4 0-8z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><line x1="6" y1="22" x2="18" y2="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="ico-pizza" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M12 2L4.93 18.07M12 2l7.07 16.07M4.93 18.07h14.14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="10" cy="10" r="1" fill="currentColor"/><circle cx="14" cy="13" r="1" fill="currentColor"/></symbol>
+    <symbol id="ico-burger" viewBox="0 0 24 24"><line x1="3" y1="8" x2="21" y2="8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3 12h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="3" y1="16" x2="21" y2="16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M5 8c0-2 1.5-4 7-4s7 2 7 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M5 16c0 2 1.5 4 7 4s7-2 7-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></symbol>
+    <symbol id="ico-salad" viewBox="0 0 24 24"><path d="M12 2a9 9 0 00-9 9h18a9 9 0 00-9-9z" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M3 11c0 5.52 4.48 10 9 10s9-4.48 9-10" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M8 11c1 2 2 4 4 4s3-2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></symbol>
+    <symbol id="ico-heart" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke="currentColor" stroke-width="1.8" fill="none"/></symbol>
+    <symbol id="ico-fire" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 01-7 7c-2.42 0-4.57-1.04-6.07-2.71" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+    <symbol id="ico-leaf" viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 22M9.68 10.84C13 7 17 6 21 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M21 2c0 8-6 14-18 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></symbol>
+    <symbol id="ico-crown" viewBox="0 0 24 24"><path d="M2 20h20M5 20L3 8l4.5 4L12 4l4.5 8L21 8l-2 12H5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+    <symbol id="ico-gift" viewBox="0 0 24 24"><path d="M20 12v10H4V12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M2 7h20v5H2z" stroke="currentColor" stroke-width="1.8" fill="none"/><line x1="12" y1="22" x2="12" y2="7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></symbol>
+    <symbol id="ico-cocktail" viewBox="0 0 24 24"><path d="M8 22h8M12 11v11M3 3l9 8 9-8H3z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M6 6l2.5 2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  `;
+  document.body.appendChild(svg);
+}
+
+/* ═══════════════════════════════════════════
+   DONNÉES PAR DÉFAUT (produits)
+═══════════════════════════════════════════ */
+function getDefaultItems() {
+  return [
+  /* ---- CAT 0: Boissons Chaudes ---- */
+  {
+    id:1, cat:0, price:'3.500 DT', photo:'photo-1509042239860-f550ce710b93',
+    badges:['popular'],
+    name:{ fr:'Espresso', en:'Espresso', ar:'إسبريسو' },
+    desc:{ fr:'Café court et intense — pur, concentré, signature Mozart.', en:'Short and intense coffee — pure, concentrated, Mozart signature.', ar:'قهوة قصيرة ومكثفة — نقية وصافية، توقيع موزارت.' },
+    full:{ fr:'Notre espresso est extrait à la pression idéale de 9 bars, révélant des arômes profonds de noisette et de chocolat noir. Servi dans une tasse préchauffée pour préserver toutes ses saveurs.', en:'Our espresso is extracted at the ideal pressure of 9 bars, revealing deep notes of hazelnut and dark chocolate. Served in a preheated cup to preserve all its flavours.', ar:'يُستخلص إسبريسونا على ضغط مثالي 9 بار، ليكشف نكهات عميقة من البندق والشوكولاتة الداكنة. يُقدَّم في كوب مسخَّن مسبقاً للحفاظ على كل نكهاته.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:2, cat:0, price:'4.000 DT', photo:'photo-1565031491910-e57fac031c41',
+    badges:[],
+    name:{ fr:'Doppio', en:'Doppio', ar:'دوبيو' },
+    desc:{ fr:'Double espresso puissant — pour les vrais amateurs de café fort.', en:'Powerful double espresso — for true lovers of strong coffee.', ar:'إسبريسو مزدوج قوي — لعشاق القهوة الحقيقيين.' },
+    full:{ fr:'Deux extractions d\'espresso combinées dans une même tasse. Un café généreux, puissant et plein de caractère, idéal l\'après-midi ou en fin de repas.', en:'Two espresso extractions combined in one cup. A generous, powerful, full-character coffee, perfect in the afternoon or after a meal.', ar:'استخلاصان من الإسبريسو مجمعتان في كوب واحد. قهوة سخية وقوية ومليئة بالطابع، مثالية بعد الظهر أو بعد الأكل.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:3, cat:0, price:'5.500 DT', photo:'photo-1572442388796-11668a67e53d',
+    badges:['popular'],
+    name:{ fr:'Cappuccino', en:'Cappuccino', ar:'كابتشينو' },
+    desc:{ fr:'Espresso, lait chaud et mousse veloutée — l\'équilibre parfait.', en:'Espresso, steamed milk and velvety foam — the perfect balance.', ar:'إسبريسو وحليب مسخَّن وزبد مخملي — التوازن المثالي.' },
+    full:{ fr:'Notre cappuccino est préparé avec un espresso maison et un lait entier texturé à la vapeur à 65°C pour une mousse soyeuse et homogène. Un classique indémodable.', en:'Our cappuccino is made with a house espresso and whole milk textured with steam at 65°C for a silky, even foam. A timeless classic.', ar:'يُحضَّر كابتشينو بإسبريسو البيت وحليب كامل الدسم مبخَّر على 65°C لزبد حريري ومتجانس. كلاسيكي لا يمل.' },
+    allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
+  },
+  {
+    id:4, cat:0, price:'6.000 DT', photo:'photo-1561882468-9110e03e0f78',
+    badges:['popular'],
+    name:{ fr:'Café Latte', en:'Café Latte', ar:'كافيه لاتيه' },
+    desc:{ fr:'Espresso sur lit de lait soyeux, doux et crémeux.', en:'Espresso on a bed of silky milk, soft and creamy.', ar:'إسبريسو على سرير من الحليب الحريري، ناعم وكريمي.' },
+    full:{ fr:'Le café latte associe un espresso intense à une grande quantité de lait micro-moussé pour une boisson douce, longue et réconfortante. Parfait pour un moment de détente.', en:'The café latte combines an intense espresso with a large amount of micro-frothed milk for a soft, long and comforting drink. Perfect for a relaxing moment.', ar:'يجمع الكافيه لاتيه بين إسبريسو قوي وكمية كبيرة من الحليب المرغي لمشروب ناعم وطويل ومريح. مثالي للاسترخاء.' },
+    allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
+  },
+  {
+    id:5, cat:0, price:'5.000 DT', photo:'photo-1514432324607-a09d9b4aefdd',
+    badges:[],
+    name:{ fr:'Café Noisette', en:'Hazelnut Coffee', ar:'قهوة بالبندق' },
+    desc:{ fr:'Espresso allongé d\'un nuage de lait parfumé à la noisette.', en:'Espresso with a cloud of hazelnut-scented milk.', ar:'إسبريسو مع قليل من الحليب بنكهة البندق.' },
+    full:{ fr:'Un espresso doux agrémenté d\'un soupçon de lait chaud et d\'un arôme de noisette. La douceur d\'un latte avec le caractère d\'un espresso.', en:'A mild espresso enhanced with a hint of hot milk and hazelnut aroma. The sweetness of a latte with the character of an espresso.', ar:'إسبريسو ناعم مع لمسة من الحليب الساخن ورائحة البندق. حلاوة اللاتيه مع طابع الإسبريسو.' },
+    allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
+  },
+  {
+    id:6, cat:0, price:'4.500 DT', photo:'photo-1496318447583-f524534e9ce1',
+    badges:[],
+    name:{ fr:'Americano', en:'Americano', ar:'أمريكانو' },
+    desc:{ fr:'Espresso allongé à l\'eau chaude — café long et équilibré.', en:'Espresso extended with hot water — long and balanced coffee.', ar:'إسبريسو ممدود بالماء الساخن — قهوة طويلة ومتوازنة.' },
+    full:{ fr:'L\'americano est un espresso dilué avec de l\'eau chaude pour obtenir un café long avec un goût plein mais moins intense. Idéal pour ceux qui préfèrent un café plus doux.', en:'The americano is an espresso diluted with hot water to create a long coffee with a full taste but less intense. Ideal for those who prefer a milder coffee.', ar:'الأمريكانو هو إسبريسو مخفف بالماء الساخن للحصول على قهوة طويلة بطعم كامل لكن أقل حدة. مثالي لمن يفضلون قهوة أكثر نعومة.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:7, cat:0, price:'3.000 DT', photo:'photo-1544787219-7f47ccb76574',
+    badges:[],
+    name:{ fr:'Thé Nature', en:'Plain Tea', ar:'شاي طبيعي' },
+    desc:{ fr:'Thé noir ou vert selon votre choix — chaud et réconfortant.', en:'Black or green tea of your choice — warm and comforting.', ar:'شاي أسود أو أخضر حسب اختيارك — دافئ ومريح.' },
+    full:{ fr:'Un thé préparé avec soin, servi dans une théière élégante avec sucre et citron. Choisissez entre thé noir Ceylon et thé vert Gunpowder.', en:'Carefully prepared tea, served in an elegant teapot with sugar and lemon. Choose between Ceylon black tea and Gunpowder green tea.', ar:'شاي محضَّر بعناية، يُقدَّم في إبريق أنيق مع السكر والليمون. اختر بين الشاي الأسود سيلاني والشاي الأخضر.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:8, cat:0, price:'4.000 DT', photo:'photo-1556679343-c7306c1976bc',
+    badges:['popular'],
+    name:{ fr:'Thé à la Menthe', en:'Mint Tea', ar:'شاي بالنعناع' },
+    desc:{ fr:'Thé vert frais infusé avec de la menthe fraîche — traditionnel et rafraîchissant.', en:'Fresh green tea infused with fresh mint — traditional and refreshing.', ar:'شاي أخضر طازج منقوع بالنعناع الطازج — تقليدي ومنعش.' },
+    full:{ fr:'Notre thé à la menthe est préparé à la façon traditionnelle avec de la menthe fraîche du jardin, du thé vert de qualité et une touche de sucre. Un classique intemporel.', en:'Our mint tea is prepared in the traditional way with fresh garden mint, quality green tea and a touch of sugar. A timeless classic.', ar:'يُحضَّر شاي النعناع بالطريقة التقليدية مع نعناع طازج وشاي أخضر عالي الجودة ولمسة من السكر. كلاسيكي خالد.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:9, cat:0, price:'7.000 DT', photo:'photo-1542990253-a781e904e62f',
+    badges:[],
+    name:{ fr:'Chocolat Chaud', en:'Hot Chocolate', ar:'شوكولاتة ساخنة' },
+    desc:{ fr:'Chocolat onctueux et crémeux — réconfort assuré.', en:'Smooth and creamy chocolate — guaranteed comfort.', ar:'شوكولاتة ناعمة وكريمية — راحة مضمونة.' },
+    full:{ fr:'Un chocolat chaud préparé avec du vrai cacao en poudre et du lait entier, couronné d\'une généreuse touche de chantilly. Le petit plaisir par excellence.', en:'A hot chocolate made with real cocoa powder and whole milk, topped with a generous swirl of whipped cream. The ultimate little pleasure.', ar:'شوكولاتة ساخنة محضرة بمسحوق الكاكاو الحقيقي والحليب الكامل، مزيَّنة بالكريمة المخفوقة. المتعة الصغيرة بامتياز.' },
+    allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
+  },
+
+  /* ---- CAT 1: Boissons Froides ---- */
+  {
+    id:10, cat:1, price:'12.000 DT', photo:'photo-1514362545857-3bc16c4c7d1b',
+    badges:['popular'],
+    name:{ fr:'Mojito Classique', en:'Classic Mojito', ar:'موهيتو كلاسيك' },
+    desc:{ fr:'Menthe fraîche, citron vert, sucre de canne et eau pétillante — l\'original.', en:'Fresh mint, lime, cane sugar and sparkling water — the original.', ar:'نعناع طازج وليمون أخضر وسكر قصب ومياه فوارة — الأصلي.' },
+    full:{ fr:'Notre mojito classique est préparé minute avec de la menthe fraîche écrasée, du jus de citron vert pressé, du sucre de canne et de l\'eau pétillante. Sans alcool, 100% saveur.', en:'Our classic mojito is freshly prepared with crushed fresh mint, freshly squeezed lime juice, cane sugar and sparkling water. Alcohol-free, 100% flavour.', ar:'موهيتو الكلاسيك يُحضَّر لحظياً بالنعناع الطازج المهروس وعصير الليمون الأخضر الطازج وسكر القصب والمياه الفوارة. بدون كحول، 100% نكهة.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:11, cat:1, price:'12.000 DT', photo:'photo-1544145945-f90425340c7e',
+    badges:['popular'],
+    name:{ fr:'Mojito Fraise', en:'Strawberry Mojito', ar:'موهيتو فراولة' },
+    desc:{ fr:'Fraises fraîches, menthe, citron vert et eau pétillante — fruité et frais.', en:'Fresh strawberries, mint, lime and sparkling water — fruity and fresh.', ar:'فراولة طازجة ونعناع وليمون أخضر ومياه فوارة — فاكهي ومنعش.' },
+    full:{ fr:'Une version gourmande de notre mojito avec des fraises fraîches mixées, de la menthe écrasée et une eau pétillante bien froide. Visuellement magnifique et délicieux.', en:'A gourmet version of our mojito with blended fresh strawberries, crushed mint and very cold sparkling water. Visually stunning and delicious.', ar:'نسخة شهية من موهيتونا مع فراولة طازجة مهروسة ونعناع مسحوق ومياه فوارة باردة جداً. جميل بصرياً ولذيذ.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:12, cat:1, price:'13.000 DT', photo:'photo-1553361371-9b22f78e8b1d',
+    badges:[],
+    name:{ fr:'Smoothie Fruits Rouges', en:'Red Fruits Smoothie', ar:'سموثي فواكه حمراء' },
+    desc:{ fr:'Fraises, framboises et myrtilles mixées — onctueux et vitaminé.', en:'Blended strawberries, raspberries and blueberries — smooth and full of vitamins.', ar:'فراولة وتوت أحمر وتوت أزرق — ناعم ومليء بالفيتامينات.' },
+    full:{ fr:'Un mélange généreux de fruits rouges frais ou surgelés, mixés avec du lait ou du jus de pomme pour une texture épaisse et onctueuse. Riche en antioxydants.', en:'A generous blend of fresh or frozen red fruits, blended with milk or apple juice for a thick and smooth texture. Rich in antioxidants.', ar:'مزيج سخي من الفواكه الحمراء الطازجة أو المجمدة، مخلوطة بالحليب أو عصير التفاح لقوام كثيف وناعم. غني بمضادات الأكسدة.' },
+    allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
+  },
+  {
+    id:13, cat:1, price:'13.000 DT', photo:'photo-1490645935967-10de6ba17061',
+    badges:[],
+    name:{ fr:'Smoothie Mangue-Banane', en:'Mango Banana Smoothie', ar:'سموثي مانجو وموز' },
+    desc:{ fr:'Mangue et banane mixées — tropical, doux et nourrissant.', en:'Blended mango and banana — tropical, sweet and nourishing.', ar:'مانجو وموز مهروسان — استوائي، حلو ومغذٍّ.' },
+    full:{ fr:'Mangue juteuse et banane crémeuse mixées ensemble pour un smoothie épais, sucré naturellement et plein d\'énergie. Le plein de vitamines tropicales.', en:'Juicy mango and creamy banana blended together for a thick, naturally sweet and energising smoothie. A full load of tropical vitamins.', ar:'مانجو عصيرية وموز كريمي مخلوطان معاً لسموثي كثيف محلى طبيعياً وممتلئ بالطاقة. شحنة كاملة من الفيتامينات الاستوائية.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:14, cat:1, price:'8.000 DT', photo:'photo-1621506289937-a8e4df240d0b',
+    badges:[],
+    name:{ fr:'Jus d\'Orange Pressé', en:'Fresh Orange Juice', ar:'عصير برتقال طازج' },
+    desc:{ fr:'Oranges fraîches pressées à la demande — pur et naturel.', en:'Fresh oranges pressed on demand — pure and natural.', ar:'برتقال طازج معصور عند الطلب — نقي وطبيعي.' },
+    full:{ fr:'Des oranges fraîches sélectionnées avec soin, pressées devant vous pour garantir un jus pur sans additifs ni conservateurs. Le goût du naturel.', en:'Carefully selected fresh oranges, pressed in front of you to guarantee a pure juice without additives or preservatives. The taste of nature.', ar:'برتقال طازج مختار بعناية، معصور أمامك لضمان عصير نقي بدون إضافات أو مواد حافظة. طعم الطبيعة.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:15, cat:1, price:'8.000 DT', photo:'photo-1589733955941-5eeaf752f6dd',
+    badges:[],
+    name:{ fr:'Jus de Pastèque', en:'Watermelon Juice', ar:'عصير بطيخ' },
+    desc:{ fr:'Pastèque fraîche mixée — légère, sucrée et ultra-rafraîchissante.', en:'Blended fresh watermelon — light, sweet and ultra-refreshing.', ar:'بطيخ طازج مهروس — خفيف وحلو ومنعش للغاية.' },
+    full:{ fr:'Pastèque rouge bien mûre mixée avec une touche de menthe et de citron pour un jus d\'été désaltérant et plein de fraîcheur. Servi bien frais.', en:'Ripe red watermelon blended with a touch of mint and lemon for a refreshing summer juice full of freshness. Served very cold.', ar:'بطيخ أحمر ناضج مهروس مع لمسة من النعناع والليمون لعصير صيفي منعش. يُقدَّم بارداً جداً.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:16, cat:1, price:'9.000 DT', photo:'photo-1461023058943-07fcbe16d735',
+    badges:['popular'],
+    name:{ fr:'Ice Latte', en:'Ice Latte', ar:'آيس لاتيه' },
+    desc:{ fr:'Espresso sur glaçons avec lait froid — café glacé velouté.', en:'Espresso over ice with cold milk — velvety iced coffee.', ar:'إسبريسو على الثلج مع حليب بارد — قهوة مثلجة مخملية.' },
+    full:{ fr:'Un espresso double versé sur des glaçons avec du lait entier froid pour une boisson rafraîchissante qui allie la puissance du café à la douceur du lait. À siroter lentement.', en:'A double espresso poured over ice with cold whole milk for a refreshing drink that combines the power of coffee with the sweetness of milk. To be sipped slowly.', ar:'إسبريسو مزدوج يُسكب على الثلج مع حليب كامل الدسم بارد لمشروب منعش يجمع قوة القهوة مع حلاوة الحليب. اشربه ببطء.' },
+    allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
+  },
+  {
+    id:17, cat:1, price:'8.000 DT', photo:'photo-1600718374662-0483d2b9da44',
+    badges:[],
+    name:{ fr:'Ice Coffee', en:'Ice Coffee', ar:'قهوة مثلجة' },
+    desc:{ fr:'Café froid préparé, sucré et servi sur glaçons — simple et délicieux.', en:'Prepared cold coffee, sweetened and served over ice — simple and delicious.', ar:'قهوة باردة محضَّرة، محلاة ومقدَّمة على الثلج — بسيطة ولذيذة.' },
+    full:{ fr:'Notre ice coffee est préparé avec un café fort refroidi, légèrement sucré et servi dans un grand verre sur des glaçons. Parfait pour les journées chaudes.', en:'Our ice coffee is made with strong chilled coffee, lightly sweetened and served in a large glass over ice. Perfect for hot days.', ar:'يُحضَّر آيس كوفي من قهوة قوية مبرَّدة، محلاة قليلاً في كوب كبير على الثلج. مثالي للأيام الحارة.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:18, cat:1, price:'13.000 DT', photo:'photo-1568901346375-23c9450c58cd',
+    badges:[],
+    name:{ fr:'Milkshake Chocolat', en:'Chocolate Milkshake', ar:'ميلك شيك شوكولاتة' },
+    desc:{ fr:'Lait, glace chocolat et sirop — épais, riche et gourmand.', en:'Milk, chocolate ice cream and syrup — thick, rich and indulgent.', ar:'حليب وآيس كريم شوكولاتة وشراب — كثيف وغني وشهي.' },
+    full:{ fr:'Notre milkshake au chocolat est mixé avec de la glace artisanale au chocolat, du lait entier et un généreux filet de sirop de chocolat. Couronné de chantilly et d\'éclats de chocolat.', en:'Our chocolate milkshake is blended with artisan chocolate ice cream, whole milk and a generous drizzle of chocolate syrup. Topped with whipped cream and chocolate shards.', ar:'ميلك شيك الشوكولاتة مخلوط بآيس كريم شوكولاتة حرفي وحليب كامل الدسم وشراب شوكولاتة سخي. مزيَّن بالكريمة المخفوقة وشظايا الشوكولاتة.' },
+    allergens:{ fr:['Lait','Gluten'], en:['Milk','Gluten'], ar:['الحليب','الغلوتين'] }
+  },
+  {
+    id:19, cat:1, price:'13.000 DT', photo:'photo-1614086138868-51ab4f45f84c',
+    badges:['popular'],
+    name:{ fr:'Milkshake Fraise', en:'Strawberry Milkshake', ar:'ميلك شيك فراولة' },
+    desc:{ fr:'Fraises fraîches, glace vanille et lait — fruité et crémeux.', en:'Fresh strawberries, vanilla ice cream and milk — fruity and creamy.', ar:'فراولة طازجة وآيس كريم فانيلا وحليب — فاكهي وكريمي.' },
+    full:{ fr:'Des fraises fraîches mixées avec de la glace à la vanille et du lait pour un shake fruité et crémeux. Une douceur irrésistible à toute heure.', en:'Fresh strawberries blended with vanilla ice cream and milk for a fruity, creamy shake. An irresistible treat at any hour.', ar:'فراولة طازجة مخلوطة مع آيس كريم الفانيلا والحليب لميلك شيك فاكهي وكريمي. متعة لا تقاوم في أي وقت.' },
+    allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
+  },
+  {
+    id:20, cat:1, price:'14.000 DT', photo:'photo-1551024709-8f23befc6f87',
+    badges:['new'],
+    name:{ fr:'Cocktail Tropical', en:'Tropical Cocktail', ar:'كوكتيل استوائي' },
+    desc:{ fr:'Ananas, mangue, fruit de la passion et citron vert — un voyage tropical.', en:'Pineapple, mango, passion fruit and lime — a tropical journey.', ar:'أناناس ومانجو وفاكهة العاطفة والليمون الأخضر — رحلة استوائية.' },
+    full:{ fr:'Un cocktail sans alcool aux accents tropicaux, préparé avec du jus d\'ananas, de la purée de mangue, du fruit de la passion et une touche de citron vert. Exotique et désaltérant.', en:'An alcohol-free cocktail with tropical accents, prepared with pineapple juice, mango purée, passion fruit and a touch of lime. Exotic and thirst-quenching.', ar:'كوكتيل بدون كحول بنكهات استوائية، محضَّر بعصير الأناناس وبيوريه المانجو وفاكهة العاطفة ولمسة من الليمون الأخضر. غريب الطابع ومروٍّ للعطش.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:21, cat:1, price:'11.000 DT', photo:'photo-1543362906-acfc16c67564',
+    badges:[],
+    name:{ fr:'Détox Citron-Gingembre', en:'Lemon Ginger Detox', ar:'ديتوكس ليمون وزنجبيل' },
+    desc:{ fr:'Eau infusée au citron, gingembre et menthe — purifiante et vitaminée.', en:'Water infused with lemon, ginger and mint — purifying and vitamin-rich.', ar:'ماء منقوع بالليمون والزنجبيل والنعناع — منقٍّ وغني بالفيتامينات.' },
+    full:{ fr:'Notre détox est préparé avec de l\'eau froide infusée au citron frais, au gingembre râpé et à la menthe fraîche. Une boisson saine, légère et revigorante.', en:'Our detox is prepared with cold water infused with fresh lemon, grated ginger and fresh mint. A healthy, light and invigorating drink.', ar:'ديتوكس محضَّر بماء بارد منقوع بالليمون الطازج والزنجبيل المبشور والنعناع الطازج. مشروب صحي وخفيف ومنشط.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+
+  /* ---- CAT 2: Cuisine ---- */
+  {
+    id:22, cat:2, price:'17.000 DT', photo:'photo-1512621776951-a57141f2eefd',
+    badges:[],
+    name:{ fr:'Salade César', en:'Caesar Salad', ar:'سالاد سيزار' },
+    desc:{ fr:'Laitue romaine, poulet grillé, croûtons, parmesan et sauce César maison.', en:'Romaine lettuce, grilled chicken, croutons, parmesan and house Caesar dressing.', ar:'خس روماني ودجاج مشوي وخبز محمص وبارميزان وصلصة سيزار البيت.' },
+    full:{ fr:'Notre salade César est préparée avec de la laitue romaine croquante, du poulet grillé mariné aux herbes, des croûtons dorés maison, des copeaux de parmesan et notre sauce César crémeuse préparée chaque jour.', en:'Our Caesar salad is prepared with crunchy romaine lettuce, herb-marinated grilled chicken, house-made golden croutons, parmesan shavings and our creamy Caesar dressing made daily.', ar:'سالاد سيزار يُحضَّر بالخس الروماني المقرمش والدجاج المشوي المتبَّل بالأعشاب والخبز المحمص المنزلي وشرائح البارميزان وصلصة سيزار الكريمية اليومية.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+  },
+  {
+    id:23, cat:2, price:'16.000 DT', photo:'photo-1540420773420-3366772f4999',
+    badges:[],
+    name:{ fr:'Salade Thon', en:'Tuna Salad', ar:'سالاد تونة' },
+    desc:{ fr:'Thon, tomates, olives, œuf dur, maïs et vinaigrette maison.', en:'Tuna, tomatoes, olives, hard-boiled egg, corn and house vinaigrette.', ar:'تونة وطماطم وزيتون وبيض مسلوق وذرة وخل البيت.' },
+    full:{ fr:'Une salade fraîche et nourrissante avec du thon de qualité, des légumes croquants, des olives et une vinaigrette légère préparée chaque jour. Idéale pour un repas léger.', en:'A fresh and nourishing salad with quality tuna, crunchy vegetables, olives and a light vinaigrette made daily. Ideal for a light meal.', ar:'سالاد طازج ومغذٍّ مع تونة عالية الجودة وخضروات مقرمشة وزيتون وخل خفيف يُحضَّر يومياً. مثالي لوجبة خفيفة.' },
+    allergens:{ fr:['Œufs','Poisson'], en:['Eggs','Fish'], ar:['البيض','السمك'] }
+  },
+  {
+    id:24, cat:2, price:'24.000 DT', photo:'photo-1563379926898-05f4575a45d8',
+    badges:['popular'],
+    name:{ fr:'Pasta Carbonara', en:'Pasta Carbonara', ar:'باستا كاربونارا' },
+    desc:{ fr:'Pâtes crémeuses, lardons, jaune d\'œuf et parmesan — un classique italien.', en:'Creamy pasta, bacon, egg yolk and parmesan — an Italian classic.', ar:'معكرونة كريمية ولحم مقدد وصفار بيض وبارميزان — كلاسيكي إيطالي.' },
+    full:{ fr:'Notre carbonara est préparée avec des pâtes fraîches cuites al dente, une crème de parmesan onctueuse et du bacon fumé. Saupoudrée de poivre noir fraîchement moulu.', en:'Our carbonara is made with fresh pasta cooked al dente, a smooth parmesan cream and smoked bacon. Sprinkled with freshly ground black pepper.', ar:'كاربونارا محضَّرة بمعكرونة طازجة مطبوخة al dente وكريمة البارميزان الناعمة واللحم المقدد المدخن. مرشوشة بالفلفل الأسود الطازج.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+  },
+  {
+    id:25, cat:2, price:'24.000 DT', photo:'photo-1621996346565-e3dbc646d9a9',
+    badges:[],
+    name:{ fr:'Pasta Bolognaise', en:'Pasta Bolognese', ar:'باستا بولونيز' },
+    desc:{ fr:'Pâtes avec sauce tomate à la viande hachée, mijotée longuement.', en:'Pasta with minced meat tomato sauce, slow-simmered.', ar:'معكرونة مع صلصة طماطم اللحم المفروم، مطهوة ببطء.' },
+    full:{ fr:'Notre bolognaise est préparée avec de la viande hachée de bœuf, des tomates concassées, des oignons et des herbes aromatiques, mijotée pendant plusieurs heures pour un goût riche et profond.', en:'Our bolognese is made with ground beef, crushed tomatoes, onions and aromatic herbs, simmered for several hours for a rich and deep flavour.', ar:'بولونيز محضَّرة من اللحم المفروم والطماطم المجروشة والبصل والأعشاب العطرية، مطهوة لساعات لطعم غني وعميق.' },
+    allergens:{ fr:['Gluten'], en:['Gluten'], ar:['الغلوتين'] }
+  },
+  {
+    id:26, cat:2, price:'26.000 DT', photo:'photo-1586190848861-99aa4a171e90',
+    badges:['popular'],
+    name:{ fr:'Hamburger Classic', en:'Classic Burger', ar:'هامبرغر كلاسيك' },
+    desc:{ fr:'Steak haché, cheddar fondu, salade, tomate et sauce maison.', en:'Beef patty, melted cheddar, lettuce, tomato and house sauce.', ar:'لحم مفروم وشيدر مذاب وخس وطماطم وصلصة البيت.' },
+    full:{ fr:'Notre burger est composé d\'un steak haché de bœuf juteux, d\'une tranche de cheddar fondu, de salade fraîche, de tomate et de notre sauce secrète maison. Servi avec des frites ou une salade.', en:'Our burger is composed of a juicy beef patty, a slice of melted cheddar, fresh lettuce, tomato and our secret house sauce. Served with fries or a salad.', ar:'يتكون هامبرغر من لحم بقري عصيري وشريحة شيدر مذوبة وخس طازج وطماطم وصلصتنا السرية. يُقدَّم مع البطاطس أو السالاد.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+  },
+  {
+    id:27, cat:2, price:'26.000 DT', photo:'photo-1568901346375-23c9450c58cd',
+    badges:['new'],
+    name:{ fr:'Burger Crispy Chicken', en:'Crispy Chicken Burger', ar:'بيرغر دجاج كريسبي' },
+    desc:{ fr:'Poulet croustillant frit, coleslaw, pickles et sauce ranch.', en:'Crispy fried chicken, coleslaw, pickles and ranch sauce.', ar:'دجاج مقلي مقرمش وكول سلو ومخللات وصلصة رانش.' },
+    full:{ fr:'Un filet de poulet croustillant pané et frit, posé sur un pain brioché avec du coleslaw maison, des pickles croquants et une sauce ranch crémeuse. Savoureux et généreux.', en:'A crispy breaded fried chicken fillet on a brioche bun with house coleslaw, crunchy pickles and a creamy ranch sauce. Tasty and generous.', ar:'فيليه دجاج مقرمش مُقلَّى على خبز برييوش مع كول سلو منزلي ومخللات مقرمشة وصلصة رانش كريمية. لذيذ وسخي.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+  },
+  {
+    id:28, cat:2, price:'22.000 DT', photo:'photo-1552332386-f8dd00dc2f85',
+    badges:['popular'],
+    name:{ fr:'Tacos Poulet', en:'Chicken Tacos', ar:'تاكوس دجاج' },
+    desc:{ fr:'Galette moelleuse, poulet grillé, fromage fondu, salade et sauce.', en:'Soft flatbread, grilled chicken, melted cheese, salad and sauce.', ar:'خبز ناعم ودجاج مشوي وجبن مذاب وخس وصلصة.' },
+    full:{ fr:'Nos tacos sont préparés dans une galette moelleuse avec du poulet mariné grillé, du fromage fondu, de la salade fraîche, des tomates et une sauce crémeuse épicée.', en:'Our tacos are made in a soft flatbread with marinated grilled chicken, melted cheese, fresh salad, tomatoes and a spiced creamy sauce.', ar:'تاكوس محضَّرة في خبز ناعم مع دجاج مشوي متبَّل وجبن مذاب وخس طازج وطماطم وصلصة كريمية حارة.' },
+    allergens:{ fr:['Gluten','Lait'], en:['Gluten','Milk'], ar:['الغلوتين','الحليب'] }
+  },
+  {
+    id:29, cat:2, price:'20.000 DT', photo:'photo-1528735602780-2552fd46c7af',
+    badges:[],
+    name:{ fr:'Ciabatta Thon-Fromage', en:'Tuna Cheese Ciabatta', ar:'شياباتا تونة وجبن' },
+    desc:{ fr:'Pain ciabatta grillé, thon, fromage fondu, tomates et roquette.', en:'Grilled ciabatta, tuna, melted cheese, tomatoes and rocket.', ar:'خبز شياباتا مشوي وتونة وجبن مذاب وطماطم وجرجير.' },
+    full:{ fr:'Une ciabatta croustillante garnie de thon à l\'huile d\'olive, de fromage fondu, de tomates fraîches et de roquette. Grillée à point pour un résultat chaud et savoureux.', en:'A crispy ciabatta filled with tuna in olive oil, melted cheese, fresh tomatoes and rocket. Grilled to perfection for a warm and tasty result.', ar:'شياباتا مقرمشة محشوة بالتونة بزيت الزيتون والجبن المذاب والطماطم الطازجة والجرجير. مشوية بشكل مثالي لنتيجة دافئة ولذيذة.' },
+    allergens:{ fr:['Gluten','Lait','Poisson'], en:['Gluten','Milk','Fish'], ar:['الغلوتين','الحليب','السمك'] }
+  },
+  {
+    id:30, cat:2, price:'18.000 DT', photo:'photo-1565299507177-b0ac66763828',
+    badges:[],
+    name:{ fr:'Sandwich Libanais Poulet', en:'Lebanese Chicken Sandwich', ar:'ساندويش لبناني دجاج' },
+    desc:{ fr:'Pain pita, poulet grillé aux épices, toum, chou et tomates.', en:'Pita bread, spiced grilled chicken, toum, cabbage and tomatoes.', ar:'خبز بيتا ودجاج مشوي بالتوابل وثوم وملفوف وطماطم.' },
+    full:{ fr:'Un sandwich généreux dans un pain pita chaud avec du poulet mariné aux épices orientales, de la sauce toum à l\'ail, du chou blanc et des tomates fraîches. Un goût authentique.', en:'A generous sandwich in warm pita bread with chicken marinated in oriental spices, garlic toum sauce, white cabbage and fresh tomatoes. An authentic taste.', ar:'ساندويش سخي في خبز بيتا دافئ مع دجاج متبَّل بالتوابل الشرقية وصلصة الثوم (التومة) والملفوف الأبيض والطماطم الطازجة. طعم أصيل.' },
+    allergens:{ fr:['Gluten'], en:['Gluten'], ar:['الغلوتين'] }
+  },
+  {
+    id:31, cat:2, price:'16.000 DT', photo:'photo-1519676867240-f03562e64548',
+    badges:[],
+    name:{ fr:'Crêpe Poulet-Fromage', en:'Chicken Cheese Crêpe', ar:'كريب دجاج وجبن' },
+    desc:{ fr:'Fine crêpe salée, poulet grillé, fromage fondu et herbes fraîches.', en:'Thin savoury crêpe, grilled chicken, melted cheese and fresh herbs.', ar:'كريب رفيع مملح ودجاج مشوي وجبن مذاب وأعشاب طازجة.' },
+    full:{ fr:'Une crêpe salée fine et dorée garnie de poulet grillé émincé, de fromage fondu crémeux et de fines herbes fraîches. Pliée et servie chaude.', en:'A thin golden savoury crêpe filled with sliced grilled chicken, creamy melted cheese and fresh fine herbs. Folded and served hot.', ar:'كريب مملح رفيع وذهبي محشو بشرائح الدجاج المشوي والجبن المذاب الكريمي والأعشاب الطازجة. مطوي ومقدَّم ساخناً.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+  },
+  {
+    id:32, cat:2, price:'16.000 DT', photo:'photo-1528735602780-2552fd46c7af',
+    badges:[],
+    name:{ fr:'Panini Mozzarella-Tomates', en:'Mozzarella Tomato Panini', ar:'باني موزاريلا وطماطم' },
+    desc:{ fr:'Pain panini grillé, mozzarella fondante, tomates fraîches et basilic.', en:'Grilled panini bread, melting mozzarella, fresh tomatoes and basil.', ar:'خبز باني مشوي وموزاريلا ذائبة وطماطم طازجة وريحان.' },
+    full:{ fr:'Un panini grillé croustillant garni de mozzarella fondante, de tomates fraîches tranchées et de feuilles de basilic frais. Un délice simple et savoureux.', en:'A crispy grilled panini filled with melting mozzarella, sliced fresh tomatoes and fresh basil leaves. A simple and delicious delight.', ar:'باني مشوي مقرمش محشو بالموزاريلا الذائبة والطماطم الطازجة المقطعة وأوراق الريحان الطازج. متعة بسيطة ولذيذة.' },
+    allergens:{ fr:['Gluten','Lait'], en:['Gluten','Milk'], ar:['الغلوتين','الحليب'] }
+  },
+  {
+    id:33, cat:2, price:'14.000 DT', photo:'photo-1525351484163-7529414344d8',
+    badges:[],
+    name:{ fr:'Omlette au Fromage', en:'Cheese Omelette', ar:'أومليت بالجبن' },
+    desc:{ fr:'Trois œufs frais, fromage fondu, herbes aromatiques — simple et généreux.', en:'Three fresh eggs, melted cheese, aromatic herbs — simple and generous.', ar:'ثلاث بيضات طازجة وجبن مذاب وأعشاب عطرية — بسيط وسخي.' },
+    full:{ fr:'Notre omlette est préparée avec trois œufs frais battus, du fromage fondu généreusement et des fines herbes fraîches. Moelleuse à l\'intérieur, légèrement dorée à l\'extérieur.', en:'Our omelette is made with three beaten fresh eggs, generously melted cheese and fresh fine herbs. Soft inside, lightly golden outside.', ar:'أومليت محضَّرة من ثلاث بيضات طازجة مخفوقة وجبن مذاب بسخاء وأعشاب طازجة. طرية من الداخل، ذهبية خفيفة من الخارج.' },
+    allergens:{ fr:['Œufs','Lait'], en:['Eggs','Milk'], ar:['البيض','الحليب'] }
+  },
+
+  /* ---- CAT 3: Sucré ---- */
+  {
+    id:34, cat:3, price:'10.000 DT', photo:'photo-1519676867240-f03562e64548',
+    badges:['popular'],
+    name:{ fr:'Crêpe Nutella', en:'Nutella Crêpe', ar:'كريب نوتيلا' },
+    desc:{ fr:'Fine crêpe sucrée généreusement garnie de Nutella — un classique indémodable.', en:'Fine sweet crêpe generously filled with Nutella — a timeless classic.', ar:'كريب رفيع محشو بسخاء بالنوتيلا — كلاسيكي خالد.' },
+    full:{ fr:'Une crêpe fine et dorée nappée d\'une couche généreuse de Nutella fondant. Simple, gourmand et inégalable. À déguster chaud pour un maximum de plaisir.', en:'A fine golden crêpe coated with a generous layer of melting Nutella. Simple, indulgent and unbeatable. Best enjoyed warm for maximum pleasure.', ar:'كريب رفيع ذهبي مطلي بطبقة سخية من النوتيلا الذائبة. بسيط وشهي ولا يُضاهى. الأفضل تناوله ساخناً للحصول على أقصى متعة.' },
+    allergens:{ fr:['Gluten','Lait','Fruits à coque'], en:['Gluten','Milk','Tree nuts'], ar:['الغلوتين','الحليب','المكسرات'] }
+  },
+  {
+    id:35, cat:3, price:'11.000 DT', photo:'photo-1605288558240-e2d0fa15c1d4',
+    badges:[],
+    name:{ fr:'Crêpe Fraise-Chantilly', en:'Strawberry Cream Crêpe', ar:'كريب فراولة وكريمة' },
+    desc:{ fr:'Crêpe sucrée avec fraises fraîches et chantilly maison.', en:'Sweet crêpe with fresh strawberries and house whipped cream.', ar:'كريب حلو مع فراولة طازجة وكريمة شانتيه البيت.' },
+    full:{ fr:'Une crêpe légère garnie de fraises fraîches tranchées et d\'une généreuse rosette de chantilly maison. Un dessert frais et élégant.', en:'A light crêpe filled with sliced fresh strawberries and a generous rosette of house whipped cream. A fresh and elegant dessert.', ar:'كريب خفيف محشو بشرائح الفراولة الطازجة وزهرة سخية من كريمة شانتيه البيت. حلوى طازجة وأنيقة.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+  },
+  {
+    id:36, cat:3, price:'11.000 DT', photo:'photo-1562376552-0d160a2f238a',
+    badges:[],
+    name:{ fr:'Gaufre Chocolat', en:'Chocolate Waffle', ar:'غوفر شوكولاتة' },
+    desc:{ fr:'Gaufre croustillante, sauce chocolat chaude et chantilly.', en:'Crispy waffle, warm chocolate sauce and whipped cream.', ar:'غوفر مقرمش وصلصة شوكولاتة ساخنة وكريمة مخفوقة.' },
+    full:{ fr:'Notre gaufre est croustillante à l\'extérieur et moelleuse à l\'intérieur, nappée d\'une sauce au chocolat chaude et couronnée d\'une généreuse chantilly. Un régal à partager.', en:'Our waffle is crispy outside and soft inside, coated with a warm chocolate sauce and topped with generous whipped cream. A treat to share.', ar:'غوفر مقرمشة من الخارج وطرية من الداخل، مغطاة بصلصة شوكولاتة ساخنة ومزيَّنة بكريمة مخفوقة سخية. متعة للمشاركة.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+  },
+  {
+    id:37, cat:3, price:'13.000 DT', photo:'photo-1567620832903-9fc6debc209f',
+    badges:['new','popular'],
+    name:{ fr:'Gaufre Lotus', en:'Lotus Waffle', ar:'غوفر لوتس' },
+    desc:{ fr:'Gaufre dorée, crème de biscuit Lotus et éclats de Speculoos.', en:'Golden waffle, Lotus biscuit cream and Speculoos crumbles.', ar:'غوفر ذهبي وكريمة بسكويت لوتس وفتات سبيكولوس.' },
+    full:{ fr:'Notre gaufre Lotus est notre création signature. Une gaufre dorée et croustillante généreusement nappée de crème de biscuit Lotus fondu, parsemée d\'éclats de Speculoos caramélisés.', en:'Our Lotus waffle is our signature creation. A golden, crispy waffle generously coated with melted Lotus biscuit cream, sprinkled with caramelised Speculoos crumbles.', ar:'غوفر لوتس هو إبداعنا المميز. غوفر ذهبي ومقرمش مغطى بسخاء بكريمة بسكويت لوتس المذاب، مرشوش بفتات سبيكولوس المكرمل.' },
+    allergens:{ fr:['Gluten','Lait'], en:['Gluten','Milk'], ar:['الغلوتين','الحليب'] }
+  },
+  {
+    id:38, cat:3, price:'12.000 DT', photo:'photo-1530373239216-42518e6b4063',
+    badges:['popular'],
+    name:{ fr:'Tiramisu Maison', en:'House Tiramisu', ar:'تيراميسو البيت' },
+    desc:{ fr:'Mascarpone, biscuits imbibés de café, cacao — recette italienne maison.', en:'Mascarpone, coffee-soaked biscuits, cocoa — homemade Italian recipe.', ar:'ماسكاربوني وبسكويت منقوع بالقهوة وكاكاو — وصفة إيطالية منزلية.' },
+    full:{ fr:'Notre tiramisu est préparé chaque jour selon la recette italienne traditionnelle : mascarpone crémeux, biscuits savoiardi imbibés de café fort et saupoudrés de cacao pur. Un dessert inoubliable.', en:'Our tiramisu is prepared daily according to the traditional Italian recipe: creamy mascarpone, savoiardi biscuits soaked in strong coffee and dusted with pure cocoa. An unforgettable dessert.', ar:'يُحضَّر تيراميسو يومياً وفق الوصفة الإيطالية التقليدية: ماسكاربوني كريمي وبسكويت سافواردي منقوع في قهوة قوية ومرشوش بالكاكاو الخالص. حلوى لا تُنسى.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+  },
+  {
+    id:39, cat:3, price:'12.000 DT', photo:'photo-1533134242443-d4fd215305ad',
+    badges:[],
+    name:{ fr:'Cheesecake', en:'Cheesecake', ar:'تشيز كيك' },
+    desc:{ fr:'Base sablée, crème de fromage onctueuse et coulis de fruits rouges.', en:'Buttery base, smooth cream cheese and red fruit coulis.', ar:'قاعدة هشة وكريمة جبن ناعمة وصلصة فواكه حمراء.' },
+    full:{ fr:'Notre cheesecake est préparé avec une base de biscuits émiettés beurrés, une crème de fromage Philadelphia onctueuse et un coulis de fruits rouges maison. Fraîcheur et gourmandise.', en:'Our cheesecake features a buttered crumbled biscuit base, a smooth Philadelphia cream cheese filling and a house red fruit coulis. Freshness and indulgence.', ar:'تشيز كيك يتميز بقاعدة بسكويت مجروش بالزبدة وحشوة جبن فيلادلفيا ناعمة وصلصة فواكه حمراء منزلية. نضارة وشهوة.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+  },
+  {
+    id:40, cat:3, price:'10.000 DT', photo:'photo-1606312619070-d48b5b7a1b96',
+    badges:[],
+    name:{ fr:'Brownie Chaud', en:'Warm Brownie', ar:'براوني ساخن' },
+    desc:{ fr:'Brownie au chocolat fondant, servi chaud avec glace vanille.', en:'Melting chocolate brownie, served warm with vanilla ice cream.', ar:'براوني شوكولاتة ذائب، مقدَّم ساخناً مع آيس كريم فانيلا.' },
+    full:{ fr:'Un brownie dense et fondant, riche en chocolat et noix, servi chaud et accompagné d\'une boule de glace à la vanille. Le contraste chaud-froid est irrésistible.', en:'A dense and melting brownie, rich in chocolate and nuts, served warm and accompanied by a scoop of vanilla ice cream. The hot-cold contrast is irresistible.', ar:'براوني كثيف وذائب، غني بالشوكولاتة والمكسرات، مقدَّم ساخناً مع كرة آيس كريم فانيلا. التناقض بين الحار والبارد لا يقاوم.' },
+    allergens:{ fr:['Gluten','Lait','Œufs','Fruits à coque'], en:['Gluten','Milk','Eggs','Tree nuts'], ar:['الغلوتين','الحليب','البيض','المكسرات'] }
+  },
+  {
+    id:41, cat:3, price:'13.000 DT', photo:'photo-1564355808539-22fda35bed7e',
+    badges:['popular'],
+    name:{ fr:'Coulant Chocolat', en:'Chocolate Lava Cake', ar:'كولان شوكولاتة' },
+    desc:{ fr:'Gâteau moelleux au cœur coulant de chocolat chaud — le dessert signature.', en:'Soft cake with a flowing hot chocolate centre — the signature dessert.', ar:'كيك طري بقلب شوكولاتة ساخنة ذائبة — الحلوى المميزة.' },
+    full:{ fr:'Notre coulant est cuit à la commande pour garantir un cœur coulant parfait. Servi avec une boule de glace à la vanille, il révèle un chocolat noir intense à la première cuillère.', en:'Our lava cake is baked to order to guarantee a perfect flowing centre. Served with a scoop of vanilla ice cream, it reveals an intense dark chocolate at the first spoonful.', ar:'يُخبز الكولان عند الطلب لضمان قلب ذائب مثالي. مقدَّم مع كرة آيس كريم فانيلا، يكشف شوكولاتة داكنة مكثفة عند أول ملعقة.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+  },
+
+  /* ---- CAT 4: Le Matin ---- */
+  {
+    id:42, cat:4, price:'18.000 DT', photo:'photo-1504754524776-8f4f37790ca0',
+    badges:[],
+    name:{ fr:'Petit-Déjeuner Classique', en:'Classic Breakfast', ar:'فطور كلاسيك' },
+    desc:{ fr:'Café ou thé, pain beurre et confiture, jus d\'orange et fromage frais.', en:'Coffee or tea, bread with butter and jam, orange juice and fresh cheese.', ar:'قهوة أو شاي وخبز بالزبدة والمربى وعصير برتقال وجبن طازج.' },
+    full:{ fr:'Notre petit-déjeuner classique comprend une boisson chaude au choix, des tranches de pain frais avec beurre et confiture, un jus d\'orange pressé et un fromage frais. Le démarrage parfait.', en:'Our classic breakfast includes a hot drink of your choice, slices of fresh bread with butter and jam, a pressed orange juice and fresh cheese. The perfect start.', ar:'فطور كلاسيك يشمل مشروباً ساخناً حسب الاختيار وشرائح خبز طازج مع الزبدة والمربى وعصير برتقال معصور وجبناً طازجاً. البداية المثالية.' },
+    allergens:{ fr:['Gluten','Lait'], en:['Gluten','Milk'], ar:['الغلوتين','الحليب'] }
+  },
+  {
+    id:43, cat:4, price:'24.000 DT', photo:'photo-1533089860892-a7c6f0a88666',
+    badges:['popular'],
+    name:{ fr:'Petit-Déjeuner Complet', en:'Full Breakfast', ar:'فطور كامل' },
+    desc:{ fr:'Œufs brouillés, fromage, pain grillé, jus, café, yaourt et fruits frais.', en:'Scrambled eggs, cheese, toast, juice, coffee, yoghurt and fresh fruit.', ar:'بيض مخفوق وجبن وخبز محمص وعصير وقهوة ويوغرت وفواكه طازجة.' },
+    full:{ fr:'Un petit-déjeuner généreux avec des œufs brouillés crémeux, du fromage, des toasts grillés, un jus de fruits pressé, un café maison, un yaourt et une assiette de fruits de saison.', en:'A generous breakfast with creamy scrambled eggs, cheese, grilled toasts, fresh-pressed fruit juice, house coffee, yoghurt and a plate of seasonal fruit.', ar:'فطور سخي مع بيض مخفوق كريمي وجبن وخبز مشوي وعصير فواكه طازج وقهوة البيت ويوغرت وصحن فواكه موسمية.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+  },
+  {
+    id:44, cat:4, price:'26.000 DT', photo:'photo-1484723091739-30990009462f',
+    badges:['new'],
+    name:{ fr:'Petit-Déjeuner Américain', en:'American Breakfast', ar:'فطور أمريكي' },
+    desc:{ fr:'Pancakes, œufs au plat, bacon, sirop d\'érable et jus de fruits.', en:'Pancakes, fried eggs, bacon, maple syrup and fruit juice.', ar:'بانكيك وبيض مقلي ولحم مقدد وشراب القيقب وعصير فواكه.' },
+    full:{ fr:'Trois pancakes moelleux accompagnés d\'œufs au plat, de bacon croustillant, d\'un sirop d\'érable et d\'un grand verre de jus de fruits frais. Le brunch américain par excellence.', en:'Three soft pancakes accompanied by fried eggs, crispy bacon, maple syrup and a large glass of fresh fruit juice. The American brunch par excellence.', ar:'ثلاثة بانكيك طري مع بيض مقلي ولحم مقدد مقرمش وشراب القيقب وكوب كبير من عصير الفواكه الطازج. الفطور الأمريكي بامتياز.' },
+    allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
+  },
+
+  /* ---- CAT 5: Hookah ---- */
+  {
+    id:45, cat:5, price:'35.000 DT', photo:'photo-1584302179602-e4c3d3fd629d',
+    badges:['popular'],
+    name:{ fr:'Chicha Simple', en:'Single Hookah', ar:'شيشة سيمبل' },
+    desc:{ fr:'Chicha premium au parfum de votre choix — détente garantie.', en:'Premium hookah with your choice of flavour — relaxation guaranteed.', ar:'شيشة بريميوم بنكهة حسب اختيارك — استرخاء مضمون.' },
+    full:{ fr:'Profitez d\'une chicha de qualité premium avec un large choix de parfums : pomme, menthe, fruits tropicaux, double pomme et bien plus encore. Charbon naturel et préparation soignée.', en:'Enjoy a premium quality hookah with a wide range of flavours: apple, mint, tropical fruits, double apple and much more. Natural charcoal and careful preparation.', ar:'استمتع بشيشة ذات جودة بريميوم مع مجموعة واسعة من النكهات: تفاح ونعناع وفواكه استوائية وتفاح مزدوج والمزيد. فحم طبيعي وتحضير دقيق.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:46, cat:5, price:'40.000 DT', photo:'photo-1584302179602-e4c3d3fd629d',
+    badges:[],
+    name:{ fr:'Chicha Double', en:'Double Hookah', ar:'شيشة دابل' },
+    desc:{ fr:'Chicha double avec deux parfums combinés — expérience enrichie.', en:'Double hookah with two combined flavours — enriched experience.', ar:'شيشة دابل بنكهتين مدمجتين — تجربة مُثرَاة.' },
+    full:{ fr:'Une chicha double avec une combinaison de deux parfums au choix pour une expérience aromatique unique. Idéale pour les amateurs qui souhaitent une saveur plus complexe.', en:'A double hookah with a combination of two flavours of your choice for a unique aromatic experience. Ideal for enthusiasts who want a more complex flavour.', ar:'شيشة دابل مع مزيج من نكهتين حسب الاختيار لتجربة عطرية فريدة. مثالية لعشاق الشيشة الذين يريدون نكهة أكثر تعقيداً.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:47, cat:5, price:'6.000 DT', photo:'photo-1534353341816-abfbe27f97da',
+    badges:[],
+    name:{ fr:'Supplément Glace', en:'Ice Supplement', ar:'إضافة ثلج' },
+    desc:{ fr:'Ajoutez des glaçons dans le vase de votre chicha pour une fumée plus fraîche.', en:'Add ice to your hookah vase for a cooler, smoother smoke.', ar:'أضف ثلجاً إلى إناء الشيشة للحصول على دخان أبرد وأكثر نعومة.' },
+    full:{ fr:'L\'ajout de glace dans le vase refroidit la fumée avant inhalation, offrant une sensation plus fraîche et une expérience plus douce et agréable.', en:'Adding ice to the vase cools the smoke before inhalation, offering a fresher sensation and a smoother, more enjoyable experience.', ar:'إضافة الثلج إلى الإناء يبرد الدخان قبل الاستنشاق، مما يوفر إحساساً أكثر برودة وتجربة أكثر نعومة وإمتاعاً.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  },
+  {
+    id:48, cat:5, price:'6.000 DT', photo:'photo-1534353341816-abfbe27f97da',
+    badges:[],
+    name:{ fr:'Supplément Lait de Coco', en:'Coconut Milk Supplement', ar:'إضافة حليب جوز الهند' },
+    desc:{ fr:'Remplacez l\'eau par du lait de coco pour une fumée crémeuse et exotique.', en:'Replace water with coconut milk for a creamy, exotic smoke.', ar:'استبدل الماء بحليب جوز الهند للحصول على دخان كريمي واستوائي.' },
+    full:{ fr:'En remplaçant l\'eau du vase par du lait de coco, la fumée acquiert une douceur crémeuse et un arôme exotique subtil qui transforme complètement l\'expérience chicha.', en:'By replacing the vase water with coconut milk, the smoke acquires a creamy softness and a subtle exotic aroma that completely transforms the hookah experience.', ar:'باستبدال ماء الإناء بحليب جوز الهند، يكتسب الدخان نعومة كريمية وعطراً استوائياً خفياً يحوِّل تجربة الشيشة كلياً.' },
+    allergens:{ fr:[], en:[], ar:[] }
+  }
+  ];
+}
+
+/* ═══════════════════════════════════════════
+   TRADUCTION AUTOMATIQUE — Google Translate (endpoint public)
+   Aucune clé requise, qualité excellente, supporte FR/EN/AR.
+═══════════════════════════════════════════ */
+
+async function translateText(text, fromLang, toLang) {
+  if (!text || !text.trim()) return '';
+  if (fromLang === toLang) return text;
+
+  // Découper si trop long (limite ~1000 chars par requête)
+  if (text.length <= 1000) {
+    return await googleTranslateCall(text, fromLang, toLang);
+  }
+
+  const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+  const chunks = [];
+  let current = '';
+  for (const s of sentences) {
+    if ((current + s).length > 900) {
+      if (current) chunks.push(current.trim());
+      current = s;
+    } else {
+      current += s;
+    }
+  }
+  if (current.trim()) chunks.push(current.trim());
+
+  const results = [];
+  for (const chunk of chunks) {
+    const tx = await googleTranslateCall(chunk, fromLang, toLang);
+    results.push(tx || chunk);
+    await sleep(200);
+  }
+  return results.join(' ');
+}
+
+async function googleTranslateCall(text, src, tgt) {
+  const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${src}&tl=${tgt}&dt=t&q=${encodeURIComponent(text)}`;
+  const res  = await fetch(url);
+  if (!res.ok) throw new Error('API error ' + res.status);
+  const data = await res.json();
+  // La réponse est un tableau imbriqué : [[["texte traduit","texte source",...],...],...]
+  if (Array.isArray(data) && Array.isArray(data[0])) {
+    return data[0].map(part => part[0]).filter(Boolean).join('');
+  }
+  throw new Error('Réponse inattendue de Google Translate');
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+/* ═══════════════════════════════════════════
+   UTILS
+═══════════════════════════════════════════ */
+function esc(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ═══════════════════════════════════════════
+   THÈME VISUEL
+═══════════════════════════════════════════ */
+const THEMES_DATA = [
+  { id:'prestige',       name:'Prestige',           sub:'Standard & élégant',       dark:'#0c0a08', accent:'#c8a44e' },
+  { id:'gold-noir',      name:'Gold Noir',           sub:'Cinéma & élégance',        dark:'#0c0a08', accent:'#c8a44e' },
+  { id:'neon-tokyo',     name:'Neon Pulse',          sub:'Néon cyan & futuriste',    dark:'#030010', accent:'#00f5d4' },
+  { id:'botanical',      name:'Botanical Forest',    sub:'Forêt & organique',        dark:'#060e06', accent:'#7acc5a' },
+  { id:'rose-parisien',  name:'Rose Parisien',       sub:'Romance & douceur',        dark:'#140a0e', accent:'#e890b0' },
+  { id:'midnight-luxe',  name:'Enseigne',             sub:'Prix dominant & brasserie',dark:'#03041a', accent:'#f0d060' },
+  { id:'velvet-luxe',    name:'Velvet Luxe',         sub:'Éditorial & raffinement',  dark:'#0d0006', accent:'#d4af37' },
+  { id:'santorin',       name:'Sidi Bou Saïd',       sub:'Volet bleu & Méditerranée', dark:'#04090f', accent:'#4db8ff' },
+  { id:'islamic',        name:'Islamic',              sub:'Mosquée, lanternes & or',   dark:'#071407', accent:'#c8a850' },
+];
+
+let currentMenuTheme = 'prestige';
+
+function loadMenuTheme() {
+  renderThemeSelector();
+  _db.ref('menu/menuTheme').once('value').then(snap => {
+    const t = snap.val() || 'prestige';
+    currentMenuTheme = t;
+    renderThemeSelector();
+  }).catch(() => {});
+}
+
+function saveMenuTheme(themeId) {
+  currentMenuTheme = themeId;
+  _db.ref('menu/menuTheme').set(themeId);
+  renderThemeSelector();
+}
+
+function renderThemeSelector() {
+  const grid = document.getElementById('theme-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  THEMES_DATA.forEach(th => {
+    const card = document.createElement('div');
+    card.className = 'theme-card' + (th.id === currentMenuTheme ? ' active' : '');
+    card.style.setProperty('--tc-accent', th.accent);
+    card.innerHTML = `
+      <span class="tc-dot"></span>
+      <span class="tc-name">${th.name}</span>
+      <span class="tc-check">✓</span>`;
+    card.addEventListener('click', () => saveMenuTheme(th.id));
+    grid.appendChild(card);
+  });
+}
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+checkLogin();
+
+// Fermer tous les icon pickers si clic en dehors
+document.addEventListener('click', () => {
+  document.querySelectorAll('.ico-picker-popup.open').forEach(p => p.classList.remove('open'));
+});
+</script>
+</body>
+</html>
