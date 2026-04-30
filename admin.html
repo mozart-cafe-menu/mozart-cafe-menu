@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mozart Café — Administration</title>
-  <link rel="manifest" href="admin-manifest.json">
+  <title>Mozart Coffee Lounge — Administration</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant:wght@300;400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -129,17 +128,11 @@
     }
     .adm-right { display:flex; gap:6px; align-items:center; flex-shrink:0; }
     .btn-preview {
-      padding:7px 12px; border:1px solid var(--bord2); border-radius:10px;
-      color:var(--muted); font-size:0.75rem; transition:var(--tr); white-space:nowrap;
-      min-height:34px;
+      width:34px; height:34px; border:1px solid var(--bord2); border-radius:10px;
+      color:var(--muted); transition:var(--tr);
+      display:flex; align-items:center; justify-content:center; flex-shrink:0;
     }
     .btn-preview:hover { border-color:var(--gold); color:var(--gold); }
-    .btn-logout {
-      padding:7px 12px; border:1px solid rgba(224,82,82,0.3); border-radius:10px;
-      color:var(--red); font-size:0.75rem; opacity:0.7; transition:var(--tr); white-space:nowrap;
-      min-height:34px;
-    }
-    .btn-logout:hover { opacity:1; border-color:var(--red); }
     .btn-theme {
       width:34px; height:34px;
       border:1px solid var(--border); border-radius:8px;
@@ -162,8 +155,11 @@
       font-family:inherit; text-align:left; width:100%;
     }
     .note-status:hover { border-color:var(--bord2); }
+    .note-status .vis-dot { width:8px; height:8px; border-radius:50%; background:var(--muted); flex-shrink:0; transition:background 0.2s; }
     .note-status.on { color:var(--green); border-color:var(--green); }
+    .note-status.on .vis-dot { background:var(--green); }
     html.light .note-status.on { color:#4a8c3f; border-color:#4a8c3f; }
+    html.light .note-status.on .vis-dot { background:#4a8c3f; }
     .note-lang-tabs { display:flex; gap:4px; }
     .note-textarea {
       width:100%; min-height:80px; resize:vertical;
@@ -184,46 +180,40 @@
       color:var(--muted); transition:var(--tr); white-space:nowrap;
       min-height:32px; cursor:pointer;
     }
+    .adm-vis-btn.adm-vis-ico {
+      width:34px; height:34px; min-height:34px;
+      padding:0; justify-content:center; gap:0;
+    }
+    .adm-vis-btn.adm-vis-ico .vis-dot {
+      position:absolute; width:5px; height:5px;
+      top:6px; right:6px; border-radius:50%;
+    }
+    .adm-vis-btn.adm-vis-ico { position:relative; }
+    .adm-vis-btn .vis-dot {
+      width:7px; height:7px; border-radius:50%;
+      background:var(--muted); transition:background 0.2s; flex-shrink:0;
+    }
     .adm-vis-btn.on { border-color:var(--green); color:var(--green); }
+    .adm-vis-btn.on .vis-dot { background:var(--green); }
     html.light .adm-vis-btn { border-color:rgba(0,0,0,0.15); color:#888; }
     html.light .adm-vis-btn.on { border-color:#4a8c3f; color:#4a8c3f; }
-
-    /* ── Case à cocher animée (remplace vis-dot) ── */
-    .vis-check { width:16px; height:16px; flex-shrink:0; display:inline-flex; }
-    .vis-check svg { width:16px; height:16px; overflow:visible; }
-    .vis-check .chk-box {
-      fill:none; stroke:var(--muted); stroke-width:1.6;
-      transition:stroke 0.22s ease, fill 0.22s ease;
-    }
-    .vis-check .chk-mark {
-      fill:none; stroke:var(--green); stroke-width:2;
-      stroke-linecap:round; stroke-linejoin:round;
-      pathLength:1; stroke-dasharray:1; stroke-dashoffset:1;
-      transition:stroke-dashoffset 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.22s;
-      opacity:0;
-    }
-    /* État ON : case verte + coche dessinée */
-    .adm-vis-btn.on .vis-check .chk-box,
-    .note-status.on .vis-check .chk-box { stroke:var(--green); fill:rgba(126,189,106,0.12); }
-    .adm-vis-btn.on .vis-check .chk-mark,
-    .note-status.on .vis-check .chk-mark { stroke-dashoffset:0; opacity:1; }
-    /* Mode clair */
-    html.light .vis-check .chk-box { stroke:rgba(0,0,0,0.3); }
-    html.light .adm-vis-btn.on .vis-check .chk-box,
-    html.light .note-status.on .vis-check .chk-box { stroke:#4a8c3f; fill:rgba(74,140,63,0.1); }
-    html.light .vis-check .chk-mark,
-    html.light .adm-vis-btn.on .vis-check .chk-mark,
-    html.light .note-status.on .vis-check .chk-mark { stroke:#4a8c3f; }
+    html.light .adm-vis-btn.on .vis-dot { background:#4a8c3f; }
     /* ── Toggle visibilité photo (par produit) ── */
     .photo-show-row {
       display:flex; align-items:center; gap:7px;
       margin-top:9px; font-size:0.76rem; color:var(--muted); cursor:pointer;
     }
     .photo-show-chk { accent-color:var(--green); width:15px; height:15px; cursor:pointer; flex-shrink:0; }
-    @media(max-width:600px) {
+    /* Labels courts cachés par défaut (desktop) */
+    .mode-lbl-short { display:none; }
+    /* ── MOBILE ── */
+    @media(max-width:767px) {
       .adm-sub { display:none; }
-      .btn-preview { padding:7px 8px; font-size:0.9rem; }
-      .adm-center { order:3; width:100%; justify-content:flex-start; }
+      /* Mode popup ancré à droite pour ne pas déborder */
+      #mode-sel-wrap .adm-sel-popup { left:auto; right:0; }
+      /* Labels : cacher le long, afficher le court */
+      .mode-lbl-full  { display:none !important; }
+      .mode-lbl-short { display:inline !important; }
     }
 
     /* ── SAVED TOAST ── */
@@ -239,6 +229,46 @@
       transition:opacity 0.35s ease, transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
     }
     #toast.show { opacity:1; pointer-events:none; transform:translateX(-50%) translateY(-8px); }
+
+    /* ── FAB NAVIGATION (raccourcis) ── */
+    #sc-fab {
+      position:fixed; top:50%; right:16px; transform:translateY(-50%);
+      width:46px; height:46px; border-radius:50%;
+      background:var(--bg3); border:1.5px solid var(--bord2);
+      color:var(--gold); display:none; align-items:center; justify-content:center;
+      z-index:300; cursor:pointer;
+      box-shadow:0 4px 18px rgba(0,0,0,0.32);
+      transition:border-color 0.2s, box-shadow 0.2s, color 0.2s;
+    }
+    #sc-fab.show { display:flex; }
+    #sc-fab:hover, #sc-fab.open { border-color:var(--gold); box-shadow:0 6px 22px rgba(200,164,78,0.35); }
+    #sc-fab svg { width:20px; height:20px; pointer-events:none; }
+    .sc-popup {
+      position:fixed; top:50%; right:70px;
+      transform:translateY(-50%) translateX(6px);
+      background:var(--bg3); border:1px solid var(--bord2); border-radius:14px;
+      padding:6px; z-index:299; min-width:170px;
+      display:flex; flex-direction:column; gap:2px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.42);
+      opacity:0; pointer-events:none;
+      transition:opacity 0.18s ease, transform 0.18s ease;
+    }
+    .sc-popup.open {
+      opacity:1; pointer-events:all;
+      transform:translateY(-50%) translateX(0);
+    }
+    .sc-popup button {
+      padding:9px 14px; border-radius:10px; border:none;
+      background:transparent; color:var(--cream);
+      font-size:0.82rem; font-family:inherit; cursor:pointer;
+      text-align:left; white-space:nowrap;
+      transition:background 0.15s, color 0.15s;
+    }
+    .sc-popup button:hover { background:rgba(200,164,78,0.12); color:var(--gold); }
+    html[dir="rtl"] #sc-fab { right:auto; left:16px; }
+    html[dir="rtl"] .sc-popup { right:auto; left:70px; transform:translateY(-50%) translateX(-6px); }
+    html[dir="rtl"] .sc-popup.open { transform:translateY(-50%) translateX(0); }
+    html[dir="rtl"] .sc-popup button { text-align:right; }
 
     /* ── MAIN LAYOUT ── */
     .adm-wrap { max-width:900px; margin:0 auto; padding:20px 16px 90px; }
@@ -271,7 +301,8 @@
       position:absolute; inset:-8%;
       background-size:cover; background-position:50% 40%;
       opacity:0; transition:opacity 1s ease;
-      transform-origin:center; will-change:transform;
+      transform-origin:center;
+      will-change:transform;
     }
     .phone-hero-bg.flow {
       opacity:1;
@@ -326,7 +357,7 @@
     .phone-social-btn {
       display:flex; align-items:center; gap:2px;
       font-size:0.38rem; padding:3px 7px; border-radius:20px;
-      border:1px solid rgba(200,164,78,0.35); color:rgba(200,164,78,0.85);
+      border:1px solid rgba(212,149,107,0.35); color:rgba(212,149,107,0.85);
       letter-spacing:0.03em;
     }
     .phone-scroll {
@@ -376,6 +407,76 @@
     html.light .phone-mockup { border-color:#bbb; box-shadow:0 0 0 1px #aaa, 0 16px 40px rgba(0,0,0,0.15); }
     html.light .phone-notch { background:#ddd; }
 
+    /* ── FAB NOTIFICATION ── */
+    #fab-notif {
+      position:fixed; bottom:100px; right:20px;
+      width:52px; height:52px; border-radius:50%;
+      background:linear-gradient(135deg,#5a9e4a,#7ebd6a);
+      color:#fff; display:flex; align-items:center; justify-content:center;
+      box-shadow:0 4px 18px rgba(126,189,106,0.5), 0 2px 8px rgba(0,0,0,0.3);
+      z-index:200; cursor:pointer;
+      transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s;
+    }
+    #fab-notif:hover { transform:translateY(-3px) scale(1.06); box-shadow:0 8px 28px rgba(126,189,106,0.65); }
+    #fab-notif:active { transform:scale(0.93); }
+    #fab-notif svg { width:22px; height:22px; }
+    #fab-notif::before {
+      content: attr(data-tooltip);
+      position:absolute; right:60px; top:50%; transform:translateY(-50%);
+      background:var(--bg3); border:1px solid var(--bord2); border-radius:8px;
+      padding:6px 12px; font-size:0.76rem; color:var(--cream); white-space:nowrap;
+      opacity:0; pointer-events:none; transition:opacity 0.2s;
+    }
+    #fab-notif:hover::before { opacity:1; }
+
+    /* ── MODAL NOTIFICATION ── */
+    #notif-modal {
+      position:fixed; inset:0; background:rgba(0,0,0,0.65);
+      display:flex; align-items:center; justify-content:center;
+      z-index:500; padding:20px; opacity:0; pointer-events:none;
+      transition:opacity 0.25s ease;
+    }
+    #notif-modal.on { opacity:1; pointer-events:auto; }
+    .notif-box {
+      background:var(--bg3); border:1px solid var(--bord2); border-radius:22px;
+      padding:28px 24px; width:100%; max-width:420px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.6);
+      transform:translateY(20px); transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    #notif-modal.on .notif-box { transform:translateY(0); }
+    .notif-title {
+      font-family:'Cormorant',serif; font-size:1.3rem; font-weight:600;
+      color:var(--cream); margin-bottom:6px;
+    }
+    .notif-sub { font-size:0.78rem; color:var(--muted); margin-bottom:18px; }
+    .notif-textarea {
+      width:100%; min-height:90px; resize:vertical;
+      background:var(--bg2); border:1px solid var(--border); border-radius:12px;
+      padding:12px 14px; color:var(--cream); font-size:0.9rem; font-family:inherit;
+      outline:none; transition:border-color 0.2s; line-height:1.55;
+    }
+    .notif-textarea:focus { border-color:var(--gold); }
+    .notif-textarea::placeholder { color:var(--muted); }
+    .notif-actions { display:flex; gap:10px; margin-top:14px; justify-content:flex-end; }
+    .notif-cancel {
+      padding:10px 18px; border-radius:12px; font-size:0.85rem;
+      border:1px solid var(--border); color:var(--muted);
+      cursor:pointer; transition:border-color 0.2s, color 0.2s;
+    }
+    .notif-cancel:hover { border-color:var(--bord2); color:var(--cream); }
+    .notif-send {
+      padding:10px 22px; border-radius:12px; font-size:0.85rem; font-weight:500;
+      background:linear-gradient(135deg,#5a9e4a,#7ebd6a); color:#fff;
+      cursor:pointer; transition:opacity 0.2s, transform 0.15s;
+      display:flex; align-items:center; gap:7px;
+    }
+    .notif-send:hover { opacity:0.9; }
+    .notif-send:active { transform:scale(0.96); }
+    .notif-send svg { width:15px; height:15px; }
+    .notif-send:disabled { opacity:0.5; cursor:not-allowed; }
+    html.light .notif-box { background:var(--bg3); }
+    html.light .notif-textarea { background:rgba(255,255,255,0.7); color:var(--cream); }
+
     /* ── SECTION ── */
     .adm-section { margin-bottom:32px; }
     .sec-hd {
@@ -383,7 +484,26 @@
       color:var(--cream); padding-bottom:12px; margin-bottom:16px;
       border-bottom:1px solid var(--border);
       display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+      cursor:pointer; user-select:none;
+      transition:color 0.2s;
     }
+    .sec-hd:hover { color:var(--gold); }
+    .sec-hd .sec-chevron {
+      margin-left:auto; flex-shrink:0; color:var(--muted);
+      transition:transform 0.36s cubic-bezier(0.4,0,0.2,1), color 0.2s;
+      display:flex; align-items:center;
+    }
+    .sec-hd:hover .sec-chevron { color:var(--gold); }
+    .adm-section.collapsed .sec-hd { margin-bottom:0; }
+    .adm-section.collapsed .sec-hd .sec-chevron { transform:rotate(-90deg); }
+    /* Contenu animé */
+    .sec-body {
+      display:grid;
+      grid-template-rows:1fr;
+      transition:grid-template-rows 0.38s cubic-bezier(0.4,0,0.2,1);
+    }
+    .adm-section.collapsed .sec-body { grid-template-rows:0fr; }
+    .sec-body-inner { min-height:0; overflow:hidden; padding-bottom:2px; }
     .sec-badge {
       font-family:'Outfit',sans-serif; font-size:0.66rem; font-weight:500;
       padding:4px 11px; border-radius:10px; letter-spacing:0.06em;
@@ -443,6 +563,39 @@
     }
     .cat-row-ico { color:var(--gold); flex-shrink:0; }
     .cat-row-ico svg { width:18px; height:18px; }
+    /* Photos catégorie — 3 slots sous la ligne de catégorie */
+    .cat-photos-row {
+      flex-basis:100%; display:flex; align-items:flex-start; gap:10px;
+      padding-top:10px; margin-top:6px; border-top:1px solid var(--border);
+    }
+    .cat-photos-slots { display:flex; gap:10px; flex:1; }
+    /* Slot vertical : boutons en haut, image en dessous */
+    .cat-photo-slot {
+      display:flex; flex-direction:column; align-items:center; gap:5px;
+      flex:1; min-width:0;
+    }
+    .cat-photo-actions {
+      display:flex; gap:5px; align-items:center; justify-content:center; width:100%;
+    }
+    .cat-photo-thumb {
+      width:100%; max-width:80px; height:52px; border-radius:8px; object-fit:cover;
+      border:1px solid var(--border); display:block;
+    }
+    .cat-photo-btn {
+      flex:1; height:30px; border-radius:6px; border:1px dashed var(--border);
+      background:var(--bg3); color:var(--muted); font-size:0.85rem;
+      cursor:pointer; display:flex; align-items:center; justify-content:center;
+      transition:border-color 0.2s, color 0.2s;
+    }
+    .cat-photo-btn:hover { border-color:var(--gold); color:var(--gold); }
+    .cat-photo-clear {
+      width:26px; height:30px; border-radius:6px; border:1px solid rgba(224,82,82,0.3);
+      color:var(--red,#e05252); cursor:pointer; background:none;
+      opacity:0.75; display:flex; align-items:center; justify-content:center;
+      font-size:0.75rem; flex-shrink:0;
+    }
+    .cat-photo-clear:hover { opacity:1; background:rgba(224,82,82,0.08); }
+    input.cat-photo-input { display:none; }
     .inline-input {
       flex:1; min-width:100px; background:transparent; border:none; border-bottom:1px solid transparent;
       color:var(--cream); font-size:0.88rem; padding:6px 2px; outline:none; transition:border-color 0.2s;
@@ -467,7 +620,7 @@
       display:none; position:fixed; z-index:600;
       background:var(--bg3); border:1px solid var(--bord2);
       border-radius:14px; padding:12px;
-      box-shadow:0 12px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(200,164,78,0.08);
+      box-shadow:0 12px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(212,149,107,0.08);
       width:min(264px, calc(100vw - 16px));
       max-height:80vh; overflow-y:auto;
     }
@@ -691,15 +844,94 @@
     .btn-save-cats:hover { background:rgba(200,164,78,0.14); border-color:var(--gold); }
     .btn-save-cats:active { transform:scale(0.97); }
 
-    /* ── GLOBAL TRANSLATE BAR ── */
-    .global-src-sel {
-      background:var(--bg3); border:1px solid rgba(126,189,106,0.3); border-radius:8px;
-      color:var(--green); font-size:0.76rem; padding:6px 10px; outline:none; cursor:pointer;
-      min-height:32px;
+    /* ── SÉLECTEURS ICÔNE (langue + mode) ── */
+    .adm-sel-wrap { position:relative; flex-shrink:0; }
+    .adm-sel-btn {
+      background:var(--card); border:1px solid var(--border); border-radius:8px;
+      padding:4px 8px; cursor:pointer; font-size:1.15rem; line-height:1;
+      display:flex; align-items:center; justify-content:center;
+      min-width:36px; height:30px; transition:border-color 0.2s; color:var(--cream);
     }
-    .global-src-sel option { background:#181612; color:#e8d9c0; }
-    html.light .global-src-sel { background:#f5ede4; border-color:rgba(74,140,63,0.4); color:#3a6b33; }
-    html.light .global-src-sel option { background:#f5ede4; color:#2a1a0e; }
+    .adm-sel-btn:hover, .adm-sel-btn.open { border-color:var(--gold); }
+    .adm-sel-popup {
+      position:absolute; top:calc(100% + 6px); left:0;
+      background:var(--bg3); border:1px solid var(--bord2); border-radius:12px;
+      padding:6px; z-index:500; min-width:160px;
+      box-shadow:0 8px 28px rgba(0,0,0,0.45);
+      opacity:0; pointer-events:none;
+      transform:translateY(-4px);
+      transition:opacity 0.15s ease, transform 0.15s ease;
+    }
+    .adm-sel-popup.open { opacity:1; pointer-events:all; transform:translateY(0); }
+    .adm-sel-popup button {
+      display:block; width:100%; padding:9px 13px;
+      border-radius:8px; border:none;
+      background:transparent; color:var(--cream);
+      font-size:0.83rem; font-family:inherit; cursor:pointer;
+      text-align:left; white-space:nowrap;
+      transition:background 0.15s, color 0.15s;
+    }
+    .adm-sel-popup button:hover { background:rgba(200,164,78,0.12); color:var(--gold); }
+    .adm-sel-popup button.active { color:var(--gold); font-weight:600; }
+    html[dir="rtl"] .adm-sel-popup { left:auto; right:0; }
+    html[dir="rtl"] .adm-sel-popup button { text-align:right; }
+    /* ── Panneau Commandes ── */
+    #orders-admin-section { display:none; }
+    /* En mode papier : cacher toute la section photo des produits (upload, preview, label, toggle) */
+    body.adm-mode-paper .photo-form-group { display:none !important; }
+    /* En mode papier : cacher les miniatures produit dans l'en-tête des cartes */
+    body.adm-mode-paper .prod-thumb,
+    body.adm-mode-paper .prod-thumb-empty { display:none !important; }
+    /* Section photos catégorie (3 slots) : visible SEULEMENT en mode papier */
+    .cat-photos-row { display:none; }
+    body.adm-mode-paper .cat-photos-row { display:flex !important; }
+    .order-adm-card {
+      background:var(--card); border:1px solid var(--border); border-radius:14px;
+      overflow:hidden; margin-bottom:12px; transition:border-color 0.2s;
+    }
+    .order-adm-card.status-pending  { border-left:3px solid var(--gold); }
+    .order-adm-card.status-progress { border-left:3px solid #4db8ff; }
+    .order-adm-card.status-done     { border-left:3px solid var(--green); opacity:0.65; }
+    .order-adm-hd {
+      display:flex; align-items:center; gap:10px; padding:12px 14px;
+      cursor:pointer; user-select:none; flex-wrap:wrap;
+    }
+    .order-adm-hd:hover { background:rgba(255,255,255,0.03); }
+    .order-adm-table { font-family:'Cormorant',serif; font-size:1.05rem; color:var(--cream); font-weight:600; }
+    .order-adm-time { font-size:0.68rem; color:var(--muted); }
+    .order-adm-total-hd { font-size:0.74rem; color:var(--cream); font-weight:600; }
+    .order-adm-badge {
+      font-size:0.64rem; padding:2px 8px; border-radius:20px; font-weight:500;
+    }
+    .status-pending  .order-adm-badge { background:rgba(200,164,78,0.15); color:var(--gold); border:1px solid rgba(200,164,78,0.3); }
+    .status-progress .order-adm-badge { background:rgba(77,184,255,0.12); color:#4db8ff;   border:1px solid rgba(77,184,255,0.3); }
+    .status-done     .order-adm-badge { background:rgba(126,189,106,0.12);color:var(--green);border:1px solid rgba(126,189,106,0.3); }
+    .order-adm-chevron {
+      margin-left:auto; flex-shrink:0; color:var(--muted);
+      transition:transform 0.25s ease; display:flex; align-items:center;
+    }
+    .order-adm-card.collapsed .order-adm-chevron { transform:rotate(-90deg); }
+    /* Body collapsible */
+    .order-adm-body {
+      display:grid; grid-template-rows:1fr;
+      transition:grid-template-rows 0.28s ease;
+    }
+    .order-adm-card.collapsed .order-adm-body { grid-template-rows:0fr; }
+    .order-adm-body-inner { min-height:0; overflow:hidden; }
+    .order-adm-body-pad { padding:0 14px 12px; }
+    .order-adm-items { font-size:0.74rem; color:var(--muted); margin-bottom:10px; line-height:1.6; }
+    .order-adm-total { font-size:0.78rem; color:var(--cream); font-weight:600; margin-bottom:10px; }
+    .order-adm-btns { display:flex; gap:6px; flex-wrap:wrap; }
+    .order-adm-btn {
+      padding:5px 12px; border-radius:8px; font-size:0.72rem; font-weight:500;
+      border:1px solid var(--border); color:var(--muted); transition:var(--tr); cursor:pointer;
+      background:none; font-family:inherit;
+    }
+    .order-adm-btn:hover { border-color:var(--gold); color:var(--gold); }
+    .order-adm-btn.active-btn { border-color:var(--gold); color:var(--gold); background:rgba(200,164,78,0.08); }
+    .order-adm-btn.btn-progress.active-btn { border-color:#4db8ff; color:#4db8ff; background:rgba(77,184,255,0.08); }
+    .order-adm-btn.btn-done.active-btn { border-color:var(--green); color:var(--green); background:rgba(126,189,106,0.08); }
+    .orders-empty { color:var(--muted); font-size:0.82rem; text-align:center; padding:24px 0; }
     .global-progress {
       font-size:0.73rem; color:var(--green); white-space:nowrap;
       max-width:260px; overflow:hidden; text-overflow:ellipsis;
@@ -751,7 +983,6 @@
       .adm-sub  { display:block !important; }
       .adm-center { flex-wrap:nowrap; justify-content:flex-start; gap:10px; }
       .btn-preview { font-size:0.8rem; }
-      .btn-logout  { font-size:0.8rem; }
 
       /* Hero : mockup à gauche, contrôles à droite */
       .hero-img-card {
@@ -785,12 +1016,13 @@
 
       /* FABs décalés pour ne pas couvrir le contenu */
       #fab-save  { bottom:36px; right:36px; width:64px; height:64px; }
+      #fab-notif { bottom:116px; right:36px; }
 
       /* Form grid : 3 colonnes sur desktop large */
       .form-grid-2 { grid-template-columns:1fr 1fr; }
 
       /* Section header plus aéré */
-      .sec-hd { font-size:1.3rem; padding-bottom:14px; margin-bottom:20px; }
+      .sec-hd { font-size:1.3rem; padding-bottom:14px; margin-bottom:20px; cursor:pointer; }
 
       /* Cat row plus large */
       .cat-row { padding:14px 18px; border-radius:16px; }
@@ -821,6 +1053,7 @@
       }
     }
 
+    /* ── Thème Sélecteur ── */
     .theme-grid { display:flex; flex-wrap:wrap; gap:8px; }
     .theme-card {
       display:flex; align-items:center; gap:9px;
@@ -844,13 +1077,19 @@
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-  <!-- ✅ Configuration centralisée — modifier uniquement firebase-config.js -->
-  <script src="firebase-config.js"></script>
   <script>
-    firebase.initializeApp(FIREBASE_CONFIG);
+    firebase.initializeApp({
+      apiKey:            "AIzaSyAOuYRxE39KDgmizSdqCzAglWrkL4DZXYQ",
+      authDomain:        "mozart-cafe-ae8e0.firebaseapp.com",
+      projectId:         "mozart-cafe-ae8e0",
+      storageBucket:     "mozart-cafe-ae8e0.firebasestorage.app",
+      messagingSenderId: "89531105163",
+      appId:             "1:89531105163:web:13654bfe96f1c83db43bd8",
+      databaseURL:       "https://mozart-cafe-ae8e0-default-rtdb.europe-west1.firebasedatabase.app"
+    });
     const _db = firebase.database();
-    /* ── Cloudinary (hébergement images) ── */
-    const CLOUDINARY_CLOUD  = 'dty1cz8et';
+    /* ── Cloudinary (hébergement images) — remplacer YOUR_CLOUD_NAME par votre cloud name Cloudinary ── */
+    const CLOUDINARY_CLOUD  = 'dowi189l9';
     const CLOUDINARY_PRESET = 'menu_photos';
     async function uploadToCloudinary(blob) {
       const fd = new FormData();
@@ -870,7 +1109,7 @@
 ══════════════════════════════════════ -->
 <div id="login-screen">
   <div class="login-box">
-    <div class="login-logo">Mozart Café</div>
+    <div class="login-logo">Mozart Coffee Lounge</div>
     <div class="login-sub">Administration</div>
     <input type="password" class="login-input" id="pwd-input"
            placeholder="Mot de passe" autocomplete="current-password">
@@ -884,17 +1123,49 @@
 ══════════════════════════════════════ -->
 <header class="adm-header" id="adm-header" style="display:none">
   <div>
-    <div class="adm-logo">Café &amp; Restaurant</div>
+    <div class="adm-logo">Mozart Coffee Lounge</div>
     <div class="adm-sub">Administration du menu</div>
   </div>
   <div class="adm-center">
-    <select class="global-src-sel" id="global-src-lang">
-      <option value="fr">🇫🇷 Français</option>
-      <option value="en">🇬🇧 English</option>
-      <option value="ar">🇸🇦 العربية</option>
-    </select>
-<button class="adm-vis-btn" id="toggle-photos-btn" title="Afficher/cacher toutes les photos dans le menu">
-      <span class="vis-check"><svg viewBox="0 0 16 16" fill="none"><rect class="chk-box" x="1.5" y="1.5" width="13" height="13" rx="2.5"/><path class="chk-mark" d="M3.5,8.5 L6.5,11.5 L12.5,4.5" pathLength="1"/></svg></span>Photos (tout)
+    <!-- Langue -->
+    <div class="adm-sel-wrap" id="lang-sel-wrap">
+      <button class="adm-sel-btn" id="lang-sel-btn" aria-haspopup="true" aria-expanded="false">🇫🇷</button>
+      <div class="adm-sel-popup" id="lang-sel-popup" role="menu">
+        <button data-lang="fr" onclick="window._pickLang('fr')">🇫🇷 Français</button>
+        <button data-lang="en" onclick="window._pickLang('en')">🇬🇧 English</button>
+        <button data-lang="ar" onclick="window._pickLang('ar')">🇸🇦 العربية</button>
+      </div>
+    </div>
+    <!-- Mode -->
+    <div class="adm-sel-wrap" id="mode-sel-wrap">
+      <button class="adm-sel-btn" id="mode-sel-btn" aria-haspopup="true" aria-expanded="false">🔔</button>
+      <div class="adm-sel-popup" id="mode-sel-popup" role="menu">
+        <button data-mode="paper" onclick="window._pickMode('paper')" id="mode-opt-paper"><span class="mode-lbl-full">📄 Mode Papier</span><span class="mode-lbl-short">📄 Papier</span></button>
+        <button data-mode="simple" onclick="window._pickMode('simple')" id="mode-opt-simple"><span class="mode-lbl-full">🖼️ Mode Photo</span><span class="mode-lbl-short">🖼️ Photo</span></button>
+        <button data-mode="sonet" onclick="window._pickMode('sonet')" id="mode-opt-sonet"><span class="mode-lbl-full">🔔 Mode Sonnette</span><span class="mode-lbl-short">🔔 Sonnette</span></button>
+        <button data-mode="order" onclick="window._pickMode('order')" id="mode-opt-order"><span class="mode-lbl-full">🛒 Mode Commande</span><span class="mode-lbl-short">🛒 Commande</span></button>
+      </div>
+    </div>
+    <button class="adm-vis-btn adm-vis-ico" id="toggle-call-btn" title="Afficher/cacher le bouton sonnette dans le menu">
+      <span class="vis-dot"></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
+        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+    </button>
+    <button class="adm-vis-btn adm-vis-ico" id="toggle-photos-btn" title="Afficher/cacher toutes les photos dans le menu">
+      <span class="vis-dot"></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
+        <rect x="2" y="6" width="20" height="14" rx="2"/><circle cx="8.5" cy="12.5" r="2"/><path d="M14 12l3 4H5l4-5 2.5 2.5"/>
+        <path d="M16 2l-1.5 2h-5L8 2"/>
+      </svg>
+    </button>
+    <button class="adm-vis-btn adm-vis-ico" id="toggle-order-btn" title="Afficher/cacher le mode commande dans le menu" style="display:none">
+      <span class="vis-dot"></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
+        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+        <rect x="9" y="3" width="6" height="4" rx="1"/>
+        <line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/>
+      </svg>
     </button>
     <div class="global-progress" id="global-progress"></div>
   </div>
@@ -904,22 +1175,41 @@
         <path id="adm-theme-ico-path" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
       </svg>
     </button>
-    <button class="btn-preview" onclick="window.open('index.html','_blank')">👁 Voir le menu</button>
-    <button class="btn-logout" id="logout-btn">Déconnexion</button>
+    <button class="btn-preview btn-preview-ico" onclick="window.open('index.html','_blank')" title="Voir le menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+      </svg>
+    </button>
   </div>
 </header>
+
+<!-- FAB navigation raccourcis -->
+<button id="sc-fab" title="Navigation" aria-label="Navigation">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+    <line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/>
+  </svg>
+</button>
+<div id="sc-popup" class="sc-popup" role="menu">
+  <button id="sc-design-btn" onclick="scGo('sec-theme')">🎨 Design</button>
+  <button id="sc-hero-btn"   onclick="scGo('sec-hero')">🖼️ Hero</button>
+  <button id="sc-infos-btn"  onclick="scGo('sec-info')">ℹ️ Infos</button>
+  <button id="sc-note-btn"   onclick="scGo('sec-note')">📢 Note</button>
+  <button id="sc-cats-btn"   onclick="scGo('sec-cats')">📂 Catégories</button>
+  <button id="sc-prods-btn"  onclick="scGo('sec-produits')">🍽️ Produits</button>
+  <button id="sc-orders-btn" onclick="scGo('orders-admin-section')" style="display:none">🧾 Commandes</button>
+</div>
 
 <div class="adm-wrap" id="adm-wrap" style="display:none">
 
   <!-- ── THÈME VISUEL ── -->
-  <div class="adm-section">
-    <div class="sec-hd">Thème visuel <span class="sec-badge">Design</span></div>
+  <div class="adm-section" id="sec-theme">
+    <div class="sec-hd" id="sec-hd-theme">Thème visuel <span class="sec-badge" id="badge-theme">Design</span></div>
     <div class="theme-grid" id="theme-grid"></div>
   </div>
 
   <!-- ── PHOTO D'ACCUEIL ── -->
-  <div class="adm-section">
-    <div class="sec-hd">Photo d'accueil <span class="sec-badge">Hero</span></div>
+  <div class="adm-section" id="sec-hero">
+    <div class="sec-hd" id="sec-hd-hero">Photo d'accueil <span class="sec-badge" id="badge-hero">Hero</span></div>
     <div class="hero-img-card" id="hero-img-card">
 
       <!-- Mockup téléphone -->
@@ -930,13 +1220,13 @@
             <div class="phone-hero-bg" id="phone-hero-bg"></div>
             <div class="phone-overlay"></div>
             <div class="phone-content">
-              <img src="logo.png" class="phone-logo" alt="Mozart">
+
               <div class="phone-ornament">
                 <div class="phone-orn-line"></div>
                 <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:var(--gold)"><polygon points="12,2 22,9 18,20 6,20 2,9"/></svg>
                 <div class="phone-orn-line phone-orn-line-r"></div>
               </div>
-              <div class="phone-title" id="pm-title">Café &amp; Restaurant</div>
+              <div class="phone-title" id="pm-title">Mozart Coffee Lounge</div>
               <div class="phone-tagline" id="pm-tagline"></div>
               <div class="phone-sub" id="pm-sub"></div>
               <div class="phone-socials">
@@ -962,34 +1252,34 @@
       <div class="hero-controls">
         <label class="hero-upload-btn" for="hero-file-input">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          Choisir une photo
+          <span id="btn-choose-photo-lbl">Choisir une photo</span>
         </label>
         <input type="file" id="hero-file-input" accept="image/*" style="display:none">
         <button class="hero-del-btn" id="hero-del-btn" style="display:none">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          Supprimer
+          <span id="btn-del-photo-lbl">Supprimer</span>
         </button>
       </div>
-      <div class="hero-hint">Photo recommandée : format portrait, min. 900×1600 px</div>
+      <div class="hero-hint" id="hero-hint-txt">Photo recommandée : format portrait, min. 900×1600 px</div>
     </div>
   </div>
 
   <!-- ── INFORMATIONS DU CAFÉ ── -->
-  <div class="adm-section">
-    <div class="sec-hd">Informations du café <span class="sec-badge">Footer</span></div>
+  <div class="adm-section" id="sec-info">
+    <div class="sec-hd" id="sec-hd-info">Informations du café <span class="sec-badge" id="badge-footer">Footer</span></div>
     <div class="info-card" id="info-card">
       <!-- Rempli par JS -->
     </div>
   </div>
 
   <!-- ── NOTE CLIENTS ── -->
-  <div class="adm-section">
-    <div class="sec-hd">Note pour les clients <span class="sec-badge">Annonce</span></div>
+  <div class="adm-section" id="sec-note">
+    <div class="sec-hd" id="sec-hd-note">Note pour les clients <span class="sec-badge" id="badge-note">Annonce</span></div>
     <div class="note-card" id="note-card"></div>
   </div>
 
   <!-- ── CATÉGORIES ── -->
-  <div class="adm-section">
+  <div class="adm-section" id="sec-cats">
     <div class="sec-hd">Catégories <span class="sec-badge" id="cat-count">0</span></div>
     <div class="cats-list" id="cats-list"></div>
     <button class="btn-add" id="btn-add-cat">＋ Ajouter une catégorie</button>
@@ -1005,9 +1295,15 @@
   </div>
 
   <!-- ── PRODUITS PAR CATÉGORIE ── -->
-  <div class="adm-section">
+  <div class="adm-section" id="sec-produits">
     <div class="sec-hd" id="sec-hd-produits">Produits <span class="sec-badge" id="prod-count-badge">0</span></div>
     <div id="products-area"></div>
+  </div>
+
+  <!-- ── COMMANDES (visible seulement en mode Commande) ── -->
+  <div class="adm-section" id="orders-admin-section">
+    <div class="sec-hd" id="sec-hd-orders">Commandes en temps réel <span class="sec-badge" id="orders-count-badge">0</span></div>
+    <div id="orders-admin-list"><div class="orders-empty">Aucune commande pour le moment</div></div>
   </div>
 
 </div>
@@ -1027,6 +1323,31 @@
   </svg>
 </button>
 
+<!-- FAB Notification serveurs -->
+<button id="fab-notif" style="display:none" title="Envoyer une notification" data-tooltip="Envoyer une notification">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+    <path d="M13.73 21a2 2 0 01-3.46 0"/>
+    <line x1="12" y1="3" x2="12" y2="1"/>
+  </svg>
+</button>
+
+<!-- Modal notification -->
+<div id="notif-modal">
+  <div class="notif-box">
+    <div class="notif-title" id="notif-title-txt">Notifier les serveurs</div>
+    <div class="notif-sub" id="notif-sub-txt">Le message sera envoyé en notification push à tous les appareils connectés.</div>
+    <textarea class="notif-textarea" id="notif-textarea" placeholder="" maxlength="200"></textarea>
+    <div class="notif-actions">
+      <button class="notif-cancel" id="notif-cancel">Annuler</button>
+      <button class="notif-send" id="notif-send">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        <span id="notif-send-lbl">Envoyer</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- Toast -->
 <div id="toast">✓ Modifications sauvegardées avec succès</div>
 
@@ -1038,7 +1359,7 @@
    2. Remplacer la valeur de ADMIN_HASH ci-dessous
 ═══════════════════════════════════════════ */
 // SHA-256 hash local — utilisé uniquement si Firebase /config/adminHash est absent
-const ADMIN_HASH = '16cd9de849c3cfd4ce1234d0d50e91553576b3ae4bbeb9446d0edfb237389aa2';
+const ADMIN_HASH = '16cd9de849c3cfd4ce1234d0d50e91553576b3ae4bbeb9446d0edfb237389aa2'; // mozart2026
 const STORE_KEY = 'mc_admin_data_v1';
 
 async function _hashPwd(pwd) {
@@ -1056,21 +1377,22 @@ const LANG_LABELS = { fr:'🇫🇷 FR', en:'🇬🇧 EN', ar:'🇸🇦 AR' };
    DONNÉES PAR DÉFAUT (chargées depuis index.html)
 ═══════════════════════════════════════════ */
 const DEFAULT_CATS = [
-  { key:'hot',     ico:'ico-coffee',  names:{ fr:'Boissons Chaudes', en:'Hot Drinks',    ar:'مشروبات ساخنة' } },
-  { key:'cold',    ico:'ico-cold',    names:{ fr:'Boissons Froides', en:'Cold Drinks',   ar:'مشروبات باردة' } },
-  { key:'food',    ico:'ico-food',    names:{ fr:'Cuisine',          en:'Food',           ar:'الأكل'         } },
-  { key:'sweet',   ico:'ico-cake',    names:{ fr:'Sucré',            en:'Sweet',          ar:'حلويات'        } },
-  { key:'morning', ico:'ico-sunrise', names:{ fr:'Le Matin',         en:'Breakfast',      ar:'الصباح'        } },
-  { key:'hookah',  ico:'ico-hookah',  names:{ fr:'Hookah',           en:'Hookah',         ar:'الشيشة'        } },
+  { key:'hot',     ico:'ico-coffee',  names:{ fr:'Boissons Chaudes', en:'Hot Drinks',  ar:'مشروبات ساخنة' } },
+  { key:'cold',    ico:'ico-cold',    names:{ fr:'Boissons Froides', en:'Cold Drinks', ar:'مشروبات باردة' } },
+  { key:'food',    ico:'ico-food',    names:{ fr:'Cuisine',          en:'Food',         ar:'الأكل'         } },
+  { key:'sweet',   ico:'ico-cake',    names:{ fr:'Sucré',            en:'Sweet',        ar:'حلويات'        } },
+  { key:'morning', ico:'ico-sunrise', names:{ fr:'Le Matin',         en:'Breakfast',    ar:'الصباح'        } },
+  { key:'hookah',  ico:'ico-hookah',  names:{ fr:'Hookah',           en:'Hookah',       ar:'النرجيلة'      } },
 ];
 
 const DEFAULT_INFO = {
   wifi_name:  { fr:'WiFi', en:'WiFi', ar:'واي فاي' },
-  wifi_val:   { fr:'MozartCafe_Free · Mozart2026', en:'MozartCafe_Free · Mozart2026', ar:'MozartCafe_Free · Mozart2026' },
+  wifi_val:   { fr:'', en:'', ar:'' },
   hours_name: { fr:'Horaires', en:'Hours', ar:'أوقات العمل' },
-  hours_val:  { fr:'Tous les jours 7h00 – 00h00', en:'Every day 7:00 AM – midnight', ar:'كل يوم 7:00 صباحاً – منتصف الليل' },
-  addr_name:   { fr:'Adresse', en:'Address', ar:'العنوان' },
-  addr_val:    { fr:'Radès, Tunis, Tunisie', en:'Radès, Tunis, Tunisia', ar:'رادس، تونس، تونس' },
+  hours_val:  { fr:'', en:'', ar:'' },
+  addr_name:  { fr:'Adresse', en:'Address', ar:'العنوان' },
+  addr_val:   { fr:'Tunis, Tunisie', en:'Tunis, Tunisia', ar:'تونس العاصمة' },
+  showCallBtn: true,
   showPhotos:  true,
   showNote:    false,
   noteText:    { fr: '', en: '', ar: '' },
@@ -1080,11 +1402,116 @@ const DEFAULT_INFO = {
    TRADUCTIONS UI ADMIN
 ═══════════════════════════════════════════ */
 const ADMIN_UI = {
+  el: {
+    admSub:        'Διαχείριση μενού',
+    btnPreview:    '👁 Προβολή μενού',
+    btnLogout:     'Αποσύνδεση',
+    btnTranslate:  '🌐 Μετάφραση όλων των άλλων γλωσσών',
+    secInfo:       'Πληροφορίες',
+    secCats:       'Κατηγορίες',
+    secProds:      'Προϊόντα',
+    btnAddCat:     '＋ Προσθήκη κατηγορίας',
+    btnSaveCats:   'Αποθήκευση κατηγοριών',
+    btnAddProd:    '＋ Προσθήκη προϊόντος',
+    btnSaveProd:   'Αποθήκευση προϊόντος',
+    btnDelProd:    'Διαγραφή',
+    lblCatName:    'Όνομα',
+    lblPrice:      'Τιμή',
+    lblBadges:     'Ετικέτες',
+    lblPhoto:      'Φωτογραφία',
+    lblFromDevice: 'Από τη συσκευή',
+    lblOrUnsplash: 'Ή ID / URL Unsplash',
+    lblPhotoHelp:  'ID από <a href="https://unsplash.com" target="_blank">unsplash.com</a> (π.χ. <em>photo-1234567890</em>) ή απευθείας μεταφόρτωση.',
+    lblName:       'Όνομα',
+    lblShortDesc:  'Σύντομη περιγραφή',
+    lblFullDesc:   'Πλήρης περιγραφή / Λεπτομέρειες',
+    lblAllergens:  'Αλλεργιογόνα — χωρισμένα με κόμμα',
+    phName:        'Όνομα προϊόντος',
+    phShortDesc:   'Σύντομη περιγραφή στη λίστα',
+    phFullDesc:    'Πλήρες κείμενο κατά το κλικ',
+    phAllergens:   'π.χ. Γάλα, Γλουτένη, Αυγά',
+    phPrice:       '€4.50',
+    produits:      'προϊόν(τα)',
+    toastSaved:    '✓ Οι αλλαγές αποθηκεύτηκαν',
+    toastProd:     '✓ Το προϊόν ενημερώθηκε',
+    fabTitle:      'Αποθήκευση όλων',
+    fabTooltip:    'Αποθήκευση όλων',
+    infoWifiName:  'WiFi — Όνομα',
+    infoWifiVal:   'WiFi — Κωδικός',
+    infoHoursName: 'Ωράριο — Τίτλος',
+    infoHoursVal:  'Ωράριο — Τιμή',
+    infoAddrName:  'Διεύθυνση — Τίτλος',
+    infoAddrVal:   'Διεύθυνση — Τιμή',
+    badgePopular:  '🔥 Δημοφιλές',
+    badgeNew:      '✨ Νέο',
+    badgeVegan:    '🌱 Vegan',
+    badgeSel:      '⭐ Επιλογή ημέρας',
+    badgeType:     '— Τύπος —',
+    badgeTemp:     '— Θερμοκρασία —',
+    bdgBoisson:    '🥤 Ρόφημα', bdgCuisine:'🍽 Φαγητό', bdgSucre:'🧁 Γλυκό', bdgHookah:'💨 Ναργιλές',
+    bdgChaud:      '🔥 Ζεστό', bdgFroid:'❄ Κρύο', bdgGlace:'🧊 Παγωμένο',
+    badgeMorning:  '☀ Πρωί',
+    badgeLimited:  '⏳ Περιορισμένη προσφορά',
+    btnTranslate:  '🌐 Αυτόματη μετάφραση σε όλες τις γλώσσες',
+    progressCats:  'Κατηγορίες…',
+    progressProds: 'Προϊόντα…',
+    progressInfo:  'Πληροφορίες καφέ…',
+    txOk:          'μεταφράστηκαν',
+    txErr:         'σφάλματα',
+    txDone:        'πεδίο(α) μεταφράστηκαν αυτόματα',
+    errTransFailed:'⚠ Μετάφραση απέτυχε (όριο API;) — τα δεδομένα EL αποθηκεύτηκαν',
+    skipTx:        '— Αποθήκευση χωρίς μετάφραση (η αυτόματη μετάφραση λειτουργεί μόνο από τα Ελληνικά)',
+    confirmDelete: 'Διαγραφή αυτού του προϊόντος;',
+    newProd:       'Νέο προϊόν',
+    secHero:       'Εικόνα',
+    badgeHero:     'Hero',
+    secNote:       'Σημείωμα',
+    badgeNote:     'Ανακοίνωση',
+    badgeFooter:   'Footer',
+    btnChoosePhoto:'Επιλογή φωτογραφίας',
+    btnDelPhoto:   'Διαγραφή',
+    heroHint:      'Συνιστώμενη: κατακόρυφος προσανατολισμός, ελάχ. 900×1600 px',
+    noteShown:     'Εμφανίζεται στο μενού',
+    noteHidden:    'Κρυφό στο μενού',
+    notePh:        'Κείμενο σε {L} — π.χ.: Καλωσορίσατε! Η βεράντα μας είναι ανοιχτή.',
+    noteHint:      'Εμφανίζεται κάτω από τις κατηγορίες — μέγιστο 300 χαρακτήρες ανά γλώσσα.',
+    visBtnCall:    'Κουμπί σερβιτόρου',
+    visBtnPhotos:  'Φωτογραφίες',
+    visBtnOrder:   'Λειτουργία παραγγελίας',
+    visBtnNote:    'Σημείωμα πελατών',
+    secTheme:'Σχεδίαση', badgeTheme:'Design',
+    secOrders:'Παραγγελίες',
+    scDesign:'🎨 Σχεδίαση', scHero:'🖼️ Εικόνα', scInfos:'ℹ️ Πληροφορίες',
+    scNote:'📢 Σημείωμα', scCats:'📂 Κατηγορίες', scProds:'🍽️ Προϊόντα', scOrders:'🧾 Παραγγελίες',
+    modePaper:'📄 Κατάλογος', modePhoto:'🖼️ Φωτογραφίες', modeSonet:'🔔 Σερβιτόρος', modeOrder:'🛒 Παραγγελίες',
+    modePaperShort:'Κατάλογος', modePhotoShort:'Φωτογραφίες', modeSonetShort:'Σερβιτόρος', modeOrderShort:'Παραγγελίες',
+    catPhotosLabel:'📄 Κατάλογος',
+    ordTable:'Τραπέζι', ordTakeaway:'Σερβίρισμα', ordTotal:'Σύνολο',
+    ordPending:'Ελήφθη', ordProgress:'Σε εξέλιξη', ordDone:'Ολοκληρώθηκε',
+    ordEmpty:'Δεν υπάρχουν παραγγελίες προς το παρόν',
+    fabNotif:      'Αποστολή ειδοποίησης',
+    notifTitle:    'Ειδοποίηση σερβιτόρων',
+    notifSub:      'Το μήνυμα θα αποσταλεί ως push σε όλες τις συνδεδεμένες συσκευές.',
+    notifCancel:   'Ακύρωση',
+    notifSend:     'Αποστολή',
+    notifSending:  'Αποστολή…',
+    notifOk:       '✓ Ειδοποίηση στάλθηκε σε {n} συσκευή(ές)',
+    notifNoToken:  '⚠ Καμία συνδεδεμένη συσκευή',
+    notifErrSrv:   '✗ Σφάλμα διακομιστή: {e}',
+    notifErrNet:   '✗ Σφάλμα δικτύου: {e}',
+    showInMenu:    'Εμφάνιση στο μενού',
+    btnMove:       'Μετακίνηση',
+    changeCat:     '— Αλλαγή κατηγορίας —',
+    newCat:        'Νέα κατηγορία',
+    delIcon:       '✕ Διαγραφή εικονιδίου',
+    noneIco:       '— Καμία —',
+    noPhoto:       'Καμία φωτογραφία',
+  },
   fr: {
     admSub:        'Administration du menu',
     btnPreview:    '👁 Voir le menu',
     btnLogout:     'Déconnexion',
-    secInfo:       'Informations du café',
+    secInfo:       'Infos',
     secCats:       'Catégories',
     secProds:      'Produits',
     btnAddCat:     '＋ Ajouter une catégorie',
@@ -1107,7 +1534,7 @@ const ADMIN_UI = {
     phShortDesc:   'Description courte affichée dans la liste',
     phFullDesc:    'Texte complet affiché quand on clique sur le produit',
     phAllergens:   'ex: Lait, Gluten, Œufs',
-    phPrice:       '0.000 DT',
+    phPrice:       '€4.50',
     produits:      'produit(s)',
     toastSaved:    '✓ Modifications sauvegardées avec succès',
     toastProd:     '✓ Produit mis à jour',
@@ -1128,12 +1555,65 @@ const ADMIN_UI = {
     badgeLimited:  '⏳ Offre limitée',
     badgeNew:      '✨ Nouveau',
     badgePopular:  '🔥 Populaire',
+    progressCats:  'Catégories…',
+    progressProds: 'Produits…',
+    progressInfo:  'Infos café…',
+    txOk:          'traduits',
+    txErr:         'erreurs',
+    txDone:        'champ(s) traduits automatiquement',
+    errTransFailed:'⚠ Traduction échouée (limite API ?) — données EL sauvegardées',
+    skipTx:        '— Enregistrement sans traduction (la traduction auto ne fonctionne que depuis le Grec)',
+    confirmDelete: 'Supprimer ce produit ?',
+    newProd:       'Nouveau produit',
+    secHero:       'Hero',
+    badgeHero:     'Hero',
+    secNote:       'Note',
+    badgeNote:     'Annonce',
+    badgeFooter:   'Footer',
+    btnChoosePhoto:'Choisir une photo',
+    btnDelPhoto:   'Supprimer',
+    heroHint:      'Photo recommandée : format portrait, min. 900×1600 px',
+    noteShown:     'Affichée dans le menu',
+    noteHidden:    'Masquée dans le menu',
+    notePh:        'Texte de la note en {L} — ex: Bienvenue ! Notre terrasse est ouverte ce weekend.',
+    noteHint:      'Le texte s\'affiche sous les catégories — max 300 caractères par langue.',
+    visBtnCall:    'Bouton serveur',
+    visBtnPhotos:  'Photos',
+    visBtnOrder:   'Mode commande',
+    visBtnNote:    'Note clients',
+    secTheme:'Design', badgeTheme:'Design',
+    secOrders:'Commandes',
+    scDesign:'🎨 Design', scHero:'🖼️ Hero', scInfos:'ℹ️ Infos',
+    scNote:'📢 Note', scCats:'📂 Catégories', scProds:'🍽️ Produits', scOrders:'🧾 Commandes',
+    modePaper:'📄 Mode Papier', modePhoto:'🖼️ Mode Photo', modeSonet:'🔔 Mode Sonnette', modeOrder:'🛒 Mode Commande',
+    modePaperShort:'Papier', modePhotoShort:'Photo', modeSonetShort:'Sonnette', modeOrderShort:'Commande',
+    catPhotosLabel:'📄 Mode Papier',
+    ordTable:'Table', ordTakeaway:'À emporter', ordTotal:'Total',
+    ordPending:'Reçue', ordProgress:'En cours', ordDone:'Terminée',
+    ordEmpty:'Aucune commande pour le moment',
+    fabNotif:      'Envoyer une notification',
+    notifTitle:    'Notifier les serveurs',
+    notifSub:      'Le message sera envoyé en notification push à tous les appareils connectés.',
+    notifCancel:   'Annuler',
+    notifSend:     'Envoyer',
+    notifSending:  'Envoi…',
+    notifOk:       '✓ Notification envoyée à {n} appareil(s)',
+    notifNoToken:  '⚠ Aucun appareil connecté',
+    notifErrSrv:   '✗ Erreur serveur : {e}',
+    notifErrNet:   '✗ Erreur réseau : {e}',
+    showInMenu:    'Afficher dans le menu',
+    btnMove:       'Déplacer',
+    changeCat:     '— Changer de catégorie —',
+    newCat:        'Nouvelle catégorie',
+    delIcon:       '✕ Supprimer l\'icône',
+    noneIco:       '— Aucune —',
+    noPhoto:       'Aucune photo',
   },
   en: {
     admSub:        'Menu administration',
     btnPreview:    '👁 View menu',
     btnLogout:     'Logout',
-    secInfo:       'Café information',
+    secInfo:       'Info',
     secCats:       'Categories',
     secProds:      'Products',
     btnAddCat:     '＋ Add a category',
@@ -1156,7 +1636,7 @@ const ADMIN_UI = {
     phShortDesc:   'Short description shown in the list',
     phFullDesc:    'Full text shown when the product is clicked',
     phAllergens:   'e.g. Milk, Gluten, Eggs',
-    phPrice:       '0.000 DT',
+    phPrice:       '€4.50',
     produits:      'product(s)',
     toastSaved:    '✓ Changes saved successfully',
     toastProd:     '✓ Product updated',
@@ -1177,12 +1657,65 @@ const ADMIN_UI = {
     badgeLimited:  '⏳ Limited offer',
     badgeNew:      '✨ New',
     badgePopular:  '🔥 Popular',
+    progressCats:  'Categories…',
+    progressProds: 'Products…',
+    progressInfo:  'Café info…',
+    txOk:          'translated',
+    txErr:         'errors',
+    txDone:        'field(s) auto-translated',
+    errTransFailed:'⚠ Translation failed (API limit?) — EL data saved',
+    skipTx:        '— Saved without translation (auto-translate only works from Greek)',
+    confirmDelete: 'Delete this product?',
+    newProd:       'New product',
+    secHero:       'Hero',
+    badgeHero:     'Hero',
+    secNote:       'Note',
+    badgeNote:     'Notice',
+    badgeFooter:   'Footer',
+    btnChoosePhoto:'Choose a photo',
+    btnDelPhoto:   'Delete',
+    heroHint:      'Recommended: portrait format, min. 900×1600 px',
+    noteShown:     'Visible in menu',
+    noteHidden:    'Hidden in menu',
+    notePh:        'Note in {L} — e.g.: Welcome! Our terrace is open this weekend.',
+    noteHint:      'Text appears below menu categories — max 300 chars per language.',
+    visBtnCall:    'Waiter button',
+    visBtnPhotos:  'Photos',
+    visBtnOrder:   'Order mode',
+    visBtnNote:    'Customer note',
+    secTheme:'Design', badgeTheme:'Design',
+    secOrders:'Orders',
+    scDesign:'🎨 Design', scHero:'🖼️ Hero', scInfos:'ℹ️ Info',
+    scNote:'📢 Note', scCats:'📂 Categories', scProds:'🍽️ Products', scOrders:'🧾 Orders',
+    modePaper:'📄 Print mode', modePhoto:'🖼️ Photo mode', modeSonet:'🔔 Waiter mode', modeOrder:'🛒 Order mode',
+    modePaperShort:'Print', modePhotoShort:'Photo', modeSonetShort:'Waiter', modeOrderShort:'Order',
+    catPhotosLabel:'📄 Print mode',
+    ordTable:'Table', ordTakeaway:'Takeaway', ordTotal:'Total',
+    ordPending:'Received', ordProgress:'In progress', ordDone:'Done',
+    ordEmpty:'No orders at the moment',
+    fabNotif:      'Send a notification',
+    notifTitle:    'Notify waiters',
+    notifSub:      'The message will be sent as a push notification to all connected devices.',
+    notifCancel:   'Cancel',
+    notifSend:     'Send',
+    notifSending:  'Sending…',
+    notifOk:       '✓ Notification sent to {n} device(s)',
+    notifNoToken:  '⚠ No connected devices',
+    notifErrSrv:   '✗ Server error: {e}',
+    notifErrNet:   '✗ Network error: {e}',
+    showInMenu:    'Show in menu',
+    btnMove:       'Move',
+    changeCat:     '— Change category —',
+    newCat:        'New category',
+    delIcon:       '✕ Remove icon',
+    noneIco:       '— None —',
+    noPhoto:       'No photo',
   },
   ar: {
     admSub:        'إدارة القائمة',
     btnPreview:    '👁 عرض القائمة',
     btnLogout:     'تسجيل الخروج',
-    secInfo:       'معلومات المقهى',
+    secInfo:       'معلومات',
     secCats:       'الفئات',
     secProds:      'المنتجات',
     btnAddCat:     '＋ إضافة فئة',
@@ -1205,7 +1738,7 @@ const ADMIN_UI = {
     phShortDesc:   'وصف مختصر يظهر في القائمة',
     phFullDesc:    'النص الكامل عند النقر على المنتج',
     phAllergens:   'مثال: حليب، غلوتين، بيض',
-    phPrice:       '0.000 DT',
+    phPrice:       '€4.50',
     produits:      'منتج(ات)',
     toastSaved:    '✓ تم حفظ التغييرات بنجاح',
     toastProd:     '✓ تم تحديث المنتج',
@@ -1226,16 +1759,70 @@ const ADMIN_UI = {
     badgeLimited:  '⏳ عرض محدود',
     badgeNew:      '✨ جديد',
     badgePopular:  '🔥 الأكثر طلباً',
+    progressCats:  'الفئات…',
+    progressProds: 'المنتجات…',
+    progressInfo:  'معلومات المقهى…',
+    txOk:          'مترجم',
+    txErr:         'أخطاء',
+    txDone:        'حقل(حقول) تُرجمت تلقائياً',
+    errTransFailed:'⚠ فشلت الترجمة (حد API؟) — تم حفظ بيانات EL',
+    skipTx:        '— حُفظ بدون ترجمة (الترجمة التلقائية تعمل فقط من اليونانية)',
+    confirmDelete: 'حذف هذا المنتج؟',
+    newProd:       'منتج جديد',
+    secHero:       'الصورة',
+    badgeHero:     'Hero',
+    secNote:       'ملاحظة',
+    badgeNote:     'إعلان',
+    badgeFooter:   'Footer',
+    btnChoosePhoto:'اختيار صورة',
+    btnDelPhoto:   'حذف',
+    heroHint:      'مستحسن: عمودي، 900×1600 بكسل على الأقل',
+    noteShown:     'ظاهر في القائمة',
+    noteHidden:    'مخفي في القائمة',
+    notePh:        'ملاحظة بـ {L} — مثال: مرحباً! تراسنا مفتوح هذا الأسبوع.',
+    noteHint:      'يظهر النص أسفل فئات القائمة — 300 حرف كحد أقصى لكل لغة.',
+    visBtnCall:    'زر النادل',
+    visBtnPhotos:  'الصور',
+    visBtnOrder:   'وضع الطلب',
+    visBtnNote:    'ملاحظة العملاء',
+    secTheme:'تصميم', badgeTheme:'Design',
+    secOrders:'الطلبات',
+    scDesign:'🎨 تصميم', scHero:'🖼️ الصورة', scInfos:'ℹ️ معلومات',
+    scNote:'📢 ملاحظة', scCats:'📂 الفئات', scProds:'🍽️ المنتجات', scOrders:'🧾 الطلبات',
+    modePaper:'📄 وضع الورق', modePhoto:'🖼️ وضع الصور', modeSonet:'🔔 وضع النادل', modeOrder:'🛒 وضع الطلب',
+    modePaperShort:'ورق', modePhotoShort:'صور', modeSonetShort:'نادل', modeOrderShort:'طلب',
+    catPhotosLabel:'📄 وضع الورق',
+    ordTable:'طاولة', ordTakeaway:'للأخذ', ordTotal:'المجموع',
+    ordPending:'مستلمة', ordProgress:'قيد التنفيذ', ordDone:'منتهية',
+    ordEmpty:'لا توجد طلبات حالياً',
+    fabNotif:      'إرسال إشعار',
+    notifTitle:    'إشعار النادلين',
+    notifSub:      'سيُرسل الرسالة كإشعار فوري إلى جميع الأجهزة المتصلة.',
+    notifCancel:   'إلغاء',
+    notifSend:     'إرسال',
+    notifSending:  'جارٍ الإرسال…',
+    notifOk:       '✓ تم الإرسال إلى {n} جهاز(أجهزة)',
+    notifNoToken:  '⚠ لا توجد أجهزة متصلة',
+    notifErrSrv:   '✗ خطأ في الخادم: {e}',
+    notifErrNet:   '✗ خطأ في الشبكة: {e}',
+    showInMenu:    'عرض في القائمة',
+    btnMove:       'نقل',
+    changeCat:     '— تغيير الفئة —',
+    newCat:        'فئة جديدة',
+    delIcon:       '✕ إزالة الأيقونة',
+    noneIco:       '— لا شيء —',
+    noPhoto:       'لا توجد صورة',
   },
 };
 
 /* ═══════════════════════════════════════════
-   HERO MOCKUP TEXTS
+   HERO MOCKUP TEXTS — miroir de index.html UI
 ═══════════════════════════════════════════ */
 const HERO_TEXTS = {
-  fr: { tagline:"Une expérience culinaire raffinée", sub:["Cafés d'exception","Plats gourmets","Ambiance élégante"], explore:'Menu' },
-  en: { tagline:'A refined culinary experience',     sub:['Exceptional coffees','Gourmet dishes','Elegant atmosphere'],   explore:'Menu' },
-  ar: { tagline:'تجربة طهي راقية',                   sub:['قهوة استثنائية','أطباق راقية','أجواء فاخرة'],                 explore:'القائمة' },
+  el: { tagline:'Μια εκλεπτυσμένη γαστρονομική εμπειρία', sub:['Εκλεκτοί καφέδες','Γαστρονομία','Κολωνάκι, Αθήνα'], explore:'Μενού' },
+  fr: { tagline:'Une expérience culinaire raffinée',       sub:["Cafés d'exception",'Plats gourmets','Ambiance élégante'],      explore:'Menu' },
+  en: { tagline:'A refined culinary experience',           sub:['Exceptional coffees','Gourmet dishes','Elegant atmosphere'],    explore:'Menu' },
+  ar: { tagline:'تجربة طهي راقية',                         sub:['قهوة استثنائية','أطباق راقية','كولوناكي، أثينا'],               explore:'القائمة' },
 };
 
 function updateMockupText() {
@@ -1254,7 +1841,8 @@ function updateMockupText() {
    STATE
 ═══════════════════════════════════════════ */
 let adminData = null;  // { cats, items, info }
-let currentLang = localStorage.getItem('mc_admin_lang') || 'fr';
+const PRIMARY_LANG = 'fr'; // ← changer ici pour changer la langue principale
+let currentLang = localStorage.getItem('mc_admin_lang') || PRIMARY_LANG;
 let unsaved = false;
 const pendingPhotos = new Map();
 let _dragCatIdx  = null;  // index catégorie en cours de drag
@@ -1298,7 +1886,7 @@ document.getElementById('adm-theme-btn').addEventListener('click', () => {
 
 document.getElementById('login-btn').addEventListener('click', doLogin);
 document.getElementById('pwd-input').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-document.getElementById('logout-btn').addEventListener('click', () => {
+document.getElementById('logout-btn')?.addEventListener('click', () => {
   sessionStorage.removeItem('mc_admin_auth');
   location.reload();
 });
@@ -1325,74 +1913,166 @@ async function doLogin() {
 
 function showAdmin() {
   document.getElementById('login-screen').classList.add('hidden');
-  document.getElementById('adm-header').style.display = '';
+  // adm-header reste caché jusqu'à ce que loadMenuMode() reçoive le vrai mode de Firebase
   document.getElementById('adm-wrap').style.display   = '';
   document.getElementById('fab-save').style.display   = '';
-  // Sync dropdown avec la langue mémorisée
-  const sel = document.getElementById('global-src-lang');
-  if (sel) sel.value = currentLang;
-  // Brancher le sélecteur de langue global (dans le header)
-  sel.addEventListener('change', e => {
-    setGlobalLang(e.target.value);
-  });
+  document.getElementById('sc-fab').classList.add('show');
+  // Sync l'icône langue
+  window._updateLangBtn?.(currentLang);
   // loadData() est async — renderAll() et applyAdminUI() sont appelés à l'intérieur
   loadData();
   loadMenuTheme();
+  loadMenuMode();
+  setupNotifFab();
 }
 
 /* ═══════════════════════════════════════════
    DONNÉES
 ═══════════════════════════════════════════ */
+let _lastLocalSave = 0;
+let _menuListener  = null;
+
+function applyMenuSnapshot(data) {
+  if (data && data.cats && data.cats.length > 0) {
+    adminData = data;
+    if (!adminData.info)  adminData.info  = JSON.parse(JSON.stringify(DEFAULT_INFO));
+    if (!adminData.items) adminData.items = getDefaultItems();
+  } else if (!adminData) {
+    adminData = {
+      cats:  JSON.parse(JSON.stringify(DEFAULT_CATS)),
+      info:  JSON.parse(JSON.stringify(DEFAULT_INFO)),
+      items: getDefaultItems()
+    };
+  }
+  try {
+    if (!adminData._txHashes) {
+      const savedHashes = localStorage.getItem('mc_tx_hashes');
+      if (savedHashes) adminData._txHashes = JSON.parse(savedHashes);
+    }
+  } catch(_) {}
+  try {
+    if (!adminData._txLock) {
+      const savedLock = localStorage.getItem('mc_tx_lock');
+      if (savedLock) adminData._txLock = JSON.parse(savedLock);
+    }
+  } catch(_) {}
+  migrateToEl(adminData);
+  renderAll();
+  applyAdminUI(currentLang);
+  updateMockupText();
+}
+
 function loadData() {
-  _db.ref('menu').once('value')
-    .then(snapshot => {
-      const data = snapshot.val();
-      // Auto-reset si les données Firebase viennent de l'ancienne démo (prix en €)
-      const hasOldData = data && data.items && data.items.length > 0 &&
-        (data.items[0].price||'').startsWith('€');
-      if (data && data.cats && data.cats.length > 0 && !hasOldData) {
-        adminData = data;
-        if (!adminData.info)  adminData.info  = JSON.parse(JSON.stringify(DEFAULT_INFO));
-        if (!adminData.items) adminData.items = getDefaultItems();
-      } else {
-        adminData = {
-          cats:  JSON.parse(JSON.stringify(DEFAULT_CATS)),
-          info:  JSON.parse(JSON.stringify(DEFAULT_INFO)),
-          items: getDefaultItems()
-        };
-      }
-      // Restaurer hashes depuis localStorage si Firebase ne les a pas encore
-      try {
-        if (!adminData._txHashes) {
-          const savedHashes = localStorage.getItem('mc_tx_hashes');
-          if (savedHashes) adminData._txHashes = JSON.parse(savedHashes);
-        }
-      } catch(_) {}
-      // Restaurer les verrous depuis localStorage si Firebase ne les a pas encore
-      try {
-        if (!adminData._txLock) {
-          const savedLock = localStorage.getItem('mc_tx_lock');
-          if (savedLock) adminData._txLock = JSON.parse(savedLock);
-        }
-      } catch(_) {}
-      renderAll();
-      applyAdminUI(currentLang);
-      updateMockupText();
-    })
-    .catch(() => {
-      try {
-        const raw = localStorage.getItem(STORE_KEY);
-        if (raw) adminData = JSON.parse(raw);
-      } catch(_) {}
-      if (!adminData.cats) adminData = {
-        cats:  JSON.parse(JSON.stringify(DEFAULT_CATS)),
-        info:  JSON.parse(JSON.stringify(DEFAULT_INFO)),
-        items: getDefaultItems()
-      };
-      renderAll();
-      applyAdminUI(currentLang);
-      updateMockupText();
+  if (_menuListener) {
+    _db.ref('menu').off('value', _menuListener);
+  }
+  _menuListener = _db.ref('menu').on('value', snapshot => {
+    // Ignorer les mises à jour déclenchées par notre propre sauvegarde
+    if (Date.now() - _lastLocalSave < 4000) return;
+    const data = snapshot.val();
+    applyMenuSnapshot(data);
+  }, () => {
+    // Fallback hors-ligne
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      if (raw) adminData = JSON.parse(raw);
+    } catch(_) {}
+    if (!adminData || !adminData.cats) adminData = {
+      cats:  JSON.parse(JSON.stringify(DEFAULT_CATS)),
+      info:  JSON.parse(JSON.stringify(DEFAULT_INFO)),
+      items: getDefaultItems()
+    };
+    migrateToEl(adminData);
+    renderAll();
+    applyAdminUI(currentLang);
+    updateMockupText();
+  });
+
+  // Premier chargement immédiat (once) pour initialiser sans attendre
+  _db.ref('menu').once('value').then(snapshot => {
+    _lastLocalSave = Date.now(); // bloquer le listener pendant le chargement initial
+    applyMenuSnapshot(snapshot.val());
+    autoTranslateToEl();
+    setTimeout(() => { _lastLocalSave = 0; }, 500);
+  }).catch(() => {});
+}
+
+function migrateToEl(data) {
+  if (!data) return;
+  const fields = ['name', 'desc', 'full'];
+  (data.items || []).forEach(item => {
+    fields.forEach(f => {
+      if (item[f] && !item[f].el && item[f].fr) item[f].el = item[f].fr;
     });
+    if (item.allergens && !item.allergens.el && item.allergens.fr) item.allergens.el = item.allergens.fr;
+  });
+  (data.cats || []).forEach(cat => {
+    if (cat.names && !cat.names.el && cat.names.fr) cat.names.el = cat.names.fr;
+  });
+  const infoFields = ['wifi_name','wifi_val','hours_name','hours_val','addr_name','addr_val','noteText'];
+  if (data.info) infoFields.forEach(f => {
+    // Migrate: plain string → per-language object (old Firebase format)
+    if (typeof data.info[f] === 'string') {
+      const val = data.info[f];
+      data.info[f] = {};
+      LANGS.forEach(l => { data.info[f][l] = val; });
+    }
+    if (data.info[f] && !data.info[f].el && data.info[f].fr) data.info[f].el = data.info[f].fr;
+  });
+}
+
+async function autoTranslateToEl() {
+  if (!adminData) return;
+  const progress = document.getElementById('global-progress');
+  const fields = ['name', 'desc', 'full'];
+  let translated = 0;
+
+  for (const item of adminData.items) {
+    for (const field of fields) {
+      const src = (item[field]?.fr || '').trim();
+      const already = (item[field]?.el || '').trim();
+      if (!src || already) continue;
+      try {
+        const tx = await translateText(src, 'fr', 'el');
+        if (tx) { if (!item[field]) item[field] = {}; item[field].el = tx; translated++; }
+      } catch(_) {}
+      await sleep(150);
+    }
+    const srcAl = (item.allergens?.fr || []).join(', ');
+    if (srcAl && !(item.allergens?.el || []).length) {
+      try {
+        const tx = await translateText(srcAl, 'fr', 'el');
+        if (tx) { if (!item.allergens) item.allergens = {}; item.allergens.el = tx.split(',').map(s => s.trim()).filter(Boolean); translated++; }
+      } catch(_) {}
+      await sleep(150);
+    }
+  }
+
+  for (let ci = 0; ci < adminData.cats.length; ci++) {
+    const cat = adminData.cats[ci];
+    const src = (cat.names?.fr || '').trim();
+    const already = (cat.names?.el || '').trim();
+    if (!src || already) continue;
+    try {
+      const tx = await translateText(src, 'fr', 'el');
+      if (tx) { if (!cat.names) cat.names = {}; cat.names.el = tx; translated++; }
+    } catch(_) {}
+    await sleep(150);
+  }
+
+  if (translated > 0) {
+    saveData();
+    renderAll();
+    if (progress) { progress.textContent = `✓ ${translated} champ(s) traduits en Grec`; setTimeout(() => { progress.textContent = ''; }, 6000); }
+  }
+}
+
+function _admThumbErr(img) {
+  img.outerHTML = '<div class="prod-thumb-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M8 5l1.5-2h5L16 5"/></svg></div>';
+}
+function _admPreviewErr(img) {
+  const _noPhoto = (ADMIN_UI[currentLang] || ADMIN_UI.fr).noPhoto;
+  img.outerHTML = `<div class="photo-preview-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M8 5l1.5-2h5L16 5"/></svg><span>${_noPhoto}</span></div>`;
 }
 
 function sanitizeItems(items) {
@@ -1414,6 +2094,7 @@ function sanitizeItems(items) {
 
 function saveData() {
   adminData.items = sanitizeItems(adminData.items);
+  _lastLocalSave = Date.now(); // bloquer le listener pendant 4s pour ne pas reboucler
   _db.ref('menu').set(adminData)
     .then(() => {
       localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
@@ -1464,31 +2145,56 @@ function renderAll() {
 
 /* ── Synchronise les boutons de visibilité avec adminData.info ── */
 function syncVisToggles() {
+  const callBtn   = document.getElementById('toggle-call-btn');
   const photosBtn = document.getElementById('toggle-photos-btn');
+  const orderBtn  = document.getElementById('toggle-order-btn');
   if (!adminData?.info) return;
-  const photosOn = adminData.info.showPhotos !== false;
-  if (photosBtn) {
-    if (photosOn) photosBtn.classList.add('on');
-    else photosBtn.classList.remove('on');
-  }
+  const showCall   = adminData.info.showCallBtn  !== false;
+  const showPhotos = adminData.info.showPhotos   !== false;
+  const showOrder  = adminData.info.showOrderUI  !== false;
+  if (callBtn)   callBtn.classList.toggle('on',   showCall);
+  if (photosBtn) photosBtn.classList.toggle('on', showPhotos);
+  if (orderBtn)  orderBtn.classList.toggle('on',  showOrder);
+  // Synchro statut dans la section note
   const noteStatus = document.querySelector('.note-status');
   if (noteStatus) {
     const on = adminData.info.showNote === true;
-    if (on) noteStatus.classList.add('on');
-    else noteStatus.classList.remove('on');
-    noteStatus.querySelector('.note-status-txt').textContent = on ? 'Affichée dans le menu' : 'Masquée dans le menu';
+    noteStatus.classList.toggle('on', on);
+    const ntt = ADMIN_UI[currentLang] || ADMIN_UI.el;
+    noteStatus.querySelector('.note-status-txt').textContent = on ? ntt.noteShown : ntt.noteHidden;
   }
 }
 
-/* ── Listener bouton visibilité photos ── */
-document.getElementById('toggle-photos-btn').addEventListener('click', () => {
-  if (!adminData) return;
-  if (!adminData.info) adminData.info = {};
-  adminData.info.showPhotos = adminData.info.showPhotos === false ? true : false;
-  _db.ref('menu/info/showPhotos').set(adminData.info.showPhotos);
-  localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
-  syncVisToggles();
-});
+/* ── Listeners des boutons de visibilité (sauvegarde instantanée) ── */
+(function() {
+  document.getElementById('toggle-call-btn').addEventListener('click', () => {
+    if (!adminData) return;
+    if (!adminData.info) adminData.info = {};
+    const newVal = adminData.info.showCallBtn === false ? true : false;
+    adminData.info.showCallBtn = newVal;
+    _db.ref('menu/info/showCallBtn').set(newVal);
+    localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
+    syncVisToggles();
+  });
+  document.getElementById('toggle-photos-btn').addEventListener('click', () => {
+    if (!adminData) return;
+    if (!adminData.info) adminData.info = {};
+    const newVal = adminData.info.showPhotos === false ? true : false;
+    adminData.info.showPhotos = newVal;
+    _db.ref('menu/info/showPhotos').set(newVal);
+    localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
+    syncVisToggles();
+  });
+  document.getElementById('toggle-order-btn').addEventListener('click', () => {
+    if (!adminData) return;
+    if (!adminData.info) adminData.info = {};
+    const newVal = adminData.info.showOrderUI === false ? true : false;
+    adminData.info.showOrderUI = newVal;
+    _db.ref('menu/info/showOrderUI').set(newVal);
+    localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
+    syncVisToggles();
+  });
+})();
 
 /* ─── SECTION NOTE CLIENTS ─── */
 function renderNoteSection() {
@@ -1499,10 +2205,11 @@ function renderNoteSection() {
   const noteText = info.noteText || { fr: '', en: '', ar: '' };
   const isOn = info.showNote === true;
 
+  const nt = ADMIN_UI[currentLang] || ADMIN_UI.el;
   let html = `
     <button class="note-status${isOn ? ' on' : ''}">
-      <span class="vis-check"><svg viewBox="0 0 16 16" fill="none"><rect class="chk-box" x="1.5" y="1.5" width="13" height="13" rx="2.5"/><path class="chk-mark" d="M3.5,8.5 L6.5,11.5 L12.5,4.5" pathLength="1"/></svg></span>
-      <span class="note-status-txt">${isOn ? 'Affichée dans le menu' : 'Masquée dans le menu'}</span>
+      <span class="vis-dot"></span>
+      <span class="note-status-txt">${isOn ? nt.noteShown : nt.noteHidden}</span>
     </button>
     <div class="lang-tabs note-lang-tabs">
       ${LANGS.map(l => `<button class="lang-tab${l===currentLang?' on':''}" data-note-lang="${l}">${LANG_LABELS[l]}</button>`).join('')}
@@ -1511,18 +2218,19 @@ function renderNoteSection() {
       <textarea class="note-textarea note-ta-${l}${l===currentLang?'':' hide'}"
         style="${l!==currentLang?'display:none':''}"
         data-lang="${l}"
-        placeholder="Texte de la note en ${l.toUpperCase()} — ex: Bienvenue ! Notre terrasse est ouverte ce weekend."
+        placeholder="${(nt.notePh||'').replace('{L}', l.toUpperCase())}"
         maxlength="300">${esc(noteText[l] || '')}</textarea>
     `).join('')}
-    <div class="note-hint">Le texte s'affiche sous les catégories du menu — max 300 caractères par langue.</div>
+    <div class="note-hint">${nt.noteHint}</div>
   `;
   card.innerHTML = html;
 
   // Bouton Afficher dans le menu — sauvegarde instantanée
-  card.querySelector('.note-status').addEventListener('click', function() {
+  card.querySelector('.note-status').addEventListener('click', () => {
     if (!adminData.info) adminData.info = {};
-    adminData.info.showNote = !adminData.info.showNote;
-    _db.ref('menu/info/showNote').set(adminData.info.showNote);
+    const newVal = !adminData.info.showNote;
+    adminData.info.showNote = newVal;
+    _db.ref('menu/info/showNote').set(newVal);
     localStorage.setItem(STORE_KEY, JSON.stringify(adminData));
     syncVisToggles();
   });
@@ -1546,7 +2254,7 @@ function renderNoteSection() {
       const l = ta.dataset.lang;
       if (!adminData.info.noteText) adminData.info.noteText = {};
       adminData.info.noteText[l] = ta.value;
-      if (l !== 'fr') setTxLock(`info-noteText-${l}`, ta.value.trim() !== '');
+      if (l !== PRIMARY_LANG) setTxLock(`info-noteText-${l}`, ta.value.trim() !== '');
       markUnsaved();
     });
   });
@@ -1625,6 +2333,132 @@ function renderHeroImageSection() {
   });
 }
 
+/* ─── SECTIONS REPLIABLES ─── */
+(function setupCollapsible() {
+  const STORE_KEY_SEC = 'mc_adm_sections';
+  const saved = JSON.parse(localStorage.getItem(STORE_KEY_SEC) || '{}');
+
+  document.querySelectorAll('.adm-section').forEach(section => {
+    const hd = section.querySelector(':scope > .sec-hd');
+    if (!hd) return;
+    const id = section.id || '';
+
+    // Chevron SVG
+    const chevron = document.createElement('span');
+    chevron.className = 'sec-chevron';
+    chevron.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+    hd.appendChild(chevron);
+
+    // Envelopper le contenu (tous les enfants sauf sec-hd) dans sec-body > sec-body-inner
+    const body  = document.createElement('div');
+    body.className = 'sec-body';
+    const inner = document.createElement('div');
+    inner.className = 'sec-body-inner';
+    body.appendChild(inner);
+    [...section.children].forEach(el => { if (el !== hd) inner.appendChild(el); });
+    section.appendChild(body);
+
+    // Restaurer l'état sauvegardé (sans animation au chargement)
+    if (id && saved[id]) {
+      body.style.transition = 'none';
+      section.classList.add('collapsed');
+      requestAnimationFrame(() => { body.style.transition = ''; });
+    }
+
+    // Toggle + sauvegarde
+    hd.addEventListener('click', () => {
+      section.classList.toggle('collapsed');
+      if (id) {
+        saved[id] = section.classList.contains('collapsed');
+        localStorage.setItem(STORE_KEY_SEC, JSON.stringify(saved));
+      }
+    });
+  });
+})();
+
+/* ─── FAB NAVIGATION RACCOURCIS ─── */
+function scGo(sectionId) {
+  const section = document.getElementById(sectionId);
+  if (!section) return;
+  const header  = document.querySelector('.adm-header');
+  const headerH = header ? header.getBoundingClientRect().height : 0;
+  const top     = section.getBoundingClientRect().top + window.scrollY - headerH - 16;
+  window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  document.getElementById('sc-popup').classList.remove('open');
+  document.getElementById('sc-fab').classList.remove('open');
+}
+
+(function setupScFab() {
+  const fab   = document.getElementById('sc-fab');
+  const popup = document.getElementById('sc-popup');
+  if (!fab || !popup) return;
+  fab.addEventListener('click', e => {
+    e.stopPropagation();
+    const isOpen = popup.classList.contains('open');
+    popup.classList.toggle('open', !isOpen);
+    fab.classList.toggle('open', !isOpen);
+  });
+  document.addEventListener('click', () => {
+    popup.classList.remove('open');
+    fab.classList.remove('open');
+  });
+  popup.addEventListener('click', e => e.stopPropagation());
+})();
+
+/* ─── FAB NOTIFICATION SERVEURS ─── */
+function setupNotifFab() {
+  const fab      = document.getElementById('fab-notif');
+  const modal    = document.getElementById('notif-modal');
+  const textarea = document.getElementById('notif-textarea');
+  const sendBtn  = document.getElementById('notif-send');
+  const cancelBtn= document.getElementById('notif-cancel');
+
+  fab.addEventListener('click', () => {
+    textarea.value = '';
+    modal.classList.add('on');
+    setTimeout(() => textarea.focus(), 300);
+  });
+
+  function closeModal() { modal.classList.remove('on'); }
+  cancelBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+  sendBtn.addEventListener('click', async () => {
+    const msg = textarea.value.trim();
+    if (!msg) { textarea.focus(); return; }
+
+    const tn = ADMIN_UI[currentLang] || ADMIN_UI.el;
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="15" height="15"><circle cx="12" cy="12" r="10"/></svg> ${tn.notifSending}`;
+
+    try {
+      const res = await fetch('/api/notify', {
+        method: 'POST',
+        keepalive: true,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ table: 'info', message: msg, lang: currentLang || 'fr' })
+      });
+      const data = await res.json();
+
+      if (data.sent > 0) {
+        closeModal();
+        showToastMsg((tn.notifOk || '').replace('{n}', data.sent));
+      } else if (data.error) {
+        showToastMsg((tn.notifErrSrv || '').replace('{e}', data.error), true);
+      } else if (data.reason === 'no_tokens') {
+        showToastMsg(tn.notifNoToken, true);
+      } else {
+        showToastMsg('⚠ ' + JSON.stringify(data), true);
+      }
+    } catch(e) {
+      showToastMsg((tn.notifErrNet || '').replace('{e}', e.message), true);
+    }
+
+    sendBtn.disabled = false;
+    sendBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="15" height="15"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> <span id="notif-send-lbl">${tn.notifSend}</span>`;
+  });
+}
+
 function showToastMsg(msg, isError = false) {
   const t = document.getElementById('toast');
   t.style.borderColor = isError ? 'rgba(224,82,82,0.4)' : '';
@@ -1637,8 +2471,8 @@ function showToastMsg(msg, isError = false) {
 function renderInfoSection() {
   const card = document.getElementById('info-card');
   const fields = [
-    { key:'wifi_name',  label:'WiFi — Nom' },
-    { key:'wifi_val',   label:'WiFi — Mot de passe' },
+    { key:'wifi_name',  label:'WiFi — Nom', global:true }, // même valeur pour toutes les langues
+    { key:'wifi_val',   label:'WiFi — Mot de passe', global:true }, // même valeur pour toutes les langues
     { key:'hours_name', label:'Horaires — Titre' },
     { key:'hours_val',  label:'Horaires — Valeur' },
     { key:'addr_name',  label:'Adresse — Titre' },
@@ -1649,15 +2483,28 @@ function renderInfoSection() {
 
   fields.forEach(f => {
     html += `<div class="info-row">
-      <div class="info-lbl">${f.label}</div>
+      <div class="info-lbl">${f.label}${f.global ? ' <span style="font-size:0.68rem;opacity:0.45">🔒</span>' : ''}</div>
       <div class="info-inputs">`;
-    LANGS.forEach(l => {
-      html += `<input class="info-input info-field-${l}${l===currentLang?'':' hide'}"
-        style="${l!==currentLang?'display:none':''}"
-        data-field="${f.key}" data-lang="${l}"
-        value="${esc(adminData.info[f.key]?.[l] || '')}"
-        placeholder="${f.label} (${l.toUpperCase()})">`;
-    });
+
+    if (f.global) {
+      // Champ global : une seule saisie, identique pour toutes les langues
+      const val = adminData.info[f.key]?.[PRIMARY_LANG]
+        || Object.values(adminData.info[f.key] || {}).find(v => v && typeof v === 'string')
+        || '';
+      html += `<input class="info-input"
+        data-field="${f.key}" data-global="true"
+        value="${esc(val)}"
+        placeholder="${f.label}">`;
+    } else {
+      LANGS.forEach(l => {
+        html += `<input class="info-input info-field-${l}${l===currentLang?'':' hide'}"
+          style="${l!==currentLang?'display:none':''}"
+          data-field="${f.key}" data-lang="${l}"
+          value="${esc(adminData.info[f.key]?.[l] || '')}"
+          placeholder="${f.label} (${l.toUpperCase()})">`;
+      });
+    }
+
     html += `</div></div>`;
   });
 
@@ -1665,10 +2512,19 @@ function renderInfoSection() {
 
   card.querySelectorAll('.info-input').forEach(inp => {
     inp.addEventListener('input', e => {
-      const { field, lang } = e.target.dataset;
-      if (!adminData.info[field]) adminData.info[field] = {};
-      adminData.info[field][lang] = e.target.value;
-      if (lang !== 'fr') setTxLock(`info-${field}-${lang}`, e.target.value.trim() !== '');
+      const { field } = e.target.dataset;
+      const isGlobal = e.target.dataset.global === 'true';
+      // Assurer que le champ est un objet (migration des anciennes valeurs string)
+      if (!adminData.info[field] || typeof adminData.info[field] !== 'object') {
+        adminData.info[field] = {};
+      }
+      if (isGlobal) {
+        LANGS.forEach(l => { adminData.info[field][l] = e.target.value; });
+      } else {
+        const { lang } = e.target.dataset;
+        adminData.info[field][lang] = e.target.value;
+        if (lang !== PRIMARY_LANG) setTxLock(`info-${field}-${lang}`, e.target.value.trim() !== '');
+      }
       markUnsaved();
     });
   });
@@ -1677,16 +2533,14 @@ function renderInfoSection() {
 
 /* ─── APPLIQUER LES TEXTES UI DANS LA LANGUE CHOISIE ─── */
 function applyAdminUI(l) {
-  const t = ADMIN_UI[l] || ADMIN_UI.fr;
+  const t = ADMIN_UI[l] || ADMIN_UI.el;
   const $ = id => document.getElementById(id);
 
   // Header
   const sub = document.querySelector('.adm-sub');
   if (sub) sub.textContent = t.admSub;
   const preview = document.querySelector('.btn-preview');
-  if (preview) preview.innerHTML = t.btnPreview;
-  const logout = $('logout-btn');
-  if (logout) logout.textContent = t.btnLogout;
+  if (preview && t.btnPreview) preview.title = t.btnPreview;
   // Section titres
   const secHds = document.querySelectorAll('.sec-hd');
   secHds.forEach(hd => {
@@ -1738,14 +2592,24 @@ function applyAdminUI(l) {
     if (!inp) return;
     const field = inp.dataset.field;
     const lbl = row.querySelector('.info-lbl');
-    if (lbl && infoLblMap[field]) lbl.textContent = infoLblMap[field];
+    if (lbl && infoLblMap[field]) {
+      const lockIcon = lbl.querySelector('span');
+      lbl.textContent = infoLblMap[field];
+      if (lockIcon) lbl.appendChild(lockIcon); // conserver le 🔒 pour les champs globaux
+    }
   });
 
   // Placeholders info inputs
   document.querySelectorAll('.info-input').forEach(inp => {
     const field = inp.dataset.field;
-    const lang  = inp.dataset.lang;
-    if (infoLblMap[field]) inp.placeholder = infoLblMap[field] + ' (' + lang.toUpperCase() + ')';
+    const isGlobal = inp.dataset.global === 'true';
+    if (!infoLblMap[field]) return;
+    if (isGlobal) {
+      inp.placeholder = infoLblMap[field];
+    } else {
+      const lang = inp.dataset.lang;
+      inp.placeholder = infoLblMap[field] + ' (' + (lang || '').toUpperCase() + ')';
+    }
   });
 
   // Produits : boutons add + labels dans les cartes déjà rendues
@@ -1798,6 +2662,84 @@ function applyAdminUI(l) {
     if (opts[2]) opts[2].textContent = t.bdgFroid;
     if (opts[3]) opts[3].textContent = t.bdgGlace;
   });
+
+  // Shortcut buttons
+  const scMap = { 'sc-design-btn':'scDesign','sc-hero-btn':'scHero','sc-infos-btn':'scInfos','sc-note-btn':'scNote','sc-cats-btn':'scCats','sc-prods-btn':'scProds','sc-orders-btn':'scOrders' };
+  Object.entries(scMap).forEach(([id, key]) => { const el = $(id); if (el) el.textContent = t[key] || el.textContent; });
+
+  // Theme section title + badge
+  const themeHd = $('sec-hd-theme');
+  if (themeHd) themeHd.firstChild.textContent = (t.secTheme || 'Thème visuel') + ' ';
+  const badgeThemeEl = $('badge-theme');
+  if (badgeThemeEl) badgeThemeEl.textContent = t.badgeTheme || 'Design';
+
+  // Orders section title
+  const ordersHd = $('sec-hd-orders');
+  if (ordersHd) ordersHd.firstChild.textContent = (t.secOrders || 'Commandes en temps réel') + ' ';
+
+  // Mode popup options (labels full + courts selon écran)
+  const modeOptFull  = { 'mode-opt-paper': t.modePaper,      'mode-opt-simple': t.modePhoto,      'mode-opt-sonet': t.modeSonet,      'mode-opt-order': t.modeOrder };
+  const modeOptShort = { 'mode-opt-paper': t.modePaperShort, 'mode-opt-simple': t.modePhotoShort, 'mode-opt-sonet': t.modeSonetShort, 'mode-opt-order': t.modeOrderShort };
+  Object.keys(modeOptFull).forEach(id => {
+    const el = $(id); if (!el) return;
+    const full  = el.querySelector('.mode-lbl-full');
+    const short = el.querySelector('.mode-lbl-short');
+    if (full  && modeOptFull[id])  full.textContent  = modeOptFull[id];
+    if (short && modeOptShort[id]) short.textContent = modeOptShort[id];
+  });
+
+  // Sections Hero / Note / Info (éléments statiques avec ID)
+  const heroHd = $('sec-hd-hero');
+  if (heroHd) heroHd.firstChild.textContent = t.secHero + ' ';
+  const badgeHero = $('badge-hero');
+  if (badgeHero) badgeHero.textContent = t.badgeHero;
+  const noteHd = $('sec-hd-note');
+  if (noteHd) noteHd.firstChild.textContent = t.secNote + ' ';
+  const badgeNote = $('badge-note');
+  if (badgeNote) badgeNote.textContent = t.badgeNote;
+  const infoHd = $('sec-hd-info');
+  if (infoHd) infoHd.firstChild.textContent = t.secInfo + ' ';
+  const badgeFooter = $('badge-footer');
+  if (badgeFooter) badgeFooter.textContent = t.badgeFooter;
+  const chooseLbl = $('btn-choose-photo-lbl');
+  if (chooseLbl) chooseLbl.textContent = t.btnChoosePhoto;
+  const delLbl = $('btn-del-photo-lbl');
+  if (delLbl) delLbl.textContent = t.btnDelPhoto;
+  const heroHint = $('hero-hint-txt');
+  if (heroHint) heroHint.textContent = t.heroHint;
+
+  // Note section — statut + hint + placeholders
+  // Boutons visibilité header
+  const callBtn2 = $('toggle-call-btn');
+  if (callBtn2) callBtn2.title = t.visBtnCall;
+  const photosBtn2 = $('toggle-photos-btn');
+  if (photosBtn2) photosBtn2.title = t.visBtnPhotos;
+  const orderBtn2 = $('toggle-order-btn');
+  if (orderBtn2) orderBtn2.title = t.visBtnOrder;
+  const fabNotifBtn = $('fab-notif');
+  if (fabNotifBtn) { fabNotifBtn.title = t.fabNotif; fabNotifBtn.dataset.tooltip = t.fabNotif; }
+
+  // Modal notification
+  const notifTitleEl = $('notif-title-txt');
+  if (notifTitleEl) notifTitleEl.textContent = t.notifTitle;
+  const notifSubEl = $('notif-sub-txt');
+  if (notifSubEl) notifSubEl.textContent = t.notifSub;
+  const notifCancelEl = $('notif-cancel');
+  if (notifCancelEl) notifCancelEl.textContent = t.notifCancel;
+  const notifSendLbl = $('notif-send-lbl');
+  if (notifSendLbl) notifSendLbl.textContent = t.notifSend;
+
+  const noteStatusTxt = document.querySelector('.note-status-txt');
+  if (noteStatusTxt) {
+    const isOn = document.querySelector('.note-status')?.classList.contains('on');
+    noteStatusTxt.textContent = isOn ? t.noteShown : t.noteHidden;
+  }
+  const noteHintEl = document.querySelector('.note-hint');
+  if (noteHintEl) noteHintEl.textContent = t.noteHint;
+  document.querySelectorAll('.note-textarea').forEach(ta => {
+    const lang = ta.dataset.lang || l;
+    ta.placeholder = (t.notePh || '').replace('{L}', lang.toUpperCase());
+  });
 }
 
 /* ─── LANGUE GLOBALE : contrôle toute la page admin ─── */
@@ -1806,13 +2748,14 @@ function setGlobalLang(l) {
   localStorage.setItem('mc_admin_lang', l);
   // Flush DOM edits back to adminData BEFORE re-rendering so manual EN/AR edits are not lost
   if (adminData) collectAllForms();
-  // Sync header select
-  const sel = document.getElementById('global-src-lang');
-  if (sel && sel.value !== l) sel.value = l;
+  // Sync icône langue
+  window._updateLangBtn?.(l);
   // Re-render complet dans la nouvelle langue
   renderAll();
   applyAdminUI(l);
   updateMockupText();
+  renderThemeSelector();
+  if (_lastAdminOrders.length) renderOrdersAdmin(_lastAdminOrders);
 }
 
 function switchInfoLang(l) {
@@ -1827,28 +2770,36 @@ const ICONS = [
   'ico-fire','ico-leaf','ico-crown','ico-gift','ico-cocktail',
 ];
 const ICON_LABELS = {
+  el: {
+    'ico-coffee':'☕ Ζεστό', 'ico-cold':'🧊 Κρύο', 'ico-food':'🍽 Φαγητό', 'ico-cake':'🍰 Γλυκό',
+    'ico-sunrise':'🌅 Πρωί', 'ico-hookah':'💨 Ναργιλές', 'ico-star':'⭐ Ειδικό', 'ico-bell':'🔔 Κουδ.',
+    'ico-clock':'🕐 Ώρες', 'ico-diamond':'💎 Premium', 'ico-wifi':'📶 WiFi', 'ico-pin':'📍 Τοποθ.',
+    'ico-glass':'🥤 Χυμός', 'ico-pizza':'🍕 Πίτσα', 'ico-burger':'🍔 Μπέργκερ', 'ico-salad':'🥗 Σαλάτα',
+    'ico-heart':'❤️ Αγαπ.', 'ico-fire':'🔥 Τάση', 'ico-leaf':'🌿 Χορτ.', 'ico-crown':'👑 VIP',
+    'ico-gift':'🎁 Προσφ.', 'ico-cocktail':'🍹 Κοκτέιλ',
+  },
   fr: {
     'ico-coffee':'☕ Café chaud', 'ico-cold':'🧊 Froid', 'ico-food':'🍽 Cuisine', 'ico-cake':'🍰 Sucré',
     'ico-sunrise':'🌅 Matin', 'ico-hookah':'💨 Hookah', 'ico-star':'⭐ Spécial', 'ico-bell':'🔔 Cloche',
     'ico-clock':'🕐 Horaires', 'ico-diamond':'💎 Premium', 'ico-wifi':'📶 WiFi', 'ico-pin':'📍 Lieu',
-    'ico-glass':'🥤 Jus / Verre', 'ico-pizza':'🍕 Pizza', 'ico-burger':'🍔 Burger', 'ico-salad':'🥗 Salade',
-    'ico-heart':'❤️ Favoris', 'ico-fire':'🔥 Tendance', 'ico-leaf':'🌿 Végétarien', 'ico-crown':'👑 VIP',
+    'ico-glass':'🥤 Verre', 'ico-pizza':'🍕 Pizza', 'ico-burger':'🍔 Burger', 'ico-salad':'🥗 Salade',
+    'ico-heart':'❤️ Favoris', 'ico-fire':'🔥 Tendance', 'ico-leaf':'🌿 Végétar.', 'ico-crown':'👑 VIP',
     'ico-gift':'🎁 Promo', 'ico-cocktail':'🍹 Cocktail',
   },
   en: {
     'ico-coffee':'☕ Hot drink', 'ico-cold':'🧊 Cold', 'ico-food':'🍽 Food', 'ico-cake':'🍰 Sweet',
     'ico-sunrise':'🌅 Morning', 'ico-hookah':'💨 Hookah', 'ico-star':'⭐ Special', 'ico-bell':'🔔 Bell',
     'ico-clock':'🕐 Hours', 'ico-diamond':'💎 Premium', 'ico-wifi':'📶 WiFi', 'ico-pin':'📍 Location',
-    'ico-glass':'🥤 Juice / Glass', 'ico-pizza':'🍕 Pizza', 'ico-burger':'🍔 Burger', 'ico-salad':'🥗 Salad',
-    'ico-heart':'❤️ Favorites', 'ico-fire':'🔥 Trending', 'ico-leaf':'🌿 Vegetarian', 'ico-crown':'👑 VIP',
+    'ico-glass':'🥤 Glass', 'ico-pizza':'🍕 Pizza', 'ico-burger':'🍔 Burger', 'ico-salad':'🥗 Salad',
+    'ico-heart':'❤️ Favorites', 'ico-fire':'🔥 Trending', 'ico-leaf':'🌿 Vegetar.', 'ico-crown':'👑 VIP',
     'ico-gift':'🎁 Promo', 'ico-cocktail':'🍹 Cocktail',
   },
   ar: {
-    'ico-coffee':'☕ قهوة ساخنة', 'ico-cold':'🧊 بارد', 'ico-food':'🍽 طعام', 'ico-cake':'🍰 حلويات',
-    'ico-sunrise':'🌅 الصباح', 'ico-hookah':'💨 شيشة', 'ico-star':'⭐ مميز', 'ico-bell':'🔔 جرس',
+    'ico-coffee':'☕ ساخن', 'ico-cold':'🧊 بارد', 'ico-food':'🍽 طعام', 'ico-cake':'🍰 حلويات',
+    'ico-sunrise':'🌅 صباح', 'ico-hookah':'💨 شيشة', 'ico-star':'⭐ مميز', 'ico-bell':'🔔 جرس',
     'ico-clock':'🕐 أوقات', 'ico-diamond':'💎 بريميوم', 'ico-wifi':'📶 واي فاي', 'ico-pin':'📍 موقع',
     'ico-glass':'🥤 عصير', 'ico-pizza':'🍕 بيتزا', 'ico-burger':'🍔 برغر', 'ico-salad':'🥗 سلطة',
-    'ico-heart':'❤️ المفضلة', 'ico-fire':'🔥 رائج', 'ico-leaf':'🌿 نباتي', 'ico-crown':'👑 VIP',
+    'ico-heart':'❤️ مفضلة', 'ico-fire':'🔥 رائج', 'ico-leaf':'🌿 نباتي', 'ico-crown':'👑 VIP',
     'ico-gift':'🎁 عروض', 'ico-cocktail':'🍹 كوكتيل',
   },
 };
@@ -1866,15 +2817,32 @@ function renderCatsSection() {
     row.dataset.ci = ci;
 
     const currentIco = cat.ico || '';
+    const _tCat = ADMIN_UI[currentLang] || ADMIN_UI.fr;
     // Nom propre sans emoji (ex: "☕ Boissons Chaudes" → "Boissons Chaudes")
     const icoLabelFull = currentIco ? getIconLabel(currentIco) : '';
     const parts = icoLabelFull.split(' ');
     const icoNameClean = currentIco
       ? (parts.length > 1 ? parts.slice(1).join(' ') : icoLabelFull)
-      : '— Aucune —';
+      : _tCat.noneIco;
+
+    // Migration : flipPhoto (ancien) → flipPhotos (nouveau, 3 slots)
+    const rawPhotos = cat.flipPhotos || (cat.flipPhoto ? [cat.flipPhoto] : []);
+    const flipPhotos = [rawPhotos[0]||'', rawPhotos[1]||'', rawPhotos[2]||''];
+
+    const slotsHtml = flipPhotos.map((url, si) => `
+      <div class="cat-photo-slot">
+        <div class="cat-photo-actions">
+          <label class="cat-photo-btn" title="Photo ${si+1}/3">
+            ${url ? '🔄' : '📷'}
+            <input type="file" class="cat-photo-input" accept="image/*" data-ci="${ci}" data-slot="${si}">
+          </label>
+          ${url ? `<button class="cat-photo-clear" data-ci="${ci}" data-slot="${si}" title="Supprimer">✕</button>` : ''}
+        </div>
+        ${url ? `<img class="cat-photo-thumb" src="${url}" alt="">` : ''}
+      </div>`).join('');
 
     row.innerHTML = `
-      <div class="drag-handle" title="Déplacer" draggable="false">
+      <div class="drag-handle" title="${_tCat.btnMove}" draggable="false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="9" y1="6" x2="15" y2="6"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
       </div>
       <div class="cat-row-ico" id="cat-ico-preview-${ci}">
@@ -1885,7 +2853,7 @@ function renderCatsSection() {
         data-ci="${ci}">
       <div style="position:relative">
         <button class="ico-picker-btn" data-ci="${ci}" title="Changer l'icône">
-          <span class="ico-pb-label">${currentIco ? icoNameClean : '— Aucune —'}</span>
+          <span class="ico-pb-label">${currentIco ? icoNameClean : _tCat.noneIco}</span>
           <span>▾</span>
         </button>
         <div class="ico-picker-popup" id="ico-popup-${ci}">
@@ -1896,10 +2864,13 @@ function renderCatsSection() {
                 <span>${getIconLabel(ic).replace(/^.+\s/,'')}</span>
               </div>`).join('')}
           </div>
-          <button class="ico-picker-none" data-ci="${ci}">✕ Supprimer l'icône</button>
+          <button class="ico-picker-none" data-ci="${ci}">${_tCat.delIcon}</button>
         </div>
       </div>
       <button class="btn-del" data-ci="${ci}" title="Supprimer">✕</button>
+      <div class="cat-photos-row">
+        <div class="cat-photos-slots">${slotsHtml}</div>
+      </div>
     `;
     list.appendChild(row);
 
@@ -1940,7 +2911,7 @@ function renderCatsSection() {
       const i = parseInt(e.target.dataset.ci);
       if (!adminData.cats[i].names) adminData.cats[i].names = {};
       adminData.cats[i].names[currentLang] = e.target.value;
-      if (currentLang !== 'fr') setTxLock(`cat-${i}-${currentLang}`, e.target.value.trim() !== '');
+      if (currentLang !== PRIMARY_LANG) setTxLock(`cat-${i}-${currentLang}`, e.target.value.trim() !== '');
       markUnsaved();
       renderProductsSection();
     });
@@ -2003,13 +2974,64 @@ function renderCatsSection() {
       renderCatsSection();
       renderProductsSection();
     });
+
+    // Photos flipbook — upload (3 slots)
+    row.querySelectorAll('.cat-photo-input').forEach(input => {
+      input.addEventListener('change', e => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const i  = parseInt(e.target.dataset.ci);
+        const si = parseInt(e.target.dataset.slot);
+        const label = e.target.closest('label');
+        const reader = new FileReader();
+        reader.onload = ev => {
+          const img = new Image();
+          img.onload = () => {
+            const MAX = 1200;
+            let w = img.width, h = img.height;
+            if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            const localUrl = canvas.toDataURL('image/jpeg', 0.82);
+            if (!adminData.cats[i].flipPhotos) adminData.cats[i].flipPhotos = ['','',''];
+            adminData.cats[i].flipPhotos[si] = localUrl;
+            markUnsaved();
+            label.innerHTML = `<span style="opacity:.6">⏳</span><input type="file" class="cat-photo-input" accept="image/*" data-ci="${i}" data-slot="${si}">`;
+            canvas.toBlob(blob => {
+              uploadToCloudinary(blob)
+                .then(url => {
+                  adminData.cats[i].flipPhotos[si] = url;
+                  markUnsaved();
+                  renderCatsSection();
+                })
+                .catch(() => { renderCatsSection(); });
+            }, 'image/jpeg', 0.82);
+          };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+        e.target.value = '';
+      });
+    });
+
+    // Photos flipbook — supprimer (3 slots)
+    row.querySelectorAll('.cat-photo-clear').forEach(btn => {
+      btn.addEventListener('click', e => {
+        const i  = parseInt(e.target.dataset.ci);
+        const si = parseInt(e.target.dataset.slot);
+        if (!adminData.cats[i].flipPhotos) adminData.cats[i].flipPhotos = ['','',''];
+        adminData.cats[i].flipPhotos[si] = '';
+        markUnsaved();
+        renderCatsSection();
+      });
+    });
   });
 }
 
 document.getElementById('btn-add-cat').addEventListener('click', () => {
   const names = {};
-  LANGS.forEach(l => { names[l] = 'Nouvelle catégorie'; });
-  names.fr = 'Nouvelle catégorie';
+  LANGS.forEach(l => { names[l] = (ADMIN_UI[l] || ADMIN_UI.fr).newCat; });
   adminData.cats.push({ key: 'cat_' + Date.now(), ico: 'ico-star', names });
   markUnsaved();
   renderCatsSection();
@@ -2088,11 +3110,14 @@ function renderProdCard(container, item, ci) {
   card.className = 'prod-card';
   card.dataset.id = item.id;
 
-  const imgSrc = item.photo && (item.photo.startsWith('data:') || item.photo.startsWith('http'))
-    ? item.photo : '';
+  const imgSrc = item.photo
+    ? (item.photo.startsWith('data:') || item.photo.startsWith('http')
+        ? item.photo
+        : `https://images.unsplash.com/${item.photo}?w=200&h=200&fit=crop`)
+    : '';
 
   const thumbHTML = imgSrc
-    ? `<img class="prod-thumb" src="${imgSrc}" alt="">`
+    ? `<img class="prod-thumb" src="${imgSrc}" alt="" onerror="_admThumbErr(this)">`
     : `<div class="prod-thumb-empty">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
           <rect x="3" y="5" width="18" height="14" rx="2"/>
@@ -2105,7 +3130,7 @@ function renderProdCard(container, item, ci) {
     <div class="prod-card-top">
       ${thumbHTML}
       <div class="prod-top-info">
-        <div class="prod-top-name">${esc(item.name?.[currentLang] || item.name?.fr || 'Produit')}</div>
+        <div class="prod-top-name">${item.name?.[currentLang] ? esc(item.name[currentLang]) : '<span style="opacity:0.3">—</span>'}</div>
         <div class="prod-top-price">${esc(item.price || '')}</div>
       </div>
       <div class="prod-expand-ico"><svg><use href="#ico-up"/></svg></div>
@@ -2124,7 +3149,7 @@ function renderProdCard(container, item, ci) {
   // Verrou traduction : champ modifié manuellement en EN/AR
   card.addEventListener('input', e => {
     const { field, lang: fieldLang } = e.target.dataset;
-    if (!field || !fieldLang || fieldLang === 'fr') return;
+    if (!field || !fieldLang || fieldLang === PRIMARY_LANG) return;
     setTxLock(`item-${item.id}-${field}-${fieldLang}`, e.target.value.trim() !== '');
   });
 
@@ -2165,7 +3190,8 @@ function renderProdCard(container, item, ci) {
         if (ph) {
           const newImg = document.createElement('img');
           newImg.className = 'photo-preview';
-          newImg.alt = 'Aperçu de la photo';
+          newImg.alt = '';
+          newImg.onerror = () => _admPreviewErr(newImg);
           ph.replaceWith(newImg);
           prev = newImg;
         }
@@ -2228,7 +3254,7 @@ function renderProdCard(container, item, ci) {
     if (thumbEl) thumbEl.outerHTML = `<div class="prod-thumb-empty">${placeholderSVG}</div>`;
     // Preview formulaire
     const prevEl = card.querySelector('.photo-preview, .photo-preview-empty');
-    if (prevEl) prevEl.outerHTML = `<div class="photo-preview-empty">${placeholderSVG}<span>Aucune photo</span></div>`;
+    if (prevEl) prevEl.outerHTML = `<div class="photo-preview-empty">${placeholderSVG}<span>${(ADMIN_UI[currentLang]||ADMIN_UI.fr).noPhoto}</span></div>`;
   });
 
   // Marquer non-sauvegardé dès qu'un champ change (carte ouverte ou fermée)
@@ -2285,7 +3311,8 @@ function renderProdCard(container, item, ci) {
 
   // Delete product
   card.querySelector('.btn-del-prod').addEventListener('click', () => {
-    if (!confirm('Supprimer ce produit ?')) return;
+    const tDel = ADMIN_UI[currentLang] || ADMIN_UI.el;
+    if (!confirm(tDel.confirmDelete)) return;
     const idx = adminData.items.findIndex(it => it.id === item.id);
     if (idx > -1) adminData.items.splice(idx, 1);
     card.remove();
@@ -2305,7 +3332,7 @@ function buildProdForm(item) {
     `<option value="${l}"${l===currentLang?' selected':''}>${LANG_LABELS[l]}</option>`
   ).join('');
 
-  const t0 = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+  const t0 = ADMIN_UI[currentLang] || ADMIN_UI.el;
   const langFields = LANGS.map(l => `
     <div class="prod-lang-fields lang-fields${l===firstLang?' on':''}" data-lang="${l}">
       <div class="form-group">
@@ -2322,7 +3349,7 @@ function buildProdForm(item) {
   `).join('');
 
   // Badges
-  const t1 = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+  const t1 = ADMIN_UI[currentLang] || ADMIN_UI.el;
   const curType  = item.type  || '';
   const curTemp  = item.temp  || '';
   const curFlags = Array.isArray(item.badges) ? item.badges : [];
@@ -2374,7 +3401,7 @@ function buildProdForm(item) {
         </div>
       </div>
 
-      <div class="form-group">
+      <div class="form-group photo-form-group">
         <div class="form-lbl" data-uitxt="lblPhoto">${t1.lblPhoto}</div>
         <div class="photo-upload-row">
           <label class="btn-upload-photo">
@@ -2385,19 +3412,19 @@ function buildProdForm(item) {
           <button type="button" class="btn-clear-photo" title="✕">✕</button>
         </div>
         ${photoSrc
-          ? `<img class="photo-preview" src="${photoSrc}" alt="Aperçu de la photo">`
+          ? `<img class="photo-preview" src="${photoSrc}" alt="" onerror="_admPreviewErr(this)">`
           : `<div class="photo-preview-empty">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
                 <rect x="3" y="5" width="18" height="14" rx="2"/>
                 <circle cx="12" cy="12" r="3"/>
                 <path d="M8 5l1.5-2h5L16 5"/>
               </svg>
-              <span>Aucune photo</span>
+              <span>${t1.noPhoto}</span>
             </div>`
         }
         <label class="photo-show-row">
           <input type="checkbox" class="photo-show-chk" ${item.showPhoto !== false ? 'checked' : ''}>
-          Afficher dans le menu
+          ${t1.showInMenu}
         </label>
       </div>
 
@@ -2406,10 +3433,10 @@ function buildProdForm(item) {
     <div class="prod-actions">
       <div class="move-cat-row">
         <select class="form-select move-cat-sel">
-          <option value="">— Changer de catégorie —</option>
+          <option value="">${t1.changeCat}</option>
           ${adminData.cats.map((c,i) => `<option value="${i}"${i===item.cat?' disabled':''} ${i===item.cat?'style="opacity:.4"':''}>${esc(c.names?.[currentLang] || c.names?.fr || 'Cat '+i)}</option>`).join('')}
         </select>
-        <button class="btn-move-cat">Déplacer</button>
+        <button class="btn-move-cat">${t1.btnMove}</button>
       </div>
       <button class="btn-del-prod">${t1.btnDelProd}</button>
     </div>
@@ -2467,13 +3494,14 @@ function addProduct(ci) {
   const id = Date.now();
   const newItem = {
     id, cat: ci,
-    price: '0.000 DT',
+    price: '',
     photo: 'photo-1509042239860-f550ce710b93',
     badges: [],
     name: {}, full: {}
   };
+  const tAdd = ADMIN_UI[currentLang] || ADMIN_UI.el;
   LANGS.forEach(l => {
-    newItem.name[l] = 'Nouveau produit';
+    newItem.name[l] = tAdd.newProd;
     newItem.full[l] = '';
   });
   adminData.items.push(newItem);
@@ -2536,19 +3564,27 @@ async function doSaveAll() {
   // 1. Collecter les formulaires ouverts
   collectAllForms();
 
-  // 2. Auto-traduire FR → EN et FR → AR uniquement si on est en mode français
-  const targets    = ['en', 'ar'];
-  const infoFields = ['wifi_name','wifi_val','hours_name','hours_val','addr_name','addr_val','noteText'];
+  // 2. Auto-traduire depuis la langue principale vers les autres langues
+  const srcLang    = PRIMARY_LANG; // Toujours traduire depuis la langue principale
+  const targets    = LANGS.filter(l => l !== srcLang);
+  const infoFields = ['hours_name','hours_val','addr_name','addr_val','noteText'];
   const prodFields = ['name','desc','full'];
   if (!adminData._txHashes) adminData._txHashes = {};
   if (!adminData._txLock)   adminData._txLock   = {};
+
+  // Rafraîchir les verrous depuis Firebase pour la synchronisation inter-appareils
+  try {
+    const freshLock = await _db.ref('menu/_txLock').once('value');
+    if (freshLock.val() && typeof freshLock.val() === 'object') {
+      adminData._txLock = { ...freshLock.val(), ...(adminData._txLock || {}) };
+    }
+  } catch(e) {}
+
   const hashes = adminData._txHashes;
   const locks  = adminData._txLock;
+  const t = ADMIN_UI[currentLang] || ADMIN_UI.el;
 
-  // Lancer la traduction si on est en FR (peu importe s'il y a des produits)
-  const hasContent = currentLang === 'fr';
-
-  if (hasContent) {
+  {
     let totalDone = 0;
     let translated = 0, skipped = 0, errors = 0;
 
@@ -2556,17 +3592,18 @@ async function doSaveAll() {
       totalDone++;
 
       // ── Catégories ──
-      setProgress(`⏳ → ${LANG_LABELS[toLang]} (${totalDone}/${targets.length}) Catégories…`);
+      setProgress(`⏳ → ${LANG_LABELS[toLang]} (${totalDone}/${targets.length}) ${t.progressCats}`);
       for (let ci = 0; ci < adminData.cats.length; ci++) {
         const cat = adminData.cats[ci];
-        const srcName = (cat.names?.fr || '').trim();
+        const srcName = (cat.names?.[srcLang] || cat.names?.el || '').trim();
         if (!srcName) continue;
         const hashKey = `cat-${ci}-${toLang}`;
         const curHash = simpleHash(srcName);
-        if (locks[hashKey]) { skipped++; continue; } // modifié manuellement
+        if (!(cat.names?.[toLang] || '').trim()) delete locks[hashKey]; // champ vide → forcer traduction
+        if (locks[hashKey]) { skipped++; continue; }
         if (hashes[hashKey] === curHash && (cat.names?.[toLang] || '').trim()) { skipped++; continue; }
         try {
-          const tx = await translateText(srcName, 'fr', toLang);
+          const tx = await translateText(srcName, srcLang, toLang);
           if (tx) { if (!cat.names) cat.names = {}; cat.names[toLang] = tx; hashes[hashKey] = curHash; translated++; }
           else errors++;
         } catch(e) { errors++; console.warn('Traduction cat échouée:', e.message); }
@@ -2574,31 +3611,33 @@ async function doSaveAll() {
       }
 
       // ── Produits ──
-      setProgress(`⏳ → ${LANG_LABELS[toLang]} (${totalDone}/${targets.length}) Produits…`);
+      setProgress(`⏳ → ${LANG_LABELS[toLang]} (${totalDone}/${targets.length}) ${t.progressProds}`);
       for (const item of adminData.items) {
         for (const field of prodFields) {
-          const srcText = (item[field]?.fr || '').trim();
+          const srcText = (item[field]?.[srcLang] || item[field]?.el || '').trim();
           if (!srcText) continue;
           const hashKey = `item-${item.id}-${field}-${toLang}`;
           const curHash = simpleHash(srcText);
-          if (locks[hashKey]) { skipped++; continue; } // modifié manuellement
+          if (!(item[field]?.[toLang] || '').trim()) delete locks[hashKey]; // champ vide → forcer traduction
+          if (locks[hashKey]) { skipped++; continue; }
           if (hashes[hashKey] === curHash && (item[field]?.[toLang] || '').trim()) { skipped++; continue; }
           try {
-            const tx = await translateText(srcText, 'fr', toLang);
+            const tx = await translateText(srcText, srcLang, toLang);
             if (tx) { if (!item[field]) item[field] = {}; item[field][toLang] = tx; hashes[hashKey] = curHash; translated++; }
             else errors++;
           } catch(e) { errors++; console.warn('Traduction produit échouée:', e.message); }
           await sleep(200);
         }
         // Allergènes
-        const srcAl = (item.allergens?.fr || []).join(', ');
+        const srcAl = (item.allergens?.[srcLang] || item.allergens?.el || []).join(', ');
         if (srcAl.trim()) {
           const hashKey = `item-${item.id}-allergens-${toLang}`;
           const curHash = simpleHash(srcAl);
+          if (!(item.allergens?.[toLang]||[]).length) delete locks[hashKey]; // vide → forcer traduction
           if (locks[hashKey]) { skipped++; }
           else if (!(hashes[hashKey] === curHash && (item.allergens?.[toLang]||[]).length)) {
             try {
-              const tx = await translateText(srcAl, 'fr', toLang);
+              const tx = await translateText(srcAl, srcLang, toLang);
               if (tx) {
                 if (!item.allergens) item.allergens = {};
                 item.allergens[toLang] = tx.split(',').map(s => s.trim()).filter(Boolean);
@@ -2611,16 +3650,21 @@ async function doSaveAll() {
       }
 
       // ── Infos café ──
-      setProgress(`⏳ → ${LANG_LABELS[toLang]} (${totalDone}/${targets.length}) Infos café…`);
+      setProgress(`⏳ → ${LANG_LABELS[toLang]} (${totalDone}/${targets.length}) ${t.progressInfo}`);
       for (const field of infoFields) {
-        const srcText = (adminData.info[field]?.fr || '').trim();
+        // Assurer que le champ est un objet avant de le traduire
+        if (!adminData.info[field] || typeof adminData.info[field] !== 'object') {
+          adminData.info[field] = {};
+        }
+        const srcText = (adminData.info[field]?.[srcLang] || adminData.info[field]?.el || '').trim();
         if (!srcText) continue;
         const hashKey = `info-${field}-${toLang}`;
         const curHash = simpleHash(srcText);
-        if (locks[hashKey]) { skipped++; continue; } // modifié manuellement
+        if (!(adminData.info[field]?.[toLang] || '').trim()) delete locks[hashKey]; // vide → forcer traduction
+        if (locks[hashKey]) { skipped++; continue; }
         if (hashes[hashKey] === curHash && (adminData.info[field]?.[toLang] || '').trim()) { skipped++; continue; }
         try {
-          const tx = await translateText(srcText, 'fr', toLang);
+          const tx = await translateText(srcText, srcLang, toLang);
           if (tx) {
             if (!adminData.info[field]) adminData.info[field] = {};
             adminData.info[field][toLang] = tx; hashes[hashKey] = curHash; translated++;
@@ -2631,22 +3675,35 @@ async function doSaveAll() {
     }
 
     if (errors > 0 && translated === 0) {
-      setProgress(`⚠ Traduction échouée (limite API atteinte ?) — données FR sauvegardées`, true);
+      setProgress(t.errTransFailed, true);
       clearProgress(10000);
     } else if (errors > 0) {
-      setProgress(`⚠ ${translated} traduits, ${errors} erreurs — vérifiez EN/AR`, true);
+      setProgress(`⚠ ${translated} ${t.txOk}, ${errors} ${t.txErr}`, true);
       clearProgress(8000);
     } else if (translated > 0) {
-      setProgress(`✓ ${translated} champ(s) traduits automatiquement`);
+      setProgress(`✓ ${translated} ${t.txDone}`);
       clearProgress();
     } else {
       setProgress('');
     }
   }
 
-  // 3. Sauvegarder
+  // 3. Synchroniser les champs globaux WiFi (même valeur pour toutes les langues)
+  for (const wifiField of ['wifi_name', 'wifi_val']) {
+    if (adminData.info?.[wifiField]) {
+      const val = adminData.info[wifiField][PRIMARY_LANG]
+        || Object.values(adminData.info[wifiField]).find(v => v && typeof v === 'string')
+        || '';
+      LANGS.forEach(l => { adminData.info[wifiField][l] = val; });
+    }
+  }
+
+  // 4. Sauvegarder
   delete fab.dataset.saving;
   saveData();
+  // Vider les cartes avant renderAll pour éviter que collectProdForm écrase les traductions
+  const _pa = document.getElementById('products-area');
+  if (_pa) _pa.innerHTML = '';
   renderAll();
 }
 
@@ -2693,7 +3750,7 @@ function getDefaultItems() {
   return [
   /* ---- CAT 0: Boissons Chaudes ---- */
   {
-    id:1, cat:0, price:'3.500 DT', photo:'photo-1509042239860-f550ce710b93',
+    id:1, cat:0, price:'€3.50', photo:'photo-1509042239860-f550ce710b93',
     badges:['popular'],
     name:{ fr:'Espresso', en:'Espresso', ar:'إسبريسو' },
     desc:{ fr:'Café court et intense — pur, concentré, signature Mozart.', en:'Short and intense coffee — pure, concentrated, Mozart signature.', ar:'قهوة قصيرة ومكثفة — نقية وصافية، توقيع موزارت.' },
@@ -2701,7 +3758,7 @@ function getDefaultItems() {
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
-    id:2, cat:0, price:'4.000 DT', photo:'photo-1565031491910-e57fac031c41',
+    id:2, cat:0, price:'€4.00', photo:'photo-1565031491910-e57fac031c41',
     badges:[],
     name:{ fr:'Doppio', en:'Doppio', ar:'دوبيو' },
     desc:{ fr:'Double espresso puissant — pour les vrais amateurs de café fort.', en:'Powerful double espresso — for true lovers of strong coffee.', ar:'إسبريسو مزدوج قوي — لعشاق القهوة الحقيقيين.' },
@@ -2709,7 +3766,7 @@ function getDefaultItems() {
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
-    id:3, cat:0, price:'5.500 DT', photo:'photo-1572442388796-11668a67e53d',
+    id:3, cat:0, price:'€5.50', photo:'photo-1572442388796-11668a67e53d',
     badges:['popular'],
     name:{ fr:'Cappuccino', en:'Cappuccino', ar:'كابتشينو' },
     desc:{ fr:'Espresso, lait chaud et mousse veloutée — l\'équilibre parfait.', en:'Espresso, steamed milk and velvety foam — the perfect balance.', ar:'إسبريسو وحليب مسخَّن وزبد مخملي — التوازن المثالي.' },
@@ -2717,7 +3774,7 @@ function getDefaultItems() {
     allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
   },
   {
-    id:4, cat:0, price:'6.000 DT', photo:'photo-1561882468-9110e03e0f78',
+    id:4, cat:0, price:'€6.00', photo:'photo-1561882468-9110e03e0f78',
     badges:['popular'],
     name:{ fr:'Café Latte', en:'Café Latte', ar:'كافيه لاتيه' },
     desc:{ fr:'Espresso sur lit de lait soyeux, doux et crémeux.', en:'Espresso on a bed of silky milk, soft and creamy.', ar:'إسبريسو على سرير من الحليب الحريري، ناعم وكريمي.' },
@@ -2725,7 +3782,7 @@ function getDefaultItems() {
     allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
   },
   {
-    id:5, cat:0, price:'5.000 DT', photo:'photo-1514432324607-a09d9b4aefdd',
+    id:5, cat:0, price:'€5.00', photo:'photo-1514432324607-a09d9b4aefdd',
     badges:[],
     name:{ fr:'Café Noisette', en:'Hazelnut Coffee', ar:'قهوة بالبندق' },
     desc:{ fr:'Espresso allongé d\'un nuage de lait parfumé à la noisette.', en:'Espresso with a cloud of hazelnut-scented milk.', ar:'إسبريسو مع قليل من الحليب بنكهة البندق.' },
@@ -2733,7 +3790,7 @@ function getDefaultItems() {
     allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
   },
   {
-    id:6, cat:0, price:'4.500 DT', photo:'photo-1496318447583-f524534e9ce1',
+    id:6, cat:0, price:'€4.50', photo:'photo-1496318447583-f524534e9ce1',
     badges:[],
     name:{ fr:'Americano', en:'Americano', ar:'أمريكانو' },
     desc:{ fr:'Espresso allongé à l\'eau chaude — café long et équilibré.', en:'Espresso extended with hot water — long and balanced coffee.', ar:'إسبريسو ممدود بالماء الساخن — قهوة طويلة ومتوازنة.' },
@@ -2741,7 +3798,7 @@ function getDefaultItems() {
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
-    id:7, cat:0, price:'3.000 DT', photo:'photo-1544787219-7f47ccb76574',
+    id:7, cat:0, price:'€3.00', photo:'photo-1544787219-7f47ccb76574',
     badges:[],
     name:{ fr:'Thé Nature', en:'Plain Tea', ar:'شاي طبيعي' },
     desc:{ fr:'Thé noir ou vert selon votre choix — chaud et réconfortant.', en:'Black or green tea of your choice — warm and comforting.', ar:'شاي أسود أو أخضر حسب اختيارك — دافئ ومريح.' },
@@ -2749,7 +3806,7 @@ function getDefaultItems() {
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
-    id:8, cat:0, price:'4.000 DT', photo:'photo-1556679343-c7306c1976bc',
+    id:8, cat:0, price:'€4.00', photo:'photo-1556679343-c7306c1976bc',
     badges:['popular'],
     name:{ fr:'Thé à la Menthe', en:'Mint Tea', ar:'شاي بالنعناع' },
     desc:{ fr:'Thé vert frais infusé avec de la menthe fraîche — traditionnel et rafraîchissant.', en:'Fresh green tea infused with fresh mint — traditional and refreshing.', ar:'شاي أخضر طازج منقوع بالنعناع الطازج — تقليدي ومنعش.' },
@@ -2757,7 +3814,7 @@ function getDefaultItems() {
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
-    id:9, cat:0, price:'7.000 DT', photo:'photo-1542990253-a781e904e62f',
+    id:9, cat:0, price:'€7.00', photo:'photo-1542990253-a781e904e62f',
     badges:[],
     name:{ fr:'Chocolat Chaud', en:'Hot Chocolate', ar:'شوكولاتة ساخنة' },
     desc:{ fr:'Chocolat onctueux et crémeux — réconfort assuré.', en:'Smooth and creamy chocolate — guaranteed comfort.', ar:'شوكولاتة ناعمة وكريمية — راحة مضمونة.' },
@@ -2767,7 +3824,7 @@ function getDefaultItems() {
 
   /* ---- CAT 1: Boissons Froides ---- */
   {
-    id:10, cat:1, price:'12.000 DT', photo:'photo-1514362545857-3bc16c4c7d1b',
+    id:10, cat:1, price:'€12.00', photo:'photo-1514362545857-3bc16c4c7d1b',
     badges:['popular'],
     name:{ fr:'Mojito Classique', en:'Classic Mojito', ar:'موهيتو كلاسيك' },
     desc:{ fr:'Menthe fraîche, citron vert, sucre de canne et eau pétillante — l\'original.', en:'Fresh mint, lime, cane sugar and sparkling water — the original.', ar:'نعناع طازج وليمون أخضر وسكر قصب ومياه فوارة — الأصلي.' },
@@ -2775,7 +3832,7 @@ function getDefaultItems() {
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
-    id:11, cat:1, price:'12.000 DT', photo:'photo-1544145945-f90425340c7e',
+    id:11, cat:1, price:'€12.00', photo:'photo-1544145945-f90425340c7e',
     badges:['popular'],
     name:{ fr:'Mojito Fraise', en:'Strawberry Mojito', ar:'موهيتو فراولة' },
     desc:{ fr:'Fraises fraîches, menthe, citron vert et eau pétillante — fruité et frais.', en:'Fresh strawberries, mint, lime and sparkling water — fruity and fresh.', ar:'فراولة طازجة ونعناع وليمون أخضر ومياه فوارة — فاكهي ومنعش.' },
@@ -2783,7 +3840,7 @@ function getDefaultItems() {
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
-    id:12, cat:1, price:'13.000 DT', photo:'photo-1553361371-9b22f78e8b1d',
+    id:12, cat:1, price:'€13.00', photo:'photo-1553361371-9b22f78e8b1d',
     badges:[],
     name:{ fr:'Smoothie Fruits Rouges', en:'Red Fruits Smoothie', ar:'سموثي فواكه حمراء' },
     desc:{ fr:'Fraises, framboises et myrtilles mixées — onctueux et vitaminé.', en:'Blended strawberries, raspberries and blueberries — smooth and full of vitamins.', ar:'فراولة وتوت أحمر وتوت أزرق — ناعم ومليء بالفيتامينات.' },
@@ -2791,7 +3848,7 @@ function getDefaultItems() {
     allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
   },
   {
-    id:13, cat:1, price:'13.000 DT', photo:'photo-1490645935967-10de6ba17061',
+    id:13, cat:1, price:'€13.00', photo:'photo-1490645935967-10de6ba17061',
     badges:[],
     name:{ fr:'Smoothie Mangue-Banane', en:'Mango Banana Smoothie', ar:'سموثي مانجو وموز' },
     desc:{ fr:'Mangue et banane mixées — tropical, doux et nourrissant.', en:'Blended mango and banana — tropical, sweet and nourishing.', ar:'مانجو وموز مهروسان — استوائي، حلو ومغذٍّ.' },
@@ -2799,7 +3856,7 @@ function getDefaultItems() {
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
-    id:14, cat:1, price:'8.000 DT', photo:'photo-1621506289937-a8e4df240d0b',
+    id:14, cat:1, price:'€8.00', photo:'photo-1621506289937-a8e4df240d0b',
     badges:[],
     name:{ fr:'Jus d\'Orange Pressé', en:'Fresh Orange Juice', ar:'عصير برتقال طازج' },
     desc:{ fr:'Oranges fraîches pressées à la demande — pur et naturel.', en:'Fresh oranges pressed on demand — pure and natural.', ar:'برتقال طازج معصور عند الطلب — نقي وطبيعي.' },
@@ -2807,7 +3864,7 @@ function getDefaultItems() {
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
-    id:15, cat:1, price:'8.000 DT', photo:'photo-1589733955941-5eeaf752f6dd',
+    id:15, cat:1, price:'€8.00', photo:'photo-1589733955941-5eeaf752f6dd',
     badges:[],
     name:{ fr:'Jus de Pastèque', en:'Watermelon Juice', ar:'عصير بطيخ' },
     desc:{ fr:'Pastèque fraîche mixée — légère, sucrée et ultra-rafraîchissante.', en:'Blended fresh watermelon — light, sweet and ultra-refreshing.', ar:'بطيخ طازج مهروس — خفيف وحلو ومنعش للغاية.' },
@@ -2815,7 +3872,7 @@ function getDefaultItems() {
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
-    id:16, cat:1, price:'9.000 DT', photo:'photo-1461023058943-07fcbe16d735',
+    id:16, cat:1, price:'€9.00', photo:'photo-1461023058943-07fcbe16d735',
     badges:['popular'],
     name:{ fr:'Ice Latte', en:'Ice Latte', ar:'آيس لاتيه' },
     desc:{ fr:'Espresso sur glaçons avec lait froid — café glacé velouté.', en:'Espresso over ice with cold milk — velvety iced coffee.', ar:'إسبريسو على الثلج مع حليب بارد — قهوة مثلجة مخملية.' },
@@ -2823,7 +3880,7 @@ function getDefaultItems() {
     allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
   },
   {
-    id:17, cat:1, price:'8.000 DT', photo:'photo-1600718374662-0483d2b9da44',
+    id:17, cat:1, price:'€8.00', photo:'photo-1600718374662-0483d2b9da44',
     badges:[],
     name:{ fr:'Ice Coffee', en:'Ice Coffee', ar:'قهوة مثلجة' },
     desc:{ fr:'Café froid préparé, sucré et servi sur glaçons — simple et délicieux.', en:'Prepared cold coffee, sweetened and served over ice — simple and delicious.', ar:'قهوة باردة محضَّرة، محلاة ومقدَّمة على الثلج — بسيطة ولذيذة.' },
@@ -2831,7 +3888,7 @@ function getDefaultItems() {
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
-    id:18, cat:1, price:'13.000 DT', photo:'photo-1568901346375-23c9450c58cd',
+    id:18, cat:1, price:'€13.00', photo:'photo-1568901346375-23c9450c58cd',
     badges:[],
     name:{ fr:'Milkshake Chocolat', en:'Chocolate Milkshake', ar:'ميلك شيك شوكولاتة' },
     desc:{ fr:'Lait, glace chocolat et sirop — épais, riche et gourmand.', en:'Milk, chocolate ice cream and syrup — thick, rich and indulgent.', ar:'حليب وآيس كريم شوكولاتة وشراب — كثيف وغني وشهي.' },
@@ -2839,7 +3896,7 @@ function getDefaultItems() {
     allergens:{ fr:['Lait','Gluten'], en:['Milk','Gluten'], ar:['الحليب','الغلوتين'] }
   },
   {
-    id:19, cat:1, price:'13.000 DT', photo:'photo-1614086138868-51ab4f45f84c',
+    id:19, cat:1, price:'€13.00', photo:'photo-1614086138868-51ab4f45f84c',
     badges:['popular'],
     name:{ fr:'Milkshake Fraise', en:'Strawberry Milkshake', ar:'ميلك شيك فراولة' },
     desc:{ fr:'Fraises fraîches, glace vanille et lait — fruité et crémeux.', en:'Fresh strawberries, vanilla ice cream and milk — fruity and creamy.', ar:'فراولة طازجة وآيس كريم فانيلا وحليب — فاكهي وكريمي.' },
@@ -2847,7 +3904,7 @@ function getDefaultItems() {
     allergens:{ fr:['Lait'], en:['Milk'], ar:['الحليب'] }
   },
   {
-    id:20, cat:1, price:'14.000 DT', photo:'photo-1551024709-8f23befc6f87',
+    id:20, cat:1, price:'€14.00', photo:'photo-1551024709-8f23befc6f87',
     badges:['new'],
     name:{ fr:'Cocktail Tropical', en:'Tropical Cocktail', ar:'كوكتيل استوائي' },
     desc:{ fr:'Ananas, mangue, fruit de la passion et citron vert — un voyage tropical.', en:'Pineapple, mango, passion fruit and lime — a tropical journey.', ar:'أناناس ومانجو وفاكهة العاطفة والليمون الأخضر — رحلة استوائية.' },
@@ -2855,7 +3912,7 @@ function getDefaultItems() {
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
-    id:21, cat:1, price:'11.000 DT', photo:'photo-1543362906-acfc16c67564',
+    id:21, cat:1, price:'€11.00', photo:'photo-1543362906-acfc16c67564',
     badges:[],
     name:{ fr:'Détox Citron-Gingembre', en:'Lemon Ginger Detox', ar:'ديتوكس ليمون وزنجبيل' },
     desc:{ fr:'Eau infusée au citron, gingembre et menthe — purifiante et vitaminée.', en:'Water infused with lemon, ginger and mint — purifying and vitamin-rich.', ar:'ماء منقوع بالليمون والزنجبيل والنعناع — منقٍّ وغني بالفيتامينات.' },
@@ -2865,7 +3922,7 @@ function getDefaultItems() {
 
   /* ---- CAT 2: Cuisine ---- */
   {
-    id:22, cat:2, price:'17.000 DT', photo:'photo-1512621776951-a57141f2eefd',
+    id:22, cat:2, price:'€17.00', photo:'photo-1512621776951-a57141f2eefd',
     badges:[],
     name:{ fr:'Salade César', en:'Caesar Salad', ar:'سالاد سيزار' },
     desc:{ fr:'Laitue romaine, poulet grillé, croûtons, parmesan et sauce César maison.', en:'Romaine lettuce, grilled chicken, croutons, parmesan and house Caesar dressing.', ar:'خس روماني ودجاج مشوي وخبز محمص وبارميزان وصلصة سيزار البيت.' },
@@ -2873,7 +3930,7 @@ function getDefaultItems() {
     allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
   },
   {
-    id:23, cat:2, price:'16.000 DT', photo:'photo-1540420773420-3366772f4999',
+    id:23, cat:2, price:'€16.00', photo:'photo-1540420773420-3366772f4999',
     badges:[],
     name:{ fr:'Salade Thon', en:'Tuna Salad', ar:'سالاد تونة' },
     desc:{ fr:'Thon, tomates, olives, œuf dur, maïs et vinaigrette maison.', en:'Tuna, tomatoes, olives, hard-boiled egg, corn and house vinaigrette.', ar:'تونة وطماطم وزيتون وبيض مسلوق وذرة وخل البيت.' },
@@ -2881,7 +3938,7 @@ function getDefaultItems() {
     allergens:{ fr:['Œufs','Poisson'], en:['Eggs','Fish'], ar:['البيض','السمك'] }
   },
   {
-    id:24, cat:2, price:'24.000 DT', photo:'photo-1563379926898-05f4575a45d8',
+    id:24, cat:2, price:'€24.00', photo:'photo-1563379926898-05f4575a45d8',
     badges:['popular'],
     name:{ fr:'Pasta Carbonara', en:'Pasta Carbonara', ar:'باستا كاربونارا' },
     desc:{ fr:'Pâtes crémeuses, lardons, jaune d\'œuf et parmesan — un classique italien.', en:'Creamy pasta, bacon, egg yolk and parmesan — an Italian classic.', ar:'معكرونة كريمية ولحم مقدد وصفار بيض وبارميزان — كلاسيكي إيطالي.' },
@@ -2889,7 +3946,7 @@ function getDefaultItems() {
     allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
   },
   {
-    id:25, cat:2, price:'24.000 DT', photo:'photo-1621996346565-e3dbc646d9a9',
+    id:25, cat:2, price:'€24.00', photo:'photo-1621996346565-e3dbc646d9a9',
     badges:[],
     name:{ fr:'Pasta Bolognaise', en:'Pasta Bolognese', ar:'باستا بولونيز' },
     desc:{ fr:'Pâtes avec sauce tomate à la viande hachée, mijotée longuement.', en:'Pasta with minced meat tomato sauce, slow-simmered.', ar:'معكرونة مع صلصة طماطم اللحم المفروم، مطهوة ببطء.' },
@@ -2897,7 +3954,7 @@ function getDefaultItems() {
     allergens:{ fr:['Gluten'], en:['Gluten'], ar:['الغلوتين'] }
   },
   {
-    id:26, cat:2, price:'26.000 DT', photo:'photo-1586190848861-99aa4a171e90',
+    id:26, cat:2, price:'€26.00', photo:'photo-1586190848861-99aa4a171e90',
     badges:['popular'],
     name:{ fr:'Hamburger Classic', en:'Classic Burger', ar:'هامبرغر كلاسيك' },
     desc:{ fr:'Steak haché, cheddar fondu, salade, tomate et sauce maison.', en:'Beef patty, melted cheddar, lettuce, tomato and house sauce.', ar:'لحم مفروم وشيدر مذاب وخس وطماطم وصلصة البيت.' },
@@ -2905,7 +3962,7 @@ function getDefaultItems() {
     allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
   },
   {
-    id:27, cat:2, price:'26.000 DT', photo:'photo-1568901346375-23c9450c58cd',
+    id:27, cat:2, price:'€26.00', photo:'photo-1568901346375-23c9450c58cd',
     badges:['new'],
     name:{ fr:'Burger Crispy Chicken', en:'Crispy Chicken Burger', ar:'بيرغر دجاج كريسبي' },
     desc:{ fr:'Poulet croustillant frit, coleslaw, pickles et sauce ranch.', en:'Crispy fried chicken, coleslaw, pickles and ranch sauce.', ar:'دجاج مقلي مقرمش وكول سلو ومخللات وصلصة رانش.' },
@@ -2913,7 +3970,7 @@ function getDefaultItems() {
     allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
   },
   {
-    id:28, cat:2, price:'22.000 DT', photo:'photo-1552332386-f8dd00dc2f85',
+    id:28, cat:2, price:'€22.00', photo:'photo-1552332386-f8dd00dc2f85',
     badges:['popular'],
     name:{ fr:'Tacos Poulet', en:'Chicken Tacos', ar:'تاكوس دجاج' },
     desc:{ fr:'Galette moelleuse, poulet grillé, fromage fondu, salade et sauce.', en:'Soft flatbread, grilled chicken, melted cheese, salad and sauce.', ar:'خبز ناعم ودجاج مشوي وجبن مذاب وخس وصلصة.' },
@@ -2921,7 +3978,7 @@ function getDefaultItems() {
     allergens:{ fr:['Gluten','Lait'], en:['Gluten','Milk'], ar:['الغلوتين','الحليب'] }
   },
   {
-    id:29, cat:2, price:'20.000 DT', photo:'photo-1528735602780-2552fd46c7af',
+    id:29, cat:2, price:'€20.00', photo:'photo-1528735602780-2552fd46c7af',
     badges:[],
     name:{ fr:'Ciabatta Thon-Fromage', en:'Tuna Cheese Ciabatta', ar:'شياباتا تونة وجبن' },
     desc:{ fr:'Pain ciabatta grillé, thon, fromage fondu, tomates et roquette.', en:'Grilled ciabatta, tuna, melted cheese, tomatoes and rocket.', ar:'خبز شياباتا مشوي وتونة وجبن مذاب وطماطم وجرجير.' },
@@ -2929,7 +3986,7 @@ function getDefaultItems() {
     allergens:{ fr:['Gluten','Lait','Poisson'], en:['Gluten','Milk','Fish'], ar:['الغلوتين','الحليب','السمك'] }
   },
   {
-    id:30, cat:2, price:'18.000 DT', photo:'photo-1565299507177-b0ac66763828',
+    id:30, cat:2, price:'€18.00', photo:'photo-1565299507177-b0ac66763828',
     badges:[],
     name:{ fr:'Sandwich Libanais Poulet', en:'Lebanese Chicken Sandwich', ar:'ساندويش لبناني دجاج' },
     desc:{ fr:'Pain pita, poulet grillé aux épices, toum, chou et tomates.', en:'Pita bread, spiced grilled chicken, toum, cabbage and tomatoes.', ar:'خبز بيتا ودجاج مشوي بالتوابل وثوم وملفوف وطماطم.' },
@@ -2937,7 +3994,7 @@ function getDefaultItems() {
     allergens:{ fr:['Gluten'], en:['Gluten'], ar:['الغلوتين'] }
   },
   {
-    id:31, cat:2, price:'16.000 DT', photo:'photo-1519676867240-f03562e64548',
+    id:31, cat:2, price:'€16.00', photo:'photo-1519676867240-f03562e64548',
     badges:[],
     name:{ fr:'Crêpe Poulet-Fromage', en:'Chicken Cheese Crêpe', ar:'كريب دجاج وجبن' },
     desc:{ fr:'Fine crêpe salée, poulet grillé, fromage fondu et herbes fraîches.', en:'Thin savoury crêpe, grilled chicken, melted cheese and fresh herbs.', ar:'كريب رفيع مملح ودجاج مشوي وجبن مذاب وأعشاب طازجة.' },
@@ -2945,7 +4002,7 @@ function getDefaultItems() {
     allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
   },
   {
-    id:32, cat:2, price:'16.000 DT', photo:'photo-1528735602780-2552fd46c7af',
+    id:32, cat:2, price:'€16.00', photo:'photo-1528735602780-2552fd46c7af',
     badges:[],
     name:{ fr:'Panini Mozzarella-Tomates', en:'Mozzarella Tomato Panini', ar:'باني موزاريلا وطماطم' },
     desc:{ fr:'Pain panini grillé, mozzarella fondante, tomates fraîches et basilic.', en:'Grilled panini bread, melting mozzarella, fresh tomatoes and basil.', ar:'خبز باني مشوي وموزاريلا ذائبة وطماطم طازجة وريحان.' },
@@ -2953,7 +4010,7 @@ function getDefaultItems() {
     allergens:{ fr:['Gluten','Lait'], en:['Gluten','Milk'], ar:['الغلوتين','الحليب'] }
   },
   {
-    id:33, cat:2, price:'14.000 DT', photo:'photo-1525351484163-7529414344d8',
+    id:33, cat:2, price:'€14.00', photo:'photo-1525351484163-7529414344d8',
     badges:[],
     name:{ fr:'Omlette au Fromage', en:'Cheese Omelette', ar:'أومليت بالجبن' },
     desc:{ fr:'Trois œufs frais, fromage fondu, herbes aromatiques — simple et généreux.', en:'Three fresh eggs, melted cheese, aromatic herbs — simple and generous.', ar:'ثلاث بيضات طازجة وجبن مذاب وأعشاب عطرية — بسيط وسخي.' },
@@ -2963,7 +4020,7 @@ function getDefaultItems() {
 
   /* ---- CAT 3: Sucré ---- */
   {
-    id:34, cat:3, price:'10.000 DT', photo:'photo-1519676867240-f03562e64548',
+    id:34, cat:3, price:'€10.00', photo:'photo-1519676867240-f03562e64548',
     badges:['popular'],
     name:{ fr:'Crêpe Nutella', en:'Nutella Crêpe', ar:'كريب نوتيلا' },
     desc:{ fr:'Fine crêpe sucrée généreusement garnie de Nutella — un classique indémodable.', en:'Fine sweet crêpe generously filled with Nutella — a timeless classic.', ar:'كريب رفيع محشو بسخاء بالنوتيلا — كلاسيكي خالد.' },
@@ -2971,7 +4028,7 @@ function getDefaultItems() {
     allergens:{ fr:['Gluten','Lait','Fruits à coque'], en:['Gluten','Milk','Tree nuts'], ar:['الغلوتين','الحليب','المكسرات'] }
   },
   {
-    id:35, cat:3, price:'11.000 DT', photo:'photo-1605288558240-e2d0fa15c1d4',
+    id:35, cat:3, price:'€11.00', photo:'photo-1605288558240-e2d0fa15c1d4',
     badges:[],
     name:{ fr:'Crêpe Fraise-Chantilly', en:'Strawberry Cream Crêpe', ar:'كريب فراولة وكريمة' },
     desc:{ fr:'Crêpe sucrée avec fraises fraîches et chantilly maison.', en:'Sweet crêpe with fresh strawberries and house whipped cream.', ar:'كريب حلو مع فراولة طازجة وكريمة شانتيه البيت.' },
@@ -2979,7 +4036,7 @@ function getDefaultItems() {
     allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
   },
   {
-    id:36, cat:3, price:'11.000 DT', photo:'photo-1562376552-0d160a2f238a',
+    id:36, cat:3, price:'€11.00', photo:'photo-1562376552-0d160a2f238a',
     badges:[],
     name:{ fr:'Gaufre Chocolat', en:'Chocolate Waffle', ar:'غوفر شوكولاتة' },
     desc:{ fr:'Gaufre croustillante, sauce chocolat chaude et chantilly.', en:'Crispy waffle, warm chocolate sauce and whipped cream.', ar:'غوفر مقرمش وصلصة شوكولاتة ساخنة وكريمة مخفوقة.' },
@@ -2987,7 +4044,7 @@ function getDefaultItems() {
     allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
   },
   {
-    id:37, cat:3, price:'13.000 DT', photo:'photo-1567620832903-9fc6debc209f',
+    id:37, cat:3, price:'€13.00', photo:'photo-1567620832903-9fc6debc209f',
     badges:['new','popular'],
     name:{ fr:'Gaufre Lotus', en:'Lotus Waffle', ar:'غوفر لوتس' },
     desc:{ fr:'Gaufre dorée, crème de biscuit Lotus et éclats de Speculoos.', en:'Golden waffle, Lotus biscuit cream and Speculoos crumbles.', ar:'غوفر ذهبي وكريمة بسكويت لوتس وفتات سبيكولوس.' },
@@ -2995,7 +4052,7 @@ function getDefaultItems() {
     allergens:{ fr:['Gluten','Lait'], en:['Gluten','Milk'], ar:['الغلوتين','الحليب'] }
   },
   {
-    id:38, cat:3, price:'12.000 DT', photo:'photo-1530373239216-42518e6b4063',
+    id:38, cat:3, price:'€12.00', photo:'photo-1530373239216-42518e6b4063',
     badges:['popular'],
     name:{ fr:'Tiramisu Maison', en:'House Tiramisu', ar:'تيراميسو البيت' },
     desc:{ fr:'Mascarpone, biscuits imbibés de café, cacao — recette italienne maison.', en:'Mascarpone, coffee-soaked biscuits, cocoa — homemade Italian recipe.', ar:'ماسكاربوني وبسكويت منقوع بالقهوة وكاكاو — وصفة إيطالية منزلية.' },
@@ -3003,7 +4060,7 @@ function getDefaultItems() {
     allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
   },
   {
-    id:39, cat:3, price:'12.000 DT', photo:'photo-1533134242443-d4fd215305ad',
+    id:39, cat:3, price:'€12.00', photo:'photo-1533134242443-d4fd215305ad',
     badges:[],
     name:{ fr:'Cheesecake', en:'Cheesecake', ar:'تشيز كيك' },
     desc:{ fr:'Base sablée, crème de fromage onctueuse et coulis de fruits rouges.', en:'Buttery base, smooth cream cheese and red fruit coulis.', ar:'قاعدة هشة وكريمة جبن ناعمة وصلصة فواكه حمراء.' },
@@ -3011,7 +4068,7 @@ function getDefaultItems() {
     allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
   },
   {
-    id:40, cat:3, price:'10.000 DT', photo:'photo-1606312619070-d48b5b7a1b96',
+    id:40, cat:3, price:'€10.00', photo:'photo-1606312619070-d48b5b7a1b96',
     badges:[],
     name:{ fr:'Brownie Chaud', en:'Warm Brownie', ar:'براوني ساخن' },
     desc:{ fr:'Brownie au chocolat fondant, servi chaud avec glace vanille.', en:'Melting chocolate brownie, served warm with vanilla ice cream.', ar:'براوني شوكولاتة ذائب، مقدَّم ساخناً مع آيس كريم فانيلا.' },
@@ -3019,7 +4076,7 @@ function getDefaultItems() {
     allergens:{ fr:['Gluten','Lait','Œufs','Fruits à coque'], en:['Gluten','Milk','Eggs','Tree nuts'], ar:['الغلوتين','الحليب','البيض','المكسرات'] }
   },
   {
-    id:41, cat:3, price:'13.000 DT', photo:'photo-1564355808539-22fda35bed7e',
+    id:41, cat:3, price:'€13.00', photo:'photo-1564355808539-22fda35bed7e',
     badges:['popular'],
     name:{ fr:'Coulant Chocolat', en:'Chocolate Lava Cake', ar:'كولان شوكولاتة' },
     desc:{ fr:'Gâteau moelleux au cœur coulant de chocolat chaud — le dessert signature.', en:'Soft cake with a flowing hot chocolate centre — the signature dessert.', ar:'كيك طري بقلب شوكولاتة ساخنة ذائبة — الحلوى المميزة.' },
@@ -3029,7 +4086,7 @@ function getDefaultItems() {
 
   /* ---- CAT 4: Le Matin ---- */
   {
-    id:42, cat:4, price:'18.000 DT', photo:'photo-1504754524776-8f4f37790ca0',
+    id:42, cat:4, price:'€18.00', photo:'photo-1504754524776-8f4f37790ca0',
     badges:[],
     name:{ fr:'Petit-Déjeuner Classique', en:'Classic Breakfast', ar:'فطور كلاسيك' },
     desc:{ fr:'Café ou thé, pain beurre et confiture, jus d\'orange et fromage frais.', en:'Coffee or tea, bread with butter and jam, orange juice and fresh cheese.', ar:'قهوة أو شاي وخبز بالزبدة والمربى وعصير برتقال وجبن طازج.' },
@@ -3037,7 +4094,7 @@ function getDefaultItems() {
     allergens:{ fr:['Gluten','Lait'], en:['Gluten','Milk'], ar:['الغلوتين','الحليب'] }
   },
   {
-    id:43, cat:4, price:'24.000 DT', photo:'photo-1533089860892-a7c6f0a88666',
+    id:43, cat:4, price:'€24.00', photo:'photo-1533089860892-a7c6f0a88666',
     badges:['popular'],
     name:{ fr:'Petit-Déjeuner Complet', en:'Full Breakfast', ar:'فطور كامل' },
     desc:{ fr:'Œufs brouillés, fromage, pain grillé, jus, café, yaourt et fruits frais.', en:'Scrambled eggs, cheese, toast, juice, coffee, yoghurt and fresh fruit.', ar:'بيض مخفوق وجبن وخبز محمص وعصير وقهوة ويوغرت وفواكه طازجة.' },
@@ -3045,7 +4102,7 @@ function getDefaultItems() {
     allergens:{ fr:['Gluten','Lait','Œufs'], en:['Gluten','Milk','Eggs'], ar:['الغلوتين','الحليب','البيض'] }
   },
   {
-    id:44, cat:4, price:'26.000 DT', photo:'photo-1484723091739-30990009462f',
+    id:44, cat:4, price:'€26.00', photo:'photo-1484723091739-30990009462f',
     badges:['new'],
     name:{ fr:'Petit-Déjeuner Américain', en:'American Breakfast', ar:'فطور أمريكي' },
     desc:{ fr:'Pancakes, œufs au plat, bacon, sirop d\'érable et jus de fruits.', en:'Pancakes, fried eggs, bacon, maple syrup and fruit juice.', ar:'بانكيك وبيض مقلي ولحم مقدد وشراب القيقب وعصير فواكه.' },
@@ -3055,7 +4112,7 @@ function getDefaultItems() {
 
   /* ---- CAT 5: Hookah ---- */
   {
-    id:45, cat:5, price:'35.000 DT', photo:'photo-1584302179602-e4c3d3fd629d',
+    id:45, cat:5, price:'€35.00', photo:'photo-1584302179602-e4c3d3fd629d',
     badges:['popular'],
     name:{ fr:'Chicha Simple', en:'Single Hookah', ar:'شيشة سيمبل' },
     desc:{ fr:'Chicha premium au parfum de votre choix — détente garantie.', en:'Premium hookah with your choice of flavour — relaxation guaranteed.', ar:'شيشة بريميوم بنكهة حسب اختيارك — استرخاء مضمون.' },
@@ -3063,7 +4120,7 @@ function getDefaultItems() {
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
-    id:46, cat:5, price:'40.000 DT', photo:'photo-1584302179602-e4c3d3fd629d',
+    id:46, cat:5, price:'€40.00', photo:'photo-1584302179602-e4c3d3fd629d',
     badges:[],
     name:{ fr:'Chicha Double', en:'Double Hookah', ar:'شيشة دابل' },
     desc:{ fr:'Chicha double avec deux parfums combinés — expérience enrichie.', en:'Double hookah with two combined flavours — enriched experience.', ar:'شيشة دابل بنكهتين مدمجتين — تجربة مُثرَاة.' },
@@ -3071,7 +4128,7 @@ function getDefaultItems() {
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
-    id:47, cat:5, price:'6.000 DT', photo:'photo-1534353341816-abfbe27f97da',
+    id:47, cat:5, price:'€6.00', photo:'photo-1534353341816-abfbe27f97da',
     badges:[],
     name:{ fr:'Supplément Glace', en:'Ice Supplement', ar:'إضافة ثلج' },
     desc:{ fr:'Ajoutez des glaçons dans le vase de votre chicha pour une fumée plus fraîche.', en:'Add ice to your hookah vase for a cooler, smoother smoke.', ar:'أضف ثلجاً إلى إناء الشيشة للحصول على دخان أبرد وأكثر نعومة.' },
@@ -3079,7 +4136,7 @@ function getDefaultItems() {
     allergens:{ fr:[], en:[], ar:[] }
   },
   {
-    id:48, cat:5, price:'6.000 DT', photo:'photo-1534353341816-abfbe27f97da',
+    id:48, cat:5, price:'€6.00', photo:'photo-1534353341816-abfbe27f97da',
     badges:[],
     name:{ fr:'Supplément Lait de Coco', en:'Coconut Milk Supplement', ar:'إضافة حليب جوز الهند' },
     desc:{ fr:'Remplacez l\'eau par du lait de coco pour une fumée crémeuse et exotique.', en:'Replace water with coconut milk for a creamy, exotic smoke.', ar:'استبدل الماء بحليب جوز الهند للحصول على دخان كريمي واستوائي.' },
@@ -3150,26 +4207,27 @@ function esc(str) {
    THÈME VISUEL
 ═══════════════════════════════════════════ */
 const THEMES_DATA = [
-  { id:'prestige',       name:'Prestige',           sub:'Standard & élégant',       dark:'#0c0a08', accent:'#c8a44e' },
-  { id:'gold-noir',      name:'Gold Noir',           sub:'Cinéma & élégance',        dark:'#0c0a08', accent:'#c8a44e' },
-  { id:'neon-tokyo',     name:'Neon Pulse',          sub:'Néon cyan & futuriste',    dark:'#030010', accent:'#00f5d4' },
-  { id:'botanical',      name:'Botanical Forest',    sub:'Forêt & organique',        dark:'#060e06', accent:'#7acc5a' },
-  { id:'rose-parisien',  name:'Rose Parisien',       sub:'Romance & douceur',        dark:'#140a0e', accent:'#e890b0' },
-  { id:'midnight-luxe',  name:'Enseigne',             sub:'Prix dominant & brasserie',dark:'#03041a', accent:'#f0d060' },
-  { id:'velvet-luxe',    name:'Velvet Luxe',         sub:'Éditorial & raffinement',  dark:'#0d0006', accent:'#d4af37' },
-  { id:'santorin',       name:'Sidi Bou Saïd',       sub:'Volet bleu & Méditerranée', dark:'#04090f', accent:'#4db8ff' },
-  { id:'islamic',        name:'Islamic',              sub:'Mosquée, lanternes & or',   dark:'#071407', accent:'#c8a850' },
+  { id:'gold-noir',      names:{ el:'Χρυσό Νουάρ',           fr:'Gold Noir',         en:'Gold Noir',         ar:'الذهب الأسود'        }, dark:'#0c0a08', accent:'#c8a44e' },
+  { id:'neon-tokyo',     names:{ el:'Νέον Παλμός',            fr:'Neon Pulse',        en:'Neon Pulse',        ar:'نبضة النيون'         }, dark:'#030010', accent:'#00f5d4' },
+  { id:'botanical',      names:{ el:'Βοτανικό Δάσος',         fr:'Botanical Forest',  en:'Botanical Forest',  ar:'الغابة النباتية'     }, dark:'#060e06', accent:'#7acc5a' },
+  { id:'rose-parisien',  names:{ el:'Παρισινό Ροζ',           fr:'Rose Parisien',     en:'Parisian Rose',     ar:'الوردي الباريسي'     }, dark:'#140a0e', accent:'#e890b0' },
+  { id:'midnight-luxe',  names:{ el:'Ταμπέλα',                fr:'Enseigne',          en:'Signboard',         ar:'لافتة'               }, dark:'#03041a', accent:'#f0d060' },
+  { id:'velvet-luxe',    names:{ el:'Βελούδινη Πολυτέλεια',   fr:'Velvet Luxe',       en:'Velvet Luxe',       ar:'المخمل الفاخر'       }, dark:'#0d0006', accent:'#d4af37' },
+  { id:'prestige',       names:{ el:'Κύρος',                  fr:'Prestige',          en:'Prestige',          ar:'المرموق'             }, dark:'#0c0a08', accent:'#c8a44e' },
+  { id:'santorin',       names:{ el:'Σαντορίνη',              fr:'Santorini',         en:'Santorini',         ar:'سانتوريني'           }, dark:'#04090f', accent:'#4db8ff' },
 ];
 
-let currentMenuTheme = 'prestige';
+let currentMenuTheme = 'gold-noir';
 
 function loadMenuTheme() {
   renderThemeSelector();
-  _db.ref('menu/menuTheme').once('value').then(snap => {
-    const t = snap.val() || 'prestige';
-    currentMenuTheme = t;
-    renderThemeSelector();
-  }).catch(() => {});
+  _db.ref('menu/menuTheme').on('value', snap => {
+    const t = snap.val() || 'gold-noir';
+    if (t !== currentMenuTheme) {
+      currentMenuTheme = t;
+      renderThemeSelector();
+    }
+  });
 }
 
 function saveMenuTheme(themeId) {
@@ -3178,17 +4236,22 @@ function saveMenuTheme(themeId) {
   renderThemeSelector();
 }
 
+const PAPER_HIDDEN_THEMES = new Set(['midnight-luxe', 'velvet-luxe', 'prestige']);
+
 function renderThemeSelector() {
   const grid = document.getElementById('theme-grid');
   if (!grid) return;
   grid.innerHTML = '';
+  const isPaper = currentMenuMode === 'paper';
   THEMES_DATA.forEach(th => {
+    if (isPaper && PAPER_HIDDEN_THEMES.has(th.id)) return;
+    const name = th.names ? (th.names[currentLang] || th.names.fr || th.names.en || '') : (th.name || '');
     const card = document.createElement('div');
     card.className = 'theme-card' + (th.id === currentMenuTheme ? ' active' : '');
     card.style.setProperty('--tc-accent', th.accent);
     card.innerHTML = `
       <span class="tc-dot"></span>
-      <span class="tc-name">${th.name}</span>
+      <span class="tc-name">${name}</span>
       <span class="tc-check">✓</span>`;
     card.addEventListener('click', () => saveMenuTheme(th.id));
     grid.appendChild(card);
@@ -3196,13 +4259,234 @@ function renderThemeSelector() {
 }
 
 /* ═══════════════════════════════════════════
+   MODE SELECTOR
+═══════════════════════════════════════════ */
+let currentMenuMode = 'sonet';
+let ordersListener  = null;
+
+function loadMenuMode() {
+  let firstLoad = true;
+  _db.ref('menu/menuMode').on('value', snap => {
+    const m = snap.val() || 'sonet';
+    if (firstLoad || m !== currentMenuMode) {
+      firstLoad = false;
+      currentMenuMode = m;
+      window._updateModeBtn?.(m);
+      syncModeAdminUI(m);
+      // Afficher le header seulement après avoir appliqué le bon mode
+      document.getElementById('adm-header').style.display = '';
+    }
+  });
+}
+
+function saveMenuMode(mode) {
+  currentMenuMode = mode;
+  _db.ref('menu/menuMode').set(mode);
+  window._updateModeBtn?.(mode);
+  syncModeAdminUI(mode);
+}
+
+function syncModeAdminUI(mode) {
+  // Afficher/masquer la section commandes
+  const ordersSection = document.getElementById('orders-admin-section');
+  if (ordersSection) ordersSection.style.display = mode === 'order' ? 'block' : 'none';
+  const scOrdersBtn = document.getElementById('sc-orders-btn');
+  if (scOrdersBtn) scOrdersBtn.style.display = mode === 'order' ? '' : 'none';
+  // Afficher/masquer les contrôles selon le mode
+  const callBtn   = document.getElementById('toggle-call-btn');
+  const photosBtn = document.getElementById('toggle-photos-btn');
+  const orderBtn  = document.getElementById('toggle-order-btn');
+  if (callBtn)   callBtn.style.display   = mode === 'sonet' ? '' : 'none';
+  if (orderBtn)  orderBtn.style.display  = mode === 'order' ? '' : 'none';
+  if (photosBtn) photosBtn.style.display = (mode === 'paper') ? 'none' : '';
+  // FAB notification visible uniquement en mode Sonnette ou Commande
+  const fabNotif = document.getElementById('fab-notif');
+  if (fabNotif) fabNotif.style.display = (mode === 'paper' || mode === 'simple') ? 'none' : '';
+  // En mode papier, cacher les zones photo des produits (papier n'affiche pas les photos produits)
+  document.body.classList.toggle('adm-mode-paper', mode === 'paper');
+  // En mode papier, la section info n'affiche que le WiFi (pas les horaires ni l'adresse)
+  const infoCard = document.getElementById('info-card');
+  if (infoCard) {
+    infoCard.querySelectorAll('.info-row').forEach(row => {
+      const lbl = row.querySelector('.info-lbl')?.textContent || '';
+      const isHoursOrAddr = /Horaires|Adresse|Hours|Address|Ωράριο|Διεύθυνση/i.test(lbl)
+        || row.querySelector('[data-field^="hours"]')
+        || row.querySelector('[data-field^="addr"]');
+      if (isHoursOrAddr) row.style.display = mode === 'paper' ? 'none' : '';
+    });
+  }
+  // Activer/désactiver le listener commandes
+  if (mode === 'order') startOrdersListener();
+  else stopOrdersListener();
+  // Refresh theme selector (paper mode hides similar-looking themes)
+  renderThemeSelector();
+}
+
+
+/* ── Listener commandes temps réel ── */
+function startOrdersListener() {
+  if (ordersListener) return;
+  ordersListener = _db.ref('orders').on('value', snap => {
+    const data = snap.val() || {};
+    const orders = Object.entries(data)
+      .map(([id, o]) => ({ id, ...o }))
+      .filter(o => o.status !== 'done' || (Date.now() - o.createdAt < 7 * 24 * 3600000))
+      .sort((a, b) => b.createdAt - a.createdAt);
+    renderOrdersAdmin(orders);
+  });
+}
+
+function stopOrdersListener() {
+  if (ordersListener) {
+    _db.ref('orders').off('value', ordersListener);
+    ordersListener = null;
+  }
+}
+
+let _lastAdminOrders = [];
+function renderOrdersAdmin(orders) {
+  _lastAdminOrders = orders;
+  const list  = document.getElementById('orders-admin-list');
+  const badge = document.getElementById('orders-count-badge');
+  if (!list) return;
+  const pending = orders.filter(o => o.status !== 'done');
+  if (badge) badge.textContent = pending.length;
+  const t = ADMIN_UI[currentLang] || ADMIN_UI.fr;
+  if (orders.length === 0) {
+    list.innerHTML = `<div class="orders-empty">${t.ordEmpty || 'Aucune commande pour le moment'}</div>`;
+    return;
+  }
+  const localeMap = { fr:'fr-FR', en:'en-GB', el:'el-GR', ar:'ar-SA' };
+  const locale = localeMap[currentLang] || 'fr-FR';
+  // Préserver les IDs des cartes déjà ouvertes avant le re-render
+  const expanded = new Set();
+  list.querySelectorAll('.order-adm-card:not(.collapsed)').forEach(el => expanded.add(el.id));
+
+  list.innerHTML = orders.map(o => {
+    const statusClass = o.status === 'done' ? 'status-done' : o.status === 'in_progress' ? 'status-progress' : 'status-pending';
+    const statusLabel = o.status === 'done' ? t.ordDone : o.status === 'in_progress' ? t.ordProgress : t.ordPending;
+    const itemsHtml = (o.items || []).map(it => {
+      const liveItem = adminData?.items?.find(i => i.id === it.id);
+      const name = liveItem ? (liveItem.name?.[currentLang] || liveItem.name?.fr || it.name) : it.name;
+      return `${it.qty}× ${name} — ${it.price}`;
+    }).join('<br>');
+    const timeStr = o.createdAt ? new Date(o.createdAt).toLocaleTimeString(locale, { hour:'2-digit', minute:'2-digit' }) : '';
+    const isNum = o.tableNum && /^\d+$/.test(String(o.tableNum));
+    const tableLabel = isNum ? `${t.ordTable} ${o.tableNum}` : t.ordTakeaway;
+    const isCollapsed = !expanded.has('oadm-' + o.id);
+    const chevronSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
+    return `
+    <div class="order-adm-card ${statusClass}${isCollapsed ? ' collapsed' : ''}" id="oadm-${o.id}">
+      <div class="order-adm-hd" onclick="toggleOrderCard('oadm-${o.id}')">
+        <div class="order-adm-table">${tableLabel}</div>
+        <div class="order-adm-time">${timeStr}</div>
+        <div class="order-adm-total-hd">${o.total || '—'}</div>
+        <span class="order-adm-badge">${statusLabel}</span>
+        <span class="order-adm-chevron">${chevronSvg}</span>
+      </div>
+      <div class="order-adm-body">
+        <div class="order-adm-body-inner">
+          <div class="order-adm-body-pad">
+            <div class="order-adm-items">${itemsHtml}</div>
+            <div class="order-adm-btns">
+              <button class="order-adm-btn btn-pending ${o.status==='pending'?'active-btn':''}" onclick="setOrderStatus('${o.id}','pending')">${t.ordPending}</button>
+              <button class="order-adm-btn btn-progress ${o.status==='in_progress'?'active-btn':''}" onclick="setOrderStatus('${o.id}','in_progress')">${t.ordProgress}</button>
+              <button class="order-adm-btn btn-done ${o.status==='done'?'active-btn':''}" onclick="setOrderStatus('${o.id}','done')">${t.ordDone}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleOrderCard(cardId) {
+  const card = document.getElementById(cardId);
+  if (card) card.classList.toggle('collapsed');
+}
+
+function setOrderStatus(orderId, status) {
+  _db.ref('orders/' + orderId + '/status').set(status);
+}
+
+/* ═══════════════════════════════════════════
+   CUSTOM SELECTS (langue + mode)
+═══════════════════════════════════════════ */
+(function setupCustomSelects() {
+  const LANG_FLAGS = { el:'🇬🇷', fr:'🇫🇷', en:'🇬🇧', ar:'🇸🇦' };
+  const MODE_ICONS = { paper:'📄', simple:'🖼️', sonet:'🔔', order:'🛒' };
+
+  // ── Lang select ──
+  const langBtn   = document.getElementById('lang-sel-btn');
+  const langPopup = document.getElementById('lang-sel-popup');
+
+  window._updateLangBtn = function(l) {
+    if (langBtn) langBtn.textContent = LANG_FLAGS[l] || '🌐';
+    langPopup?.querySelectorAll('button[data-lang]').forEach(b => {
+      b.classList.toggle('active', b.dataset.lang === l);
+    });
+  };
+
+  window._pickLang = function(l) {
+    setGlobalLang(l);
+    langPopup?.classList.remove('open');
+    langBtn?.classList.remove('open');
+    langBtn?.setAttribute('aria-expanded', 'false');
+  };
+
+  langBtn?.addEventListener('click', e => {
+    e.stopPropagation();
+    const open = langPopup.classList.toggle('open');
+    langBtn.classList.toggle('open', open);
+    langBtn.setAttribute('aria-expanded', String(open));
+    modePopup?.classList.remove('open');
+    modeBtn?.classList.remove('open');
+  });
+
+  // ── Mode select ──
+  const modeBtn   = document.getElementById('mode-sel-btn');
+  const modePopup = document.getElementById('mode-sel-popup');
+
+  window._updateModeBtn = function(m) {
+    if (modeBtn) modeBtn.textContent = MODE_ICONS[m] || '📄';
+    modePopup?.querySelectorAll('button[data-mode]').forEach(b => {
+      b.classList.toggle('active', b.dataset.mode === m);
+    });
+  };
+
+  window._pickMode = function(m) {
+    saveMenuMode(m);
+    modePopup?.classList.remove('open');
+    modeBtn?.classList.remove('open');
+    modeBtn?.setAttribute('aria-expanded', 'false');
+  };
+
+  modeBtn?.addEventListener('click', e => {
+    e.stopPropagation();
+    const open = modePopup.classList.toggle('open');
+    modeBtn.classList.toggle('open', open);
+    modeBtn.setAttribute('aria-expanded', String(open));
+    langPopup?.classList.remove('open');
+    langBtn?.classList.remove('open');
+  });
+
+  // Initialiser avec la valeur actuelle
+  _updateLangBtn(currentLang);
+  _updateModeBtn(currentMenuMode);
+})();
+
+/* ═══════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════ */
 checkLogin();
 
-// Fermer tous les icon pickers si clic en dehors
+// Fermer tous les popups si clic en dehors
 document.addEventListener('click', () => {
   document.querySelectorAll('.ico-picker-popup.open').forEach(p => p.classList.remove('open'));
+  document.querySelectorAll('.adm-sel-popup.open').forEach(p => {
+    p.classList.remove('open');
+    p.previousElementSibling?.classList.remove('open');
+  });
 });
 </script>
 </body>
