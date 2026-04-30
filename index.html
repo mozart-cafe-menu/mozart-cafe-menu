@@ -3418,7 +3418,7 @@ function buildFlipBook() {
     if (!catItems.length) return null;
 
     const catName = u.cats[ci] || cat.sub[lang] || '';
-    const activePhotos = (cat.flipPhotos || []).filter(p => p);
+    const activePhotos = showPhotos ? (cat.flipPhotos || []).filter(p => p) : [];
 
     const itemsHtml = catItems.map(item => {
       const name = item.name[lang] || item.name.fr || '';

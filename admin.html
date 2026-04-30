@@ -4423,7 +4423,7 @@ function syncModeAdminUI(mode) {
   const orderBtn  = document.getElementById('toggle-order-btn');
   if (callBtn)   callBtn.style.display   = mode === 'sonet' ? '' : 'none';
   if (orderBtn)  orderBtn.style.display  = mode === 'order' ? '' : 'none';
-  if (photosBtn) photosBtn.style.display = (mode === 'paper') ? 'none' : '';
+  if (photosBtn) photosBtn.style.display = '';
   // Contraintes de licence : masquer les boutons non licenciés
   if (_currentFeatures?.buttons) {
     const b = _currentFeatures.buttons;
