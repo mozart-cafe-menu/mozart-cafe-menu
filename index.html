@@ -2050,6 +2050,14 @@
       justify-content:flex-end;
       height:100%;
     }
+    .fp-hero-logo-top {
+      position:absolute; top:52px; left:50%; transform:translateX(-50%);
+      height:clamp(5rem,22vw,9rem); width:auto; z-index:3;
+      filter:grayscale(1) brightness(6) drop-shadow(0 2px 12px rgba(0,0,0,0.9));
+    }
+    html.light .fp-hero-logo-top {
+      filter:grayscale(1) brightness(0.18) drop-shadow(0 2px 12px rgba(255,255,255,0.5));
+    }
     .fp-hero-bg {
       position:absolute; inset:-10%;
       background-size:cover; background-position:50% 40%;
@@ -3371,6 +3379,7 @@ function buildFlipBook() {
   hero.innerHTML = `
     <div class="fp-hero-bg"></div>
     <div class="fp-hero-overlay"></div>
+    <img class="fp-hero-logo-top" src="logo.png" alt="" onerror="this.style.display='none'">
     <div class="fp-menu-cue">
       <div class="fp-menu-text">${(u.explore || 'Menu').toUpperCase()}</div>
       <div class="fp-menu-capsule"><div class="fp-menu-dot"></div></div>

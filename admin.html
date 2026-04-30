@@ -2286,16 +2286,20 @@ function renderLogoSection() {
   if (!logoImg || !logoInput || !logoDelBtn) return;
 
   function setLogo(src) {
+    const titleEl = document.getElementById('pm-title');
+    const hasCustom = !!(adminData.logoUrl || adminData.info?.logoUrl);
     if (src) {
       logoImg.src = src; logoImg.style.display = '';
-      logoDelBtn.style.display = 'flex';
+      if (titleEl) titleEl.style.display = 'none';
+      logoDelBtn.style.display = hasCustom ? 'flex' : 'none';
     } else {
       logoImg.src = ''; logoImg.style.display = 'none';
+      if (titleEl) titleEl.style.display = '';
       logoDelBtn.style.display = 'none';
     }
   }
 
-  setLogo(adminData.logoUrl || adminData.info?.logoUrl || '');
+  setLogo(adminData.logoUrl || adminData.info?.logoUrl || 'logo.png');
 
   logoInput.addEventListener('change', () => {
     const file = logoInput.files[0]; if (!file) return;
