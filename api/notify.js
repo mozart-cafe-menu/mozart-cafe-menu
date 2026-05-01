@@ -91,18 +91,38 @@ async function deleteToken(projectId, accessToken, deviceId) {
   }
 }
 
-async function sendFCM(projectId, accessToken, entries, table, lang, customMessage, title) {
-  const MESSAGES = {
-    fr: `Appel : Table ${table}`,
-    en: `Call : Table ${table}`,
-    ar: `نداء : طاولة ${table}`,
-  };
+const BELL = {
+  fr: n => `Appel : Table ${n}`,
+  en: n => `Call : Table ${n}`,
+  de: n => `Ruf : Tisch ${n}`,
+  el: n => `Κλήση : Τραπέζι ${n}`,
+  ar: n => `نداء : طاولة ${n}`,
+};
 
+const ORDER = {
+  fr: { cmd:'Commande',   takeaway:'À emporter',    table:'Table'    },
+  en: { cmd:'Order',      takeaway:'Takeaway',       table:'Table'    },
+  de: { cmd:'Bestellung', takeaway:'Zum Mitnehmen', table:'Tisch'    },
+  el: { cmd:'Παραγγελία', takeaway:'Σερβίρισμα',   table:'Τραπέζι'  },
+  ar: { cmd:'طلب',        takeaway:'للخارج',         table:'طاولة'    },
+};
+
+function buildBody(type, table, deviceLang) {
+  if (type === 'order') {
+    const lbl  = ORDER[deviceLang] || ORDER.fr;
+    const dest = table === 'takeaway' ? lbl.takeaway : `${lbl.table} ${table}`;
+    return `${lbl.cmd} · ${dest}`;
+  }
+  const fn = BELL[deviceLang] || BELL.fr;
+  return fn(table);
+}
+
+async function sendFCM(projectId, accessToken, entries, table, lang, type, title) {
   let sent = 0;
   for (const entry of entries) {
     const deviceLang = entry.lang || lang || 'fr';
-    const body_text = customMessage || MESSAGES[deviceLang] || MESSAGES[lang] || MESSAGES.fr;
-    const title_text = title || (customMessage ? '📢 Mozart Coffee Lounge' : '🔔 Mozart Coffee Lounge');
+    const body_text  = buildBody(type, table, deviceLang);
+    const title_text = title || (type === 'order' ? '🧾 Mozart Coffee Lounge' : '🔔 Mozart Coffee Lounge');
     const payload = JSON.stringify({
       message: {
         token: entry.token,
@@ -154,8 +174,8 @@ module.exports = async (req, res) => {
   if (req.method !== 'POST') { res.status(405).json({ error: 'Method not allowed' }); return; }
 
   try {
-    const { table, lang, message, title } = req.body || {};
-    console.log('Notify called: table=' + table + ' lang=' + lang + ' message=' + message);
+    const { table, lang, type, title } = req.body || {};
+    console.log('Notify called: table=' + table + ' lang=' + lang + ' type=' + type);
     if (!table) { res.status(400).json({ error: 'Missing table' }); return; }
 
     const sa = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
@@ -167,7 +187,7 @@ module.exports = async (req, res) => {
       res.status(200).json({ sent: 0, reason: 'no_tokens' }); return;
     }
 
-    const result = await sendFCM(sa.project_id, accessToken, entries, table, lang, message || null, title || null);
+    const result = await sendFCM(sa.project_id, accessToken, entries, table, lang, type || null, title || null);
     console.log('Result:', JSON.stringify(result));
     res.status(200).json(result);
 
