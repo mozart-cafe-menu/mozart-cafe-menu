@@ -356,8 +356,8 @@
 </footer>
 
 <script>
-const LANGS     = { fr:'🇫🇷', en:'🇬🇧', ar:'🇸🇦' };
-const LANG_DIRS = { fr:'ltr', en:'ltr', ar:'rtl' };
+const LANGS     = { fr:'🇫🇷', en:'🇬🇧', el:'🇬🇷', ar:'🇸🇦' };
+const LANG_DIRS = { fr:'ltr', en:'ltr', el:'ltr', ar:'rtl' };
 
 const T = {
   fr: {
@@ -384,6 +384,18 @@ const T = {
     ordPending:'Received', ordProgress:'In progress', ordDone:'Done',
     noOrders:'No orders at the moment',
   },
+  el: {
+    hdrSub:'Διεπαφή Σερβιτόρου', connWait:'Αναμονή…', connOn:'Συνδεδεμένο',
+    secHistory:'Πρόσφατες κλήσεις', secOrders:'Τρέχουσες παραγγελίες',
+    alertTitle:'Εισερχόμενη κλήση', alertSub:'Κλήση : Τραπέζι {n}',
+    callMsg:'Κλήση : Τραπέζι {n}', received:'Ελήφθη', done:'Ολοκληρώθηκε',
+    noCalls:'Δεν έχουν ληφθεί κλήσεις ακόμα', ftMenu:'Προβολή μενού',
+    ago0:'Μόλις τώρα', agoMin:'Πριν {n} λεπτά', agoH:'Πριν {n}ω',
+    today:'Σήμερα', yesterday:'Χθες',
+    ordTable:'Τραπέζι', ordTakeaway:'Σερβίρισμα', ordTotal:'Σύνολο',
+    ordPending:'Ελήφθη', ordProgress:'Σε εξέλιξη', ordDone:'Ολοκληρώθηκε',
+    noOrders:'Δεν υπάρχουν παραγγελίες προς το παρόν',
+  },
   ar: {
     hdrSub:'واجهة النادل', connWait:'في انتظار…', connOn:'متصل',
     secHistory:'المكالمات الأخيرة', secOrders:'الطلبات الحالية',
@@ -398,7 +410,8 @@ const T = {
   }
 };
 
-let lang = localStorage.getItem('mc_app_lang') || 'fr';
+const _cachedAppLang = localStorage.getItem('mc_app_lang_cache');
+let lang = localStorage.getItem('mc_app_lang') || _cachedAppLang || 'fr';
 let calls = [];
 let alertTimer = null;
 let audioCtx = null;
@@ -836,6 +849,19 @@ function renderOrders() {
 }
 
 function init() {
+  // Langue depuis Firebase primaryLang si aucune préférence utilisateur
+  _db.ref('/config/primaryLang').on('value', snap => {
+    const val = snap.val();
+    if (val) {
+      localStorage.setItem('mc_app_lang_cache', val);
+      if (!localStorage.getItem('mc_app_lang') && lang !== val) {
+        lang = val;
+        applyLang();
+        buildLangBtns();
+      }
+    }
+  });
+
   loadCalls();
   buildLangBtns();
   _db.ref('menu/items').once('value').then(snap => {

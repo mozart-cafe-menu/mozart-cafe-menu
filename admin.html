@@ -1138,6 +1138,7 @@
         <button data-lang="el" onclick="window._pickLang('el')">🇬🇷 Ελληνικά</button>
         <button data-lang="fr" onclick="window._pickLang('fr')">🇫🇷 Français</button>
         <button data-lang="en" onclick="window._pickLang('en')">🇬🇧 English</button>
+        <button data-lang="de" onclick="window._pickLang('de')">🇩🇪 Deutsch</button>
         <button data-lang="ar" onclick="window._pickLang('ar')">🇸🇦 العربية</button>
       </div>
     </div>
@@ -1270,12 +1271,12 @@
       <div class="logo-controls-row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
         <label class="hero-upload-btn" for="logo-file-input" style="font-size:0.78rem;">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          <span>Logo (optionnel)</span>
+          <span data-uitxt="btnLogo">Logo (optionnel)</span>
         </label>
         <input type="file" id="logo-file-input" accept="image/*" style="display:none">
         <button class="hero-del-btn" id="logo-del-btn" style="display:none;font-size:0.78rem;">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          <span>Supprimer le logo</span>
+          <span data-uitxt="btnDelLogo">Supprimer le logo</span>
         </button>
       </div>
     </div>
@@ -1387,32 +1388,32 @@ async function _hashPwd(pwd) {
 /* ═══════════════════════════════════════════
    LANGUES DISPONIBLES
 ═══════════════════════════════════════════ */
-const LANGS = ['el', 'fr', 'en', 'ar'];
-const LANG_LABELS = { el:'🇬🇷 ΕΛ', fr:'🇫🇷 FR', en:'🇬🇧 EN', ar:'🇸🇦 AR' };
+const LANGS = ['el', 'fr', 'en', 'de', 'ar'];
+const LANG_LABELS = { el:'🇬🇷 ΕΛ', fr:'🇫🇷 FR', en:'🇬🇧 EN', de:'🇩🇪 DE', ar:'🇸🇦 AR' };
 
 /* ═══════════════════════════════════════════
    DONNÉES PAR DÉFAUT (chargées depuis index.html)
 ═══════════════════════════════════════════ */
 const DEFAULT_CATS = [
-  { key:'hot',     ico:'ico-coffee',  names:{ el:'Ζεστά Ροφήματα',  fr:'Boissons Chaudes', en:'Hot Drinks',  ar:'مشروبات ساخنة' } },
-  { key:'cold',    ico:'ico-cold',    names:{ el:'Κρύα Ροφήματα',   fr:'Boissons Froides', en:'Cold Drinks', ar:'مشروبات باردة' } },
-  { key:'food',    ico:'ico-food',    names:{ el:'Φαγητό',           fr:'Cuisine',          en:'Food',         ar:'الأكل'         } },
-  { key:'sweet',   ico:'ico-cake',    names:{ el:'Γλυκά',            fr:'Sucré',            en:'Sweet',        ar:'حلويات'        } },
-  { key:'morning', ico:'ico-sunrise', names:{ el:'Πρωινό',           fr:'Le Matin',         en:'Breakfast',    ar:'الصباح'        } },
-  { key:'hookah',  ico:'ico-hookah',  names:{ el:'Ναργιλές',         fr:'Hookah',           en:'Hookah',       ar:'النرجيلة'      } },
+  { key:'hot',     ico:'ico-coffee',  names:{ el:'Ζεστά Ροφήματα',  fr:'Boissons Chaudes', en:'Hot Drinks',  de:'Heiße Getränke',  ar:'مشروبات ساخنة' } },
+  { key:'cold',    ico:'ico-cold',    names:{ el:'Κρύα Ροφήματα',   fr:'Boissons Froides', en:'Cold Drinks', de:'Kalte Getränke',  ar:'مشروبات باردة' } },
+  { key:'food',    ico:'ico-food',    names:{ el:'Φαγητό',           fr:'Cuisine',          en:'Food',        de:'Speisen',         ar:'الأكل'         } },
+  { key:'sweet',   ico:'ico-cake',    names:{ el:'Γλυκά',            fr:'Sucré',            en:'Sweet',       de:'Süßes',           ar:'حلويات'        } },
+  { key:'morning', ico:'ico-sunrise', names:{ el:'Πρωινό',           fr:'Le Matin',         en:'Breakfast',   de:'Frühstück',       ar:'الصباح'        } },
+  { key:'hookah',  ico:'ico-hookah',  names:{ el:'Ναργιλές',         fr:'Hookah',           en:'Hookah',      de:'Hookah',          ar:'النرجيلة'      } },
 ];
 
 const DEFAULT_INFO = {
-  wifi_name:  { el:'WiFi',        fr:'WiFi', en:'WiFi', ar:'واي فاي' },
-  wifi_val:   { el:'',            fr:'', en:'', ar:'' },
-  hours_name: { el:'Ωράριο',      fr:'Horaires', en:'Hours', ar:'أوقات العمل' },
-  hours_val:  { el:'',            fr:'', en:'', ar:'' },
-  addr_name:  { el:'Διεύθυνση',   fr:'Adresse', en:'Address', ar:'العنوان' },
-  addr_val:   { el:'Τύνιδα, Τυνησία', fr:'Tunis, Tunisie', en:'Tunis, Tunisia', ar:'تونس العاصمة' },
+  wifi_name:  { el:'WiFi',        fr:'WiFi', en:'WiFi', de:'WLAN', ar:'واي فاي' },
+  wifi_val:   { el:'',            fr:'', en:'', de:'', ar:'' },
+  hours_name: { el:'Ωράριο',      fr:'Horaires', en:'Hours', de:'Öffnungszeiten', ar:'أوقات العمل' },
+  hours_val:  { el:'',            fr:'', en:'', de:'', ar:'' },
+  addr_name:  { el:'Διεύθυνση',   fr:'Adresse', en:'Address', de:'Adresse', ar:'العنوان' },
+  addr_val:   { el:'Τύνιδα, Τυνησία', fr:'Tunis, Tunisie', en:'Tunis, Tunisia', de:'Tunis, Tunesien', ar:'تونس العاصمة' },
   showCallBtn: true,
   showPhotos:  true,
   showNote:    false,
-  noteText:    { el: '', fr: '', en: '', ar: '' },
+  noteText:    { el: '', fr: '', en: '', de: '', ar: '' },
 };
 
 /* ═══════════════════════════════════════════
@@ -1523,6 +1524,8 @@ const ADMIN_UI = {
     delIcon:       '✕ Διαγραφή εικονιδίου',
     noneIco:       '— Καμία —',
     noPhoto:       'Καμία φωτογραφία',
+    btnLogo:       'Λογότυπο (προαιρετικό)',
+    btnDelLogo:    'Διαγραφή λογοτύπου',
   },
   fr: {
     admSub:        'Administration du menu',
@@ -1625,6 +1628,8 @@ const ADMIN_UI = {
     delIcon:       '✕ Supprimer l\'icône',
     noneIco:       '— Aucune —',
     noPhoto:       'Aucune photo',
+    btnLogo:       'Logo (optionnel)',
+    btnDelLogo:    'Supprimer le logo',
   },
   en: {
     admSub:        'Menu administration',
@@ -1727,6 +1732,112 @@ const ADMIN_UI = {
     delIcon:       '✕ Remove icon',
     noneIco:       '— None —',
     noPhoto:       'No photo',
+    btnLogo:       'Logo (optional)',
+    btnDelLogo:    'Delete logo',
+  },
+  de: {
+    admSub:        'Menüverwaltung',
+    btnPreview:    '👁 Menü anzeigen',
+    btnLogout:     'Abmelden',
+    secInfo:       'Infos',
+    secCats:       'Kategorien',
+    secProds:      'Produkte',
+    btnAddCat:     '＋ Kategorie hinzufügen',
+    btnSaveCats:   'Kategorien speichern',
+    btnAddProd:    '＋ Produkt hinzufügen',
+    btnSaveProd:   'Dieses Produkt speichern',
+    btnDelProd:    'Löschen',
+    lblCatName:    'Name',
+    lblPrice:      'Preis',
+    lblBadges:     'Badges',
+    lblPhoto:      'Foto',
+    lblFromDevice: 'Vom Gerät',
+    lblOrUnsplash: 'Oder Unsplash-ID / URL',
+    lblPhotoHelp:  'ID von <a href="https://unsplash.com" target="_blank">unsplash.com</a> oder direkter Upload.',
+    lblName:       'Name',
+    lblShortDesc:  'Kurzbeschreibung',
+    lblFullDesc:   'Details',
+    lblAllergens:  'Allergene — durch Kommas getrennt',
+    phName:        'Produktname',
+    phShortDesc:   'Kurzbeschreibung in der Liste',
+    phFullDesc:    'Volltext beim Klicken auf das Produkt',
+    phAllergens:   'Beispiel: Milch, Gluten, Eier',
+    phPrice:       '€4.50',
+    produits:      'Produkt(e)',
+    toastSaved:    '✓ Änderungen gespeichert',
+    toastProd:     '✓ Produkt aktualisiert',
+    fabTitle:      'Alles speichern',
+    fabTooltip:    'Alles speichern',
+    infoWifiName:  'WLAN — Name',
+    infoWifiVal:   'WLAN — Passwort',
+    infoHoursName: 'Öffnungszeiten — Titel',
+    infoHoursVal:  'Öffnungszeiten — Wert',
+    infoAddrName:  'Adresse — Titel',
+    infoAddrVal:   'Adresse — Wert',
+    badgeType:     '— Typ —',
+    badgeTemp:     '— Temperatur —',
+    bdgBoisson:'🥤 Getränk', bdgCuisine:'🍽 Speise', bdgSucre:'🧁 Süßes', bdgHookah:'💨 Hookah',
+    bdgChaud:'🔥 Heiß', bdgFroid:'❄ Kalt', bdgGlace:'🧊 Eisgekühlt',
+    badgeMorning:  '☀ Morgen',
+    badgeVegan:    '🌱 Vegan',
+    badgeLimited:  '⏳ Limitiertes Angebot',
+    badgeNew:      '✨ Neu',
+    badgePopular:  '🔥 Beliebt',
+    progressCats:  'Kategorien…',
+    progressProds: 'Produkte…',
+    progressInfo:  'Café-Informationen…',
+    txOk:          'Übersetzt',
+    txErr:         'Fehler',
+    txDone:        'Feld(er) automatisch übersetzt',
+    errTransFailed:'⚠ Übersetzung fehlgeschlagen — EL-Daten gespeichert',
+    skipTx:        '— Ohne Übersetzung gespeichert',
+    confirmDelete: 'Dieses Produkt löschen?',
+    newProd:       'Neues Produkt',
+    secHero:       'Hero',
+    badgeHero:     'Hero',
+    secNote:       'Notiz',
+    badgeNote:     'Ankündigung',
+    badgeFooter:   'Footer',
+    btnChoosePhoto:'Foto auswählen',
+    btnDelPhoto:   'Löschen',
+    heroHint:      'Empfohlen: Hochformat, min. 900×1600 px',
+    noteShown:     'Im Menü sichtbar',
+    noteHidden:    'Im Menü ausgeblendet',
+    notePh:        'Notiz auf {L} — z.B.: Willkommen! Unsere Terrasse ist geöffnet.',
+    noteHint:      'Text erscheint unter den Kategorien — max. 300 Zeichen pro Sprache.',
+    visBtnCall:    'Kellner-Taste',
+    visBtnPhotos:  'Fotos',
+    visBtnOrder:   'Bestellmodus',
+    visBtnNote:    'Kunden-Notiz',
+    secTheme:'Design', badgeTheme:'Design',
+    secOrders:'Bestellungen',
+    scDesign:'🎨 Design', scHero:'🖼️ Hero', scInfos:'ℹ️ Infos',
+    scNote:'📢 Notiz', scCats:'📂 Kategorien', scProds:'🍽️ Produkte', scOrders:'🧾 Bestellungen',
+    modePaper:'📄 Druckmodus', modePhoto:'🖼️ Fotomodus', modeSonet:'🔔 Kellnermodus', modeOrder:'🛒 Bestellmodus',
+    modePaperShort:'Druck', modePhotoShort:'Foto', modeSonetShort:'Kellner', modeOrderShort:'Bestell.',
+    catPhotosLabel:'📄 Druckmodus',
+    ordTable:'Tisch', ordTakeaway:'Zum Mitnehmen', ordTotal:'Gesamt',
+    ordPending:'Eingegangen', ordProgress:'In Bearbeitung', ordDone:'Erledigt',
+    ordEmpty:'Derzeit keine Bestellungen',
+    fabNotif:      'Benachrichtigung senden',
+    notifTitle:    'Kellner benachrichtigen',
+    notifSub:      'Die Nachricht wird als Push an alle verbundenen Geräte gesendet.',
+    notifCancel:   'Abbrechen',
+    notifSend:     'Senden',
+    notifSending:  'Wird gesendet…',
+    notifOk:       '✓ Benachrichtigung an {n} Gerät(e) gesendet',
+    notifNoToken:  '⚠ Keine verbundenen Geräte',
+    notifErrSrv:   '✗ Serverfehler: {e}',
+    notifErrNet:   '✗ Netzwerkfehler: {e}',
+    showInMenu:    'Im Menü anzeigen',
+    btnMove:       'Verschieben',
+    changeCat:     '— Kategorie wechseln —',
+    newCat:        'Neue Kategorie',
+    delIcon:       '✕ Symbol entfernen',
+    noneIco:       '— Keines —',
+    noPhoto:       'Kein Foto',
+    btnLogo:       'Logo (optional)',
+    btnDelLogo:    'Logo löschen',
   },
   ar: {
     admSub:        'إدارة القائمة',
@@ -1829,6 +1940,8 @@ const ADMIN_UI = {
     delIcon:       '✕ إزالة الأيقونة',
     noneIco:       '— لا شيء —',
     noPhoto:       'لا توجد صورة',
+    btnLogo:       'الشعار (اختياري)',
+    btnDelLogo:    'حذف الشعار',
   },
 };
 
@@ -2798,6 +2911,10 @@ function applyAdminUI(l) {
   if (chooseLbl) chooseLbl.textContent = t.btnChoosePhoto;
   const delLbl = $('btn-del-photo-lbl');
   if (delLbl) delLbl.textContent = t.btnDelPhoto;
+  document.querySelectorAll('[data-uitxt]').forEach(el => {
+    const key = el.getAttribute('data-uitxt');
+    if (t[key] !== undefined) el.textContent = t[key];
+  });
   const heroHint = $('hero-hint-txt');
   if (heroHint) heroHint.textContent = t.heroHint;
 
@@ -4416,7 +4533,13 @@ function loadFeatures() {
 function loadPrimaryLang() {
   _db.ref('/config/primaryLang').on('value', snap => {
     const val = snap.val();
-    if (val) PRIMARY_LANG = val;
+    if (!val) return;
+    PRIMARY_LANG = val;
+    // Si aucune préférence utilisateur, aligner currentLang sur primaryLang
+    if (!localStorage.getItem('mc_admin_lang') && currentLang !== val) {
+      currentLang = val;
+      if (typeof window._updateLangBtn === 'function') window._updateLangBtn(val);
+    }
   });
 }
 
@@ -4554,7 +4677,7 @@ function setOrderStatus(orderId, status) {
    CUSTOM SELECTS (langue + mode)
 ═══════════════════════════════════════════ */
 (function setupCustomSelects() {
-  const LANG_FLAGS = { el:'🇬🇷', fr:'🇫🇷', en:'🇬🇧', ar:'🇸🇦' };
+  const LANG_FLAGS = { el:'🇬🇷', fr:'🇫🇷', en:'🇬🇧', de:'🇩🇪', ar:'🇸🇦' };
   const MODE_ICONS = { paper:'📄', simple:'🖼️', sonet:'🔔', order:'🛒' };
 
   // ── Lang select ──

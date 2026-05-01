@@ -2990,6 +2990,36 @@ const UI = {
     histReorder:'اطلب مرة أخرى', addBtn:'إضافة',
     cartEmpty:'سلة التسوق فارغة', cartSending:'جارٍ الإرسال…', cartSent:'تم إرسال الطلب!',
   },
+  de: {
+    tagline:'Ein raffiniertes Kaffeeerlebnis',
+    sub:['Ausgewählte Kaffeespezialitäten','Stilvolles Ambiente','Tunis, Tunesien'],
+    preTag:'Mozart Coffee Lounge',
+    explore:'Speisekarte',
+    search:'Speisekarte durchsuchen…',
+    all:'Alle',
+    cats:['Heiße Getränke','Kalte Getränke','Speisen','Süßes','Frühstück','Hookah'],
+    badgeN:'Neu', badgeP:'Beliebt', badgeV:'Vegan', badgeL:'Begrenztes Angebot', badgeM:'Frühstück',
+    bdgBoisson:'Getränk', bdgCuisine:'Speise', bdgSucre:'Süß', bdgHookah:'Hookah',
+    bdgChaud:'Heiß', bdgFroid:'Kalt', bdgGlace:'Eisgekühlt',
+    callBtn:'Kellner rufen',
+    notified:'Kellner benachrichtigt ✓',
+    notifiedTable:'Kellner benachrichtigt · Tisch {n} ✓',
+    tableTitle:'Kellner rufen',
+    tableDesc:'Geben Sie Ihre Tischnummer ein',
+    tableConfirm:'Bestätigen',
+    tableCancel:'Abbrechen',
+    alLabel:'Details',
+    noRes:'Keine Ergebnisse für Ihre Suche',
+    wifiN:'WLAN ', wifiV:'',
+    hoursN:'Öffnungszeiten ', hoursV:'',
+    addrN:'Adresse ', addrV:'Tunis, Tunesien',
+    cartTitle:'Meine Bestellung', cartTotal:'Gesamt', cartSend:'Bestellung senden', cartCancel:'Abbrechen',
+    destTakeaway:'🥡 Zum Mitnehmen', destTable:'🪑 Am Tisch', destTableNum:'Tischnummer (1–99)',
+    histTitle:'Meine Bestellungen', histEmpty:'Keine Bestellungen', histClose:'Schließen',
+    histPending:'Ausstehend', histProgress:'In Bearbeitung', histDone:'Abgeschlossen', histTakeaway:'Zum Mitnehmen', histTable:'Tisch',
+    histReorder:'Erneut bestellen', addBtn:'Hinzufügen',
+    cartEmpty:'Ihr Warenkorb ist leer', cartSending:'Wird gesendet…', cartSent:'Bestellung gesendet!',
+  },
 };
 
 const ITEMS = [
@@ -3101,7 +3131,8 @@ const ITEMS = [
 /* ================================================
    STATE
 ================================================ */
-let lang = localStorage.getItem('mc_menu_lang') || 'fr';
+const _cachedDefaultLang = localStorage.getItem('mc_default_lang_cache');
+let lang = localStorage.getItem('mc_menu_lang') || _cachedDefaultLang || 'fr';
 let _defaultLangFromFirebase = null;
 // Appliquer immédiatement la direction et la langue au chargement
 // (évite la différence d'affichage entre premier chargement et changement de langue)
@@ -3150,9 +3181,10 @@ function updateNoteBar() {
 // Appliquer immédiatement pour éviter le flash
 if (theme === 'light') document.documentElement.classList.add('light');
 let sheetItem = null;
-const LANG_FLAGS = { el:'🇬🇷', fr:'🇫🇷', en:'🇬🇧', ar:'🇸🇦' };
-const LANG_DIRS = { el:'ltr', fr:'ltr', en:'ltr', ar:'rtl' };
-const LANG_LABELS = { el:'ΕΛ', fr:'FR', en:'EN', ar:'عر' };
+const LANG_FLAGS = { el:'🇬🇷', fr:'🇫🇷', en:'🇬🇧', de:'🇩🇪', ar:'🇸🇦' };
+const LANG_DIRS = { el:'ltr', fr:'ltr', en:'ltr', de:'ltr', ar:'rtl' };
+const LANG_LABELS = { el:'ΕΛ', fr:'FR', en:'EN', de:'DE', ar:'عر' };
+let enabledLangs = {};
 
 /* ================================================
    ADMIN DATA OVERRIDE
@@ -3186,10 +3218,19 @@ function loadAdminData() {
   // Langue par défaut depuis Control (appliquée seulement si aucun choix localStorage)
   _db.ref('/config/defaultLang').on('value', snap => {
     const val = snap.val();
-    if (val && !localStorage.getItem('mc_menu_lang')) {
-      _defaultLangFromFirebase = val;
-      if (lang !== val) changeLang(val);
+    if (val) {
+      localStorage.setItem('mc_default_lang_cache', val);
+      if (!localStorage.getItem('mc_menu_lang')) {
+        _defaultLangFromFirebase = val;
+        if (lang !== val) changeLang(val);
+      }
     }
+  });
+
+  // Langues disponibles depuis Control
+  _db.ref('/config/enabledLangs').on('value', snap => {
+    enabledLangs = snap.val() || {};
+    buildLangBtns();
   });
 
   // Puis mettre à jour depuis Firebase en arrière-plan
@@ -4008,14 +4049,11 @@ async function confirmOrder() {
 
   // Notification push envoyée AVANT et INDEPENDAMMENT de Firebase
   // keepalive:true garantit que la requête aboutit même si la page est fermée ou naviguée
-  const notifMsg = isTakeaway
-    ? (t.histTakeaway || 'À emporter')
-    : `Table ${tableNum}`;
   const sendNotify = () => fetch('/api/notify', {
     method: 'POST',
     keepalive: true,
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ table: notifMsg, lang: lang || 'fr', message: `Commande · ${notifMsg}`, title: '🧾 Mozart Coffee Lounge' })
+    body: JSON.stringify({ table: isTakeaway ? 'takeaway' : String(tableNum), type: 'order', lang: lang || 'fr', title: '🧾 Mozart Coffee Lounge' })
   }).catch(() => setTimeout(sendNotify, 10000));
   sendNotify();
 
@@ -4523,6 +4561,7 @@ function buildLangBtns() {
   const wrap = document.getElementById('lang-wrap');
   wrap.innerHTML = '';
   Object.keys(LANG_LABELS).forEach(l => {
+    if (enabledLangs[l] === false) return;
     const btn = document.createElement('button');
     btn.className = 'lang-btn' + (l === lang ? ' on' : '');
     btn.dataset.lang = l;
@@ -4530,6 +4569,10 @@ function buildLangBtns() {
     btn.addEventListener('click', () => changeLang(l));
     wrap.appendChild(btn);
   });
+  if (enabledLangs[lang] === false) {
+    const first = Object.keys(LANG_LABELS).find(l => enabledLangs[l] !== false);
+    if (first) changeLang(first);
+  }
 }
 
 function changeLang(l) {
