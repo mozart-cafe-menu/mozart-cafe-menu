@@ -1974,6 +1974,7 @@ let adminData = null;  // { cats, items, info }
 let PRIMARY_LANG = 'fr'; // mis à jour en temps réel par Firebase /config/primaryLang
 let currentLang = localStorage.getItem('mc_admin_lang') || PRIMARY_LANG;
 let unsaved = false;
+let adminEnabledLangs = {};
 const pendingPhotos = new Map();
 let _dragCatIdx  = null;  // index catégorie en cours de drag
 let _dragItemId  = null;  // id produit en cours de drag // item.id → Firebase Storage download URL (en attente de sauvegarde)
@@ -2055,6 +2056,7 @@ function showAdmin() {
   loadMenuMode();
   loadFeatures();
   loadPrimaryLang();
+  loadEnabledLangs();
   setupNotifFab();
 }
 
@@ -4535,11 +4537,29 @@ function loadPrimaryLang() {
     const val = snap.val();
     if (!val) return;
     PRIMARY_LANG = val;
-    // Si aucune préférence utilisateur, aligner currentLang sur primaryLang
     if (!localStorage.getItem('mc_admin_lang') && currentLang !== val) {
       currentLang = val;
       if (typeof window._updateLangBtn === 'function') window._updateLangBtn(val);
     }
+  });
+}
+
+function filterAdminLangBtns() {
+  const popup = document.getElementById('lang-sel-popup');
+  if (!popup) return;
+  popup.querySelectorAll('button[data-lang]').forEach(btn => {
+    btn.style.display = adminEnabledLangs[btn.dataset.lang] === false ? 'none' : '';
+  });
+  if (adminEnabledLangs[currentLang] === false) {
+    const first = LANGS.find(l => adminEnabledLangs[l] !== false);
+    if (first) setGlobalLang(first);
+  }
+}
+
+function loadEnabledLangs() {
+  _db.ref('/config/enabledLangs').on('value', snap => {
+    adminEnabledLangs = snap.val() || {};
+    filterAdminLangBtns();
   });
 }
 

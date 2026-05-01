@@ -358,6 +358,7 @@
 <script>
 const LANGS     = { fr:'🇫🇷', en:'🇬🇧', el:'🇬🇷', ar:'🇸🇦' };
 const LANG_DIRS = { fr:'ltr', en:'ltr', el:'ltr', ar:'rtl' };
+let enabledLangs = {};
 
 const T = {
   fr: {
@@ -570,6 +571,7 @@ function buildLangBtns() {
   const wrap = document.getElementById('lang-wrap');
   wrap.innerHTML = '';
   Object.keys(LANGS).forEach(l => {
+    if (enabledLangs[l] === false) return;
     const btn = document.createElement('button');
     btn.className = 'lang-btn' + (l === lang ? ' on' : '');
     btn.dataset.l = l;
@@ -583,6 +585,15 @@ function buildLangBtns() {
     });
     wrap.appendChild(btn);
   });
+  if (enabledLangs[lang] === false) {
+    const first = Object.keys(LANGS).find(l => enabledLangs[l] !== false);
+    if (first) {
+      lang = first;
+      localStorage.setItem('mc_app_lang', first);
+      _db.ref('fcm_tokens/' + getDeviceId() + '/lang').set(first).catch(() => {});
+      applyLang();
+    }
+  }
 }
 
 function setConnected(on) {
@@ -860,6 +871,11 @@ function init() {
         buildLangBtns();
       }
     }
+  });
+
+  _db.ref('/config/enabledLangs').on('value', snap => {
+    enabledLangs = snap.val() || {};
+    buildLangBtns();
   });
 
   loadCalls();
