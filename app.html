@@ -668,8 +668,6 @@ function registerSW() {
 
   const deviceId = getDeviceId();
 
-  if (!isInstalledPWA()) return;
-
   navigator.serviceWorker.getRegistrations().then(regs => {
     regs.forEach(reg => {
       const script = (reg.active || reg.installing || reg.waiting || {}).scriptURL || '';

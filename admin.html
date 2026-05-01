@@ -1135,6 +1135,7 @@
     <div class="adm-sel-wrap" id="lang-sel-wrap">
       <button class="adm-sel-btn" id="lang-sel-btn" aria-haspopup="true" aria-expanded="false">🇫🇷</button>
       <div class="adm-sel-popup" id="lang-sel-popup" role="menu">
+        <button data-lang="el" onclick="window._pickLang('el')">🇬🇷 Ελληνικά</button>
         <button data-lang="fr" onclick="window._pickLang('fr')">🇫🇷 Français</button>
         <button data-lang="en" onclick="window._pickLang('en')">🇬🇧 English</button>
         <button data-lang="ar" onclick="window._pickLang('ar')">🇸🇦 العربية</button>
@@ -1386,32 +1387,32 @@ async function _hashPwd(pwd) {
 /* ═══════════════════════════════════════════
    LANGUES DISPONIBLES
 ═══════════════════════════════════════════ */
-const LANGS = ['fr', 'en', 'ar'];
-const LANG_LABELS = { fr:'🇫🇷 FR', en:'🇬🇧 EN', ar:'🇸🇦 AR' };
+const LANGS = ['el', 'fr', 'en', 'ar'];
+const LANG_LABELS = { el:'🇬🇷 ΕΛ', fr:'🇫🇷 FR', en:'🇬🇧 EN', ar:'🇸🇦 AR' };
 
 /* ═══════════════════════════════════════════
    DONNÉES PAR DÉFAUT (chargées depuis index.html)
 ═══════════════════════════════════════════ */
 const DEFAULT_CATS = [
-  { key:'hot',     ico:'ico-coffee',  names:{ fr:'Boissons Chaudes', en:'Hot Drinks',  ar:'مشروبات ساخنة' } },
-  { key:'cold',    ico:'ico-cold',    names:{ fr:'Boissons Froides', en:'Cold Drinks', ar:'مشروبات باردة' } },
-  { key:'food',    ico:'ico-food',    names:{ fr:'Cuisine',          en:'Food',         ar:'الأكل'         } },
-  { key:'sweet',   ico:'ico-cake',    names:{ fr:'Sucré',            en:'Sweet',        ar:'حلويات'        } },
-  { key:'morning', ico:'ico-sunrise', names:{ fr:'Le Matin',         en:'Breakfast',    ar:'الصباح'        } },
-  { key:'hookah',  ico:'ico-hookah',  names:{ fr:'Hookah',           en:'Hookah',       ar:'النرجيلة'      } },
+  { key:'hot',     ico:'ico-coffee',  names:{ el:'Ζεστά Ροφήματα',  fr:'Boissons Chaudes', en:'Hot Drinks',  ar:'مشروبات ساخنة' } },
+  { key:'cold',    ico:'ico-cold',    names:{ el:'Κρύα Ροφήματα',   fr:'Boissons Froides', en:'Cold Drinks', ar:'مشروبات باردة' } },
+  { key:'food',    ico:'ico-food',    names:{ el:'Φαγητό',           fr:'Cuisine',          en:'Food',         ar:'الأكل'         } },
+  { key:'sweet',   ico:'ico-cake',    names:{ el:'Γλυκά',            fr:'Sucré',            en:'Sweet',        ar:'حلويات'        } },
+  { key:'morning', ico:'ico-sunrise', names:{ el:'Πρωινό',           fr:'Le Matin',         en:'Breakfast',    ar:'الصباح'        } },
+  { key:'hookah',  ico:'ico-hookah',  names:{ el:'Ναργιλές',         fr:'Hookah',           en:'Hookah',       ar:'النرجيلة'      } },
 ];
 
 const DEFAULT_INFO = {
-  wifi_name:  { fr:'WiFi', en:'WiFi', ar:'واي فاي' },
-  wifi_val:   { fr:'', en:'', ar:'' },
-  hours_name: { fr:'Horaires', en:'Hours', ar:'أوقات العمل' },
-  hours_val:  { fr:'', en:'', ar:'' },
-  addr_name:  { fr:'Adresse', en:'Address', ar:'العنوان' },
-  addr_val:   { fr:'Tunis, Tunisie', en:'Tunis, Tunisia', ar:'تونس العاصمة' },
+  wifi_name:  { el:'WiFi',        fr:'WiFi', en:'WiFi', ar:'واي فاي' },
+  wifi_val:   { el:'',            fr:'', en:'', ar:'' },
+  hours_name: { el:'Ωράριο',      fr:'Horaires', en:'Hours', ar:'أوقات العمل' },
+  hours_val:  { el:'',            fr:'', en:'', ar:'' },
+  addr_name:  { el:'Διεύθυνση',   fr:'Adresse', en:'Address', ar:'العنوان' },
+  addr_val:   { el:'Τύνιδα, Τυνησία', fr:'Tunis, Tunisie', en:'Tunis, Tunisia', ar:'تونس العاصمة' },
   showCallBtn: true,
   showPhotos:  true,
   showNote:    false,
-  noteText:    { fr: '', en: '', ar: '' },
+  noteText:    { el: '', fr: '', en: '', ar: '' },
 };
 
 /* ═══════════════════════════════════════════
@@ -1857,7 +1858,7 @@ function updateMockupText() {
    STATE
 ═══════════════════════════════════════════ */
 let adminData = null;  // { cats, items, info }
-const PRIMARY_LANG = 'fr'; // ← changer ici pour changer la langue principale
+let PRIMARY_LANG = 'fr'; // mis à jour en temps réel par Firebase /config/primaryLang
 let currentLang = localStorage.getItem('mc_admin_lang') || PRIMARY_LANG;
 let unsaved = false;
 const pendingPhotos = new Map();
@@ -1940,6 +1941,7 @@ function showAdmin() {
   loadMenuTheme();
   loadMenuMode();
   loadFeatures();
+  loadPrimaryLang();
   setupNotifFab();
 }
 
@@ -4408,6 +4410,13 @@ function applyFeatures(features) {
 function loadFeatures() {
   _db.ref('/config/features').on('value', snap => {
     applyFeatures(snap.val() || {});
+  });
+}
+
+function loadPrimaryLang() {
+  _db.ref('/config/primaryLang').on('value', snap => {
+    const val = snap.val();
+    if (val) PRIMARY_LANG = val;
   });
 }
 

@@ -2227,6 +2227,10 @@
       font-size:0.73rem; color:var(--muted); margin-top:3px;
       line-height:1.4; display:-webkit-box; -webkit-line-clamp:2;
       -webkit-box-orient:vertical; overflow:hidden;
+      cursor:pointer;
+    }
+    .fp-item.expanded .fp-item-desc {
+      display:block; overflow:visible; -webkit-line-clamp:unset;
     }
     .fp-item-price {
       font-size:0.85rem; font-weight:700; color:var(--gold);
@@ -3098,6 +3102,7 @@ const ITEMS = [
    STATE
 ================================================ */
 let lang = localStorage.getItem('mc_menu_lang') || 'fr';
+let _defaultLangFromFirebase = null;
 // Appliquer immédiatement la direction et la langue au chargement
 // (évite la différence d'affichage entre premier chargement et changement de langue)
 (function _initLangDir() {
@@ -3145,7 +3150,7 @@ function updateNoteBar() {
 // Appliquer immédiatement pour éviter le flash
 if (theme === 'light') document.documentElement.classList.add('light');
 let sheetItem = null;
-const LANG_FLAGS = { fr:'🇫🇷', en:'🇬🇧', ar:'🇸🇦' };
+const LANG_FLAGS = { el:'🇬🇷', fr:'🇫🇷', en:'🇬🇧', ar:'🇸🇦' };
 const LANG_DIRS = { el:'ltr', fr:'ltr', en:'ltr', ar:'rtl' };
 const LANG_LABELS = { el:'ΕΛ', fr:'FR', en:'EN', ar:'عر' };
 
@@ -3177,6 +3182,15 @@ function loadAdminData() {
   } catch(_) {}
   applyMode(menuMode);
   init_after_data();
+
+  // Langue par défaut depuis Control (appliquée seulement si aucun choix localStorage)
+  _db.ref('/config/defaultLang').on('value', snap => {
+    const val = snap.val();
+    if (val && !localStorage.getItem('mc_menu_lang')) {
+      _defaultLangFromFirebase = val;
+      if (lang !== val) changeLang(val);
+    }
+  });
 
   // Puis mettre à jour depuis Firebase en arrière-plan
   _db.ref('menu').on('value', snap => {
@@ -3426,7 +3440,7 @@ function buildFlipBook() {
       return `<div class="fp-item">
         <div class="fp-item-left">
           <div class="fp-item-name">${name}</div>
-          ${desc ? `<div class="fp-item-desc">${desc}</div>` : ''}
+          ${desc ? `<div class="fp-item-desc" onclick="this.closest('.fp-item').classList.toggle('expanded')">${desc}</div>` : ''}
         </div>
         <div class="fp-item-price">${item.price}</div>
       </div>`;
