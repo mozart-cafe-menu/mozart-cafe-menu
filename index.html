@@ -1248,6 +1248,13 @@
     html[data-menu-theme="neon-tokyo"] .card-strip .strip-right { width:100%; justify-content:flex-end; gap:10px; }
     html[data-menu-theme="neon-tokyo"] .card-strip .strip-badges { margin-right:auto; }
     html[data-menu-theme="neon-tokyo"] .card-strip .strip-name { white-space:normal; }
+    /* Mode commande : prix en haut à droite pour ne pas être couvert par le bouton + */
+    html[data-menu-theme="neon-tokyo"] body.mode-order:not(.order-ui-off) .card-strip .strip-price {
+      position:absolute; top:8px; right:8px; z-index:1;
+    }
+    html[data-menu-theme="neon-tokyo"] body.mode-order:not(.order-ui-off) .card-strip .strip-body {
+      padding-right:62px;
+    }
 
     /* ── 3. BOTANICAL FOREST — Forêt organique ── */
     html[data-menu-theme="botanical"] .cards { padding-left:0; }
