@@ -2563,7 +2563,7 @@ function renderLogoSection() {
           const fd = new FormData();
           fd.append('file', blob);
           fd.append('upload_preset', CLOUDINARY_PRESET);
-          fd.append('public_id', 'logo');
+          fd.append('public_id', 'mozart-cafe/logo');
           fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, { method:'POST', body:fd })
             .then(r => r.json()).then(json => {
               if (!json.secure_url) throw new Error('Upload failed');
