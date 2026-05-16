@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="#0c0a08"/>
+  <!-- Gold gradient definition -->
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e2c278"/>
+      <stop offset="50%" style="stop-color:#c8a44e"/>
+      <stop offset="100%" style="stop-color:#9a7a35"/>
+    </linearGradient>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1610"/>
+      <stop offset="100%" style="stop-color:#0c0a08"/>
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="200" fill="url(#bg)" stroke="#c8a44e" stroke-width="2" stroke-opacity="0.3"/>
+  <!-- Bell shape -->
+  <path d="M256 170 C220 170 180 200 175 248 C170 280 165 305 152 320 L360 320 C347 305 342 280 337 248 C332 200 292 170 256 170 Z"
+        fill="url(#g)"/>
+  <!-- Bell top handle -->
+  <circle cx="256" cy="168" r="14" fill="none" stroke="url(#g)" stroke-width="8"/>
+  <!-- Bell clapper -->
+  <circle cx="256" cy="340" r="16" fill="url(#g)"/>
+  <!-- Bell bottom arc -->
+  <path d="M230 355 Q256 370 282 355" fill="none" stroke="url(#g)" stroke-width="8" stroke-linecap="round"/>
+  <!-- Shine effect -->
+  <path d="M210 200 Q220 185 235 195" fill="none" stroke="#fff" stroke-width="3" stroke-opacity="0.25" stroke-linecap="round"/>
+</svg>

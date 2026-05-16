@@ -1,0 +1,10 @@
+{
+  "name": "Mozart Café — Administration",
+  "short_name": "Mozart Admin",
+  "start_url": "/Mozartcafeadmin.html",
+  "scope": "/Mozartcafeadmin.html",
+  "display": "standalone",
+  "background_color": "#0c0a08",
+  "theme_color": "#0c0a08",
+  "lang": "fr"
+}
