@@ -110,7 +110,14 @@
 
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     html { overflow-x:hidden; }
-    body { background:var(--bg); color:var(--cream); font-family:'Outfit',sans-serif; font-weight:300; min-height:100vh; }
+    body {
+      background:
+        radial-gradient(ellipse at 25% 0%, rgba(200,164,78,0.05) 0%, transparent 55%),
+        radial-gradient(ellipse at 75% 100%, rgba(200,164,78,0.03) 0%, transparent 50%),
+        var(--bg);
+      color:var(--cream); font-family:'Outfit',sans-serif; font-weight:300; min-height:100vh;
+    }
+    html.light body { background:var(--bg); }
     button { font-family:inherit; cursor:pointer; border:none; background:none; }
     input, textarea, select { font-family:inherit; }
     ::-webkit-scrollbar { width:3px; }
@@ -181,6 +188,7 @@
     /* ── Section Note clients ── */
     .note-card {
       background:var(--bg2); border:1px solid var(--border); border-radius:16px; padding:18px; display:flex; flex-direction:column; gap:14px;
+      box-shadow:0 2px 10px rgba(0,0,0,0.24);
     }
     html.light .note-card { background:var(--bg3); }
     .note-status {
@@ -314,6 +322,7 @@
     .hero-img-card {
       background:var(--bg2); border:1px solid var(--border);
       border-radius:16px; padding:16px; display:flex; flex-direction:column; gap:20px;
+      box-shadow:0 2px 12px rgba(0,0,0,0.28);
     }
 
     /* ── Mockup téléphone ── */
@@ -519,11 +528,14 @@
       font-family:'Cormorant',serif; font-size:1.2rem; font-weight:600;
       color:var(--cream); padding-bottom:12px; margin-bottom:16px;
       border-bottom:1px solid var(--border);
+      padding-left:12px; border-left:3px solid rgba(200,164,78,0.45);
       display:flex; align-items:center; gap:10px; flex-wrap:wrap;
       cursor:pointer; user-select:none;
-      transition:color 0.2s;
+      transition:color 0.2s, border-left-color 0.2s;
     }
-    .sec-hd:hover { color:var(--gold); }
+    .sec-hd:hover { color:var(--gold); border-left-color:var(--gold); }
+    html.light .sec-hd { border-left-color:rgba(168,104,64,0.45); }
+    html.light .sec-hd:hover { border-left-color:var(--gold); }
     .sec-hd .sec-chevron {
       margin-left:auto; flex-shrink:0; color:var(--muted);
       transition:transform 0.36s cubic-bezier(0.4,0,0.2,1), color 0.2s;
@@ -549,7 +561,7 @@
     /* ── INFO CARD (WiFi, Horaires, Adresse) ── */
     .info-card {
       background:var(--card); border:1px solid var(--border); border-radius:var(--r);
-      overflow:hidden;
+      overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.28);
     }
     .info-row {
       display:grid; grid-template-columns:140px 1fr;
@@ -596,7 +608,10 @@
     .cat-row {
       background:var(--card); border:1px solid var(--border); border-radius:14px;
       padding:12px 14px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+      box-shadow:0 1px 8px rgba(0,0,0,0.2);
+      transition:border-color 0.2s, box-shadow 0.2s;
     }
+    .cat-row:hover { border-color:rgba(200,164,78,0.22); box-shadow:0 2px 14px rgba(0,0,0,0.3); }
     .cat-row-ico { color:var(--gold); flex-shrink:0; }
     .cat-row-ico svg { width:18px; height:18px; }
     /* Photos catégorie — 3 slots sous la ligne de catégorie */
@@ -713,8 +728,10 @@
     /* Product card in admin */
     .prod-card {
       background:var(--card); border:1px solid var(--border); border-radius:14px;
-      overflow:hidden;
+      overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.2);
+      transition:border-color 0.2s, box-shadow 0.2s;
     }
+    .prod-card:hover { border-color:rgba(200,164,78,0.22); box-shadow:0 4px 16px rgba(0,0,0,0.3); }
     .prod-card-top {
       display:flex; align-items:center; gap:12px; padding:14px;
       cursor:pointer; user-select:none; min-height:70px;
@@ -928,8 +945,10 @@
     body[data-style="paper"] .cat-photos-row { display:flex !important; }
     .order-adm-card {
       background:var(--card); border:1px solid var(--border); border-radius:14px;
-      overflow:hidden; margin-bottom:12px; transition:border-color 0.2s;
+      overflow:hidden; margin-bottom:12px; transition:border-color 0.2s, box-shadow 0.2s;
+      box-shadow:0 2px 8px rgba(0,0,0,0.2);
     }
+    .order-adm-card:hover { box-shadow:0 4px 14px rgba(0,0,0,0.28); }
     .order-adm-card.status-pending  { border-left:3px solid var(--gold); }
     .order-adm-card.status-progress { border-left:3px solid #4db8ff; }
     .order-adm-card.status-done     { border-left:3px solid var(--green); opacity:0.65; }
