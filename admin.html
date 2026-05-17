@@ -524,44 +524,60 @@
 
     /* ── SECTION ── */
     .adm-section {
-      margin-bottom:14px;
-      background:var(--card);
-      border:1px solid var(--border);
-      border-left:3px solid rgba(200,164,78,0.3);
-      border-right:3px solid rgba(200,164,78,0.3);
-      border-radius:16px;
+      margin-bottom:16px;
+      background:linear-gradient(160deg, rgba(255,255,255,0.065) 0%, rgba(255,255,255,0.018) 100%);
+      border:1px solid rgba(200,164,78,0.14);
+      border-left:3px solid rgba(200,164,78,0.5);
+      border-right:3px solid rgba(200,164,78,0.5);
+      border-radius:18px;
       overflow:hidden;
-      box-shadow:0 2px 12px rgba(0,0,0,0.22);
-      transition:border-left-color 0.28s, border-right-color 0.28s, box-shadow 0.28s;
+      box-shadow:0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.06);
+      transition:border-left-color 0.3s, border-right-color 0.3s, box-shadow 0.35s, transform 0.25s;
     }
     .adm-section:hover {
-      border-left-color:var(--gold);
-      border-right-color:var(--gold);
-      box-shadow:0 4px 20px rgba(0,0,0,0.32);
+      border-left-color:var(--gold); border-right-color:var(--gold);
+      box-shadow:0 16px 48px rgba(0,0,0,0.55), 0 4px 16px rgba(0,0,0,0.3), 0 0 0 1px rgba(200,164,78,0.1), inset 0 1px 0 rgba(255,255,255,0.08);
+      transform:translateY(-2px);
     }
     html.light .adm-section {
-      background:#fff;
-      border-color:rgba(168,104,64,0.2);
-      border-left-color:rgba(168,104,64,0.35);
-      border-right-color:rgba(168,104,64,0.35);
-      box-shadow:0 2px 12px rgba(0,0,0,0.1);
+      background:linear-gradient(160deg, #ffffff 0%, #faf7f2 100%);
+      border-color:rgba(168,104,64,0.15);
+      border-left-color:rgba(168,104,64,0.45); border-right-color:rgba(168,104,64,0.45);
+      box-shadow:0 4px 20px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.95);
     }
     html.light .adm-section:hover {
-      border-left-color:var(--gold);
-      border-right-color:var(--gold);
-      box-shadow:0 4px 18px rgba(0,0,0,0.14);
+      border-left-color:var(--gold); border-right-color:var(--gold);
+      box-shadow:0 10px 36px rgba(0,0,0,0.15), 0 3px 10px rgba(0,0,0,0.08), 0 0 0 1px rgba(168,104,64,0.1);
+      transform:translateY(-2px);
     }
     .sec-hd {
-      font-family:'Cormorant',serif; font-size:1.2rem; font-weight:600;
-      color:var(--cream); padding:14px 16px;
-      border-bottom:1px solid var(--border);
+      font-family:'Cormorant',serif; font-size:1.25rem; font-weight:600;
+      color:var(--cream); padding:16px 18px;
+      background:linear-gradient(90deg, rgba(200,164,78,0.12) 0%, rgba(200,164,78,0.04) 40%, transparent 80%);
+      border-bottom:1px solid rgba(200,164,78,0.12);
       display:flex; align-items:center; gap:10px; flex-wrap:wrap;
       cursor:pointer; user-select:none;
-      transition:color 0.2s, background 0.2s;
+      transition:color 0.22s, background 0.25s;
     }
-    .sec-hd:hover { color:var(--gold); background:rgba(200,164,78,0.04); }
-    html.light .sec-hd:hover { background:rgba(168,104,64,0.04); }
-    .adm-section.collapsed .sec-hd { border-bottom-color:transparent; }
+    .sec-hd:hover {
+      color:var(--gold);
+      background:linear-gradient(90deg, rgba(200,164,78,0.18) 0%, rgba(200,164,78,0.07) 45%, transparent 80%);
+    }
+    .adm-section.collapsed .sec-hd {
+      border-bottom-color:transparent;
+      background:linear-gradient(90deg, rgba(200,164,78,0.06) 0%, transparent 60%);
+    }
+    html.light .sec-hd {
+      background:linear-gradient(90deg, rgba(168,104,64,0.09) 0%, rgba(168,104,64,0.03) 40%, transparent 80%);
+      border-bottom-color:rgba(168,104,64,0.12);
+    }
+    html.light .sec-hd:hover {
+      background:linear-gradient(90deg, rgba(168,104,64,0.14) 0%, rgba(168,104,64,0.05) 45%, transparent 80%);
+    }
+    html.light .adm-section.collapsed .sec-hd {
+      border-bottom-color:transparent;
+      background:linear-gradient(90deg, rgba(168,104,64,0.05) 0%, transparent 60%);
+    }
     .sec-hd .sec-chevron {
       margin-left:auto; flex-shrink:0; color:var(--muted);
       transition:transform 0.36s cubic-bezier(0.4,0,0.2,1), color 0.2s;
@@ -577,11 +593,12 @@
       transition:grid-template-rows 0.38s cubic-bezier(0.4,0,0.2,1);
     }
     .adm-section.collapsed .sec-body { grid-template-rows:0fr; }
-    .sec-body-inner { min-height:0; overflow:hidden; padding:0 14px 14px; }
+    .sec-body-inner { min-height:0; overflow:hidden; padding:16px 16px 18px; }
     .sec-badge {
-      font-family:'Outfit',sans-serif; font-size:0.66rem; font-weight:500;
-      padding:4px 11px; border-radius:10px; letter-spacing:0.06em;
-      background:rgba(200,164,78,0.1); color:var(--gold); border:1px solid var(--bord2);
+      font-family:'Outfit',sans-serif; font-size:0.62rem; font-weight:600;
+      padding:4px 12px; border-radius:20px; letter-spacing:0.09em; text-transform:uppercase;
+      background:linear-gradient(135deg, rgba(200,164,78,0.22), rgba(200,164,78,0.08));
+      color:var(--gold); border:1px solid rgba(200,164,78,0.38);
     }
 
     /* ── INFO CARD (WiFi, Horaires, Adresse) ── */
