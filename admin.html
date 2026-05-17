@@ -587,13 +587,13 @@
     .adm-section.collapsed .sec-hd .sec-chevron { transform:rotate(-90deg); }
     /* Contenu animé */
     .sec-body {
-      display:grid;
-      grid-template-rows:1fr;
       overflow:hidden;
-      transition:grid-template-rows 0.38s cubic-bezier(0.4,0,0.2,1);
+      max-height:8000px;
+      transition:max-height 0.45s cubic-bezier(0.4,0,0.2,1);
     }
-    .adm-section.collapsed .sec-body { grid-template-rows:0fr; }
-    .sec-body-inner { min-height:0; overflow:hidden; padding:16px 16px 18px; }
+    .adm-section.collapsed .sec-body { max-height:0 !important; transition:max-height 0.35s cubic-bezier(0.65,0,0.35,1); }
+    .sec-body-inner { padding:16px 16px 18px; transition:padding 0.25s ease; }
+    .adm-section.collapsed .sec-body-inner { padding-top:0; padding-bottom:0; }
     .sec-badge {
       font-family:'Outfit',sans-serif; font-size:0.62rem; font-weight:600;
       padding:4px 12px; border-radius:20px; letter-spacing:0.09em; text-transform:uppercase;
@@ -1125,7 +1125,7 @@
       .form-grid-2 { grid-template-columns:1fr 1fr; }
 
       /* Section header plus aéré */
-      .sec-hd { font-size:1.3rem; padding-bottom:14px; margin-bottom:20px; cursor:pointer; }
+      .sec-hd { font-size:1.3rem; padding-bottom:20px; cursor:pointer; }
 
       /* Cat row plus large */
       .cat-row { padding:14px 18px; border-radius:16px; }
