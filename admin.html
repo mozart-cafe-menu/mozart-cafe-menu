@@ -745,6 +745,9 @@
       transition:background 0.15s;
     }
     .ico-picker-none:hover { background:rgba(224,82,82,0.15); }
+    .cat-row-controls {
+      display:flex; align-items:center; gap:8px; flex-shrink:0;
+    }
     .btn-del {
       width:36px; height:36px; flex-shrink:0;
       border:1px solid rgba(224,82,82,0.3); border-radius:8px;
@@ -3253,23 +3256,25 @@ function renderCatsSection() {
       <input class="inline-input" value="${esc(cat.names?.[currentLang] || cat.names?.fr || '')}"
         placeholder="Nom (${currentLang.toUpperCase()})"
         data-ci="${ci}">
-      <div style="position:relative">
-        <button class="ico-picker-btn" data-ci="${ci}" title="Changer l'icône">
-          <span class="ico-pb-label">${currentIco ? icoNameClean : _tCat.noneIco}</span>
-          <span>▾</span>
-        </button>
-        <div class="ico-picker-popup" id="ico-popup-${ci}">
-          <div class="ico-picker-grid">
-            ${ICONS.map(ic => `
-              <div class="ico-picker-item${ic===currentIco?' selected':''}" data-ico="${ic}" data-ci="${ci}" title="${getIconLabel(ic)}">
-                <svg width="18" height="18"><use href="#${ic}"/></svg>
-                <span>${getIconLabel(ic).replace(/^.+\s/,'')}</span>
-              </div>`).join('')}
+      <div class="cat-row-controls">
+        <div style="position:relative">
+          <button class="ico-picker-btn" data-ci="${ci}" title="Changer l'icône">
+            <span class="ico-pb-label">${currentIco ? icoNameClean : _tCat.noneIco}</span>
+            <span>▾</span>
+          </button>
+          <div class="ico-picker-popup" id="ico-popup-${ci}">
+            <div class="ico-picker-grid">
+              ${ICONS.map(ic => `
+                <div class="ico-picker-item${ic===currentIco?' selected':''}" data-ico="${ic}" data-ci="${ci}" title="${getIconLabel(ic)}">
+                  <svg width="18" height="18"><use href="#${ic}"/></svg>
+                  <span>${getIconLabel(ic).replace(/^.+\s/,'')}</span>
+                </div>`).join('')}
+            </div>
+            <button class="ico-picker-none" data-ci="${ci}">${_tCat.delIcon}</button>
           </div>
-          <button class="ico-picker-none" data-ci="${ci}">${_tCat.delIcon}</button>
         </div>
+        <button class="btn-del" data-ci="${ci}" title="Supprimer">✕</button>
       </div>
-      <button class="btn-del" data-ci="${ci}" title="Supprimer">✕</button>
       <div class="cat-photos-row">
         <div class="cat-photos-slots">${slotsHtml}</div>
       </div>
@@ -3326,23 +3331,22 @@ function renderCatsSection() {
       document.querySelectorAll('.ico-picker-popup.open').forEach(p => p.classList.remove('open'));
       if (!isOpen) {
         popup.classList.add('open');
-        // Positionnement — après rendu pour avoir scrollHeight réel
+        // Force reflow synchrone pour que offsetHeight soit précis
+        void popup.offsetHeight;
         const btn = e.currentTarget;
-        requestAnimationFrame(() => {
-          const rect = btn.getBoundingClientRect();
-          const vw = window.innerWidth, vh = window.innerHeight;
-          const pw = Math.min(280, vw - 24);
-          const popupH = Math.min(popup.scrollHeight || 340, vh * 0.75);
-          let top  = rect.bottom + 6;
-          let left = rect.left;
-          if (left + pw > vw - 12) left = vw - pw - 12;
-          if (left < 12) left = 12;
-          if (top + popupH > vh - 12) top = rect.top - popupH - 6;
-          if (top < 12) top = 12;
-          popup.style.top  = top  + 'px';
-          popup.style.left = left + 'px';
-          popup.style.width = pw + 'px';
-        });
+        const rect = btn.getBoundingClientRect();
+        const vw = window.innerWidth, vh = window.innerHeight;
+        const pw = Math.min(280, vw - 24);
+        const popupH = popup.offsetHeight || 340;
+        let top  = rect.bottom + 6;
+        let left = rect.left;
+        if (left + pw > vw - 12) left = vw - pw - 12;
+        if (left < 12) left = 12;
+        if (top + popupH > vh - 12) top = rect.top - popupH - 6;
+        if (top < 12) top = 12;
+        popup.style.top  = top  + 'px';
+        popup.style.left = left + 'px';
+        popup.style.width = pw + 'px';
       }
     });
 
