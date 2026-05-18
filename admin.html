@@ -1231,8 +1231,32 @@
     html.light .lf-dot.active { border-color: #333; box-shadow: 0 0 0 1px rgba(0,0,0,0.3); }
 
     /* ═══════════════════════════════════════════
-       NOUVEAU LAYOUT ADMIN — SIDEBAR + ONGLETS
+       DESIGN SYSTEM ADMIN — INSPIRÉ CONTROL APP
     ═══════════════════════════════════════════ */
+
+    /* ── TOKENS DARK / LIGHT ── */
+    :root {
+      --adm-bg:        #0a0806;
+      --adm-surface:   #110e0a;
+      --adm-card:      rgba(255,255,255,0.04);
+      --adm-border:    rgba(200,164,78,0.14);
+      --adm-gold:      #c8a44e;
+      --adm-gold-glow: rgba(200,164,78,0.18);
+      --adm-text:      #f0e6d3;
+      --adm-muted:     rgba(200,175,130,0.5);
+      --adm-sidebar-w: 230px;
+      --adm-r:         14px;
+    }
+    html.light {
+      --adm-bg:        #f4efe8;
+      --adm-surface:   #ece5db;
+      --adm-card:      #ffffff;
+      --adm-border:    rgba(0,0,0,0.09);
+      --adm-gold:      #9a7030;
+      --adm-gold-glow: rgba(154,112,48,0.1);
+      --adm-text:      #1c140c;
+      --adm-muted:     rgba(0,0,0,0.45);
+    }
 
     /* ── SIDEBAR DESKTOP (≥1024px) ── */
     .adm-sidebar { display:none; }
@@ -1240,58 +1264,110 @@
       #adm-wrap {
         max-width:100% !important; margin:0 !important; padding:0 !important;
         display:flex; flex-direction:row; align-items:flex-start; min-height:100vh;
+        background:var(--adm-bg); transition:background 0.3s;
       }
       .adm-sidebar {
         display:flex !important; flex-direction:column;
-        position:fixed; top:0; left:0; bottom:0; width:220px;
-        background:#0d0a07; border-right:1px solid rgba(200,164,78,0.18);
-        z-index:90; padding-top:72px; overflow-y:auto; flex-shrink:0;
+        position:fixed; top:0; left:0; bottom:0; width:var(--adm-sidebar-w);
+        background:var(--adm-surface);
+        border-right:1px solid var(--adm-border);
+        z-index:90; padding-top:70px; overflow-y:auto; flex-shrink:0;
+        transition:background 0.3s, border-color 0.3s;
       }
       .adm-content-area {
-        margin-left:220px; flex:1; min-width:0; padding:28px 36px 80px;
+        margin-left:var(--adm-sidebar-w); flex:1; min-width:0;
+        padding:28px 40px 80px;
+        background:var(--adm-bg); min-height:100vh;
+        transition:background 0.3s;
       }
       .adm-group { display:none; width:100%; }
       .adm-group.active { display:block; }
-      /* Desktop : sections toujours dépliées — spécificité 0,4,0 */
       .adm-group .adm-section.collapsed .sec-body {
-        max-height:none !important; overflow:visible !important;
-        transition:none !important;
+        max-height:none !important; overflow:visible !important; transition:none !important;
       }
       .adm-group .sec-chevron { display:none !important; }
       .adm-group .sec-hd { cursor:default !important; }
       body.adm-active #sc-fab { display:none !important; }
+      /* Boutons du header cachés sur desktop (déplacés dans Réglages) */
+      body.adm-active #lang-sel-wrap,
+      body.adm-active #mode-sel-wrap,
+      body.adm-active #toggle-call-btn,
+      body.adm-active #toggle-photos-btn,
+      body.adm-active #toggle-order-btn { display:none !important; }
     }
 
-    /* ── SIDEBAR NAV ITEMS ── */
-    .adm-nav { display:flex; flex-direction:column; padding:8px 0; }
+    /* ── SIDEBAR NAV ── */
+    .adm-nav { display:flex; flex-direction:column; padding:6px 0 20px; }
+    .adm-nav-section-lbl {
+      font-size:0.6rem; letter-spacing:0.14em; text-transform:uppercase;
+      color:var(--adm-muted); padding:14px 20px 5px; font-weight:600;
+    }
     .adm-nav-item {
-      display:flex; align-items:center; gap:12px; padding:12px 20px;
-      cursor:pointer; color:rgba(200,180,140,0.55);
-      font-family:'Outfit',sans-serif; font-size:0.86rem; font-weight:500;
-      letter-spacing:0.03em; border-left:3px solid transparent;
+      display:flex; align-items:center; gap:13px; padding:11px 18px 11px 17px;
+      cursor:pointer; color:var(--adm-muted);
+      font-family:'Outfit',sans-serif; font-size:0.85rem; font-weight:500;
+      letter-spacing:0.02em; border-left:3px solid transparent;
       transition:color 0.2s, background 0.2s, border-color 0.2s;
       white-space:nowrap; user-select:none;
+      margin:1px 10px 1px 0; border-radius:0 10px 10px 0;
     }
-    .adm-nav-item:hover { color:var(--cream); background:rgba(200,164,78,0.07); }
+    .adm-nav-item:hover { color:var(--adm-text); background:var(--adm-gold-glow); }
     .adm-nav-item.active {
-      color:var(--gold); border-left-color:var(--gold);
-      background:rgba(200,164,78,0.1);
+      color:var(--adm-gold); border-left-color:var(--adm-gold);
+      background:var(--adm-gold-glow);
+      font-weight:600;
     }
-    .adm-nav-ico { width:17px; height:17px; opacity:0.65; flex-shrink:0; transition:opacity 0.2s; }
+    .adm-nav-ico { width:16px; height:16px; opacity:0.6; flex-shrink:0; transition:opacity 0.2s; }
     .adm-nav-item.active .adm-nav-ico { opacity:1; }
-    .adm-nav-divider { height:1px; background:rgba(200,164,78,0.12); margin:8px 16px; }
+    .adm-nav-divider { height:1px; background:var(--adm-border); margin:10px 16px 8px; }
+
+    /* ── SECTION CARDS (desktop) ── */
+    @media(min-width:1024px) {
+      .adm-group .adm-section {
+        background:var(--adm-card);
+        border:1px solid var(--adm-border);
+        border-radius:var(--adm-r);
+        margin-bottom:20px;
+        overflow:hidden;
+        box-shadow:0 2px 24px rgba(0,0,0,0.14);
+        transition:background 0.3s, border-color 0.3s, box-shadow 0.3s;
+      }
+      .adm-group .adm-section:hover {
+        border-color:rgba(200,164,78,0.25);
+        box-shadow:0 4px 32px rgba(0,0,0,0.2);
+      }
+      html.light .adm-group .adm-section { box-shadow:0 2px 16px rgba(0,0,0,0.07); }
+      .adm-group .sec-hd {
+        padding:15px 22px;
+        font-family:'Outfit',sans-serif;
+        font-size:0.88rem; font-weight:600; letter-spacing:0.04em;
+        color:var(--adm-text);
+        background:linear-gradient(135deg, var(--adm-gold-glow), transparent 60%);
+        border-bottom:1px solid var(--adm-border);
+        display:flex; align-items:center; gap:10px;
+        transition:background 0.3s;
+      }
+      .adm-group .sec-hd::before {
+        content:''; display:inline-block; width:3px; height:15px;
+        background:var(--adm-gold); border-radius:2px; flex-shrink:0;
+      }
+      .adm-group .sec-badge {
+        margin-left:auto; font-size:0.58rem; padding:3px 10px;
+        border-radius:20px; background:var(--adm-gold-glow);
+        color:var(--adm-gold); border:1px solid var(--adm-border);
+        letter-spacing:0.1em; text-transform:uppercase; font-weight:700;
+      }
+      .adm-group .sec-body-inner { padding:20px 22px 24px; }
+    }
 
     /* ── ONGLETS TRACK MOBILE (<1024px) ── */
     @media(max-width:1023px) {
       .adm-sidebar { display:none !important; }
       .adm-content-area { display:block; overflow:hidden; }
-      #adm-wrap {
-        overflow-x:hidden; padding-bottom:74px;
-      }
+      #adm-wrap { overflow-x:hidden; padding-bottom:74px; background:var(--adm-bg); }
       .adm-tabs-track {
         display:flex; width:500%;
-        transition:transform 0.38s cubic-bezier(0.4,0,0.2,1);
-        will-change:transform;
+        transition:transform 0.38s cubic-bezier(0.4,0,0.2,1); will-change:transform;
       }
       .adm-group { width:20%; flex-shrink:0; padding:16px; box-sizing:border-box; }
     }
@@ -1301,77 +1377,120 @@
     @media(max-width:1023px) {
       .adm-bottom-nav.visible {
         display:flex; position:fixed; bottom:0; left:0; right:0; z-index:200;
-        background:rgba(11,8,5,0.97); backdrop-filter:blur(20px) saturate(160%);
-        border-top:1px solid rgba(200,164,78,0.22); height:64px;
-        align-items:stretch; padding:0;
+        background:rgba(10,8,6,0.97); backdrop-filter:blur(24px) saturate(160%);
+        border-top:1px solid var(--adm-border); height:64px;
+        align-items:stretch;
       }
     }
     .adm-bnav-item {
       flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
-      gap:3px; cursor:pointer; color:rgba(180,155,110,0.5);
-      font-size:0.58rem; font-family:'Outfit',sans-serif; font-weight:500;
+      gap:3px; cursor:pointer; color:var(--adm-muted);
+      font-size:0.57rem; font-family:'Outfit',sans-serif; font-weight:500;
       letter-spacing:0.04em; position:relative; transition:color 0.22s;
       padding-bottom:4px; user-select:none;
     }
-    .adm-bnav-item.active { color:var(--gold); }
-    .adm-bnav-item svg { opacity:0.55; transition:opacity 0.22s; }
+    .adm-bnav-item.active { color:var(--adm-gold); }
+    .adm-bnav-item svg { opacity:0.5; transition:opacity 0.22s; }
     .adm-bnav-item.active svg { opacity:1; }
     .adm-bnav-indicator {
       position:absolute; top:0; height:2.5px;
-      background:var(--gold); border-radius:0 0 3px 3px; width:0; left:0;
+      background:var(--adm-gold); border-radius:0 0 3px 3px; width:0; left:0;
       transition:left 0.38s cubic-bezier(0.34,1.56,0.64,1), width 0.38s cubic-bezier(0.34,1.56,0.64,1);
       pointer-events:none; z-index:1;
     }
 
-    /* ── NOTE TOGGLE (groupe Catégories) ── */
+    /* ── NOTE TOGGLE ── */
     .adm-note-toggle-row {
       display:flex; align-items:center; justify-content:space-between;
-      padding:13px 0 11px; margin-bottom:6px;
-      border-bottom:1px solid rgba(200,164,78,0.12);
+      padding:13px 4px 11px; margin-bottom:6px;
+      border-bottom:1px solid var(--adm-border);
       cursor:pointer; user-select:none;
     }
     .adm-note-toggle-lbl {
-      font-family:'Outfit',sans-serif; font-size:0.83rem; color:var(--muted);
-      display:flex; align-items:center; gap:8px;
+      font-family:'Outfit',sans-serif; font-size:0.83rem; color:var(--adm-muted);
+      display:flex; align-items:center; gap:9px;
     }
-    .adm-note-toggle-lbl svg { color:var(--gold); opacity:0.8; }
-    .adm-note-chevron {
-      color:var(--muted); transition:transform 0.3s cubic-bezier(0.4,0,0.2,1);
-    }
+    .adm-note-toggle-lbl svg { color:var(--adm-gold); opacity:0.85; }
+    .adm-note-chevron { color:var(--adm-muted); transition:transform 0.3s cubic-bezier(0.4,0,0.2,1); }
     .adm-note-toggle-row.note-section-expanded .adm-note-chevron { transform:rotate(180deg); }
     #sec-note { overflow:hidden; max-height:0; opacity:0; transition:max-height 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease; }
     #sec-note.note-expanded { max-height:1400px; opacity:1; }
 
-    /* ── SECTION RÉGLAGES ── */
-    .rgl-list { display:flex; flex-direction:column; gap:6px; }
+    /* ── RÉGLAGES ── */
+    .rgl-list { display:flex; flex-direction:column; gap:8px; }
     .rgl-row {
-      display:flex; align-items:center; justify-content:space-between;
-      padding:13px 16px; border-radius:10px;
-      background:rgba(255,255,255,0.03); border:1px solid rgba(200,164,78,0.1);
+      display:flex; align-items:center; justify-content:space-between; gap:16px;
+      padding:15px 18px; border-radius:12px;
+      background:var(--adm-card); border:1px solid var(--adm-border);
+      transition:border-color 0.2s, background 0.2s;
     }
-    .rgl-name { font-family:'Outfit',sans-serif; font-size:0.86rem; font-weight:500; color:var(--cream); margin-bottom:3px; }
-    .rgl-desc { font-size:0.71rem; color:var(--muted); }
+    .rgl-row:hover { border-color:rgba(200,164,78,0.3); }
+    .rgl-info { flex:1; min-width:0; }
+    .rgl-name {
+      font-family:'Outfit',sans-serif; font-size:0.87rem; font-weight:600;
+      color:var(--adm-text); margin-bottom:3px;
+    }
+    .rgl-desc { font-size:0.71rem; color:var(--adm-muted); }
     .rgl-toggle {
-      width:44px; height:26px; border-radius:13px;
-      background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.14);
-      position:relative; cursor:pointer; flex-shrink:0;
-      transition:background 0.25s, border-color 0.25s;
+      width:46px; height:27px; border-radius:14px; flex-shrink:0;
+      background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12);
+      position:relative; cursor:pointer;
+      transition:background 0.28s, border-color 0.28s;
     }
-    .rgl-toggle.on { background:rgba(200,164,78,0.32); border-color:rgba(200,164,78,0.7); }
+    html.light .rgl-toggle { background:rgba(0,0,0,0.1); border-color:rgba(0,0,0,0.15); }
+    .rgl-toggle.on { background:rgba(200,164,78,0.3); border-color:var(--adm-gold); }
     .rgl-toggle::after {
-      content:''; position:absolute; top:3px; left:3px; width:18px; height:18px;
-      border-radius:50%; background:rgba(200,164,78,0.45);
-      transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1), background 0.25s;
+      content:''; position:absolute; top:3px; left:3px; width:19px; height:19px;
+      border-radius:50%; background:rgba(200,164,78,0.4);
+      transition:transform 0.28s cubic-bezier(0.34,1.56,0.64,1), background 0.28s;
     }
-    .rgl-toggle.on::after { transform:translateX(18px); background:var(--gold); }
+    .rgl-toggle.on::after { transform:translateX(19px); background:var(--adm-gold); }
     .rgl-btn {
-      padding:7px 13px; border-radius:8px; background:rgba(200,164,78,0.1);
-      border:1px solid rgba(200,164,78,0.3); color:var(--gold);
-      font-family:'Outfit',sans-serif; font-size:0.79rem; font-weight:500;
-      cursor:pointer; display:flex; align-items:center; gap:7px;
-      transition:background 0.2s; white-space:nowrap;
+      padding:8px 15px; border-radius:10px;
+      background:var(--adm-gold-glow); border:1px solid var(--adm-border);
+      color:var(--adm-gold); font-family:'Outfit',sans-serif;
+      font-size:0.8rem; font-weight:500; cursor:pointer;
+      display:flex; align-items:center; gap:7px;
+      transition:background 0.2s, border-color 0.2s; white-space:nowrap;
     }
-    .rgl-btn:hover { background:rgba(200,164,78,0.2); }
+    .rgl-btn:hover { background:rgba(200,164,78,0.22); border-color:rgba(200,164,78,0.45); }
+    /* Style Mode segmented */
+    .rgl-seg {
+      display:flex; border-radius:10px; overflow:hidden;
+      border:1px solid var(--adm-border); flex-shrink:0;
+    }
+    .rgl-seg-opt {
+      padding:8px 14px; background:transparent; border:none;
+      color:var(--adm-muted); font-family:'Outfit',sans-serif;
+      font-size:0.78rem; font-weight:500; cursor:pointer;
+      transition:background 0.2s, color 0.2s; white-space:nowrap;
+    }
+    .rgl-seg-opt:not(:last-child) { border-right:1px solid var(--adm-border); }
+    .rgl-seg-opt.active { background:var(--adm-gold-glow); color:var(--adm-gold); font-weight:600; }
+
+    /* ── PHOTOS CATÉGORIES — Style Papier ── */
+    .cat-photos-row { display:none; gap:10px; padding:4px 0 6px; flex-wrap:wrap; }
+    body[data-style="paper"] .cat-photos-row { display:flex !important; }
+    .cat-photo-slot {
+      flex:0 0 90px; height:90px; border-radius:12px;
+      border:1.5px dashed var(--adm-border);
+      background:var(--adm-gold-glow);
+      overflow:hidden; cursor:pointer; position:relative;
+      transition:border-color 0.22s, transform 0.18s, box-shadow 0.22s;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .cat-photo-slot:hover {
+      border-color:var(--adm-gold); border-style:solid;
+      transform:scale(1.04); box-shadow:0 4px 16px rgba(200,164,78,0.2);
+    }
+    .cat-photo-slot img { width:100%; height:100%; object-fit:cover; display:block; }
+    .cat-photo-slot-add {
+      display:flex; flex-direction:column; align-items:center; gap:5px;
+      color:var(--adm-muted); font-size:0.62rem; font-family:'Outfit',sans-serif;
+      pointer-events:none; text-align:center; padding:8px;
+    }
+    .cat-photo-slot-add svg { color:var(--adm-gold); opacity:0.7; }
+    .cat-photo-slot.has-img .cat-photo-slot-add { display:none; }
   </style>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -1536,24 +1655,24 @@
     <nav class="adm-nav">
       <div class="adm-nav-item active" data-group="accueil" onclick="switchAdmGroup('accueil')">
         <svg class="adm-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
-        Accueil
+        <span data-uitxt="navAccueil">Accueil</span>
       </div>
       <div class="adm-nav-item" data-group="affichage" onclick="switchAdmGroup('affichage')">
         <svg class="adm-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-        Affichage
+        <span data-uitxt="navAffichage">Affichage</span>
       </div>
       <div class="adm-nav-item" data-group="categories" onclick="switchAdmGroup('categories')">
         <svg class="adm-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-        Catégories & Produits
+        <span data-uitxt="navCatsFull">Catégories & Produits</span>
       </div>
       <div class="adm-nav-item" id="adm-nav-commande" data-group="commande" onclick="switchAdmGroup('commande')">
         <svg class="adm-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
-        Commande
+        <span data-uitxt="navCommande">Commande</span>
       </div>
       <div class="adm-nav-divider"></div>
       <div class="adm-nav-item" data-group="reglages" onclick="switchAdmGroup('reglages')">
         <svg class="adm-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-        Réglages
+        <span data-uitxt="navReglages">Réglages</span>
       </div>
     </nav>
   </div>
@@ -1711,8 +1830,8 @@
             <!-- Thème -->
             <div class="rgl-row">
               <div class="rgl-info">
-                <div class="rgl-name">Thème</div>
-                <div class="rgl-desc">Basculer entre mode sombre et clair</div>
+                <div class="rgl-name" data-uitxt="rglThemeName">Thème</div>
+                <div class="rgl-desc" data-uitxt="rglThemeDesc">Basculer entre mode sombre et clair</div>
               </div>
               <button class="rgl-btn" id="rgl-theme-btn" onclick="document.getElementById('adm-theme-btn').click()">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
@@ -1723,8 +1842,8 @@
             <!-- Langue -->
             <div class="rgl-row">
               <div class="rgl-info">
-                <div class="rgl-name">Langue d'interface</div>
-                <div class="rgl-desc">Langue d'affichage de l'administration</div>
+                <div class="rgl-name" data-uitxt="rglLangName">Langue d'interface</div>
+                <div class="rgl-desc" data-uitxt="rglLangDesc">Langue d'affichage de l'administration</div>
               </div>
               <button class="rgl-btn" id="rgl-lang-btn" onclick="document.getElementById('lang-sel-btn').click()">
                 <span id="rgl-lang-flag">🇬🇷</span>
@@ -1732,11 +1851,23 @@
               </button>
             </div>
 
+            <!-- Style du menu -->
+            <div class="rgl-row" id="rgl-style-row">
+              <div class="rgl-info">
+                <div class="rgl-name" data-uitxt="rglStyleName">Style du menu</div>
+                <div class="rgl-desc" data-uitxt="rglStyleDesc">Papier (classique) ou Dynamique (avec photos)</div>
+              </div>
+              <div class="rgl-seg" id="rgl-style-seg">
+                <button class="rgl-seg-opt" id="rgl-seg-paper" data-mode="paper" onclick="window._pickMode('paper')"><span data-uitxt="rglStylePaper">📄 Papier</span></button>
+                <button class="rgl-seg-opt" id="rgl-seg-dynamic" data-mode="simple" onclick="window._pickMode('simple')"><span data-uitxt="rglStyleDynamic">🖼️ Dynamique</span></button>
+              </div>
+            </div>
+
             <!-- Sonnette -->
             <div class="rgl-row">
               <div class="rgl-info">
-                <div class="rgl-name">Bouton sonnette</div>
-                <div class="rgl-desc">Afficher le bouton d'appel dans le menu</div>
+                <div class="rgl-name" data-uitxt="rglCallName">Bouton sonnette</div>
+                <div class="rgl-desc" data-uitxt="rglCallDesc">Afficher le bouton d'appel dans le menu</div>
               </div>
               <div class="rgl-toggle" id="rgl-call-toggle" onclick="document.getElementById('toggle-call-btn').click(); syncReglagesUI()"></div>
             </div>
@@ -1744,8 +1875,8 @@
             <!-- Commande -->
             <div class="rgl-row" id="rgl-order-row">
               <div class="rgl-info">
-                <div class="rgl-name">Mode commande</div>
-                <div class="rgl-desc">Activer l'interface de commande dans le menu</div>
+                <div class="rgl-name" data-uitxt="rglOrderName">Mode commande</div>
+                <div class="rgl-desc" data-uitxt="rglOrderDesc">Activer l'interface de commande dans le menu</div>
               </div>
               <div class="rgl-toggle" id="rgl-order-toggle" onclick="document.getElementById('toggle-order-btn').click(); syncReglagesUI()"></div>
             </div>
@@ -1753,8 +1884,8 @@
             <!-- Photos -->
             <div class="rgl-row">
               <div class="rgl-info">
-                <div class="rgl-name">Photos produits</div>
-                <div class="rgl-desc">Afficher les photos dans le menu</div>
+                <div class="rgl-name" data-uitxt="rglPhotosName">Photos produits</div>
+                <div class="rgl-desc" data-uitxt="rglPhotosDesc">Afficher les photos dans le menu</div>
               </div>
               <div class="rgl-toggle" id="rgl-photos-toggle" onclick="document.getElementById('toggle-photos-btn').click(); syncReglagesUI()"></div>
             </div>
@@ -1970,6 +2101,13 @@ const ADMIN_UI = {
     noPhoto:       'Καμία φωτογραφία',
     btnLogo:       'Λογότυπο (προαιρετικό)',
     btnDelLogo:    'Διαγραφή λογοτύπου',
+    navAccueil:'Αρχική', navAffichage:'Εμφάνιση', navCatsFull:'Κατηγορίες & Προϊόντα', navCatsShort:'Κατηγορίες', navCommande:'Παραγγελίες', navReglages:'Ρυθμίσεις',
+    rglThemeName:'Θέμα', rglThemeDesc:'Εναλλαγή μεταξύ σκοτεινής και φωτεινής λειτουργίας',
+    rglLangName:'Γλώσσα διεπαφής', rglLangDesc:'Γλώσσα εμφάνισης της διαχείρισης',
+    rglStyleName:'Στυλ μενού', rglStyleDesc:'Κατάλογος ή Δυναμικό (με φωτογραφίες)', rglStylePaper:'📄 Κατάλογος', rglStyleDynamic:'🖼️ Δυναμικό',
+    rglCallName:'Κουμπί κλήσης', rglCallDesc:'Εμφάνιση κουμπιού κλήσης στο μενού',
+    rglOrderName:'Λειτουργία παραγγελίας', rglOrderDesc:'Ενεργοποίηση διεπαφής παραγγελίας στο μενού',
+    rglPhotosName:'Φωτογραφίες προϊόντων', rglPhotosDesc:'Εμφάνιση φωτογραφιών στο μενού',
   },
   fr: {
     admSub:        'Administration du menu',
@@ -2075,6 +2213,13 @@ const ADMIN_UI = {
     noPhoto:       'Aucune photo',
     btnLogo:       'Logo (optionnel)',
     btnDelLogo:    'Supprimer le logo',
+    navAccueil:'Accueil', navAffichage:'Affichage', navCatsFull:'Catégories & Produits', navCatsShort:'Catégories', navCommande:'Commande', navReglages:'Réglages',
+    rglThemeName:'Thème', rglThemeDesc:'Basculer entre mode sombre et clair',
+    rglLangName:'Langue d\'interface', rglLangDesc:'Langue d\'affichage de l\'administration',
+    rglStyleName:'Style du menu', rglStyleDesc:'Papier (classique) ou Dynamique (avec photos)', rglStylePaper:'📄 Papier', rglStyleDynamic:'🖼️ Dynamique',
+    rglCallName:'Bouton sonnette', rglCallDesc:'Afficher le bouton d\'appel dans le menu',
+    rglOrderName:'Mode commande', rglOrderDesc:'Activer l\'interface de commande dans le menu',
+    rglPhotosName:'Photos produits', rglPhotosDesc:'Afficher les photos dans le menu',
   },
   en: {
     admSub:        'Menu administration',
@@ -2180,6 +2325,13 @@ const ADMIN_UI = {
     noPhoto:       'No photo',
     btnLogo:       'Logo (optional)',
     btnDelLogo:    'Delete logo',
+    navAccueil:'Home', navAffichage:'Display', navCatsFull:'Categories & Products', navCatsShort:'Categories', navCommande:'Orders', navReglages:'Settings',
+    rglThemeName:'Theme', rglThemeDesc:'Switch between dark and light mode',
+    rglLangName:'Interface language', rglLangDesc:'Display language for administration',
+    rglStyleName:'Menu style', rglStyleDesc:'Paper (classic) or Dynamic (with photos)', rglStylePaper:'📄 Paper', rglStyleDynamic:'🖼️ Dynamic',
+    rglCallName:'Call button', rglCallDesc:'Show the call button in the menu',
+    rglOrderName:'Order mode', rglOrderDesc:'Enable the order interface in the menu',
+    rglPhotosName:'Product photos', rglPhotosDesc:'Show photos in the menu',
   },
   de: {
     admSub:        'Menüverwaltung',
@@ -2285,6 +2437,13 @@ const ADMIN_UI = {
     noPhoto:       'Kein Foto',
     btnLogo:       'Logo (optional)',
     btnDelLogo:    'Logo löschen',
+    navAccueil:'Startseite', navAffichage:'Anzeige', navCatsFull:'Kategorien & Produkte', navCatsShort:'Kategorien', navCommande:'Bestellung', navReglages:'Einstellungen',
+    rglThemeName:'Thema', rglThemeDesc:'Zwischen dunklem und hellem Modus wechseln',
+    rglLangName:'Oberflächensprache', rglLangDesc:'Anzeigesprache der Verwaltung',
+    rglStyleName:'Menü-Stil', rglStyleDesc:'Papier (klassisch) oder Dynamisch (mit Fotos)', rglStylePaper:'📄 Papier', rglStyleDynamic:'🖼️ Dynamisch',
+    rglCallName:'Klingeltaste', rglCallDesc:'Anruftaste im Menü anzeigen',
+    rglOrderName:'Bestellmodus', rglOrderDesc:'Bestelloberfläche im Menü aktivieren',
+    rglPhotosName:'Produktfotos', rglPhotosDesc:'Fotos im Menü anzeigen',
   },
   ar: {
     admSub:        'إدارة القائمة',
@@ -2390,6 +2549,13 @@ const ADMIN_UI = {
     noPhoto:       'لا توجد صورة',
     btnLogo:       'الشعار (اختياري)',
     btnDelLogo:    'حذف الشعار',
+    navAccueil:'الرئيسية', navAffichage:'العرض', navCatsFull:'الفئات والمنتجات', navCatsShort:'الفئات', navCommande:'الطلبات', navReglages:'الإعدادات',
+    rglThemeName:'الثيم', rglThemeDesc:'التبديل بين الوضع الداكن والفاتح',
+    rglLangName:'لغة الواجهة', rglLangDesc:'لغة عرض الإدارة',
+    rglStyleName:'نمط القائمة', rglStyleDesc:'ورق (كلاسيكي) أو ديناميكي (مع صور)', rglStylePaper:'📄 ورق', rglStyleDynamic:'🖼️ ديناميكي',
+    rglCallName:'زر النداء', rglCallDesc:'عرض زر النداء في القائمة',
+    rglOrderName:'وضع الطلب', rglOrderDesc:'تفعيل واجهة الطلب في القائمة',
+    rglPhotosName:'صور المنتجات', rglPhotosDesc:'عرض الصور في القائمة',
   },
 };
 
@@ -5312,6 +5478,9 @@ function syncStyleAdminUI(mode) {
 
   // Refresh theme selector (paper mode hides similar-looking themes)
   renderThemeSelector();
+
+  // Sync Réglages style segmented control if visible
+  if (_admCurrentGroup === 'reglages') syncReglagesUI();
 }
 
 
@@ -5606,6 +5775,25 @@ function syncReglagesUI() {
     rglOrder.classList.toggle('on', orderBtn.classList.contains('on'));
     if (rglOrderRow) rglOrderRow.style.display = orderBtn.style.display === 'none' ? 'none' : '';
   }
+
+  // Style mode segmented control
+  document.querySelectorAll('#rgl-style-seg .rgl-seg-opt').forEach(opt => {
+    opt.classList.toggle('active', opt.dataset.mode === currentMenuMode);
+  });
+
+  // Hide style options not available in license
+  const rglStyleRow = document.getElementById('rgl-style-row');
+  if (rglStyleRow && _currentFeatures?.styles) {
+    const styles = _currentFeatures.styles;
+    const paperVisible  = styles.paper  !== false;
+    const simpleVisible = styles.simple !== false;
+    const rglPaper   = document.getElementById('rgl-seg-paper');
+    const rglDynamic = document.getElementById('rgl-seg-dynamic');
+    if (rglPaper)   rglPaper.style.display   = paperVisible  ? '' : 'none';
+    if (rglDynamic) rglDynamic.style.display = simpleVisible ? '' : 'none';
+    // Hide row entirely if only one style is available
+    rglStyleRow.style.display = (paperVisible || simpleVisible) ? '' : 'none';
+  }
 }
 
 /* ── SWIPE MOBILE ── */
@@ -5648,23 +5836,23 @@ window.addEventListener('resize', () => {
   <div class="adm-bnav-indicator" id="adm-bnav-indicator"></div>
   <div class="adm-bnav-item active" data-group="accueil" onclick="switchAdmGroup('accueil')">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
-    Accueil
+    <span data-uitxt="navAccueil">Accueil</span>
   </div>
   <div class="adm-bnav-item" data-group="affichage" onclick="switchAdmGroup('affichage')">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-    Affichage
+    <span data-uitxt="navAffichage">Affichage</span>
   </div>
   <div class="adm-bnav-item" data-group="categories" onclick="switchAdmGroup('categories')">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-    Catégories
+    <span data-uitxt="navCatsShort">Catégories</span>
   </div>
   <div class="adm-bnav-item" id="adm-bnav-commande" data-group="commande" onclick="switchAdmGroup('commande')">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
-    Commande
+    <span data-uitxt="navCommande">Commande</span>
   </div>
   <div class="adm-bnav-item" data-group="reglages" onclick="switchAdmGroup('reglages')">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-    Réglages
+    <span data-uitxt="navReglages">Réglages</span>
   </div>
 </div>
 
