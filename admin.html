@@ -5299,12 +5299,12 @@ function syncStyleAdminUI(mode) {
   if (scNoteBtn)  scNoteBtn.style.display  = mode === 'paper' ? 'none' : '';
   if (noteTglRow) noteTglRow.style.display = mode === 'paper' ? 'none' : '';
 
-  // Navigation commande : afficher/cacher l'onglet commande selon la licence
+  // Navigation commande : visible dès que la licence est accordée depuis Control
   const admNavCommande  = document.getElementById('adm-nav-commande');
   const admBnavCommande = document.getElementById('adm-bnav-commande');
-  const showNavCmd = showOrder;
-  if (admNavCommande)  admNavCommande.style.display  = showNavCmd ? '' : 'none';
-  if (admBnavCommande) admBnavCommande.style.display = showNavCmd ? '' : 'none';
+  const cmdLicensed = !_currentFeatures?.buttons || _currentFeatures.buttons.orderUI !== false;
+  if (admNavCommande)  admNavCommande.style.display  = cmdLicensed ? '' : 'none';
+  if (admBnavCommande) admBnavCommande.style.display = cmdLicensed ? '' : 'none';
 
   // Activer/désactiver le listener commandes selon showOrderUI (et non le style)
   if (showOrder) startOrdersListener();
