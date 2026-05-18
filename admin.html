@@ -1468,6 +1468,16 @@
     .rgl-seg-opt:not(:last-child) { border-right:1px solid var(--adm-border); }
     .rgl-seg-opt.active { background:var(--adm-gold-glow); color:var(--adm-gold); font-weight:600; }
 
+    /* ── CATÉGORIES & PRODUITS PARALLÈLES — Desktop ── */
+    .cats-prods-wrap { display:flex; flex-direction:column; gap:20px; }
+    @media (min-width:1024px) {
+      .cats-prods-wrap {
+        flex-direction:row; align-items:flex-start; gap:24px;
+      }
+      .cats-prods-wrap #sec-cats    { flex:0 0 340px; min-width:0; }
+      .cats-prods-wrap #sec-produits { flex:1; min-width:0; }
+    }
+
     /* ── PHOTOS CATÉGORIES — Style Papier ── */
     .cat-photos-row { display:none; gap:10px; padding:4px 0 6px; flex-wrap:wrap; }
     body[data-style="paper"] .cat-photos-row { display:flex !important; }
@@ -1608,7 +1618,7 @@
         <path d="M16 2l-1.5 2h-5L8 2"/>
       </svg>
     </button>
-    <button class="adm-vis-btn adm-vis-ico" id="toggle-order-btn" title="Afficher/cacher le mode commande dans le menu" style="display:none">
+    <button class="adm-vis-btn adm-vis-ico" id="toggle-order-btn" title="Afficher/cacher le mode commande dans le menu">
       <span class="vis-dot"></span>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
         <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
@@ -1785,27 +1795,32 @@
           <div class="note-card" id="note-card"></div>
         </div>
 
-        <!-- ── CATÉGORIES ── -->
-        <div class="adm-section" id="sec-cats">
-          <div class="sec-hd">Catégories <span class="sec-badge" id="cat-count">0</span></div>
-          <div class="cats-list" id="cats-list"></div>
-          <button class="btn-add" id="btn-add-cat">＋ Ajouter une catégorie</button>
-          <button class="btn-save-cats" id="btn-save-cats" style="display:none">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
-              <polyline points="17,21 17,13 7,13 7,21"/>
-              <polyline points="7,3 7,8 15,8"/>
-            </svg>
-            Sauvegarder les catégories
-          </button>
-        </div>
+        <!-- ── CATÉGORIES + PRODUITS (parallèles sur desktop) ── -->
+        <div class="cats-prods-wrap">
 
-        <!-- ── PRODUITS PAR CATÉGORIE ── -->
-        <div class="adm-section" id="sec-produits">
-          <div class="sec-hd" id="sec-hd-produits">Produits <span class="sec-badge" id="prod-count-badge">0</span></div>
-          <div id="products-area"></div>
-        </div>
+          <!-- ── CATÉGORIES ── -->
+          <div class="adm-section" id="sec-cats">
+            <div class="sec-hd">Catégories <span class="sec-badge" id="cat-count">0</span></div>
+            <div class="cats-list" id="cats-list"></div>
+            <button class="btn-add" id="btn-add-cat">＋ Ajouter une catégorie</button>
+            <button class="btn-save-cats" id="btn-save-cats" style="display:none">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+                <polyline points="17,21 17,13 7,13 7,21"/>
+                <polyline points="7,3 7,8 15,8"/>
+              </svg>
+              Sauvegarder les catégories
+            </button>
+          </div>
+
+          <!-- ── PRODUITS PAR CATÉGORIE ── -->
+          <div class="adm-section" id="sec-produits">
+            <div class="sec-hd" id="sec-hd-produits">Produits <span class="sec-badge" id="prod-count-badge">0</span></div>
+            <div id="products-area"></div>
+          </div>
+
+        </div><!-- /cats-prods-wrap -->
 
       </div><!-- /categories -->
 
@@ -5343,19 +5358,47 @@ function saveMenuMode(mode) {
 const _MODE_PRIORITY = ['paper','simple'];
 let _currentFeatures = null;
 
+/* ── Feature check : compatible native app (flat) + web app (nested) ──
+   Native app writes: /config/features/orderUI   (flat)
+   Web   app writes: /config/features/buttons/orderUI (nested)
+   Both may coexist. Flat (native) takes precedence when present.         */
+function _featOk(btnKey) {
+  if (!_currentFeatures) return true;
+  const flat   = _currentFeatures[btnKey];
+  const nested = _currentFeatures.buttons?.[btnKey];
+  if (flat   !== undefined) return flat   !== false;
+  if (nested !== undefined) return nested !== false;
+  return true; // neither set → licensed by default
+}
+
+function _styleOk(mode) {
+  if (!_currentFeatures) return true;
+  // Native keys: stylePaper / styleDynamic; Web keys: styles.paper / styles.simple
+  const nativeKey = mode === 'paper' ? 'stylePaper' : 'styleDynamic';
+  const flat   = _currentFeatures[nativeKey];
+  const nested = _currentFeatures.styles?.[mode];
+  if (flat   !== undefined) return flat   !== false;
+  if (nested !== undefined) return nested !== false;
+  return true;
+}
+
 function applyFeatures(features) {
   _currentFeatures = features;
-  const modes = features?.styles || {};
+  // Compat: build unified modes object from both flat and nested paths
+  const modes = {
+    paper:  _styleOk('paper'),
+    simple: _styleOk('simple'),
+  };
 
   // Afficher/masquer les options de style dans le sélecteur
   ['paper','simple'].forEach(mode => {
     const btn = document.getElementById(`mode-opt-${mode}`);
-    if (btn) btn.style.display = modes[mode] !== false ? '' : 'none';
+    if (btn) btn.style.display = modes[mode] ? '' : 'none';
   });
 
   // Si le style actif n'est plus disponible, basculer sur le prochain
-  if (modes[currentMenuMode] === false) {
-    const next = _MODE_PRIORITY.find(m => modes[m] !== false);
+  if (!modes[currentMenuMode]) {
+    const next = _MODE_PRIORITY.find(m => modes[m]);
     if (next) saveMenuMode(next);
   }
 
@@ -5422,26 +5465,17 @@ function syncStyleAdminUI(mode) {
   const scOrdersBtn = document.getElementById('sc-orders-btn');
   if (scOrdersBtn) scOrdersBtn.style.display = showOrder ? '' : 'none';
 
-  // Toggles : toujours affichés (sous réserve de la licence)
+  // Toggles : toujours affichés (sous réserve de la licence — dual-path: flat+nested)
   const callBtn   = document.getElementById('toggle-call-btn');
   const photosBtn = document.getElementById('toggle-photos-btn');
   const orderBtn  = document.getElementById('toggle-order-btn');
-  if (callBtn)   callBtn.style.display   = '';
-  if (orderBtn)  orderBtn.style.display  = '';
-  if (photosBtn) photosBtn.style.display = '';
-  // Contraintes de licence : masquer les boutons non licenciés
-  if (_currentFeatures?.buttons) {
-    const b = _currentFeatures.buttons;
-    if (callBtn   && b.callBtn === false) callBtn.style.display   = 'none';
-    if (photosBtn && b.photos  === false) photosBtn.style.display = 'none';
-    if (orderBtn  && b.orderUI === false) orderBtn.style.display  = 'none';
-  }
+  if (callBtn)   callBtn.style.display   = _featOk('callBtn') ? '' : 'none';
+  if (photosBtn) photosBtn.style.display = _featOk('photos')  ? '' : 'none';
+  if (orderBtn)  orderBtn.style.display  = _featOk('orderUI') ? '' : 'none';
 
   // FAB notification visible uniquement si sonnette OU commande est licenciée depuis Control
   const fabNotif  = document.getElementById('fab-notif');
-  const _callLic  = !_currentFeatures?.buttons || _currentFeatures.buttons.callBtn  !== false;
-  const _orderLic = !_currentFeatures?.buttons || _currentFeatures.buttons.orderUI  !== false;
-  if (fabNotif) fabNotif.style.display = (_callLic || _orderLic) ? '' : 'none';
+  if (fabNotif) fabNotif.style.display = (_featOk('callBtn') || _featOk('orderUI')) ? '' : 'none';
 
   // En style papier, cacher les zones photo des produits (papier n'affiche pas les photos produits)
   document.body.setAttribute('data-style', mode);
@@ -5468,7 +5502,7 @@ function syncStyleAdminUI(mode) {
   // Navigation commande : visible dès que la licence est accordée depuis Control
   const admNavCommande  = document.getElementById('adm-nav-commande');
   const admBnavCommande = document.getElementById('adm-bnav-commande');
-  const cmdLicensed = !_currentFeatures?.buttons || _currentFeatures.buttons.orderUI !== false;
+  const cmdLicensed = _featOk('orderUI');
   if (admNavCommande)  admNavCommande.style.display  = cmdLicensed ? '' : 'none';
   if (admBnavCommande) admBnavCommande.style.display = cmdLicensed ? '' : 'none';
 
@@ -5773,7 +5807,7 @@ function syncReglagesUI() {
   if (photosBtn && rglPhotos) rglPhotos.classList.toggle('on', photosBtn.classList.contains('on'));
   if (orderBtn  && rglOrder) {
     rglOrder.classList.toggle('on', orderBtn.classList.contains('on'));
-    if (rglOrderRow) rglOrderRow.style.display = orderBtn.style.display === 'none' ? 'none' : '';
+    if (rglOrderRow) rglOrderRow.style.display = _featOk('orderUI') ? '' : 'none';
   }
 
   // Style mode segmented control
