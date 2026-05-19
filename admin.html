@@ -2251,9 +2251,7 @@ async function doLogin() {
 
 function showAdmin() {
   document.getElementById('login-screen').classList.add('hidden');
-  // adm-header reste caché jusqu'à ce que loadMenuMode() reçoive le vrai mode de Firebase
-  document.getElementById('adm-wrap').style.display   = '';
-  document.getElementById('fab-save').style.display   = '';
+  // adm-wrap et adm-header restent cachés jusqu'au premier rendu Firebase (cf. applyMenuSnapshot)
   document.getElementById('sc-fab').classList.add('show');
   // Sync l'icône langue
   window._updateLangBtn?.(currentLang);
@@ -2301,6 +2299,13 @@ function applyMenuSnapshot(data) {
   renderAll();
   applyAdminUI(currentLang);
   updateMockupText();
+  // Révéler l'admin seulement après le premier rendu complet (évite le flash de sections vides)
+  const _wrap = document.getElementById('adm-wrap');
+  if (_wrap && _wrap.style.display === 'none') {
+    _wrap.style.display = '';
+    const _fab = document.getElementById('fab-save');
+    if (_fab) _fab.style.display = '';
+  }
 }
 
 function loadData() {
