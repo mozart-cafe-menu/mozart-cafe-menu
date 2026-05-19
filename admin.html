@@ -1186,6 +1186,12 @@
     /* ── Thème Sélecteur ── */
     .theme-grid { display:flex; flex-wrap:wrap; gap:8px; }
     .theme-grid-sep { width:100%; font-size:.72rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:rgba(200,164,78,.6); padding:.6rem 0 .2rem; border-top:1px solid rgba(200,164,78,.15); margin-top:.4rem; flex-basis:100%; }
+    .color-picker-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; }
+    .color-swatch { width:28px; height:28px; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:transform .2s,border-color .2s; flex-shrink:0; }
+    .color-swatch:hover { transform:scale(1.2); }
+    .color-swatch.active { border-color:#fff; transform:scale(1.15); box-shadow:0 0 0 2px rgba(0,0,0,.5); }
+    .color-swatch.hidden-color { opacity:.18; cursor:default; pointer-events:none; }
+    .color-section-sep { width:100%; font-size:.72rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:rgba(200,164,78,.6); padding:.6rem 0 .2rem; border-top:1px solid rgba(200,164,78,.15); margin-top:.4rem; flex-basis:100%; }
     .theme-card {
       display:flex; align-items:center; gap:9px;
       padding:8px 14px 8px 10px;
@@ -1393,6 +1399,8 @@
   <div class="adm-section" id="sec-theme">
     <div class="sec-hd" id="sec-hd-theme">Thème visuel <span class="sec-badge" id="badge-theme">Design</span></div>
     <div class="theme-grid" id="theme-grid"></div>
+    <div class="color-section-sep">Couleur d'accentuation</div>
+    <div class="color-picker-row" id="color-picker-row"></div>
   </div>
 
   <!-- ── PHOTO D'ACCUEIL ── -->
@@ -2257,6 +2265,7 @@ function showAdmin() {
   loadData();
   loadMenuTheme();
   loadMenuMode();
+  loadMenuColor();
   loadFeatures();
   loadPrimaryLang();
   loadEnabledLangs();
@@ -4709,6 +4718,59 @@ const LAYOUTS_DATA = [
     ]
   },
 ];
+const MENU_COLORS = [
+  { hex:'#C8A44E', name:'Or' },
+  { hex:'#E8D5A0', name:'Champagne' },
+  { hex:'#F0F0EB', name:'Crème' },
+  { hex:'#4A4A4A', name:'Anthracite' },
+  { hex:'#1E3A5F', name:'Marine' },
+  { hex:'#2B7FBE', name:'Bleu royal' },
+  { hex:'#47A3A3', name:'Turquoise' },
+  { hex:'#2E7D52', name:'Vert forêt' },
+  { hex:'#9B4DCA', name:'Violet' },
+  { hex:'#E91E8C', name:'Rose vif' },
+  { hex:'#D4A090', name:'Rose poudré' },
+  { hex:'#E87B3A', name:'Terracotta' },
+  { hex:'#C73535', name:'Rouge' },
+  { hex:'#8B6914', name:'Brun doré' },
+  { hex:'#5D4037', name:'Brun profond' }
+];
+
+let currentMenuColor = null;
+let _allowedColorIndexes = null;
+
+function renderColorPicker() {
+  const row = document.getElementById('color-picker-row');
+  if (!row) return;
+  row.innerHTML = '';
+  MENU_COLORS.forEach((c, i) => {
+    const allowed = !_allowedColorIndexes || _allowedColorIndexes.includes(i);
+    const isActive = currentMenuColor === c.hex;
+    const sw = document.createElement('div');
+    sw.className = 'color-swatch' + (isActive ? ' active' : '') + (allowed ? '' : ' hidden-color');
+    sw.style.background = c.hex;
+    sw.title = c.name;
+    if (allowed) sw.addEventListener('click', () => saveMenuColor(c.hex));
+    row.appendChild(sw);
+  });
+}
+
+function saveMenuColor(hex) {
+  currentMenuColor = hex;
+  _db.ref('menu/menuColor').set(hex);
+  renderColorPicker();
+}
+
+function loadMenuColor() {
+  _db.ref('menu/menuColor').on('value', snap => {
+    const v = snap.val() || null;
+    if (v !== currentMenuColor) {
+      currentMenuColor = v;
+      renderColorPicker();
+    }
+  });
+}
+
 let currentMenuTheme = 'gold-noir';
 
 let hiddenThemesData = {};
@@ -4890,6 +4952,14 @@ function applyFeatures(features) {
 
   // Re-appliquer l'UI pour prendre en compte les contraintes de licence
   syncStyleAdminUI(currentMenuMode);
+  _allowedColorIndexes = features?.allowedColors || null;
+  if (_allowedColorIndexes && currentMenuColor) {
+    const activeIdx = MENU_COLORS.findIndex(c => c.hex === currentMenuColor);
+    if (activeIdx >= 0 && !_allowedColorIndexes.includes(activeIdx)) {
+      saveMenuColor(null);
+    }
+  }
+  renderColorPicker();
   renderThemeSelector();
 }
 
