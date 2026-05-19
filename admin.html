@@ -4963,6 +4963,22 @@ function applyFeatures(features) {
     }
   }
 
+  // Si une feature devient non-licenciée, désactiver aussi la fonctionnalité côté menu/client
+  if (adminData?.info) {
+    if (!_featOk('orderUI') && adminData.info.showOrderUI !== false) {
+      adminData.info.showOrderUI = false;
+      _db.ref('menu/info/showOrderUI').set(false);
+    }
+    if (!_featOk('callBtn') && adminData.info.showCallBtn !== false) {
+      adminData.info.showCallBtn = false;
+      _db.ref('menu/info/showCallBtn').set(false);
+    }
+    if (!_featOk('photos') && adminData.info.showPhotos !== false) {
+      adminData.info.showPhotos = false;
+      _db.ref('menu/info/showPhotos').set(false);
+    }
+  }
+
   // Re-appliquer l'UI pour prendre en compte les contraintes de licence
   syncStyleAdminUI(currentMenuMode);
   renderThemeSelector();
