@@ -1291,6 +1291,11 @@
   }
   body.demo-mode #demo-banner { display: block; }
   body.demo-mode #adm-wrap { padding-top: 36px; }
+
+  /* Réduction de taille pour les textes en écriture grecque (Crimson Pro Greek ≈ 10% plus large visuellement) */
+  html[lang="el"] .sec-hd            { font-size: 1.1rem; }
+  html[lang="el"] .cat-products-name { font-size: 0.93rem; }
+  html[lang="el"] .order-adm-table   { font-size: 0.93rem; }
 </style>
 <div id="demo-banner">🔒 Mode démo · Lecture seule — aucune modification n'est enregistrée</div>
 
@@ -3175,6 +3180,7 @@ function applyAdminUI(l) {
 /* ─── LANGUE GLOBALE : contrôle toute la page admin ─── */
 function setGlobalLang(l) {
   currentLang = l;
+  document.documentElement.lang = l;
   localStorage.setItem('mc_admin_lang', l);
   // Flush DOM edits back to adminData BEFORE re-rendering so manual EN/AR edits are not lost
   if (adminData) collectAllForms();
