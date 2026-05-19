@@ -4339,6 +4339,9 @@ function loadAdminData() {
       if (cached.menuStyle) {
         menuStyle = _normalizeStyle(cached.menuStyle);
       }
+      if (cached.menuColor) {
+        applyMenuColor(cached.menuColor);
+      }
       applyAdminData(cached);
     }
   } catch(_) {}
@@ -4401,6 +4404,8 @@ function loadAdminData() {
       menuStyle = newStyle;
       applyStyle(menuStyle);
     }
+    // Couleur d'accentuation
+    applyMenuColor(data.menuColor || null);
     applyAdminData(data); // applique logo + thème définitifs dans le DOM
     _startPreloader();    // démarre UNE SEULE FOIS avec logo+thème corrects (idempotent)
     buildCatPills();
@@ -4504,6 +4509,19 @@ function buildSubFromNames(names) {
   const sub = {};
   Object.keys(names || {}).forEach(l => { sub[l] = names[l]; });
   return sub;
+}
+
+function applyMenuColor(hex) {
+  const root = document.documentElement;
+  if (hex) {
+    root.style.setProperty('--gold', hex);
+    root.style.setProperty('--gold-lt', hex);
+    root.style.setProperty('--gold-dk', hex);
+  } else {
+    root.style.removeProperty('--gold');
+    root.style.removeProperty('--gold-lt');
+    root.style.removeProperty('--gold-dk');
+  }
 }
 
 /* ================================================
