@@ -1185,6 +1185,7 @@
 
     /* ── Thème Sélecteur ── */
     .theme-grid { display:flex; flex-wrap:wrap; gap:8px; }
+    .theme-grid-sep { width:100%; font-size:.72rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:rgba(200,164,78,.6); padding:.6rem 0 .2rem; border-top:1px solid rgba(200,164,78,.15); margin-top:.4rem; flex-basis:100%; }
     .theme-card {
       display:flex; align-items:center; gap:9px;
       padding:8px 14px 8px 10px;
@@ -1331,14 +1332,6 @@
         <button data-lang="en" onclick="window._pickLang('en')">🇬🇧 English</button>
         <button data-lang="de" onclick="window._pickLang('de')">🇩🇪 Deutsch</button>
         <button data-lang="ar" onclick="window._pickLang('ar')">🇸🇦 العربية</button>
-      </div>
-    </div>
-    <!-- Mode -->
-    <div class="adm-sel-wrap" id="mode-sel-wrap">
-      <button class="adm-sel-btn" id="mode-sel-btn" aria-haspopup="true" aria-expanded="false">🔔</button>
-      <div class="adm-sel-popup" id="mode-sel-popup" role="menu">
-        <button data-style="paper" onclick="window._pickMode('paper')" id="mode-opt-paper"><span class="mode-lbl-full">📄 Style Papier</span><span class="mode-lbl-short">📄 Papier</span></button>
-        <button data-style="simple" onclick="window._pickMode('simple')" id="mode-opt-simple"><span class="mode-lbl-full">🖼️ Style Dynamique</span><span class="mode-lbl-short">🖼️ Dynamique</span></button>
       </div>
     </div>
     <button class="adm-vis-btn adm-vis-ico" id="toggle-call-btn" title="Afficher/cacher le bouton sonnette dans le menu">
@@ -3108,17 +3101,6 @@ function applyAdminUI(l) {
   const ordersHd = $('sec-hd-orders');
   if (ordersHd) ordersHd.firstChild.textContent = (t.secOrders || 'Commandes en temps réel') + ' ';
 
-  // Mode popup options (labels full + courts selon écran)
-  const modeOptFull  = { 'mode-opt-paper': t.modePaper,      'mode-opt-simple': t.modePhoto };
-  const modeOptShort = { 'mode-opt-paper': '📄 ' + t.modePaperShort, 'mode-opt-simple': '🖼️ ' + t.modePhotoShort };
-  Object.keys(modeOptFull).forEach(id => {
-    const el = $(id); if (!el) return;
-    const full  = el.querySelector('.mode-lbl-full');
-    const short = el.querySelector('.mode-lbl-short');
-    if (full  && modeOptFull[id])  full.textContent  = modeOptFull[id];
-    if (short && modeOptShort[id]) short.textContent = modeOptShort[id];
-  });
-
   // Sections Hero / Note / Info (éléments statiques avec ID)
   const heroHd = $('sec-hd-hero');
   if (heroHd) heroHd.firstChild.textContent = t.secHero + ' ';
@@ -4749,6 +4731,14 @@ function loadMenuTheme() {
 function saveMenuTheme(themeId) {
   currentMenuTheme = themeId;
   _db.ref('menu/menuTheme').set(themeId);
+  // Déduire le style automatiquement selon la famille du thème
+  const isLayout = LAYOUTS_DATA.some(l => l.variants.some(v => v.id === themeId));
+  const deduced  = isLayout ? 'simple' : 'paper';
+  if (deduced !== currentMenuMode) {
+    currentMenuMode = deduced;
+    _db.ref('menu/menuStyle').set(deduced);
+    syncStyleAdminUI(deduced);
+  }
   renderThemeSelector();
 }
 
@@ -4756,111 +4746,38 @@ function renderThemeSelector() {
   const grid = document.getElementById('theme-grid');
   if (!grid) return;
   grid.innerHTML = '';
-  const activeStyle = (currentMenuMode === 'paper') ? 'paper' : 'simple';
-  grid.classList.toggle('mode-simple', activeStyle === 'simple');
+  // Toujours en mode unifié — le style se déduit du thème choisi
+  grid.classList.remove('mode-simple');
 
-  if (activeStyle === 'paper') {
-    // ── PAPER : liste plate classique ──
-    const paperThemes = [
-  {
-    "id": "gold-noir",
-    "fr": "Gold Noir",
-    "en": "Gold Noir"
-  },
-  {
-    "id": "neon-tokyo",
-    "fr": "Neon Pulse",
-    "en": "Neon Pulse"
-  },
-  {
-    "id": "botanical",
-    "fr": "Botanical Forest",
-    "en": "Botanical Forest"
-  },
-  {
-    "id": "rose-parisien",
-    "fr": "Rose Parisien",
-    "en": "Parisian Rose"
-  },
-  {
-    "id": "midnight-luxe",
-    "fr": "Enseigne",
-    "en": "Signboard"
-  },
-  {
-    "id": "velvet-luxe",
-    "fr": "Velvet Luxe",
-    "en": "Velvet Luxe"
-  },
-  {
-    "id": "prestige",
-    "fr": "Prestige",
-    "en": "Prestige"
-  },
-  {
-    "id": "santorin",
-    "fr": "Santorini",
-    "en": "Santorini"
-  },
-  {
-    "id": "midnight",
-    "fr": "Minuit",
-    "en": "Midnight"
-  },
-  {
-    "id": "forest",
-    "fr": "Forêt",
-    "en": "Forest"
-  },
-  {
-    "id": "ruby",
-    "fr": "Rubis",
-    "en": "Ruby"
-  },
-  {
-    "id": "paper-grunge",
-    "fr": "Street Food",
-    "en": "Street Food"
-  },
-  {
-    "id": "paper-elegant",
-    "fr": "Élégance Bistrot",
-    "en": "Elegant Bistrot"
-  }
-];
-    const filtered = THEMES_DATA.filter(t => t.styles.includes('paper') && !hiddenThemesData[t.id]);
-    if (!filtered.some(t => t.id === currentMenuTheme) && filtered.length > 0) {
-      // Ne pas auto-switcher si le thème actif est un thème Simple valide
-      // (race condition au chargement : mode pas encore lu depuis Firebase)
-      const isValidSimple = LAYOUTS_DATA.some(l => l.variants.some(v => v.id === currentMenuTheme));
-      if (!isValidSimple) { saveMenuTheme(filtered[0].id); return; }
-    }
-    filtered.forEach(th => {
-      const name = th.names ? (th.names[currentLang] || th.names.fr || th.names.en || '') : '';
-      const card = document.createElement('div');
-      card.className = 'theme-card' + (th.id === currentMenuTheme ? ' active' : '');
-      card.style.setProperty('--tc-accent', th.accent);
-      card.innerHTML = `<span class="tc-dot"></span><span class="tc-name">${name}</span><span class="tc-check">✓</span>`;
-      card.addEventListener('click', () => saveMenuTheme(th.id));
-      grid.appendChild(card);
-    });
+  const hiddenData = hiddenThemesData || {};
 
-  } else {
-    // ── SIMPLE : familles avec pastilles ──
-    const visibleLayouts = LAYOUTS_DATA.filter(l => !hiddenThemesData[l.family] && !hiddenThemesData[l.variants[0].id]);
-    const allSimpleIds = visibleLayouts.flatMap(l => l.variants.map(v => v.id));
-    if (!allSimpleIds.includes(currentMenuTheme) && allSimpleIds.length > 0) {
-      // Ne pas auto-switcher si le thème actif est un thème Paper valide
-      // (race condition au chargement : mode pas encore lu depuis Firebase)
-      const isValidPaper = THEMES_DATA.some(t => t.id === currentMenuTheme);
-      if (!isValidPaper) { saveMenuTheme(visibleLayouts[0].variants[0].id); return; }
-    }
-    const themeVariants = _currentFeatures?.themeVariants || {};
+  // ── Section Thèmes Papier (THEMES_DATA) ──
+  const paperThemes = THEMES_DATA.filter(t => !hiddenData[t.id]);
+  paperThemes.forEach(th => {
+    const name = th.names ? (th.names[currentLang] || th.names.fr || th.names.en || '') : '';
+    const card = document.createElement('div');
+    card.className = 'theme-card' + (th.id === currentMenuTheme ? ' active' : '');
+    card.style.setProperty('--tc-accent', th.accent);
+    card.innerHTML = `<span class="tc-dot"></span><span class="tc-name">${name}</span><span class="tc-check">✓</span>`;
+    card.addEventListener('click', () => saveMenuTheme(th.id));
+    grid.appendChild(card);
+  });
+
+  // ── Section Thèmes Dynamiques (LAYOUTS_DATA) ──
+  const themeVariants = _currentFeatures?.themeVariants || {};
+  const visibleLayouts = LAYOUTS_DATA.filter(l => !hiddenData[l.family] && !hiddenData[l.variants[0].id]);
+
+  if (visibleLayouts.length > 0) {
+    const sep = document.createElement('div');
+    sep.className = 'theme-grid-sep';
+    sep.textContent = currentLang === 'en' ? 'Dynamic Themes' : currentLang === 'de' ? 'Dynamische Themen' : currentLang === 'ar' ? 'الثيمات الديناميكية' : currentLang === 'el' ? 'Δυναμικά θέματα' : 'Thèmes dynamiques';
+    grid.appendChild(sep);
+
     visibleLayouts.forEach(layout => {
-      const varConfig       = themeVariants[layout.family] || {};
-      const hiddenVariants  = varConfig.hidden || {};
+      const varConfig      = themeVariants[layout.family] || {};
+      const hiddenVariants = varConfig.hidden || {};
       const visibleVariants = layout.variants.filter(v => !hiddenVariants[v.id]);
-      if (visibleVariants.length === 0) return; // famille masquée via variantes
+      if (visibleVariants.length === 0) return;
       const familyName    = layout.names[currentLang] || layout.names.fr || layout.names.en || '';
       const isActiveFamily = layout.variants.some(v => v.id === currentMenuTheme);
       const wrap = document.createElement('div');
@@ -4907,7 +4824,6 @@ function loadMenuMode() {
     if (firstLoad || m !== currentMenuMode) {
       firstLoad = false;
       currentMenuMode = m;
-      window._updateModeBtn?.(m);
       syncStyleAdminUI(m);
       // Afficher le header seulement après avoir appliqué le bon style
       document.getElementById('adm-header').style.display = '';
@@ -4918,7 +4834,6 @@ function loadMenuMode() {
 function saveMenuMode(mode) {
   currentMenuMode = mode;
   _db.ref('menu/menuStyle').set(mode);
-  window._updateModeBtn?.(mode);
   syncStyleAdminUI(mode);
 }
 
@@ -4946,18 +4861,6 @@ function _styleOk(mode) {
 
 function applyFeatures(features) {
   _currentFeatures = features;
-
-  // Afficher/masquer les options de style dans le sélecteur
-  ['paper','simple'].forEach(mode => {
-    const btn = document.getElementById(`mode-opt-${mode}`);
-    if (btn) btn.style.display = _styleOk(mode) ? '' : 'none';
-  });
-
-  // Si le style actif n'est plus disponible, basculer sur le prochain
-  if (!_styleOk(currentMenuMode)) {
-    const next = _MODE_PRIORITY.find(m => _styleOk(m));
-    if (next) saveMenuMode(next);
-  }
 
   // Si le thème actif est une variante cachée → revenir à la default de la famille
   const _tv = features?.themeVariants || {};
@@ -5208,40 +5111,10 @@ function setOrderStatus(orderId, status) {
     const open = langPopup.classList.toggle('open');
     langBtn.classList.toggle('open', open);
     langBtn.setAttribute('aria-expanded', String(open));
-    modePopup?.classList.remove('open');
-    modeBtn?.classList.remove('open');
-  });
-
-  // ── Mode select ──
-  const modeBtn   = document.getElementById('mode-sel-btn');
-  const modePopup = document.getElementById('mode-sel-popup');
-
-  window._updateModeBtn = function(m) {
-    if (modeBtn) modeBtn.textContent = MODE_ICONS[m] || '📄';
-    modePopup?.querySelectorAll('button[data-style]').forEach(b => {
-      b.classList.toggle('active', b.dataset.style === m);
-    });
-  };
-
-  window._pickMode = function(m) {
-    saveMenuMode(m);
-    modePopup?.classList.remove('open');
-    modeBtn?.classList.remove('open');
-    modeBtn?.setAttribute('aria-expanded', 'false');
-  };
-
-  modeBtn?.addEventListener('click', e => {
-    e.stopPropagation();
-    const open = modePopup.classList.toggle('open');
-    modeBtn.classList.toggle('open', open);
-    modeBtn.setAttribute('aria-expanded', String(open));
-    langPopup?.classList.remove('open');
-    langBtn?.classList.remove('open');
   });
 
   // Initialiser avec la valeur actuelle
   _updateLangBtn(currentLang);
-  _updateModeBtn(currentMenuMode);
 })();
 
 /* ═══════════════════════════════════════════
