@@ -51,11 +51,14 @@
     html.light .ico-pb-label { color:var(--cream) !important; }
     html.light .ico-picker-btn { background:var(--bg3); border-color:var(--bord2); color:var(--cream); }
     /* Popups et cards */
-    html.light .ico-modal-box { background:#fff; border-color:rgba(168,104,64,0.18); }
-    html.light .ico-modal-hd { background:#fff; border-color:rgba(168,104,64,0.12); }
-    html.light .ico-modal-title { color:var(--gold); }
-    html.light .ico-modal-item { color:var(--cream); }
-    html.light .ico-modal-close { background:var(--bg3); }
+    html.light .ico-picker-popup {
+      background:var(--bg3);
+      box-shadow:0 8px 32px rgba(0,0,0,0.15), 0 0 0 1px rgba(168,104,64,0.12);
+    }
+    html.light .ico-picker-item { color:var(--cream); }
+    html.light .ico-picker-item svg { color:var(--cream); }
+    html.light .ico-picker-item.selected { background:rgba(168,104,64,0.12); border-color:var(--gold); }
+    html.light .ico-picker-none { color:var(--red); background:rgba(224,82,82,0.06); border-color:rgba(224,82,82,0.25); }
     html.light .login-box { background:var(--bg3); }
     html.light .cat-row { background:rgba(255,255,255,0.95); }
     /* Produit cards */
@@ -107,14 +110,7 @@
 
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     html { overflow-x:hidden; }
-    body {
-      background:
-        radial-gradient(ellipse at 25% 0%, rgba(200,164,78,0.05) 0%, transparent 55%),
-        radial-gradient(ellipse at 75% 100%, rgba(200,164,78,0.03) 0%, transparent 50%),
-        var(--bg);
-      color:var(--cream); font-family:'Outfit',sans-serif; font-weight:300; min-height:100vh;
-    }
-    html.light body { background:var(--bg); }
+    body { background:var(--bg); color:var(--cream); font-family:'Outfit',sans-serif; font-weight:300; min-height:100vh; }
     button { font-family:inherit; cursor:pointer; border:none; background:none; }
     input, textarea, select { font-family:inherit; }
     ::-webkit-scrollbar { width:3px; }
@@ -185,7 +181,6 @@
     /* ── Section Note clients ── */
     .note-card {
       background:var(--bg2); border:1px solid var(--border); border-radius:16px; padding:18px; display:flex; flex-direction:column; gap:14px;
-      box-shadow:0 2px 10px rgba(0,0,0,0.24);
     }
     html.light .note-card { background:var(--bg3); }
     .note-status {
@@ -319,7 +314,6 @@
     .hero-img-card {
       background:var(--bg2); border:1px solid var(--border);
       border-radius:16px; padding:16px; display:flex; flex-direction:column; gap:20px;
-      box-shadow:0 2px 12px rgba(0,0,0,0.28);
     }
 
     /* ── Mockup téléphone ── */
@@ -520,88 +514,42 @@
     html.light .notif-textarea { background:rgba(255,255,255,0.7); color:var(--cream); }
 
     /* ── SECTION ── */
-    .adm-section {
-      margin-bottom:16px;
-      background:linear-gradient(160deg, rgba(255,255,255,0.065) 0%, rgba(255,255,255,0.018) 100%);
-      border:1px solid rgba(200,164,78,0.14);
-      border-left:3px solid rgba(200,164,78,0.5);
-      border-right:3px solid rgba(200,164,78,0.5);
-      border-radius:18px;
-      overflow:hidden;
-      box-shadow:0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.06);
-      transition:border-left-color 0.3s, border-right-color 0.3s, box-shadow 0.35s, transform 0.25s;
-    }
-    .adm-section:hover {
-      border-left-color:var(--gold); border-right-color:var(--gold);
-      box-shadow:0 16px 48px rgba(0,0,0,0.55), 0 4px 16px rgba(0,0,0,0.3), 0 0 0 1px rgba(200,164,78,0.1), inset 0 1px 0 rgba(255,255,255,0.08);
-      transform:translateY(-2px);
-    }
-    html.light .adm-section {
-      background:linear-gradient(160deg, #ffffff 0%, #faf7f2 100%);
-      border-color:rgba(168,104,64,0.15);
-      border-left-color:rgba(168,104,64,0.45); border-right-color:rgba(168,104,64,0.45);
-      box-shadow:0 4px 20px rgba(0,0,0,0.1), 0 1px 4px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.95);
-    }
-    html.light .adm-section:hover {
-      border-left-color:var(--gold); border-right-color:var(--gold);
-      box-shadow:0 10px 36px rgba(0,0,0,0.15), 0 3px 10px rgba(0,0,0,0.08), 0 0 0 1px rgba(168,104,64,0.1);
-      transform:translateY(-2px);
-    }
+    .adm-section { margin-bottom:32px; }
     .sec-hd {
-      font-family:'Cormorant',serif; font-size:1.25rem; font-weight:600;
-      color:var(--cream); padding:16px 18px;
-      background:linear-gradient(90deg, rgba(200,164,78,0.12) 0%, rgba(200,164,78,0.04) 40%, transparent 80%);
-      border-bottom:1px solid rgba(200,164,78,0.12);
+      font-family:'Cormorant',serif; font-size:1.2rem; font-weight:600;
+      color:var(--cream); padding-bottom:12px; margin-bottom:16px;
+      border-bottom:1px solid var(--border);
       display:flex; align-items:center; gap:10px; flex-wrap:wrap;
       cursor:pointer; user-select:none;
-      transition:color 0.22s, background 0.25s;
+      transition:color 0.2s;
     }
-    .sec-hd:hover {
-      color:var(--gold);
-      background:linear-gradient(90deg, rgba(200,164,78,0.18) 0%, rgba(200,164,78,0.07) 45%, transparent 80%);
-    }
-    .adm-section.collapsed .sec-hd {
-      border-bottom-color:transparent;
-      background:linear-gradient(90deg, rgba(200,164,78,0.06) 0%, transparent 60%);
-    }
-    html.light .sec-hd {
-      background:linear-gradient(90deg, rgba(168,104,64,0.09) 0%, rgba(168,104,64,0.03) 40%, transparent 80%);
-      border-bottom-color:rgba(168,104,64,0.12);
-    }
-    html.light .sec-hd:hover {
-      background:linear-gradient(90deg, rgba(168,104,64,0.14) 0%, rgba(168,104,64,0.05) 45%, transparent 80%);
-    }
-    html.light .adm-section.collapsed .sec-hd {
-      border-bottom-color:transparent;
-      background:linear-gradient(90deg, rgba(168,104,64,0.05) 0%, transparent 60%);
-    }
+    .sec-hd:hover { color:var(--gold); }
     .sec-hd .sec-chevron {
       margin-left:auto; flex-shrink:0; color:var(--muted);
       transition:transform 0.36s cubic-bezier(0.4,0,0.2,1), color 0.2s;
       display:flex; align-items:center;
     }
     .sec-hd:hover .sec-chevron { color:var(--gold); }
+    .adm-section.collapsed .sec-hd { margin-bottom:0; }
     .adm-section.collapsed .sec-hd .sec-chevron { transform:rotate(-90deg); }
     /* Contenu animé */
     .sec-body {
-      overflow:hidden;
-      max-height:8000px;
-      transition:max-height 0.45s cubic-bezier(0.4,0,0.2,1);
+      display:grid;
+      grid-template-rows:1fr;
+      transition:grid-template-rows 0.38s cubic-bezier(0.4,0,0.2,1);
     }
-    .adm-section.collapsed .sec-body { max-height:0 !important; transition:max-height 0.35s cubic-bezier(0.65,0,0.35,1); }
-    .sec-body-inner { padding:16px 16px 18px; transition:padding 0.25s ease; }
-    .adm-section.collapsed .sec-body-inner { padding-top:0; padding-bottom:0; }
+    .adm-section.collapsed .sec-body { grid-template-rows:0fr; }
+    .sec-body-inner { min-height:0; overflow:hidden; padding-bottom:2px; }
     .sec-badge {
-      font-family:'Outfit',sans-serif; font-size:0.62rem; font-weight:600;
-      padding:4px 12px; border-radius:20px; letter-spacing:0.09em; text-transform:uppercase;
-      background:linear-gradient(135deg, rgba(200,164,78,0.22), rgba(200,164,78,0.08));
-      color:var(--gold); border:1px solid rgba(200,164,78,0.38);
+      font-family:'Outfit',sans-serif; font-size:0.66rem; font-weight:500;
+      padding:4px 11px; border-radius:10px; letter-spacing:0.06em;
+      background:rgba(200,164,78,0.1); color:var(--gold); border:1px solid var(--bord2);
     }
 
     /* ── INFO CARD (WiFi, Horaires, Adresse) ── */
     .info-card {
       background:var(--card); border:1px solid var(--border); border-radius:var(--r);
-      overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.28);
+      overflow:hidden;
     }
     .info-row {
       display:grid; grid-template-columns:140px 1fr;
@@ -648,10 +596,7 @@
     .cat-row {
       background:var(--card); border:1px solid var(--border); border-radius:14px;
       padding:12px 14px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;
-      box-shadow:0 1px 8px rgba(0,0,0,0.2);
-      transition:border-color 0.2s, box-shadow 0.2s;
     }
-    .cat-row:hover { border-color:rgba(200,164,78,0.22); box-shadow:0 2px 14px rgba(0,0,0,0.3); }
     .cat-row-ico { color:var(--gold); flex-shrink:0; }
     .cat-row-ico svg { width:18px; height:18px; }
     /* Photos catégorie — 3 slots sous la ligne de catégorie */
@@ -696,76 +641,49 @@
 
     /* ── Icon Picker ── */
     .ico-picker-btn {
-      display:flex; align-items:center; gap:5px;
+      display:flex; align-items:center; gap:6px;
       padding:7px 10px; border-radius:8px;
       background:var(--bg3); border:1px solid var(--border);
       color:var(--gold); font-size:0.75rem; cursor:pointer;
       transition:border-color 0.2s, background 0.2s;
-      flex-shrink:0; max-width:110px; min-width:0;
+      white-space:nowrap; flex-shrink:0;
     }
     .ico-picker-btn:hover { border-color:var(--gold); background:rgba(201,168,76,0.08); }
     .ico-picker-btn svg { width:16px; height:16px; flex-shrink:0; }
-    .ico-picker-btn .ico-pb-label {
-      font-size:0.7rem; color:var(--muted);
-      overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0;
-    }
+    .ico-picker-btn .ico-pb-label { font-size:0.7rem; color:var(--muted); }
 
-    /* ── Icon Modal ── */
-    .ico-modal-overlay {
-      display:none; position:fixed; inset:0;
-      background:rgba(0,0,0,0.65); z-index:1000;
-      align-items:flex-end; justify-content:center;
-    }
-    .ico-modal-overlay.open { display:flex; }
-    .ico-modal-box {
+    .ico-picker-popup {
+      display:none; position:fixed; z-index:600;
       background:var(--bg3); border:1px solid var(--bord2);
-      border-radius:20px 20px 0 0;
-      padding:0 16px 28px; width:100%; max-width:480px;
-      max-height:82vh; overflow-y:auto;
-      box-shadow:0 -8px 40px rgba(0,0,0,0.5);
+      border-radius:14px; padding:12px;
+      backdrop-filter:blur(24px) saturate(180%);
+      box-shadow:0 8px 32px rgba(0,0,0,0.45), 0 0 0 1px rgba(212,149,107,0.08);
+      width:min(264px, calc(100vw - 16px));
+      max-height:80vh; overflow-y:auto;
     }
-    .ico-modal-hd {
-      display:flex; align-items:center; justify-content:space-between;
-      padding:16px 0 14px;
-      position:sticky; top:0; background:var(--bg3);
-      border-bottom:1px solid var(--border); margin-bottom:14px;
-    }
-    .ico-modal-title { font-size:0.88rem; font-weight:600; color:var(--gold); }
-    .ico-modal-close {
-      width:30px; height:30px; background:var(--bg);
-      border:1px solid var(--border); border-radius:50%;
-      color:var(--muted); font-size:0.9rem;
-      display:flex; align-items:center; justify-content:center;
-      cursor:pointer; transition:color 0.2s, border-color 0.2s;
-    }
-    .ico-modal-close:hover { color:var(--red); border-color:var(--red); }
-    .ico-modal-grid {
+    .ico-picker-popup.open { display:block; }
+    .ico-picker-grid {
       display:grid; grid-template-columns:repeat(5,1fr); gap:6px;
-      margin-bottom:12px;
+      margin-bottom:8px;
     }
-    .ico-modal-item {
-      display:flex; flex-direction:column; align-items:center;
-      gap:4px; padding:8px 4px; border-radius:10px;
-      border:1px solid transparent; cursor:pointer;
+    .ico-picker-item {
+      display:flex; flex-direction:column; align-items:center; gap:3px;
+      padding:8px 4px; border-radius:8px; cursor:pointer;
+      border:1px solid transparent;
       transition:background 0.15s, border-color 0.15s;
-      color:var(--text); font-size:0.65rem; text-align:center;
+      font-size:0.58rem; color:var(--muted); text-align:center;
     }
-    .ico-modal-item:hover { background:rgba(200,164,78,0.1); border-color:rgba(200,164,78,0.25); }
-    .ico-modal-item.selected { background:rgba(200,164,78,0.15); border-color:var(--gold); color:var(--gold); }
-    .ico-modal-item svg { width:20px; height:20px; color:inherit; }
-    .ico-modal-none {
-      width:100%; padding:10px; border:1px solid rgba(224,82,82,0.3);
-      border-radius:10px; color:var(--red); background:transparent;
-      font-size:0.8rem; cursor:pointer; transition:background 0.15s;
+    .ico-picker-item svg { width:18px; height:18px; color:var(--cream); }
+    .ico-picker-item:hover { background:rgba(201,168,76,0.1); border-color:rgba(201,168,76,0.3); }
+    .ico-picker-item.selected { background:rgba(201,168,76,0.15); border-color:var(--gold); }
+    .ico-picker-item.selected svg { color:var(--gold); }
+    .ico-picker-none {
+      width:100%; padding:7px; border-radius:8px; font-size:0.75rem;
+      background:rgba(224,82,82,0.08); border:1px solid rgba(224,82,82,0.2);
+      color:var(--red); cursor:pointer; text-align:center;
+      transition:background 0.15s;
     }
-    .ico-modal-none:hover { background:rgba(224,82,82,0.08); }
-    @media(min-width:600px) {
-      .ico-modal-overlay { align-items:center; }
-      .ico-modal-box { border-radius:20px; max-width:400px; }
-    }
-    .cat-row-controls {
-      display:flex; align-items:center; gap:8px; flex-shrink:0;
-    }
+    .ico-picker-none:hover { background:rgba(224,82,82,0.15); }
     .btn-del {
       width:36px; height:36px; flex-shrink:0;
       border:1px solid rgba(224,82,82,0.3); border-radius:8px;
@@ -795,10 +713,8 @@
     /* Product card in admin */
     .prod-card {
       background:var(--card); border:1px solid var(--border); border-radius:14px;
-      overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.2);
-      transition:border-color 0.2s, box-shadow 0.2s;
+      overflow:hidden;
     }
-    .prod-card:hover { border-color:rgba(200,164,78,0.22); box-shadow:0 4px 16px rgba(0,0,0,0.3); }
     .prod-card-top {
       display:flex; align-items:center; gap:12px; padding:14px;
       cursor:pointer; user-select:none; min-height:70px;
@@ -1012,10 +928,8 @@
     body[data-style="paper"] .cat-photos-row { display:flex !important; }
     .order-adm-card {
       background:var(--card); border:1px solid var(--border); border-radius:14px;
-      overflow:hidden; margin-bottom:12px; transition:border-color 0.2s, box-shadow 0.2s;
-      box-shadow:0 2px 8px rgba(0,0,0,0.2);
+      overflow:hidden; margin-bottom:12px; transition:border-color 0.2s;
     }
-    .order-adm-card:hover { box-shadow:0 4px 14px rgba(0,0,0,0.28); }
     .order-adm-card.status-pending  { border-left:3px solid var(--gold); }
     .order-adm-card.status-progress { border-left:3px solid #4db8ff; }
     .order-adm-card.status-done     { border-left:3px solid var(--green); opacity:0.65; }
@@ -1149,7 +1063,7 @@
       .form-grid-2 { grid-template-columns:1fr 1fr; }
 
       /* Section header plus aéré */
-      .sec-hd { font-size:1.3rem; padding-bottom:20px; cursor:pointer; }
+      .sec-hd { font-size:1.3rem; padding-bottom:14px; margin-bottom:20px; cursor:pointer; }
 
       /* Cat row plus large */
       .cat-row { padding:14px 18px; border-radius:16px; }
@@ -1229,278 +1143,6 @@
     html.light .lf-dot { box-shadow: 0 0 0 1.5px rgba(0,0,0,0.18); }
     html.light .lf-dot:hover { border-color: rgba(0,0,0,0.3); box-shadow: 0 0 0 1.5px rgba(0,0,0,0.25); }
     html.light .lf-dot.active { border-color: #333; box-shadow: 0 0 0 1px rgba(0,0,0,0.3); }
-
-    /* ═══════════════════════════════════════════
-       DESIGN SYSTEM ADMIN — INSPIRÉ CONTROL APP
-    ═══════════════════════════════════════════ */
-
-    /* ── TOKENS DARK / LIGHT ── */
-    :root {
-      --adm-bg:        #0a0806;
-      --adm-surface:   #110e0a;
-      --adm-card:      rgba(255,255,255,0.04);
-      --adm-border:    rgba(200,164,78,0.14);
-      --adm-gold:      #c8a44e;
-      --adm-gold-glow: rgba(200,164,78,0.18);
-      --adm-text:      #f0e6d3;
-      --adm-muted:     rgba(200,175,130,0.5);
-      --adm-sidebar-w: 230px;
-      --adm-r:         14px;
-    }
-    html.light {
-      --adm-bg:        #f4efe8;
-      --adm-surface:   #ece5db;
-      --adm-card:      #ffffff;
-      --adm-border:    rgba(0,0,0,0.09);
-      --adm-gold:      #9a7030;
-      --adm-gold-glow: rgba(154,112,48,0.1);
-      --adm-text:      #1c140c;
-      --adm-muted:     rgba(0,0,0,0.45);
-    }
-
-    /* ── SIDEBAR DESKTOP (≥1024px) ── */
-    .adm-sidebar { display:none; }
-    @media(min-width:1024px) {
-      #adm-wrap {
-        max-width:100% !important; margin:0 !important; padding:0 !important;
-        display:flex; flex-direction:row; align-items:flex-start; min-height:100vh;
-        background:var(--adm-bg); transition:background 0.3s;
-      }
-      .adm-sidebar {
-        display:flex !important; flex-direction:column;
-        position:fixed; top:0; left:0; bottom:0; width:var(--adm-sidebar-w);
-        background:var(--adm-surface);
-        border-right:1px solid var(--adm-border);
-        z-index:90; padding-top:70px; overflow-y:auto; flex-shrink:0;
-        transition:background 0.3s, border-color 0.3s;
-      }
-      .adm-content-area {
-        margin-left:var(--adm-sidebar-w); flex:1; min-width:0;
-        padding:28px 40px 80px;
-        background:var(--adm-bg); min-height:100vh;
-        transition:background 0.3s;
-      }
-      .adm-group { display:none; width:100%; }
-      .adm-group.active { display:block; }
-      .adm-group .adm-section.collapsed .sec-body {
-        max-height:none !important; overflow:visible !important; transition:none !important;
-      }
-      .adm-group .sec-chevron { display:none !important; }
-      .adm-group .sec-hd { cursor:default !important; }
-      body.adm-active #sc-fab { display:none !important; }
-      /* Boutons du header cachés sur desktop (déplacés dans Réglages) */
-      body.adm-active #lang-sel-wrap,
-      body.adm-active #mode-sel-wrap,
-      body.adm-active #toggle-call-btn,
-      body.adm-active #toggle-photos-btn,
-      body.adm-active #toggle-order-btn { display:none !important; }
-    }
-
-    /* ── SIDEBAR NAV ── */
-    .adm-nav { display:flex; flex-direction:column; padding:6px 0 20px; }
-    .adm-nav-section-lbl {
-      font-size:0.6rem; letter-spacing:0.14em; text-transform:uppercase;
-      color:var(--adm-muted); padding:14px 20px 5px; font-weight:600;
-    }
-    .adm-nav-item {
-      display:flex; align-items:center; gap:13px; padding:11px 18px 11px 17px;
-      cursor:pointer; color:var(--adm-muted);
-      font-family:'Outfit',sans-serif; font-size:0.85rem; font-weight:500;
-      letter-spacing:0.02em; border-left:3px solid transparent;
-      transition:color 0.2s, background 0.2s, border-color 0.2s;
-      white-space:nowrap; user-select:none;
-      margin:1px 10px 1px 0; border-radius:0 10px 10px 0;
-    }
-    .adm-nav-item:hover { color:var(--adm-text); background:var(--adm-gold-glow); }
-    .adm-nav-item.active {
-      color:var(--adm-gold); border-left-color:var(--adm-gold);
-      background:var(--adm-gold-glow);
-      font-weight:600;
-    }
-    .adm-nav-ico { width:16px; height:16px; opacity:0.6; flex-shrink:0; transition:opacity 0.2s; }
-    .adm-nav-item.active .adm-nav-ico { opacity:1; }
-    .adm-nav-divider { height:1px; background:var(--adm-border); margin:10px 16px 8px; }
-
-    /* ── SECTION CARDS (desktop) ── */
-    @media(min-width:1024px) {
-      .adm-group .adm-section {
-        background:var(--adm-card);
-        border:1px solid var(--adm-border);
-        border-radius:var(--adm-r);
-        margin-bottom:20px;
-        overflow:hidden;
-        box-shadow:0 2px 24px rgba(0,0,0,0.14);
-        transition:background 0.3s, border-color 0.3s, box-shadow 0.3s;
-      }
-      .adm-group .adm-section:hover {
-        border-color:rgba(200,164,78,0.25);
-        box-shadow:0 4px 32px rgba(0,0,0,0.2);
-      }
-      html.light .adm-group .adm-section { box-shadow:0 2px 16px rgba(0,0,0,0.07); }
-      .adm-group .sec-hd {
-        padding:15px 22px;
-        font-family:'Outfit',sans-serif;
-        font-size:0.88rem; font-weight:600; letter-spacing:0.04em;
-        color:var(--adm-text);
-        background:linear-gradient(135deg, var(--adm-gold-glow), transparent 60%);
-        border-bottom:1px solid var(--adm-border);
-        display:flex; align-items:center; gap:10px;
-        transition:background 0.3s;
-      }
-      .adm-group .sec-hd::before {
-        content:''; display:inline-block; width:3px; height:15px;
-        background:var(--adm-gold); border-radius:2px; flex-shrink:0;
-      }
-      .adm-group .sec-badge {
-        margin-left:auto; font-size:0.58rem; padding:3px 10px;
-        border-radius:20px; background:var(--adm-gold-glow);
-        color:var(--adm-gold); border:1px solid var(--adm-border);
-        letter-spacing:0.1em; text-transform:uppercase; font-weight:700;
-      }
-      .adm-group .sec-body-inner { padding:20px 22px 24px; }
-    }
-
-    /* ── ONGLETS TRACK MOBILE (<1024px) ── */
-    @media(max-width:1023px) {
-      .adm-sidebar { display:none !important; }
-      .adm-content-area { display:block; overflow:hidden; }
-      #adm-wrap { overflow-x:hidden; padding-bottom:74px; background:var(--adm-bg); }
-      .adm-tabs-track {
-        display:flex; width:500%;
-        transition:transform 0.38s cubic-bezier(0.4,0,0.2,1); will-change:transform;
-      }
-      .adm-group { width:20%; flex-shrink:0; padding:16px; box-sizing:border-box; }
-    }
-
-    /* ── BOTTOM NAV MOBILE ── */
-    .adm-bottom-nav { display:none; }
-    @media(max-width:1023px) {
-      .adm-bottom-nav.visible {
-        display:flex; position:fixed; bottom:0; left:0; right:0; z-index:200;
-        background:rgba(10,8,6,0.97); backdrop-filter:blur(24px) saturate(160%);
-        border-top:1px solid var(--adm-border); height:64px;
-        align-items:stretch;
-      }
-    }
-    .adm-bnav-item {
-      flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
-      gap:3px; cursor:pointer; color:var(--adm-muted);
-      font-size:0.57rem; font-family:'Outfit',sans-serif; font-weight:500;
-      letter-spacing:0.04em; position:relative; transition:color 0.22s;
-      padding-bottom:4px; user-select:none;
-    }
-    .adm-bnav-item.active { color:var(--adm-gold); }
-    .adm-bnav-item svg { opacity:0.5; transition:opacity 0.22s; }
-    .adm-bnav-item.active svg { opacity:1; }
-    .adm-bnav-indicator {
-      position:absolute; top:0; height:2.5px;
-      background:var(--adm-gold); border-radius:0 0 3px 3px; width:0; left:0;
-      transition:left 0.38s cubic-bezier(0.34,1.56,0.64,1), width 0.38s cubic-bezier(0.34,1.56,0.64,1);
-      pointer-events:none; z-index:1;
-    }
-
-    /* ── NOTE TOGGLE ── */
-    .adm-note-toggle-row {
-      display:flex; align-items:center; justify-content:space-between;
-      padding:13px 4px 11px; margin-bottom:6px;
-      border-bottom:1px solid var(--adm-border);
-      cursor:pointer; user-select:none;
-    }
-    .adm-note-toggle-lbl {
-      font-family:'Outfit',sans-serif; font-size:0.83rem; color:var(--adm-muted);
-      display:flex; align-items:center; gap:9px;
-    }
-    .adm-note-toggle-lbl svg { color:var(--adm-gold); opacity:0.85; }
-    .adm-note-chevron { color:var(--adm-muted); transition:transform 0.3s cubic-bezier(0.4,0,0.2,1); }
-    .adm-note-toggle-row.note-section-expanded .adm-note-chevron { transform:rotate(180deg); }
-    #sec-note { overflow:hidden; max-height:0; opacity:0; transition:max-height 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease; }
-    #sec-note.note-expanded { max-height:1400px; opacity:1; }
-
-    /* ── RÉGLAGES ── */
-    .rgl-list { display:flex; flex-direction:column; gap:8px; }
-    .rgl-row {
-      display:flex; align-items:center; justify-content:space-between; gap:16px;
-      padding:15px 18px; border-radius:12px;
-      background:var(--adm-card); border:1px solid var(--adm-border);
-      transition:border-color 0.2s, background 0.2s;
-    }
-    .rgl-row:hover { border-color:rgba(200,164,78,0.3); }
-    .rgl-info { flex:1; min-width:0; }
-    .rgl-name {
-      font-family:'Outfit',sans-serif; font-size:0.87rem; font-weight:600;
-      color:var(--adm-text); margin-bottom:3px;
-    }
-    .rgl-desc { font-size:0.71rem; color:var(--adm-muted); }
-    .rgl-toggle {
-      width:46px; height:27px; border-radius:14px; flex-shrink:0;
-      background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12);
-      position:relative; cursor:pointer;
-      transition:background 0.28s, border-color 0.28s;
-    }
-    html.light .rgl-toggle { background:rgba(0,0,0,0.1); border-color:rgba(0,0,0,0.15); }
-    .rgl-toggle.on { background:rgba(200,164,78,0.3); border-color:var(--adm-gold); }
-    .rgl-toggle::after {
-      content:''; position:absolute; top:3px; left:3px; width:19px; height:19px;
-      border-radius:50%; background:rgba(200,164,78,0.4);
-      transition:transform 0.28s cubic-bezier(0.34,1.56,0.64,1), background 0.28s;
-    }
-    .rgl-toggle.on::after { transform:translateX(19px); background:var(--adm-gold); }
-    .rgl-btn {
-      padding:8px 15px; border-radius:10px;
-      background:var(--adm-gold-glow); border:1px solid var(--adm-border);
-      color:var(--adm-gold); font-family:'Outfit',sans-serif;
-      font-size:0.8rem; font-weight:500; cursor:pointer;
-      display:flex; align-items:center; gap:7px;
-      transition:background 0.2s, border-color 0.2s; white-space:nowrap;
-    }
-    .rgl-btn:hover { background:rgba(200,164,78,0.22); border-color:rgba(200,164,78,0.45); }
-    /* Style Mode segmented */
-    .rgl-seg {
-      display:flex; border-radius:10px; overflow:hidden;
-      border:1px solid var(--adm-border); flex-shrink:0;
-    }
-    .rgl-seg-opt {
-      padding:8px 14px; background:transparent; border:none;
-      color:var(--adm-muted); font-family:'Outfit',sans-serif;
-      font-size:0.78rem; font-weight:500; cursor:pointer;
-      transition:background 0.2s, color 0.2s; white-space:nowrap;
-    }
-    .rgl-seg-opt:not(:last-child) { border-right:1px solid var(--adm-border); }
-    .rgl-seg-opt.active { background:var(--adm-gold-glow); color:var(--adm-gold); font-weight:600; }
-
-    /* ── CATÉGORIES & PRODUITS PARALLÈLES — Desktop ── */
-    .cats-prods-wrap { display:flex; flex-direction:column; gap:20px; }
-    @media (min-width:1024px) {
-      .cats-prods-wrap {
-        flex-direction:row; align-items:flex-start; gap:24px;
-      }
-      .cats-prods-wrap #sec-cats    { flex:0 0 340px; min-width:0; }
-      .cats-prods-wrap #sec-produits { flex:1; min-width:0; }
-    }
-
-    /* ── PHOTOS CATÉGORIES — Style Papier ── */
-    .cat-photos-row { display:none; gap:10px; padding:4px 0 6px; flex-wrap:wrap; }
-    body[data-style="paper"] .cat-photos-row { display:flex !important; }
-    .cat-photo-slot {
-      flex:0 0 90px; height:90px; border-radius:12px;
-      border:1.5px dashed var(--adm-border);
-      background:var(--adm-gold-glow);
-      overflow:hidden; cursor:pointer; position:relative;
-      transition:border-color 0.22s, transform 0.18s, box-shadow 0.22s;
-      display:flex; align-items:center; justify-content:center;
-    }
-    .cat-photo-slot:hover {
-      border-color:var(--adm-gold); border-style:solid;
-      transform:scale(1.04); box-shadow:0 4px 16px rgba(200,164,78,0.2);
-    }
-    .cat-photo-slot img { width:100%; height:100%; object-fit:cover; display:block; }
-    .cat-photo-slot-add {
-      display:flex; flex-direction:column; align-items:center; gap:5px;
-      color:var(--adm-muted); font-size:0.62rem; font-family:'Outfit',sans-serif;
-      pointer-events:none; text-align:center; padding:8px;
-    }
-    .cat-photo-slot-add svg { color:var(--adm-gold); opacity:0.7; }
-    .cat-photo-slot.has-img .cat-photo-slot-add { display:none; }
   </style>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -1618,7 +1260,7 @@
         <path d="M16 2l-1.5 2h-5L8 2"/>
       </svg>
     </button>
-    <button class="adm-vis-btn adm-vis-ico" id="toggle-order-btn" title="Afficher/cacher le mode commande dans le menu">
+    <button class="adm-vis-btn adm-vis-ico" id="toggle-order-btn" title="Afficher/cacher le mode commande dans le menu" style="display:none">
       <span class="vis-dot"></span>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
         <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
@@ -1660,258 +1302,122 @@
 
 <div class="adm-wrap" id="adm-wrap" style="display:none">
 
-  <!-- ── SIDEBAR (desktop uniquement) ── -->
-  <div class="adm-sidebar" id="adm-sidebar">
-    <nav class="adm-nav">
-      <div class="adm-nav-item active" data-group="accueil" onclick="switchAdmGroup('accueil')">
-        <svg class="adm-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
-        <span data-uitxt="navAccueil">Accueil</span>
-      </div>
-      <div class="adm-nav-item" data-group="affichage" onclick="switchAdmGroup('affichage')">
-        <svg class="adm-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-        <span data-uitxt="navAffichage">Affichage</span>
-      </div>
-      <div class="adm-nav-item" data-group="categories" onclick="switchAdmGroup('categories')">
-        <svg class="adm-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-        <span data-uitxt="navCatsFull">Catégories & Produits</span>
-      </div>
-      <div class="adm-nav-item" id="adm-nav-commande" data-group="commande" onclick="switchAdmGroup('commande')">
-        <svg class="adm-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
-        <span data-uitxt="navCommande">Commande</span>
-      </div>
-      <div class="adm-nav-divider"></div>
-      <div class="adm-nav-item" data-group="reglages" onclick="switchAdmGroup('reglages')">
-        <svg class="adm-nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-        <span data-uitxt="navReglages">Réglages</span>
-      </div>
-    </nav>
+  <!-- ── THÈME VISUEL ── -->
+  <div class="adm-section" id="sec-theme">
+    <div class="sec-hd" id="sec-hd-theme">Thème visuel <span class="sec-badge" id="badge-theme">Design</span></div>
+    <div class="theme-grid" id="theme-grid"></div>
   </div>
 
-  <!-- ── ZONE CONTENU ── -->
-  <div class="adm-content-area" id="adm-content-area">
-    <div class="adm-tabs-track" id="adm-tabs-track">
+  <!-- ── PHOTO D'ACCUEIL ── -->
+  <div class="adm-section" id="sec-hero">
+    <div class="sec-hd" id="sec-hd-hero">Photo d'accueil <span class="sec-badge" id="badge-hero">Hero</span></div>
+    <div class="hero-img-card" id="hero-img-card">
 
-      <!-- ══ GROUPE 1 : ACCUEIL ══ -->
-      <div class="adm-group active" data-group="accueil">
+      <!-- Mockup téléphone -->
+      <div class="phone-mockup-wrap">
+        <div class="phone-mockup">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="phone-hero-bg" id="phone-hero-bg"></div>
+            <div class="phone-overlay"></div>
+            <div class="phone-content">
 
-        <!-- ── PHOTO D'ACCUEIL ── -->
-        <div class="adm-section" id="sec-hero">
-          <div class="sec-hd" id="sec-hd-hero">Photo d'accueil <span class="sec-badge" id="badge-hero">Hero</span></div>
-          <div class="hero-img-card" id="hero-img-card">
-            <div class="phone-mockup-wrap">
-              <div class="phone-mockup">
-                <div class="phone-notch"></div>
-                <div class="phone-screen">
-                  <div class="phone-hero-bg" id="phone-hero-bg"></div>
-                  <div class="phone-overlay"></div>
-                  <div class="phone-content">
-                    <img class="phone-logo" id="pm-logo" src="" alt="" style="display:none">
-                    <div class="phone-ornament">
-                      <div class="phone-orn-line"></div>
-                      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:var(--gold)"><polygon points="12,2 22,9 18,20 6,20 2,9"/></svg>
-                      <div class="phone-orn-line phone-orn-line-r"></div>
-                    </div>
-                    <div class="phone-title" id="pm-title">Mozart Coffee Lounge</div>
-                    <div class="phone-tagline" id="pm-tagline"></div>
-                    <div class="phone-sub" id="pm-sub"></div>
-                    <div class="phone-socials">
-                      <span class="phone-social-btn">
-                        <svg width="7" height="7" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
-                        Facebook
-                      </span>
-                      <span class="phone-social-btn">
-                        <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
-                        Instagram
-                      </span>
-                    </div>
-                  </div>
-                  <div class="phone-scroll">
-                    <div class="phone-scroll-lbl"></div>
-                    <div class="phone-capsule"><div class="phone-capsule-dot"></div></div>
-                  </div>
-                </div>
+              <img class="phone-logo" id="pm-logo" src="" alt="" style="display:none">
+              <div class="phone-ornament">
+                <div class="phone-orn-line"></div>
+                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:var(--gold)"><polygon points="12,2 22,9 18,20 6,20 2,9"/></svg>
+                <div class="phone-orn-line phone-orn-line-r"></div>
+              </div>
+              <div class="phone-title" id="pm-title">Mozart Coffee Lounge</div>
+              <div class="phone-tagline" id="pm-tagline"></div>
+              <div class="phone-sub" id="pm-sub"></div>
+              <div class="phone-socials">
+                <span class="phone-social-btn">
+                  <svg width="7" height="7" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+                  Facebook
+                </span>
+                <span class="phone-social-btn">
+                  <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
+                  Instagram
+                </span>
               </div>
             </div>
-            <div class="hero-controls">
-              <label class="hero-upload-btn" for="hero-file-input">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                <span id="btn-choose-photo-lbl">Choisir une photo</span>
-              </label>
-              <input type="file" id="hero-file-input" accept="image/*" style="display:none">
-              <button class="hero-del-btn" id="hero-del-btn" style="display:none">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                <span id="btn-del-photo-lbl">Supprimer</span>
-              </button>
-            </div>
-            <div class="hero-hint" id="hero-hint-txt">Photo recommandée : format portrait, min. 900×1600 px</div>
-            <div class="logo-controls-row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
-              <label class="hero-upload-btn" for="logo-file-input" style="font-size:0.78rem;">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                <span data-uitxt="btnLogo">Logo (optionnel)</span>
-              </label>
-              <input type="file" id="logo-file-input" accept="image/*" style="display:none">
-              <button class="hero-del-btn" id="logo-del-btn" style="display:none;font-size:0.78rem;">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                <span data-uitxt="btnDelLogo">Supprimer le logo</span>
-              </button>
+            <div class="phone-scroll">
+              <div class="phone-scroll-lbl"></div>
+              <div class="phone-capsule"><div class="phone-capsule-dot"></div></div>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- ── INFORMATIONS DU CAFÉ ── -->
-        <div class="adm-section" id="sec-info">
-          <div class="sec-hd" id="sec-hd-info">Informations du café <span class="sec-badge" id="badge-footer">Footer</span></div>
-          <div class="info-card" id="info-card"><!-- Rempli par JS --></div>
-        </div>
+      <!-- Contrôles -->
+      <div class="hero-controls">
+        <label class="hero-upload-btn" for="hero-file-input">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span id="btn-choose-photo-lbl">Choisir une photo</span>
+        </label>
+        <input type="file" id="hero-file-input" accept="image/*" style="display:none">
+        <button class="hero-del-btn" id="hero-del-btn" style="display:none">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <span id="btn-del-photo-lbl">Supprimer</span>
+        </button>
+      </div>
+      <div class="hero-hint" id="hero-hint-txt">Photo recommandée : format portrait, min. 900×1600 px</div>
+      <div class="logo-controls-row" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
+        <label class="hero-upload-btn" for="logo-file-input" style="font-size:0.78rem;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span data-uitxt="btnLogo">Logo (optionnel)</span>
+        </label>
+        <input type="file" id="logo-file-input" accept="image/*" style="display:none">
+        <button class="hero-del-btn" id="logo-del-btn" style="display:none;font-size:0.78rem;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <span data-uitxt="btnDelLogo">Supprimer le logo</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
-      </div><!-- /accueil -->
+  <!-- ── INFORMATIONS DU CAFÉ ── -->
+  <div class="adm-section" id="sec-info">
+    <div class="sec-hd" id="sec-hd-info">Informations du café <span class="sec-badge" id="badge-footer">Footer</span></div>
+    <div class="info-card" id="info-card">
+      <!-- Rempli par JS -->
+    </div>
+  </div>
 
-      <!-- ══ GROUPE 2 : AFFICHAGE ══ -->
-      <div class="adm-group" data-group="affichage">
+  <!-- ── NOTE CLIENTS ── -->
+  <div class="adm-section" id="sec-note">
+    <div class="sec-hd" id="sec-hd-note">Note pour les clients <span class="sec-badge" id="badge-note">Annonce</span></div>
+    <div class="note-card" id="note-card"></div>
+  </div>
 
-        <!-- ── THÈME VISUEL ── -->
-        <div class="adm-section" id="sec-theme">
-          <div class="sec-hd" id="sec-hd-theme">Thème visuel <span class="sec-badge" id="badge-theme">Design</span></div>
-          <div class="theme-grid" id="theme-grid"></div>
-        </div>
+  <!-- ── CATÉGORIES ── -->
+  <div class="adm-section" id="sec-cats">
+    <div class="sec-hd">Catégories <span class="sec-badge" id="cat-count">0</span></div>
+    <div class="cats-list" id="cats-list"></div>
+    <button class="btn-add" id="btn-add-cat">＋ Ajouter une catégorie</button>
+    <button class="btn-save-cats" id="btn-save-cats" style="display:none">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+        <polyline points="17,21 17,13 7,13 7,21"/>
+        <polyline points="7,3 7,8 15,8"/>
+      </svg>
+      Sauvegarder les catégories
+    </button>
+  </div>
 
-      </div><!-- /affichage -->
+  <!-- ── PRODUITS PAR CATÉGORIE ── -->
+  <div class="adm-section" id="sec-produits">
+    <div class="sec-hd" id="sec-hd-produits">Produits <span class="sec-badge" id="prod-count-badge">0</span></div>
+    <div id="products-area"></div>
+  </div>
 
-      <!-- ══ GROUPE 3 : CATÉGORIES ══ -->
-      <div class="adm-group" data-group="categories">
-
-        <!-- Note toggle -->
-        <div class="adm-note-toggle-row" id="adm-note-toggle-row" onclick="toggleAdmNoteSection()">
-          <div class="adm-note-toggle-lbl">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-            Note pour les clients
-          </div>
-          <svg class="adm-note-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
-
-        <!-- ── NOTE CLIENTS ── -->
-        <div class="adm-section" id="sec-note">
-          <div class="sec-hd" id="sec-hd-note">Note pour les clients <span class="sec-badge" id="badge-note">Annonce</span></div>
-          <div class="note-card" id="note-card"></div>
-        </div>
-
-        <!-- ── CATÉGORIES + PRODUITS (parallèles sur desktop) ── -->
-        <div class="cats-prods-wrap">
-
-          <!-- ── CATÉGORIES ── -->
-          <div class="adm-section" id="sec-cats">
-            <div class="sec-hd">Catégories <span class="sec-badge" id="cat-count">0</span></div>
-            <div class="cats-list" id="cats-list"></div>
-            <button class="btn-add" id="btn-add-cat">＋ Ajouter une catégorie</button>
-            <button class="btn-save-cats" id="btn-save-cats" style="display:none">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
-                <polyline points="17,21 17,13 7,13 7,21"/>
-                <polyline points="7,3 7,8 15,8"/>
-              </svg>
-              Sauvegarder les catégories
-            </button>
-          </div>
-
-          <!-- ── PRODUITS PAR CATÉGORIE ── -->
-          <div class="adm-section" id="sec-produits">
-            <div class="sec-hd" id="sec-hd-produits">Produits <span class="sec-badge" id="prod-count-badge">0</span></div>
-            <div id="products-area"></div>
-          </div>
-
-        </div><!-- /cats-prods-wrap -->
-
-      </div><!-- /categories -->
-
-      <!-- ══ GROUPE 4 : COMMANDE ══ -->
-      <div class="adm-group" data-group="commande">
-
-        <!-- ── COMMANDES ── -->
-        <div class="adm-section" id="orders-admin-section">
-          <div class="sec-hd" id="sec-hd-orders">Commandes en temps réel <span class="sec-badge" id="orders-count-badge">0</span></div>
-          <div id="orders-admin-list"><div class="orders-empty">Aucune commande pour le moment</div></div>
-        </div>
-
-      </div><!-- /commande -->
-
-      <!-- ══ GROUPE 5 : RÉGLAGES ══ -->
-      <div class="adm-group" data-group="reglages">
-
-        <div class="adm-section" id="sec-reglages">
-          <div class="sec-hd">Réglages</div>
-          <div class="rgl-list">
-
-            <!-- Thème -->
-            <div class="rgl-row">
-              <div class="rgl-info">
-                <div class="rgl-name" data-uitxt="rglThemeName">Thème</div>
-                <div class="rgl-desc" data-uitxt="rglThemeDesc">Basculer entre mode sombre et clair</div>
-              </div>
-              <button class="rgl-btn" id="rgl-theme-btn" onclick="document.getElementById('adm-theme-btn').click()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
-                <span id="rgl-theme-lbl">Sombre</span>
-              </button>
-            </div>
-
-            <!-- Langue -->
-            <div class="rgl-row">
-              <div class="rgl-info">
-                <div class="rgl-name" data-uitxt="rglLangName">Langue d'interface</div>
-                <div class="rgl-desc" data-uitxt="rglLangDesc">Langue d'affichage de l'administration</div>
-              </div>
-              <button class="rgl-btn" id="rgl-lang-btn" onclick="document.getElementById('lang-sel-btn').click()">
-                <span id="rgl-lang-flag">🇬🇷</span>
-                <span id="rgl-lang-lbl">Ελληνικά</span>
-              </button>
-            </div>
-
-            <!-- Style du menu -->
-            <div class="rgl-row" id="rgl-style-row">
-              <div class="rgl-info">
-                <div class="rgl-name" data-uitxt="rglStyleName">Style du menu</div>
-                <div class="rgl-desc" data-uitxt="rglStyleDesc">Papier (classique) ou Dynamique (avec photos)</div>
-              </div>
-              <div class="rgl-seg" id="rgl-style-seg">
-                <button class="rgl-seg-opt" id="rgl-seg-paper" data-mode="paper" onclick="window._pickMode('paper')"><span data-uitxt="rglStylePaper">📄 Papier</span></button>
-                <button class="rgl-seg-opt" id="rgl-seg-dynamic" data-mode="simple" onclick="window._pickMode('simple')"><span data-uitxt="rglStyleDynamic">🖼️ Dynamique</span></button>
-              </div>
-            </div>
-
-            <!-- Sonnette -->
-            <div class="rgl-row">
-              <div class="rgl-info">
-                <div class="rgl-name" data-uitxt="rglCallName">Bouton sonnette</div>
-                <div class="rgl-desc" data-uitxt="rglCallDesc">Afficher le bouton d'appel dans le menu</div>
-              </div>
-              <div class="rgl-toggle" id="rgl-call-toggle" onclick="document.getElementById('toggle-call-btn').click(); syncReglagesUI()"></div>
-            </div>
-
-            <!-- Commande -->
-            <div class="rgl-row" id="rgl-order-row">
-              <div class="rgl-info">
-                <div class="rgl-name" data-uitxt="rglOrderName">Mode commande</div>
-                <div class="rgl-desc" data-uitxt="rglOrderDesc">Activer l'interface de commande dans le menu</div>
-              </div>
-              <div class="rgl-toggle" id="rgl-order-toggle" onclick="document.getElementById('toggle-order-btn').click(); syncReglagesUI()"></div>
-            </div>
-
-            <!-- Photos -->
-            <div class="rgl-row">
-              <div class="rgl-info">
-                <div class="rgl-name" data-uitxt="rglPhotosName">Photos produits</div>
-                <div class="rgl-desc" data-uitxt="rglPhotosDesc">Afficher les photos dans le menu</div>
-              </div>
-              <div class="rgl-toggle" id="rgl-photos-toggle" onclick="document.getElementById('toggle-photos-btn').click(); syncReglagesUI()"></div>
-            </div>
-
-          </div>
-        </div>
-
-      </div><!-- /reglages -->
-
-    </div><!-- /adm-tabs-track -->
-  </div><!-- /adm-content-area -->
+  <!-- ── COMMANDES (visible seulement en mode Commande) ── -->
+  <div class="adm-section" id="orders-admin-section">
+    <div class="sec-hd" id="sec-hd-orders">Commandes en temps réel <span class="sec-badge" id="orders-count-badge">0</span></div>
+    <div id="orders-admin-list"><div class="orders-empty">Aucune commande pour le moment</div></div>
+  </div>
 
 </div>
 
@@ -2116,13 +1622,6 @@ const ADMIN_UI = {
     noPhoto:       'Καμία φωτογραφία',
     btnLogo:       'Λογότυπο (προαιρετικό)',
     btnDelLogo:    'Διαγραφή λογοτύπου',
-    navAccueil:'Αρχική', navAffichage:'Εμφάνιση', navCatsFull:'Κατηγορίες & Προϊόντα', navCatsShort:'Κατηγορίες', navCommande:'Παραγγελίες', navReglages:'Ρυθμίσεις',
-    rglThemeName:'Θέμα', rglThemeDesc:'Εναλλαγή μεταξύ σκοτεινής και φωτεινής λειτουργίας',
-    rglLangName:'Γλώσσα διεπαφής', rglLangDesc:'Γλώσσα εμφάνισης της διαχείρισης',
-    rglStyleName:'Στυλ μενού', rglStyleDesc:'Κατάλογος ή Δυναμικό (με φωτογραφίες)', rglStylePaper:'📄 Κατάλογος', rglStyleDynamic:'🖼️ Δυναμικό',
-    rglCallName:'Κουμπί κλήσης', rglCallDesc:'Εμφάνιση κουμπιού κλήσης στο μενού',
-    rglOrderName:'Λειτουργία παραγγελίας', rglOrderDesc:'Ενεργοποίηση διεπαφής παραγγελίας στο μενού',
-    rglPhotosName:'Φωτογραφίες προϊόντων', rglPhotosDesc:'Εμφάνιση φωτογραφιών στο μενού',
   },
   fr: {
     admSub:        'Administration du menu',
@@ -2228,13 +1727,6 @@ const ADMIN_UI = {
     noPhoto:       'Aucune photo',
     btnLogo:       'Logo (optionnel)',
     btnDelLogo:    'Supprimer le logo',
-    navAccueil:'Accueil', navAffichage:'Affichage', navCatsFull:'Catégories & Produits', navCatsShort:'Catégories', navCommande:'Commande', navReglages:'Réglages',
-    rglThemeName:'Thème', rglThemeDesc:'Basculer entre mode sombre et clair',
-    rglLangName:'Langue d\'interface', rglLangDesc:'Langue d\'affichage de l\'administration',
-    rglStyleName:'Style du menu', rglStyleDesc:'Papier (classique) ou Dynamique (avec photos)', rglStylePaper:'📄 Papier', rglStyleDynamic:'🖼️ Dynamique',
-    rglCallName:'Bouton sonnette', rglCallDesc:'Afficher le bouton d\'appel dans le menu',
-    rglOrderName:'Mode commande', rglOrderDesc:'Activer l\'interface de commande dans le menu',
-    rglPhotosName:'Photos produits', rglPhotosDesc:'Afficher les photos dans le menu',
   },
   en: {
     admSub:        'Menu administration',
@@ -2340,13 +1832,6 @@ const ADMIN_UI = {
     noPhoto:       'No photo',
     btnLogo:       'Logo (optional)',
     btnDelLogo:    'Delete logo',
-    navAccueil:'Home', navAffichage:'Display', navCatsFull:'Categories & Products', navCatsShort:'Categories', navCommande:'Orders', navReglages:'Settings',
-    rglThemeName:'Theme', rglThemeDesc:'Switch between dark and light mode',
-    rglLangName:'Interface language', rglLangDesc:'Display language for administration',
-    rglStyleName:'Menu style', rglStyleDesc:'Paper (classic) or Dynamic (with photos)', rglStylePaper:'📄 Paper', rglStyleDynamic:'🖼️ Dynamic',
-    rglCallName:'Call button', rglCallDesc:'Show the call button in the menu',
-    rglOrderName:'Order mode', rglOrderDesc:'Enable the order interface in the menu',
-    rglPhotosName:'Product photos', rglPhotosDesc:'Show photos in the menu',
   },
   de: {
     admSub:        'Menüverwaltung',
@@ -2452,13 +1937,6 @@ const ADMIN_UI = {
     noPhoto:       'Kein Foto',
     btnLogo:       'Logo (optional)',
     btnDelLogo:    'Logo löschen',
-    navAccueil:'Startseite', navAffichage:'Anzeige', navCatsFull:'Kategorien & Produkte', navCatsShort:'Kategorien', navCommande:'Bestellung', navReglages:'Einstellungen',
-    rglThemeName:'Thema', rglThemeDesc:'Zwischen dunklem und hellem Modus wechseln',
-    rglLangName:'Oberflächensprache', rglLangDesc:'Anzeigesprache der Verwaltung',
-    rglStyleName:'Menü-Stil', rglStyleDesc:'Papier (klassisch) oder Dynamisch (mit Fotos)', rglStylePaper:'📄 Papier', rglStyleDynamic:'🖼️ Dynamisch',
-    rglCallName:'Klingeltaste', rglCallDesc:'Anruftaste im Menü anzeigen',
-    rglOrderName:'Bestellmodus', rglOrderDesc:'Bestelloberfläche im Menü aktivieren',
-    rglPhotosName:'Produktfotos', rglPhotosDesc:'Fotos im Menü anzeigen',
   },
   ar: {
     admSub:        'إدارة القائمة',
@@ -2564,13 +2042,6 @@ const ADMIN_UI = {
     noPhoto:       'لا توجد صورة',
     btnLogo:       'الشعار (اختياري)',
     btnDelLogo:    'حذف الشعار',
-    navAccueil:'الرئيسية', navAffichage:'العرض', navCatsFull:'الفئات والمنتجات', navCatsShort:'الفئات', navCommande:'الطلبات', navReglages:'الإعدادات',
-    rglThemeName:'الثيم', rglThemeDesc:'التبديل بين الوضع الداكن والفاتح',
-    rglLangName:'لغة الواجهة', rglLangDesc:'لغة عرض الإدارة',
-    rglStyleName:'نمط القائمة', rglStyleDesc:'ورق (كلاسيكي) أو ديناميكي (مع صور)', rglStylePaper:'📄 ورق', rglStyleDynamic:'🖼️ ديناميكي',
-    rglCallName:'زر النداء', rglCallDesc:'عرض زر النداء في القائمة',
-    rglOrderName:'وضع الطلب', rglOrderDesc:'تفعيل واجهة الطلب في القائمة',
-    rglPhotosName:'صور المنتجات', rglPhotosDesc:'عرض الصور في القائمة',
   },
 };
 
@@ -2691,12 +2162,10 @@ async function doLogin() {
 
 function showAdmin() {
   document.getElementById('login-screen').classList.add('hidden');
-  document.body.classList.add('adm-active');
   // adm-header reste caché jusqu'à ce que loadMenuMode() reçoive le vrai mode de Firebase
   document.getElementById('adm-wrap').style.display   = '';
   document.getElementById('fab-save').style.display   = '';
-  document.getElementById('adm-bottom-nav')?.classList.add('visible');
-  switchAdmGroup('accueil');
+  document.getElementById('sc-fab').classList.add('show');
   // Sync l'icône langue
   window._updateLangBtn?.(currentLang);
   // loadData() est async — renderAll() et applyAdminUI() sont appelés à l'intérieur
@@ -3231,7 +2700,6 @@ function renderHeroImageSection() {
 
     // Toggle + sauvegarde
     hd.addEventListener('click', () => {
-      if (window.innerWidth >= 1024) return; // Pas de repli sur desktop
       section.classList.toggle('collapsed');
       if (id) {
         saved[id] = section.classList.contains('collapsed');
@@ -3648,7 +3116,7 @@ const ICON_LABELS = {
     'ico-gift':'🎁 Προσφ.', 'ico-cocktail':'🍹 Κοκτέιλ',
   },
   fr: {
-    'ico-coffee':'☕ Chaud', 'ico-cold':'🧊 Froid', 'ico-food':'🍽 Cuisine', 'ico-cake':'🍰 Sucré',
+    'ico-coffee':'☕ Café chaud', 'ico-cold':'🧊 Froid', 'ico-food':'🍽 Cuisine', 'ico-cake':'🍰 Sucré',
     'ico-sunrise':'🌅 Matin', 'ico-hookah':'💨 Hookah', 'ico-star':'⭐ Spécial', 'ico-bell':'🔔 Cloche',
     'ico-clock':'🕐 Horaires', 'ico-diamond':'💎 Premium', 'ico-wifi':'📶 WiFi', 'ico-pin':'📍 Lieu',
     'ico-glass':'🥤 Verre', 'ico-pizza':'🍕 Pizza', 'ico-burger':'🍔 Burger', 'ico-salad':'🥗 Salade',
@@ -3720,13 +3188,23 @@ function renderCatsSection() {
       <input class="inline-input" value="${esc(cat.names?.[currentLang] || cat.names?.fr || '')}"
         placeholder="Nom (${currentLang.toUpperCase()})"
         data-ci="${ci}">
-      <div class="cat-row-controls">
+      <div style="position:relative">
         <button class="ico-picker-btn" data-ci="${ci}" title="Changer l'icône">
           <span class="ico-pb-label">${currentIco ? icoNameClean : _tCat.noneIco}</span>
           <span>▾</span>
         </button>
-        <button class="btn-del" data-ci="${ci}" title="Supprimer">✕</button>
+        <div class="ico-picker-popup" id="ico-popup-${ci}">
+          <div class="ico-picker-grid">
+            ${ICONS.map(ic => `
+              <div class="ico-picker-item${ic===currentIco?' selected':''}" data-ico="${ic}" data-ci="${ci}" title="${getIconLabel(ic)}">
+                <svg width="18" height="18"><use href="#${ic}"/></svg>
+                <span>${getIconLabel(ic).replace(/^.+\s/,'')}</span>
+              </div>`).join('')}
+          </div>
+          <button class="ico-picker-none" data-ci="${ci}">${_tCat.delIcon}</button>
+        </div>
       </div>
+      <button class="btn-del" data-ci="${ci}" title="Supprimer">✕</button>
       <div class="cat-photos-row">
         <div class="cat-photos-slots">${slotsHtml}</div>
       </div>
@@ -3775,9 +3253,52 @@ function renderCatsSection() {
       renderProductsSection();
     });
 
-    // Ouvrir le modal icône
+    // Ouvrir/fermer le picker
     row.querySelector('.ico-picker-btn').addEventListener('click', e => {
-      openIconModal(parseInt(e.currentTarget.dataset.ci));
+      e.stopPropagation();
+      const popup = document.getElementById(`ico-popup-${ci}`);
+      const isOpen = popup.classList.contains('open');
+      document.querySelectorAll('.ico-picker-popup.open').forEach(p => p.classList.remove('open'));
+      if (!isOpen) {
+        popup.classList.add('open');
+        // Positionnement intelligent — reste dans le viewport
+        const rect = e.currentTarget.getBoundingClientRect();
+        const vw = window.innerWidth, vh = window.innerHeight;
+        const pw = Math.min(264, vw - 16);
+        // Hauteur réelle du popup (limité à 80vh)
+        const popupH = Math.min(popup.scrollHeight || 360, vh * 0.8);
+        let top  = rect.bottom + 6;
+        let left = rect.left;
+        // Déborde à droite ?
+        if (left + pw > vw - 8) left = vw - pw - 8;
+        if (left < 8) left = 8;
+        // Déborde en bas ? → afficher au-dessus
+        if (top + popupH > vh - 8) top = rect.top - popupH - 6;
+        if (top < 8) top = 8;
+        popup.style.top  = top  + 'px';
+        popup.style.left = left + 'px';
+      }
+    });
+
+    // Sélectionner une icône
+    row.querySelectorAll('.ico-picker-item').forEach(item => {
+      item.addEventListener('click', e => {
+        const i = parseInt(item.dataset.ci);
+        const ico = item.dataset.ico;
+        adminData.cats[i].ico = ico;
+        markUnsaved();
+        renderCatsSection();
+        renderProductsSection();
+      });
+    });
+
+    // Supprimer l'icône
+    row.querySelector('.ico-picker-none').addEventListener('click', e => {
+      const i = parseInt(e.target.dataset.ci);
+      adminData.cats[i].ico = '';
+      markUnsaved();
+      renderCatsSection();
+      renderProductsSection();
     });
 
     row.querySelector('.btn-del').addEventListener('click', e => {
@@ -5358,47 +4879,19 @@ function saveMenuMode(mode) {
 const _MODE_PRIORITY = ['paper','simple'];
 let _currentFeatures = null;
 
-/* ── Feature check : compatible native app (flat) + web app (nested) ──
-   Native app writes: /config/features/orderUI   (flat)
-   Web   app writes: /config/features/buttons/orderUI (nested)
-   Both may coexist. Flat (native) takes precedence when present.         */
-function _featOk(btnKey) {
-  if (!_currentFeatures) return true;
-  const flat   = _currentFeatures[btnKey];
-  const nested = _currentFeatures.buttons?.[btnKey];
-  if (flat   !== undefined) return flat   !== false;
-  if (nested !== undefined) return nested !== false;
-  return true; // neither set → licensed by default
-}
-
-function _styleOk(mode) {
-  if (!_currentFeatures) return true;
-  // Native keys: stylePaper / styleDynamic; Web keys: styles.paper / styles.simple
-  const nativeKey = mode === 'paper' ? 'stylePaper' : 'styleDynamic';
-  const flat   = _currentFeatures[nativeKey];
-  const nested = _currentFeatures.styles?.[mode];
-  if (flat   !== undefined) return flat   !== false;
-  if (nested !== undefined) return nested !== false;
-  return true;
-}
-
 function applyFeatures(features) {
   _currentFeatures = features;
-  // Compat: build unified modes object from both flat and nested paths
-  const modes = {
-    paper:  _styleOk('paper'),
-    simple: _styleOk('simple'),
-  };
+  const modes = features?.styles || {};
 
   // Afficher/masquer les options de style dans le sélecteur
   ['paper','simple'].forEach(mode => {
     const btn = document.getElementById(`mode-opt-${mode}`);
-    if (btn) btn.style.display = modes[mode] ? '' : 'none';
+    if (btn) btn.style.display = modes[mode] !== false ? '' : 'none';
   });
 
   // Si le style actif n'est plus disponible, basculer sur le prochain
-  if (!modes[currentMenuMode]) {
-    const next = _MODE_PRIORITY.find(m => modes[m]);
+  if (modes[currentMenuMode] === false) {
+    const next = _MODE_PRIORITY.find(m => modes[m] !== false);
     if (next) saveMenuMode(next);
   }
 
@@ -5465,17 +4958,26 @@ function syncStyleAdminUI(mode) {
   const scOrdersBtn = document.getElementById('sc-orders-btn');
   if (scOrdersBtn) scOrdersBtn.style.display = showOrder ? '' : 'none';
 
-  // Toggles : toujours affichés (sous réserve de la licence — dual-path: flat+nested)
+  // Toggles : toujours affichés (sous réserve de la licence)
   const callBtn   = document.getElementById('toggle-call-btn');
   const photosBtn = document.getElementById('toggle-photos-btn');
   const orderBtn  = document.getElementById('toggle-order-btn');
-  if (callBtn)   callBtn.style.display   = _featOk('callBtn') ? '' : 'none';
-  if (photosBtn) photosBtn.style.display = _featOk('photos')  ? '' : 'none';
-  if (orderBtn)  orderBtn.style.display  = _featOk('orderUI') ? '' : 'none';
+  if (callBtn)   callBtn.style.display   = '';
+  if (orderBtn)  orderBtn.style.display  = '';
+  if (photosBtn) photosBtn.style.display = '';
+  // Contraintes de licence : masquer les boutons non licenciés
+  if (_currentFeatures?.buttons) {
+    const b = _currentFeatures.buttons;
+    if (callBtn   && b.callBtn === false) callBtn.style.display   = 'none';
+    if (photosBtn && b.photos  === false) photosBtn.style.display = 'none';
+    if (orderBtn  && b.orderUI === false) orderBtn.style.display  = 'none';
+  }
 
   // FAB notification visible uniquement si sonnette OU commande est licenciée depuis Control
   const fabNotif  = document.getElementById('fab-notif');
-  if (fabNotif) fabNotif.style.display = (_featOk('callBtn') || _featOk('orderUI')) ? '' : 'none';
+  const _callLic  = !_currentFeatures?.buttons || _currentFeatures.buttons.callBtn  !== false;
+  const _orderLic = !_currentFeatures?.buttons || _currentFeatures.buttons.orderUI  !== false;
+  if (fabNotif) fabNotif.style.display = (_callLic || _orderLic) ? '' : 'none';
 
   // En style papier, cacher les zones photo des produits (papier n'affiche pas les photos produits)
   document.body.setAttribute('data-style', mode);
@@ -5494,17 +4996,8 @@ function syncStyleAdminUI(mode) {
   // En style papier, cacher la section Note (non affichée dans le menu papier)
   const secNote = document.getElementById('sec-note');
   const scNoteBtn = document.getElementById('sc-note-btn');
-  const noteTglRow = document.getElementById('adm-note-toggle-row');
-  if (secNote)    secNote.style.display    = mode === 'paper' ? 'none' : '';
-  if (scNoteBtn)  scNoteBtn.style.display  = mode === 'paper' ? 'none' : '';
-  if (noteTglRow) noteTglRow.style.display = mode === 'paper' ? 'none' : '';
-
-  // Navigation commande : visible dès que la licence est accordée depuis Control
-  const admNavCommande  = document.getElementById('adm-nav-commande');
-  const admBnavCommande = document.getElementById('adm-bnav-commande');
-  const cmdLicensed = _featOk('orderUI');
-  if (admNavCommande)  admNavCommande.style.display  = cmdLicensed ? '' : 'none';
-  if (admBnavCommande) admBnavCommande.style.display = cmdLicensed ? '' : 'none';
+  if (secNote)   secNote.style.display   = mode === 'paper' ? 'none' : '';
+  if (scNoteBtn) scNoteBtn.style.display = mode === 'paper' ? 'none' : '';
 
   // Activer/désactiver le listener commandes selon showOrderUI (et non le style)
   if (showOrder) startOrdersListener();
@@ -5512,9 +5005,6 @@ function syncStyleAdminUI(mode) {
 
   // Refresh theme selector (paper mode hides similar-looking themes)
   renderThemeSelector();
-
-  // Sync Réglages style segmented control if visible
-  if (_admCurrentGroup === 'reglages') syncReglagesUI();
 }
 
 
@@ -5680,227 +5170,18 @@ function setOrderStatus(orderId, status) {
 })();
 
 /* ═══════════════════════════════════════════
-   NAVIGATION GROUPES — déclarés ici pour éviter TDZ lors de checkLogin()
-═══════════════════════════════════════════ */
-const ADM_GROUPS = ['accueil', 'affichage', 'categories', 'commande', 'reglages'];
-let _admCurrentGroup = 'accueil';
-
-/* ═══════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════ */
 checkLogin();
 
-// Fermer les dropdowns si clic en dehors
+// Fermer tous les popups si clic en dehors
 document.addEventListener('click', () => {
+  document.querySelectorAll('.ico-picker-popup.open').forEach(p => p.classList.remove('open'));
   document.querySelectorAll('.adm-sel-popup.open').forEach(p => {
     p.classList.remove('open');
     p.previousElementSibling?.classList.remove('open');
   });
 });
-
-// ── Icon Modal ──
-let _icoModalCi = null;
-
-function openIconModal(ci) {
-  _icoModalCi = ci;
-  const currentIco = adminData.cats[ci]?.ico || '';
-  document.getElementById('ico-modal-grid').innerHTML = ICONS.map(ic => `
-    <div class="ico-modal-item${ic === currentIco ? ' selected' : ''}" onclick="selectIconModal('${ic}')">
-      <svg width="20" height="20"><use href="#${ic}"/></svg>
-      <span>${getIconLabel(ic).replace(/^.+\s/, '')}</span>
-    </div>`).join('');
-  document.getElementById('ico-modal-overlay').classList.add('open');
-}
-
-function selectIconModal(ico) {
-  if (_icoModalCi === null) return;
-  adminData.cats[_icoModalCi].ico = ico;
-  markUnsaved();
-  closeIconModal();
-  renderCatsSection();
-  renderProductsSection();
-}
-
-function closeIconModal() {
-  document.getElementById('ico-modal-overlay').classList.remove('open');
-  _icoModalCi = null;
-}
-
-/* ═══════════════════════════════════════════
-   NAVIGATION GROUPES ADMIN
-═══════════════════════════════════════════ */
-function switchAdmGroup(groupId) {
-  if (!ADM_GROUPS.includes(groupId)) return;
-  const idx = ADM_GROUPS.indexOf(groupId);
-  _admCurrentGroup = groupId;
-
-  // Sidebar + bottom nav items
-  document.querySelectorAll('[data-group]').forEach(el => {
-    if (el.classList.contains('adm-nav-item') || el.classList.contains('adm-bnav-item')) {
-      el.classList.toggle('active', el.dataset.group === groupId);
-    }
-    if (el.classList.contains('adm-group')) {
-      el.classList.toggle('active', el.dataset.group === groupId);
-    }
-  });
-
-  // Mobile : déplacer le track
-  if (window.innerWidth < 1024) {
-    const track = document.getElementById('adm-tabs-track');
-    if (track) track.style.transform = 'translateX(-' + (idx * 20) + '%)';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  // Indicateur bottom nav
-  _updateAdmBnavIndicator(idx);
-
-  // Sync réglages si nécessaire
-  if (groupId === 'reglages') syncReglagesUI();
-}
-
-function _updateAdmBnavIndicator(idx) {
-  const indicator = document.getElementById('adm-bnav-indicator');
-  const nav = document.getElementById('adm-bottom-nav');
-  if (!indicator || !nav) return;
-  const items = nav.querySelectorAll('.adm-bnav-item');
-  if (!items.length) return;
-  const itemW = nav.offsetWidth / items.length;
-  indicator.style.left  = (idx * itemW) + 'px';
-  indicator.style.width = itemW + 'px';
-}
-
-function toggleAdmNoteSection() {
-  const secNote   = document.getElementById('sec-note');
-  const toggleRow = document.getElementById('adm-note-toggle-row');
-  if (!secNote) return;
-  const expanded = secNote.classList.toggle('note-expanded');
-  if (toggleRow) toggleRow.classList.toggle('note-section-expanded', expanded);
-}
-
-function syncReglagesUI() {
-  // Thème
-  const isLight = document.documentElement.classList.contains('light');
-  const rglThemeLbl = document.getElementById('rgl-theme-lbl');
-  if (rglThemeLbl) rglThemeLbl.textContent = isLight ? 'Clair' : 'Sombre';
-
-  // Langue
-  const langBtn    = document.getElementById('lang-sel-btn');
-  const rglLangFlag = document.getElementById('rgl-lang-flag');
-  const rglLangLbl  = document.getElementById('rgl-lang-lbl');
-  if (langBtn && rglLangFlag) {
-    const flag = langBtn.textContent.trim();
-    rglLangFlag.textContent = flag;
-    const NAMES = { '🇫🇷':'Français','🇬🇧':'English','🇸🇦':'العربية','🇬🇷':'Ελληνικά','🇩🇪':'Deutsch' };
-    if (rglLangLbl) rglLangLbl.textContent = NAMES[flag] || flag;
-  }
-
-  // Toggles
-  const callBtn   = document.getElementById('toggle-call-btn');
-  const photosBtn = document.getElementById('toggle-photos-btn');
-  const orderBtn  = document.getElementById('toggle-order-btn');
-  const rglCall   = document.getElementById('rgl-call-toggle');
-  const rglPhotos = document.getElementById('rgl-photos-toggle');
-  const rglOrder  = document.getElementById('rgl-order-toggle');
-  const rglOrderRow = document.getElementById('rgl-order-row');
-
-  if (callBtn   && rglCall)   rglCall.classList.toggle('on',   callBtn.classList.contains('on'));
-  if (photosBtn && rglPhotos) rglPhotos.classList.toggle('on', photosBtn.classList.contains('on'));
-  if (orderBtn  && rglOrder) {
-    rglOrder.classList.toggle('on', orderBtn.classList.contains('on'));
-    if (rglOrderRow) rglOrderRow.style.display = _featOk('orderUI') ? '' : 'none';
-  }
-
-  // Style mode segmented control
-  document.querySelectorAll('#rgl-style-seg .rgl-seg-opt').forEach(opt => {
-    opt.classList.toggle('active', opt.dataset.mode === currentMenuMode);
-  });
-
-  // Hide style options not available in license
-  const rglStyleRow = document.getElementById('rgl-style-row');
-  if (rglStyleRow && _currentFeatures?.styles) {
-    const styles = _currentFeatures.styles;
-    const paperVisible  = styles.paper  !== false;
-    const simpleVisible = styles.simple !== false;
-    const rglPaper   = document.getElementById('rgl-seg-paper');
-    const rglDynamic = document.getElementById('rgl-seg-dynamic');
-    if (rglPaper)   rglPaper.style.display   = paperVisible  ? '' : 'none';
-    if (rglDynamic) rglDynamic.style.display = simpleVisible ? '' : 'none';
-    // Hide row entirely if only one style is available
-    rglStyleRow.style.display = (paperVisible || simpleVisible) ? '' : 'none';
-  }
-}
-
-/* ── SWIPE MOBILE ── */
-(function setupAdmSwipe() {
-  const wrap = document.getElementById('adm-wrap');
-  if (!wrap) return;
-  let tx = 0, ty = 0, swiping = false;
-  wrap.addEventListener('touchstart', e => {
-    tx = e.touches[0].clientX; ty = e.touches[0].clientY; swiping = false;
-  }, { passive:true });
-  wrap.addEventListener('touchmove', e => {
-    if (!swiping) {
-      const dx = Math.abs(e.touches[0].clientX - tx);
-      const dy = Math.abs(e.touches[0].clientY - ty);
-      if (dx > dy && dx > 12) swiping = true;
-    }
-  }, { passive:true });
-  wrap.addEventListener('touchend', e => {
-    if (!swiping || window.innerWidth >= 1024) return;
-    const dx = e.changedTouches[0].clientX - tx;
-    if (Math.abs(dx) < 50) return;
-    const idx = ADM_GROUPS.indexOf(_admCurrentGroup);
-    if (dx < 0 && idx < ADM_GROUPS.length - 1) switchAdmGroup(ADM_GROUPS[idx + 1]);
-    else if (dx > 0 && idx > 0)                 switchAdmGroup(ADM_GROUPS[idx - 1]);
-  }, { passive:true });
-})();
-
-window.addEventListener('resize', () => {
-  const idx = ADM_GROUPS.indexOf(_admCurrentGroup);
-  _updateAdmBnavIndicator(idx);
-  if (window.innerWidth >= 1024) {
-    const track = document.getElementById('adm-tabs-track');
-    if (track) track.style.transform = '';
-  }
-});
 </script>
-
-<!-- ── Bottom Navigation Mobile Admin ── -->
-<div class="adm-bottom-nav" id="adm-bottom-nav">
-  <div class="adm-bnav-indicator" id="adm-bnav-indicator"></div>
-  <div class="adm-bnav-item active" data-group="accueil" onclick="switchAdmGroup('accueil')">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
-    <span data-uitxt="navAccueil">Accueil</span>
-  </div>
-  <div class="adm-bnav-item" data-group="affichage" onclick="switchAdmGroup('affichage')">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-    <span data-uitxt="navAffichage">Affichage</span>
-  </div>
-  <div class="adm-bnav-item" data-group="categories" onclick="switchAdmGroup('categories')">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-    <span data-uitxt="navCatsShort">Catégories</span>
-  </div>
-  <div class="adm-bnav-item" id="adm-bnav-commande" data-group="commande" onclick="switchAdmGroup('commande')">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
-    <span data-uitxt="navCommande">Commande</span>
-  </div>
-  <div class="adm-bnav-item" data-group="reglages" onclick="switchAdmGroup('reglages')">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-    <span data-uitxt="navReglages">Réglages</span>
-  </div>
-</div>
-
-<!-- ── Icon Modal ── -->
-<div id="ico-modal-overlay" class="ico-modal-overlay" onclick="closeIconModal()">
-  <div class="ico-modal-box" onclick="event.stopPropagation()">
-    <div class="ico-modal-hd">
-      <span class="ico-modal-title">Icône de catégorie</span>
-      <button class="ico-modal-close" onclick="closeIconModal()">✕</button>
-    </div>
-    <div class="ico-modal-grid" id="ico-modal-grid"></div>
-    <button class="ico-modal-none" onclick="selectIconModal('')">Retirer l'icône</button>
-  </div>
-</div>
-
 </body>
 </html>
