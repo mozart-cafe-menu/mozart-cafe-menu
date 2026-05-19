@@ -1349,7 +1349,7 @@
         <path d="M16 2l-1.5 2h-5L8 2"/>
       </svg>
     </button>
-    <button class="adm-vis-btn adm-vis-ico" id="toggle-order-btn" title="Afficher/cacher le mode commande dans le menu" style="display:none">
+    <button class="adm-vis-btn adm-vis-ico" id="toggle-order-btn" title="Afficher/cacher le mode commande dans le menu">
       <span class="vis-dot"></span>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
         <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
@@ -4914,19 +4914,37 @@ function saveMenuMode(mode) {
 const _MODE_PRIORITY = ['paper','simple'];
 let _currentFeatures = null;
 
+// Dual-path helpers: native Control writes flat keys, web control.html writes nested keys
+function _featOk(btnKey) {
+  if (!_currentFeatures) return true;
+  const flat   = _currentFeatures[btnKey];
+  const nested = _currentFeatures.buttons?.[btnKey];
+  if (flat   !== undefined) return flat   !== false;
+  if (nested !== undefined) return nested !== false;
+  return true;
+}
+function _styleOk(mode) {
+  if (!_currentFeatures) return true;
+  const nativeKey = mode === 'paper' ? 'stylePaper' : 'styleDynamic';
+  const flat   = _currentFeatures[nativeKey];
+  const nested = _currentFeatures.styles?.[mode];
+  if (flat   !== undefined) return flat   !== false;
+  if (nested !== undefined) return nested !== false;
+  return true;
+}
+
 function applyFeatures(features) {
   _currentFeatures = features;
-  const modes = features?.styles || {};
 
   // Afficher/masquer les options de style dans le sélecteur
   ['paper','simple'].forEach(mode => {
     const btn = document.getElementById(`mode-opt-${mode}`);
-    if (btn) btn.style.display = modes[mode] !== false ? '' : 'none';
+    if (btn) btn.style.display = _styleOk(mode) ? '' : 'none';
   });
 
   // Si le style actif n'est plus disponible, basculer sur le prochain
-  if (modes[currentMenuMode] === false) {
-    const next = _MODE_PRIORITY.find(m => modes[m] !== false);
+  if (!_styleOk(currentMenuMode)) {
+    const next = _MODE_PRIORITY.find(m => _styleOk(m));
     if (next) saveMenuMode(next);
   }
 
@@ -5000,19 +5018,14 @@ function syncStyleAdminUI(mode) {
   if (callBtn)   callBtn.style.display   = '';
   if (orderBtn)  orderBtn.style.display  = '';
   if (photosBtn) photosBtn.style.display = '';
-  // Contraintes de licence : masquer les boutons non licenciés
-  if (_currentFeatures?.buttons) {
-    const b = _currentFeatures.buttons;
-    if (callBtn   && b.callBtn === false) callBtn.style.display   = 'none';
-    if (photosBtn && b.photos  === false) photosBtn.style.display = 'none';
-    if (orderBtn  && b.orderUI === false) orderBtn.style.display  = 'none';
-  }
+  // Contraintes de licence : masquer les boutons non licenciés (dual-path: flat ou nested)
+  if (callBtn   && !_featOk('callBtn')) callBtn.style.display   = 'none';
+  if (photosBtn && !_featOk('photos'))  photosBtn.style.display = 'none';
+  if (orderBtn  && !_featOk('orderUI')) orderBtn.style.display  = 'none';
 
   // FAB notification visible uniquement si sonnette OU commande est licenciée depuis Control
-  const fabNotif  = document.getElementById('fab-notif');
-  const _callLic  = !_currentFeatures?.buttons || _currentFeatures.buttons.callBtn  !== false;
-  const _orderLic = !_currentFeatures?.buttons || _currentFeatures.buttons.orderUI  !== false;
-  if (fabNotif) fabNotif.style.display = (_callLic || _orderLic) ? '' : 'none';
+  const fabNotif = document.getElementById('fab-notif');
+  if (fabNotif) fabNotif.style.display = (_featOk('callBtn') || _featOk('orderUI')) ? '' : 'none';
 
   // En style papier, cacher les zones photo des produits (papier n'affiche pas les photos produits)
   document.body.setAttribute('data-style', mode);
