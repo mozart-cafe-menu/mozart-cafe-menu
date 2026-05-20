@@ -1186,12 +1186,18 @@
     /* ── Thème Sélecteur ── */
     .theme-grid { display:flex; flex-wrap:wrap; gap:8px; }
     .theme-grid-sep { width:100%; font-size:.72rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:rgba(200,164,78,.6); padding:.6rem 0 .2rem; border-top:1px solid rgba(200,164,78,.15); margin-top:.4rem; flex-basis:100%; }
-    .color-picker-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; }
-    .color-swatch { width:28px; height:28px; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:transform .2s,border-color .2s; flex-shrink:0; }
-    .color-swatch:hover { transform:scale(1.2); }
-    .color-swatch.active { border-color:#fff; transform:scale(1.15); box-shadow:0 0 0 2px rgba(0,0,0,.5); }
-    .color-swatch.hidden-color { opacity:.18; cursor:default; pointer-events:none; }
-    .color-section-sep { width:100%; font-size:.72rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:rgba(200,164,78,.6); padding:.6rem 0 .2rem; border-top:1px solid rgba(200,164,78,.15); margin-top:.4rem; flex-basis:100%; }
+    .tc-color-btn { background:none; border:1px solid rgba(200,164,78,0.3); border-radius:6px; color:rgba(200,164,78,0.7); cursor:pointer; font-size:0.78rem; padding:3px 8px; margin-left:auto; flex-shrink:0; transition:border-color 0.18s, color 0.18s; font-family:inherit; }
+    .tc-color-btn:hover { border-color:var(--gold); color:var(--gold); }
+    .adm-color-modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.78); z-index:900; align-items:flex-end; justify-content:center; padding:0.75rem; }
+    .adm-color-modal-box { background:#13110e; border:1px solid rgba(200,164,78,0.22); border-radius:20px 20px 16px 16px; padding:1.5rem 1.25rem 1.75rem; width:100%; max-width:460px; max-height:85vh; overflow-y:auto; }
+    .adm-color-modal-title { font-size:0.95rem; font-weight:600; color:#e8e0d0; margin:0 0 1rem; letter-spacing:0.01em; }
+    .adm-color-grid { display:flex; flex-wrap:wrap; gap:10px; margin:0.4rem 0 0.75rem; }
+    .adm-color-swatch { width:38px; height:38px; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:transform .2s,border-color .2s,box-shadow .2s; flex-shrink:0; }
+    .adm-color-swatch:hover { transform:scale(1.18); }
+    .adm-color-swatch.active { border-color:#fff; transform:scale(1.12); box-shadow:0 0 0 2px rgba(0,0,0,.6),0 0 0 4px rgba(255,255,255,0.18); }
+    .adm-color-section-label { font-size:0.68rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:rgba(200,164,78,.55); margin:0.7rem 0 0.3rem; padding-top:0.5rem; border-top:1px solid rgba(200,164,78,.12); }
+    .adm-color-close { width:100%; padding:0.65rem; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:rgba(255,255,255,0.7); cursor:pointer; font-size:0.83rem; margin-top:0.5rem; transition:background 0.18s; font-family:inherit; }
+    .adm-color-close:hover { background:rgba(255,255,255,0.11); }
     .theme-card {
       display:flex; align-items:center; gap:9px;
       padding:8px 14px 8px 10px;
@@ -1399,8 +1405,6 @@
   <div class="adm-section" id="sec-theme">
     <div class="sec-hd" id="sec-hd-theme">Thème visuel <span class="sec-badge" id="badge-theme">Design</span></div>
     <div class="theme-grid" id="theme-grid"></div>
-    <div class="color-section-sep">Couleur d'accentuation</div>
-    <div class="color-picker-row" id="color-picker-row"></div>
   </div>
 
   <!-- ── PHOTO D'ACCUEIL ── -->
@@ -4737,28 +4741,12 @@ const MENU_COLORS = [
 ];
 
 let currentMenuColor = null;
-let _allowedColorIndexes = null;
-
-function renderColorPicker() {
-  const row = document.getElementById('color-picker-row');
-  if (!row) return;
-  row.innerHTML = '';
-  MENU_COLORS.forEach((c, i) => {
-    const allowed = !_allowedColorIndexes || _allowedColorIndexes.includes(i);
-    const isActive = currentMenuColor === c.hex;
-    const sw = document.createElement('div');
-    sw.className = 'color-swatch' + (isActive ? ' active' : '') + (allowed ? '' : ' hidden-color');
-    sw.style.background = c.hex;
-    sw.title = c.name;
-    if (allowed) sw.addEventListener('click', () => saveMenuColor(c.hex));
-    row.appendChild(sw);
-  });
-}
+let _variantConfigCache = {};
+let _adm_colorModalTheme = null;
 
 function saveMenuColor(hex) {
   currentMenuColor = hex;
   _db.ref('menu/menuColor').set(hex);
-  renderColorPicker();
 }
 
 function loadMenuColor() {
@@ -4766,7 +4754,7 @@ function loadMenuColor() {
     const v = snap.val() || null;
     if (v !== currentMenuColor) {
       currentMenuColor = v;
-      renderColorPicker();
+      renderThemeSelector();
     }
   });
 }
@@ -4822,6 +4810,13 @@ function renderThemeSelector() {
     card.style.setProperty('--tc-accent', th.accent);
     card.innerHTML = `<span class="tc-dot"></span><span class="tc-name">${name}</span><span class="tc-check">✓</span>`;
     card.addEventListener('click', () => saveMenuTheme(th.id));
+    if (_colorCount(th.id) > 1) {
+      const _cb = document.createElement('button');
+      _cb.className = 'tc-color-btn';
+      _cb.textContent = '🎨';
+      _cb.addEventListener('click', e => { e.stopPropagation(); openAdminColorModal(th.id); });
+      card.appendChild(_cb);
+    }
     grid.appendChild(card);
   });
 
@@ -4856,9 +4851,114 @@ function renderThemeSelector() {
           dot.addEventListener('click', e => { e.stopPropagation(); saveMenuTheme(dot.dataset.id); });
         });
       }
+      if (_colorCount(layout.family) > 1) {
+        const _cb = document.createElement('button');
+        _cb.className = 'tc-color-btn';
+        _cb.textContent = '🎨';
+        _cb.addEventListener('click', e => { e.stopPropagation(); openAdminColorModal(layout.family); });
+        wrap.appendChild(_cb);
+      }
       grid.appendChild(wrap);
     });
   }
+}
+
+function _colorDist(h1, h2) {
+  const p = h => { const s=h.replace('#',''); return [parseInt(s.slice(0,2),16),parseInt(s.slice(2,4),16),parseInt(s.slice(4,6),16)]; };
+  const [r1,g1,b1]=p(h1),[r2,g2,b2]=p(h2);
+  return Math.sqrt((r1-r2)**2+(g1-g2)**2+(b1-b2)**2);
+}
+
+function _colorCount(themeId) {
+  const tv = LAYOUTS_DATA.find(l => l.family === themeId);
+  const varCfg = (_variantConfigCache || {})[themeId] || {};
+  const hiddenV = varCfg.hidden || {};
+  const hiddenU = varCfg.hiddenUniversal || {};
+  let count = tv ? tv.variants.filter(v => !hiddenV[v.id]).length : 1;
+  const themeEntry = THEMES_DATA.find(t => t.id === themeId);
+  const refColors = tv ? tv.variants.map(v => v.accent) : [themeEntry?.accent || '#c8a44e'];
+  MENU_COLORS.forEach(c => {
+    if (!refColors.some(rc => _colorDist(c.hex, rc) < 55) && !hiddenU[c.hex]) count++;
+  });
+  return count;
+}
+
+function openAdminColorModal(themeId) {
+  _adm_colorModalTheme = themeId;
+  const tv = LAYOUTS_DATA.find(l => l.family === themeId);
+  const themeEntry = THEMES_DATA.find(t => t.id === themeId);
+  const varCfg = (_variantConfigCache || {})[themeId] || {};
+  const hiddenV = varCfg.hidden || {};
+  const hiddenU = varCfg.hiddenUniversal || {};
+  const lname = o => o?.[currentLang] || o?.fr || o?.en || '';
+  const themeName = tv ? lname(tv.names) : (lname(themeEntry?.names) || themeId);
+  document.getElementById('adm-color-modal-title').textContent = themeName + ' — Couleurs';
+  const body = document.getElementById('adm-color-modal-body');
+  body.innerHTML = '';
+  const stdAccent = tv ? tv.variants[0].accent : (themeEntry?.accent || '#c8a44e');
+  const isStandard = !currentMenuColor;
+  const topGrid = document.createElement('div'); topGrid.className = 'adm-color-grid';
+  const stdSw = document.createElement('div');
+  stdSw.className = 'adm-color-swatch' + (isStandard ? ' active' : '');
+  stdSw.style.cssText = 'background:' + stdAccent + '; outline:2px dashed rgba(255,255,255,0.4); outline-offset:2px;';
+  stdSw.title = 'Standard';
+  stdSw.onclick = () => selectAdminColor(null, themeId, false);
+  topGrid.appendChild(stdSw);
+  if (tv) {
+    const visVariants = tv.variants.filter(v => !hiddenV[v.id]);
+    visVariants.slice(1).forEach(v => {
+      const isActive = currentMenuTheme === v.id && !currentMenuColor;
+      const sw = document.createElement('div');
+      sw.className = 'adm-color-swatch' + (isActive ? ' active' : '');
+      sw.style.background = v.accent;
+      sw.title = v.id;
+      sw.onclick = () => selectAdminColor(v.id, themeId, false);
+      topGrid.appendChild(sw);
+    });
+  }
+  body.appendChild(topGrid);
+  const refColors = tv ? tv.variants.map(v => v.accent) : [themeEntry?.accent || '#c8a44e'];
+  const univColors = MENU_COLORS.filter(c => !refColors.some(rc => _colorDist(c.hex, rc) < 55) && !hiddenU[c.hex]);
+  if (univColors.length > 0) {
+    const sepEl = document.createElement('div');
+    sepEl.className = 'adm-color-section-label';
+    sepEl.textContent = currentLang === 'en' ? 'Universal colors' : currentLang === 'de' ? 'Universelle Farben' : currentLang === 'ar' ? 'ألوان عالمية' : 'Couleurs universelles';
+    body.appendChild(sepEl);
+    const univGrid = document.createElement('div'); univGrid.className = 'adm-color-grid';
+    univColors.forEach(c => {
+      const isActive = currentMenuColor === c.hex;
+      const sw = document.createElement('div');
+      sw.className = 'adm-color-swatch' + (isActive ? ' active' : '');
+      sw.style.background = c.hex;
+      sw.title = c.name;
+      sw.onclick = () => selectAdminColor(c.hex, themeId, true);
+      univGrid.appendChild(sw);
+    });
+    body.appendChild(univGrid);
+  }
+  document.getElementById('adm-color-modal-overlay').style.display = 'flex';
+}
+
+function selectAdminColor(colorVal, themeId, isUniversal) {
+  if (isUniversal) {
+    saveMenuColor(colorVal);
+    const tv = LAYOUTS_DATA.find(l => l.family === themeId);
+    if (tv && !tv.variants.some(v => v.id === currentMenuTheme)) {
+      saveMenuTheme((_variantConfigCache[themeId] || {}).default || tv.variants[0].id);
+    }
+  } else if (colorVal) {
+    saveMenuTheme(colorVal);
+    saveMenuColor(null);
+  } else {
+    const tv = LAYOUTS_DATA.find(l => l.family === themeId);
+    if (tv) saveMenuTheme((_variantConfigCache[themeId] || {}).default || tv.variants[0].id);
+    saveMenuColor(null);
+  }
+  closeAdminColorModal();
+}
+
+function closeAdminColorModal() {
+  document.getElementById('adm-color-modal-overlay').style.display = 'none';
 }
 
 /* ═══════════════════════════════════════════
@@ -4952,14 +5052,12 @@ function applyFeatures(features) {
 
   // Re-appliquer l'UI pour prendre en compte les contraintes de licence
   syncStyleAdminUI(currentMenuMode);
-  _allowedColorIndexes = features?.allowedColors || null;
-  if (_allowedColorIndexes && currentMenuColor) {
-    const activeIdx = MENU_COLORS.findIndex(c => c.hex === currentMenuColor);
-    if (activeIdx >= 0 && !_allowedColorIndexes.includes(activeIdx)) {
-      saveMenuColor(null);
-    }
+  _variantConfigCache = features?.themeVariants || {};
+  if (currentMenuColor) {
+    const _tv = LAYOUTS_DATA.find(l => l.variants.some(v => v.id === currentMenuTheme));
+    const _cfgKey = _tv ? _tv.family : currentMenuTheme;
+    if ((_variantConfigCache[_cfgKey] || {}).hiddenUniversal?.[currentMenuColor]) saveMenuColor(null);
   }
-  renderColorPicker();
   renderThemeSelector();
 }
 
@@ -5240,5 +5338,14 @@ function closeIconModal() {
   </div>
 </div>
 
+
+<!-- ── ADMIN COLOR MODAL ── -->
+<div class="adm-color-modal-overlay" id="adm-color-modal-overlay" onclick="if(event.target===this)closeAdminColorModal()">
+  <div class="adm-color-modal-box">
+    <div class="adm-color-modal-title" id="adm-color-modal-title">Changer la couleur</div>
+    <div id="adm-color-modal-body"></div>
+    <button class="adm-color-close" onclick="closeAdminColorModal()">Fermer</button>
+  </div>
+</div>
 </body>
 </html>
