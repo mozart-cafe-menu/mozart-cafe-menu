@@ -4610,14 +4610,9 @@ const THEMES_DATA = [
   { id:'ruby',          styles:['paper','simple'], names:{el:'Ρουμπίνι',      fr:'Rubis',             en:'Ruby',              de:'Rubin',                  ar:'ياقوت'},         dark:'#140808', accent:'#ff6b6b' },
   // 2 thèmes Paper exclusifs (Street Food + Élégance Bistrot)
   { id:'paper-grunge',  styles:['paper'],          names:{fr:'Street Food',        en:'Street Food',        de:'Street Food'},        dark:'#111111', accent:'#ff7300' },
-  { id:'paper-elegant', styles:['paper'],          names:{fr:'Élégance Bistrot',   en:'Elegant Bistrot',    de:'Elegantes Bistrot'},  dark:'#1a1a1a', accent:'#e8e0d0' },
-  // 6 thèmes Simple + Paper
-  { id:'dyn-bento',     styles:['paper','simple'], names:{fr:'Dashboard Bento',    en:'Bento Board',        de:'Dashboard Bento'},    dark:'#121212', accent:'#ffffff' },
-  { id:'dyn-uber',      styles:['simple'],         names:{fr:'Uber Clean',         en:'Uber Clean',         de:'Uber Clean'},          dark:'#000000', accent:'#05a357' },
-  { id:'dyn-luxury',    styles:['simple'],         names:{fr:'Full Image Luxe',    en:'Luxury Full',        de:'Full Image Luxus'},   dark:'#0a0a0a', accent:'#d4af37' },
-  { id:'dyn-carousel',  styles:['simple'],         names:{fr:'Carousel Horizontal',en:'Horizontal Carousel',de:'Horizontales Karussell'}, dark:'#111111', accent:'#00c853' },
-  { id:'dyn-app',       styles:['simple'],         names:{fr:'Application Mobile', en:'Mobile App',         de:'Mobile App'},          dark:'#1e1e1e', accent:'#ff9800' },
-  { id:'dyn-split',     styles:['simple'],         names:{fr:'Split Screen',       en:'Split Screen',       de:'Split Screen'},        dark:'#111111', accent:'#42a5f5' }
+  { id:'paper-elegant', styles:['paper'],          names:{fr:"Livre d'Or",         en:'Book of Gold',       de:'Goldenes Buch'},       dark:'#1a1a1a', accent:'#e8e0d0' },
+  // 1 thème Simple + Paper
+  { id:'dyn-bento',     styles:['paper','simple'], names:{fr:'Dashboard Bento',    en:'Bento Board',        de:'Dashboard Bento'},    dark:'#121212', accent:'#ffffff' }
 ];
 
 
@@ -4759,6 +4754,22 @@ function loadMenuColor() {
   });
 }
 
+function applyLastColor(familyOrId) {
+  const key = '_admclr_' + familyOrId;
+  const last = localStorage.getItem(key);
+  const tv = LAYOUTS_DATA.find(l => l.family === familyOrId);
+  const varCfg = (_variantConfigCache || {})[familyOrId] || {};
+  if (last && last !== 'standard' && last.startsWith('#')) {
+    if (tv) saveMenuTheme(varCfg.default || tv.variants[0].id); else saveMenuTheme(familyOrId);
+    saveMenuColor(last);
+  } else if (last && last !== 'standard') {
+    saveMenuTheme(last); saveMenuColor(null);
+  } else {
+    if (tv) saveMenuTheme(varCfg.default || tv.variants[0].id); else saveMenuTheme(familyOrId);
+    saveMenuColor(null);
+  }
+}
+
 let currentMenuTheme = 'gold-noir';
 
 let hiddenThemesData = {};
@@ -4796,69 +4807,73 @@ function renderThemeSelector() {
   const grid = document.getElementById('theme-grid');
   if (!grid) return;
   grid.innerHTML = '';
-  // Toujours en mode unifié — le style se déduit du thème choisi
   grid.classList.remove('mode-simple');
-
   const hiddenData = hiddenThemesData || {};
-
-  // ── Section Thèmes Papier (THEMES_DATA) ──
-  const paperThemes = THEMES_DATA.filter(t => !hiddenData[t.id]);
-  paperThemes.forEach(th => {
-    const name = th.names ? (th.names[currentLang] || th.names.fr || th.names.en || '') : '';
-    const card = document.createElement('div');
-    card.className = 'theme-card' + (th.id === currentMenuTheme ? ' active' : '');
-    card.style.setProperty('--tc-accent', th.accent);
-    card.innerHTML = `<span class="tc-dot"></span><span class="tc-name">${name}</span><span class="tc-check">✓</span>`;
-    card.addEventListener('click', () => saveMenuTheme(th.id));
-    if (_colorCount(th.id) > 1) {
-      const _cb = document.createElement('button');
-      _cb.className = 'tc-color-btn';
-      _cb.textContent = '🎨';
-      _cb.addEventListener('click', e => { e.stopPropagation(); openAdminColorModal(th.id); });
-      card.appendChild(_cb);
-    }
-    grid.appendChild(card);
-  });
-
-  // ── Section Thèmes Dynamiques (LAYOUTS_DATA) ──
   const themeVariants = _currentFeatures?.themeVariants || {};
-  const visibleLayouts = LAYOUTS_DATA.filter(l => !hiddenData[l.family] && !hiddenData[l.variants[0].id]);
+  const layoutFamilies = new Set(LAYOUTS_DATA.map(l => l.family));
 
+  const makeSep = txt => { const d=document.createElement('div'); d.className='theme-grid-sep'; d.textContent=txt; return d; };
+
+  function getActiveAccent(id) {
+    const tv = LAYOUTS_DATA.find(l => l.family === id);
+    if (tv) {
+      const v = tv.variants.find(x => x.id === currentMenuTheme);
+      return v ? (currentMenuColor || v.accent) : tv.variants[0].accent;
+    }
+    const th = THEMES_DATA.find(t => t.id === id);
+    return id === currentMenuTheme ? (currentMenuColor || th?.accent || '#c8a44e') : (th?.accent || '#c8a44e');
+  }
+
+  function makeCard(id, nameStr, isActive) {
+    const card = document.createElement('div');
+    card.className = 'theme-card' + (isActive ? ' active' : '');
+    card.style.setProperty('--tc-accent', getActiveAccent(id));
+    card.innerHTML = '<span class="tc-dot"></span><span class="tc-name">'+nameStr+'</span><span class="tc-check">✓</span>';
+    card.addEventListener('click', () => applyLastColor(id));
+    if (_colorCount(id) > 1) {
+      const btn = document.createElement('button');
+      btn.className = 'tc-color-btn'; btn.textContent = '🎨';
+      btn.addEventListener('click', e => { e.stopPropagation(); openAdminColorModal(id); });
+      card.appendChild(btn);
+    }
+    return card;
+  }
+
+  const staticThemes = THEMES_DATA.filter(t => !hiddenData[t.id] && !layoutFamilies.has(t.id));
+  const CARTE_IDS = new Set(['midnight','forest','ruby','paper-grunge']);
+  const carteThemes = staticThemes.filter(t => CARTE_IDS.has(t.id));
+  const livreThemes = staticThemes.filter(t => !CARTE_IDS.has(t.id));
+
+  if (carteThemes.length > 0) {
+    const lbl = currentLang==='en'?'Basic':currentLang==='de'?'Einfach':currentLang==='ar'?'بطاقة':'Carte';
+    grid.appendChild(makeSep(lbl));
+    carteThemes.forEach(th => {
+      const name = th.names?.[currentLang] || th.names?.fr || th.names?.en || '';
+      grid.appendChild(makeCard(th.id, name, th.id === currentMenuTheme));
+    });
+  }
+
+  if (livreThemes.length > 0) {
+    const lbl = currentLang==='en'?'Book':currentLang==='de'?'Buch':currentLang==='ar'?'كتاب':'Livre';
+    grid.appendChild(makeSep(lbl));
+    livreThemes.forEach(th => {
+      const name = th.names?.[currentLang] || th.names?.fr || th.names?.en || '';
+      grid.appendChild(makeCard(th.id, name, th.id === currentMenuTheme));
+    });
+  }
+
+  const visibleLayouts = LAYOUTS_DATA.filter(l => {
+    if (hiddenData[l.family]) return false;
+    const hv = (themeVariants[l.family]||{}).hidden||{};
+    return l.variants.some(v => !hv[v.id]);
+  });
   if (visibleLayouts.length > 0) {
-    const sep = document.createElement('div');
-    sep.className = 'theme-grid-sep';
-    sep.textContent = currentLang === 'en' ? 'Dynamic Themes' : currentLang === 'de' ? 'Dynamische Themen' : currentLang === 'ar' ? 'الثيمات الديناميكية' : currentLang === 'el' ? 'Δυναμικά θέματα' : 'Thèmes dynamiques';
-    grid.appendChild(sep);
-
+    const lbl = currentLang==='en'?'Elegant':currentLang==='de'?'Elegant':currentLang==='ar'?'أنيق':'Élégant';
+    grid.appendChild(makeSep(lbl));
     visibleLayouts.forEach(layout => {
-      const varConfig      = themeVariants[layout.family] || {};
-      const hiddenVariants = varConfig.hidden || {};
-      const visibleVariants = layout.variants.filter(v => !hiddenVariants[v.id]);
-      if (visibleVariants.length === 0) return;
-      const familyName    = layout.names[currentLang] || layout.names.fr || layout.names.en || '';
-      const isActiveFamily = layout.variants.some(v => v.id === currentMenuTheme);
-      const wrap = document.createElement('div');
-      wrap.className = 'layout-family' + (isActiveFamily ? ' active' : '');
-      const showDots = visibleVariants.length > 1;
-      const dots = showDots ? visibleVariants.map(v =>
-        `<span class="lf-dot${v.id === currentMenuTheme ? ' active' : ''}" style="background:${v.accent}" data-id="${v.id}" title="${v.id}"></span>`
-      ).join('') : '';
-      wrap.innerHTML = `<span class="lf-name">${familyName}</span><span class="lf-dots">${dots}</span>`;
-      const defaultVariant = varConfig.default || layout.variants[0].id;
-      wrap.querySelector('.lf-name').addEventListener('click', () => saveMenuTheme(defaultVariant));
-      if (showDots) {
-        wrap.querySelectorAll('.lf-dot').forEach(dot => {
-          dot.addEventListener('click', e => { e.stopPropagation(); saveMenuTheme(dot.dataset.id); });
-        });
-      }
-      if (_colorCount(layout.family) > 1) {
-        const _cb = document.createElement('button');
-        _cb.className = 'tc-color-btn';
-        _cb.textContent = '🎨';
-        _cb.addEventListener('click', e => { e.stopPropagation(); openAdminColorModal(layout.family); });
-        wrap.appendChild(_cb);
-      }
-      grid.appendChild(wrap);
+      const isActive = layout.variants.some(v => v.id === currentMenuTheme);
+      const name = layout.names[currentLang] || layout.names.fr || layout.names.en || '';
+      grid.appendChild(makeCard(layout.family, name, isActive));
     });
   }
 }
@@ -4889,70 +4904,63 @@ function openAdminColorModal(themeId) {
   const themeEntry = THEMES_DATA.find(t => t.id === themeId);
   const varCfg = (_variantConfigCache || {})[themeId] || {};
   const hiddenV = varCfg.hidden || {};
-  const hiddenU = varCfg.hiddenUniversal || {};
   const lname = o => o?.[currentLang] || o?.fr || o?.en || '';
   const themeName = tv ? lname(tv.names) : (lname(themeEntry?.names) || themeId);
   document.getElementById('adm-color-modal-title').textContent = themeName + ' — Couleurs';
   const body = document.getElementById('adm-color-modal-body');
   body.innerHTML = '';
-  const stdAccent = tv ? tv.variants[0].accent : (themeEntry?.accent || '#c8a44e');
-  const isStandard = !currentMenuColor;
-  const topGrid = document.createElement('div'); topGrid.className = 'adm-color-grid';
+  const dfHex = varCfg.defaultHex || null;
+  const stdAccent = dfHex || (tv ? tv.variants[0].accent : (themeEntry?.accent || '#c8a44e'));
+  const isStandard = dfHex ? currentMenuColor === dfHex : !currentMenuColor;
+  const stdRow = document.createElement('div'); stdRow.className = 'adm-color-grid';
   const stdSw = document.createElement('div');
   stdSw.className = 'adm-color-swatch' + (isStandard ? ' active' : '');
-  stdSw.style.cssText = 'background:' + stdAccent + '; outline:2px dashed rgba(255,255,255,0.4); outline-offset:2px;';
+  stdSw.style.cssText = 'background:'+stdAccent+';outline:2px dashed rgba(255,255,255,0.4);outline-offset:2px;';
   stdSw.title = 'Standard';
   stdSw.onclick = () => selectAdminColor(null, themeId, false);
-  topGrid.appendChild(stdSw);
+  stdRow.appendChild(stdSw);
+  body.appendChild(stdRow);
+  const allGrid = document.createElement('div'); allGrid.className = 'adm-color-grid';
+  const refColors = tv ? tv.variants.map(v => v.accent) : [themeEntry?.accent || '#c8a44e'];
   if (tv) {
-    const visVariants = tv.variants.filter(v => !hiddenV[v.id]);
-    visVariants.slice(1).forEach(v => {
+    tv.variants.filter(v => !hiddenV[v.id]).slice(1).forEach(v => {
       const isActive = currentMenuTheme === v.id && !currentMenuColor;
       const sw = document.createElement('div');
       sw.className = 'adm-color-swatch' + (isActive ? ' active' : '');
-      sw.style.background = v.accent;
-      sw.title = v.id;
+      sw.style.background = v.accent; sw.title = v.id;
       sw.onclick = () => selectAdminColor(v.id, themeId, false);
-      topGrid.appendChild(sw);
+      allGrid.appendChild(sw);
     });
   }
-  body.appendChild(topGrid);
-  const refColors = tv ? tv.variants.map(v => v.accent) : [themeEntry?.accent || '#c8a44e'];
-  const univColors = MENU_COLORS.filter(c => !refColors.some(rc => _colorDist(c.hex, rc) < 55) && !hiddenU[c.hex]);
-  if (univColors.length > 0) {
-    const sepEl = document.createElement('div');
-    sepEl.className = 'adm-color-section-label';
-    sepEl.textContent = currentLang === 'en' ? 'Universal colors' : currentLang === 'de' ? 'Universelle Farben' : currentLang === 'ar' ? 'ألوان عالمية' : 'Couleurs universelles';
-    body.appendChild(sepEl);
-    const univGrid = document.createElement('div'); univGrid.className = 'adm-color-grid';
-    univColors.forEach(c => {
-      const isActive = currentMenuColor === c.hex;
-      const sw = document.createElement('div');
-      sw.className = 'adm-color-swatch' + (isActive ? ' active' : '');
-      sw.style.background = c.hex;
-      sw.title = c.name;
-      sw.onclick = () => selectAdminColor(c.hex, themeId, true);
-      univGrid.appendChild(sw);
-    });
-    body.appendChild(univGrid);
-  }
+  MENU_COLORS.forEach(c => {
+    if (refColors.some(rc => _colorDist(c.hex, rc) < 55)) return;
+    const isActive = currentMenuColor === c.hex;
+    const sw = document.createElement('div');
+    sw.className = 'adm-color-swatch' + (isActive ? ' active' : '');
+    sw.style.background = c.hex; sw.title = c.name;
+    sw.onclick = () => selectAdminColor(c.hex, themeId, true);
+    allGrid.appendChild(sw);
+  });
+  if (allGrid.children.length > 0) body.appendChild(allGrid);
   document.getElementById('adm-color-modal-overlay').style.display = 'flex';
 }
 
 function selectAdminColor(colorVal, themeId, isUniversal) {
+  const key = '_admclr_' + themeId;
+  const tv = LAYOUTS_DATA.find(l => l.family === themeId);
+  const varCfg = (_variantConfigCache || {})[themeId] || {};
   if (isUniversal) {
+    localStorage.setItem(key, colorVal);
+    if (tv && !tv.variants.some(v => v.id === currentMenuTheme)) saveMenuTheme(varCfg.default || tv.variants[0].id);
     saveMenuColor(colorVal);
-    const tv = LAYOUTS_DATA.find(l => l.family === themeId);
-    if (tv && !tv.variants.some(v => v.id === currentMenuTheme)) {
-      saveMenuTheme((_variantConfigCache[themeId] || {}).default || tv.variants[0].id);
-    }
   } else if (colorVal) {
-    saveMenuTheme(colorVal);
-    saveMenuColor(null);
+    localStorage.setItem(key, colorVal);
+    saveMenuTheme(colorVal); saveMenuColor(null);
   } else {
-    const tv = LAYOUTS_DATA.find(l => l.family === themeId);
-    if (tv) saveMenuTheme((_variantConfigCache[themeId] || {}).default || tv.variants[0].id);
-    saveMenuColor(null);
+    localStorage.setItem(key, 'standard');
+    const dfHex = varCfg.defaultHex;
+    if (tv) saveMenuTheme(varCfg.default || tv.variants[0].id);
+    saveMenuColor(dfHex || null);
   }
   closeAdminColorModal();
 }
