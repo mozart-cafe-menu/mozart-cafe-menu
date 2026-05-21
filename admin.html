@@ -4605,11 +4605,8 @@ const THEMES_DATA = [
   { id:'velvet-luxe',   styles:['paper','simple'], names:{el:'Βελούδινη Πολυτέλεια', fr:'Velvet Luxe', en:'Velvet Luxe',      de:'Samt-Luxus',             ar:'فخامة مخملية'}, dark:'#0d0006', accent:'#d4af37' },
   { id:'prestige',      styles:['paper','simple'], names:{el:'Κύρος',         fr:'Prestige',          en:'Prestige',          de:'Prestige',               ar:'برستيج'},      dark:'#0c0a08', accent:'#c8a44e' },
   { id:'santorin',      styles:['paper','simple'], names:{el:'Σαντορίνη',     fr:'Santorini',         en:'Santorini',         de:'Santorini',              ar:'سانتوريني'},     dark:'#04090f', accent:'#4db8ff' },
-  { id:'midnight',      styles:['paper','simple'], names:{el:'Μεσάνυχτα',     fr:'Minuit',            en:'Midnight',          de:'Mitternacht',            ar:'منتصف الليل'},  dark:'#0b0914', accent:'#a67cff' },
-  { id:'forest',        styles:['paper','simple'], names:{el:'Δάσος',         fr:'Forêt',             en:'Forest',            de:'Wald',                   ar:'غابة'},          dark:'#09120c', accent:'#5ebd85' },
-  { id:'ruby',          styles:['paper','simple'], names:{el:'Ρουμπίνι',      fr:'Rubis',             en:'Ruby',              de:'Rubin',                  ar:'ياقوت'},         dark:'#140808', accent:'#ff6b6b' },
-  // 2 thèmes Paper exclusifs (Street Food + Élégance Bistrot)
-  { id:'paper-grunge',  styles:['paper'],          names:{fr:'Street Food',        en:'Street Food',        de:'Street Food'},        dark:'#111111', accent:'#ff7300' },
+  // 2 thèmes Paper exclusifs (Carte Classique + Livre d'Or)
+  { id:'carte-classique', styles:['paper'],        names:{el:'Κλασική Κάρτα', fr:'Carte Classique',   en:'Classic Menu',      de:'Klassische Karte',       ar:'قائمة كلاسيكية'}, dark:'#0f0e0c', accent:'#d4b896' },
   { id:'paper-elegant', styles:['paper'],          names:{fr:"Livre d'Or",         en:'Book of Gold',       de:'Goldenes Buch'},       dark:'#1a1a1a', accent:'#e8e0d0' },
   // 1 thème Simple + Paper
   { id:'dyn-bento',     styles:['paper','simple'], names:{fr:'Dashboard Bento',    en:'Bento Board',        de:'Dashboard Bento'},    dark:'#121212', accent:'#ffffff' }
@@ -4703,6 +4700,17 @@ const LAYOUTS_DATA = [
       { id: 'santorin-sea',    accent: '#2e8b57' },
       { id: 'santorin-coral',  accent: '#c0446c' },
       { id: 'santorin-white',  accent: '#f8f8f8' }
+    ]
+  },
+  {
+    family: 'editorial', names: { fr: 'Éditorial', en: 'Editorial', de: 'Editorial', el: 'Εκδοτικό', ar: 'إديتوريال' },
+    variants: [
+      { id: 'editorial',            accent: '#c0ccd8' },
+      { id: 'editorial-azure',      accent: '#4a90d9' },
+      { id: 'editorial-terracotta', accent: '#e07050' },
+      { id: 'editorial-sage',       accent: '#6aaa72' },
+      { id: 'editorial-plum',       accent: '#9a5aa0' },
+      { id: 'editorial-pearl',      accent: '#d8ccc0' }
     ]
   },
   {
@@ -4840,7 +4848,7 @@ function renderThemeSelector() {
   }
 
   const staticThemes = THEMES_DATA.filter(t => !hiddenData[t.id] && !layoutFamilies.has(t.id));
-  const CARTE_IDS = new Set(['midnight','forest','ruby','paper-grunge']);
+  const CARTE_IDS = new Set(['carte-classique']);
   const carteThemes = staticThemes.filter(t => CARTE_IDS.has(t.id));
   const livreThemes = staticThemes.filter(t => !CARTE_IDS.has(t.id));
 
