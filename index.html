@@ -924,6 +924,60 @@
       --shadow:0 4px 16px rgba(0,0,0,0.08); --shadow-h:0 8px 28px rgba(90,80,72,0.1),0 4px 14px rgba(0,0,0,0.08);
     }
 
+    /* ── CARTE CLASSIQUE: en-tête centré style carte papier ── */
+    html[data-menu-theme="carte-classique"] .cat-hd {
+      flex-direction:column; align-items:center; text-align:center; padding:28px 0 12px; gap:4px;
+    }
+    html[data-menu-theme="carte-classique"] .cat-ico-box { display:none; }
+    html[data-menu-theme="carte-classique"] .cat-name {
+      font-size:1.2rem; letter-spacing:0.14em; text-transform:uppercase; text-align:center;
+    }
+    html[data-menu-theme="carte-classique"] .cat-sub { display:none; }
+    html[data-menu-theme="carte-classique"] .cat-div {
+      background:none; border-bottom:1px solid var(--border2); margin-bottom:4px;
+    }
+    html[data-menu-theme="carte-classique"] .cards { gap:0; }
+
+    /* ── CARTE CLASSIQUE: card liste plate ── */
+    .card-classique {
+      background:transparent !important; border:none !important; border-radius:0 !important;
+      box-shadow:none !important; padding:13px 0 !important;
+      border-bottom:1px solid var(--border) !important;
+    }
+    .cls-row { display:flex; align-items:baseline; gap:10px; }
+    .cls-name {
+      font-family:'Cormorant',serif; font-size:1.02rem; font-weight:600;
+      color:var(--cream); flex:1; line-height:1.3;
+    }
+    .cls-price {
+      font-size:0.9rem; color:var(--gold); font-weight:600;
+      white-space:nowrap; font-variant-numeric:tabular-nums; flex-shrink:0;
+    }
+    .cls-desc { font-size:0.79rem; color:var(--muted); margin-top:4px; line-height:1.42; }
+    .cls-badges { margin-top:5px; }
+
+    /* ── ÉDITORIAL: card miniature gauche + texte droite ── */
+    .card-editorial { display:flex; gap:12px; align-items:flex-start; padding:12px !important; }
+    .edt-thumb {
+      width:88px; height:88px; flex-shrink:0;
+      border-radius:10px; overflow:hidden; background:var(--bg2);
+    }
+    .edt-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+    .edt-no-thumb {
+      width:88px; height:88px; flex-shrink:0;
+      border-radius:10px; background:var(--bg2);
+      display:flex; align-items:center; justify-content:center; color:var(--muted);
+    }
+    .edt-no-thumb svg { width:26px; height:26px; }
+    .edt-body { flex:1; min-width:0; }
+    .edt-name {
+      font-family:'Cormorant',serif; font-size:1.08rem; font-weight:600;
+      color:var(--cream); line-height:1.2; margin-bottom:4px;
+    }
+    .edt-price { font-size:0.9rem; font-weight:600; color:var(--gold); margin-bottom:4px; }
+    .edt-desc { font-size:0.79rem; color:var(--muted); line-height:1.4; }
+    .edt-badges { margin-top:5px; }
+
     /* ═══ OVERRIDES STRUCTURELS PAR THÈME ═══ */
     /* Simple exclusifs — Bento */
     body[data-style="simple"][data-theme^="dyn-bento"] .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
@@ -6434,6 +6488,52 @@ function _cardSantorin(item) {
   return card;
 }
 
+/* ── Thème : Carte Classique — liste papier plate ── */
+function _cardClassique(item) {
+  const card = document.createElement('div');
+  const badges = _getBadges(item);
+  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  card.className = 'card card-classique';
+  card.dataset.item = item.id;
+  card.style.transitionDelay = '0s';
+  card.innerHTML = `
+    <div class="cls-row">
+      <div class="cls-name">${item.name[lang]||item.name.fr||''}</div>
+      <div class="cls-price">${item.price}</div>
+    </div>
+    ${desc ? `<div class="cls-desc">${desc}</div>` : ''}
+    ${badges ? `<div class="cls-badges">${badges}</div>` : ''}`;
+  _setupCardEvents(card, item);
+  return card;
+}
+
+/* ── Thème : Éditorial — miniature gauche + texte droite ── */
+function _cardEditorial(item) {
+  const card = document.createElement('div');
+  const photoEnabled = showPhotos && (item.showPhoto !== false);
+  const src = photoEnabled ? _getPhotoSrc(item) : '';
+  const badges = _getBadges(item);
+  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  card.className = 'card card-editorial';
+  card.dataset.item = item.id;
+  card.style.transitionDelay = '0s';
+  const thumbBlock = src
+    ? `<div class="edt-thumb"><img src="${src}" alt="" loading="lazy" onerror="_menuImgErr(this)"></div>`
+    : photoEnabled
+      ? `<div class="edt-no-thumb">${_camSvg}</div>`
+      : '';
+  card.innerHTML = `
+    ${thumbBlock}
+    <div class="edt-body">
+      <div class="edt-name">${item.name[lang]||item.name.fr||''}</div>
+      <div class="edt-price">${item.price}</div>
+      ${desc ? `<div class="edt-desc">${desc}</div>` : ''}
+      ${badges ? `<div class="edt-badges">${badges}</div>` : ''}
+    </div>`;
+  _setupCardEvents(card, item);
+  return card;
+}
+
 /* ── Dispatcher principal ── */
 const _THEME_FAMILY_MAP = {
   'midnight':'gold-noir','forest':'gold-noir','ruby':'gold-noir','sapphire':'gold-noir','pearl':'gold-noir',
@@ -6445,20 +6545,23 @@ const _THEME_FAMILY_MAP = {
   'prestige-silver':'prestige','prestige-bronze':'prestige','prestige-emerald':'prestige','prestige-sapphire':'prestige','prestige-ruby':'prestige',
   'santorin-sunset':'santorin','santorin-sand':'santorin','santorin-sea':'santorin','santorin-coral':'santorin','santorin-white':'santorin',
   'dyn-bento-gold':'dyn-bento','dyn-bento-neon':'dyn-bento','dyn-bento-blue':'dyn-bento','dyn-bento-green':'dyn-bento','dyn-bento-pink':'dyn-bento',
+  'editorial-azure':'editorial','editorial-terracotta':'editorial','editorial-sage':'editorial','editorial-plum':'editorial','editorial-pearl':'editorial',
 };
 function _themeFamily(id) { return _THEME_FAMILY_MAP[id] || id; }
 
 function createCard(item, idx) {
   let card;
   switch (_themeFamily(menuTheme)) {
-    case 'neon-tokyo':     card = _cardStrip(item);      break;
-    case 'botanical':      card = _cardForest(item);     break;
-    case 'rose-parisien':  card = _cardRose(item);       break;
-    case 'midnight-luxe':  card = _cardEnseigne(item);   break;
-    case 'velvet-luxe':    card = _cardVelvet(item, idx);break;
-    case 'prestige':       card = _cardPrestige(item);   break;
-    case 'santorin':       card = _cardSantorin(item);   break;
-    default:               card = _cardCinema(item);     break;
+    case 'neon-tokyo':      card = _cardStrip(item);       break;
+    case 'botanical':       card = _cardForest(item);      break;
+    case 'rose-parisien':   card = _cardRose(item);        break;
+    case 'midnight-luxe':   card = _cardEnseigne(item);    break;
+    case 'velvet-luxe':     card = _cardVelvet(item, idx); break;
+    case 'prestige':        card = _cardPrestige(item);    break;
+    case 'santorin':        card = _cardSantorin(item);    break;
+    case 'carte-classique': card = _cardClassique(item);   break;
+    case 'editorial':       card = _cardEditorial(item);   break;
+    default:                card = _cardCinema(item);      break;
   }
   // Contrôle quantité (− qty +) pour Mode Commande
   const qtyCtrl = document.createElement('div');
