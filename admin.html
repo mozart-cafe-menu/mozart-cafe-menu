@@ -4901,7 +4901,7 @@ function _colorCount(themeId) {
   const themeEntry = THEMES_DATA.find(t => t.id === themeId);
   const refColors = tv ? tv.variants.map(v => v.accent) : [themeEntry?.accent || '#c8a44e'];
   MENU_COLORS.forEach(c => {
-    if (!refColors.some(rc => _colorDist(c.hex, rc) < 55) && !hiddenU[c.hex]) count++;
+    if (!refColors.some(rc => _colorDist(c.hex, rc) < 55) && !hiddenU[c.hex.replace("#","")]) count++;
   });
   return count;
 }
@@ -4912,6 +4912,7 @@ function openAdminColorModal(themeId) {
   const themeEntry = THEMES_DATA.find(t => t.id === themeId);
   const varCfg = (_variantConfigCache || {})[themeId] || {};
   const hiddenV = varCfg.hidden || {};
+  const hiddenU = varCfg.hiddenUniversal || {};
   const lname = o => o?.[currentLang] || o?.fr || o?.en || '';
   const themeName = tv ? lname(tv.names) : (lname(themeEntry?.names) || themeId);
   document.getElementById('adm-color-modal-title').textContent = themeName + ' — Couleurs';
@@ -4942,6 +4943,7 @@ function openAdminColorModal(themeId) {
   }
   MENU_COLORS.forEach(c => {
     if (refColors.some(rc => _colorDist(c.hex, rc) < 55)) return;
+    if (hiddenU[c.hex.replace('#','')]) return;
     const isActive = currentMenuColor === c.hex;
     const sw = document.createElement('div');
     sw.className = 'adm-color-swatch' + (isActive ? ' active' : '');
