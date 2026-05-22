@@ -5074,7 +5074,7 @@ function applyFeatures(features) {
   if (currentMenuColor) {
     const _tv = LAYOUTS_DATA.find(l => l.variants.some(v => v.id === currentMenuTheme));
     const _cfgKey = _tv ? _tv.family : currentMenuTheme;
-    if ((_variantConfigCache[_cfgKey] || {}).hiddenUniversal?.[currentMenuColor]) saveMenuColor(null);
+    if ((_variantConfigCache[_cfgKey] || {}).hiddenUniversal?.[currentMenuColor.replace('#','')]) saveMenuColor(null);
   }
   renderThemeSelector();
 }
