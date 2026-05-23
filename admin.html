@@ -4606,7 +4606,7 @@ const THEMES_DATA = [
   { id:'prestige',      styles:['paper','simple'], names:{el:'Κύρος',         fr:'Prestige',          en:'Prestige',          de:'Prestige',               ar:'برستيج'},      dark:'#0c0a08', accent:'#c8a44e' },
   { id:'santorin',      styles:['paper','simple'], names:{el:'Σαντορίνη',     fr:'Santorini',         en:'Santorini',         de:'Santorini',              ar:'سانتوريني'},     dark:'#04090f', accent:'#4db8ff' },
   // 2 thèmes Paper exclusifs (Carte Classique + Livre d'Or)
-  { id:'carte-classique', styles:['paper'],        names:{el:'Κλασική Κάρτα', fr:'Carte Classique',   en:'Classic Menu',      de:'Klassische Karte',       ar:'قائمة كلاسيكية'}, dark:'#0f0e0c', accent:'#d4b896' },
+  { id:'carte-classique', styles:['simple'],        names:{el:'Κλασική Κάρτα', fr:'Carte Classique',   en:'Classic Menu',      de:'Klassische Karte',       ar:'قائمة كلاسيكية'}, dark:'#0f0e0c', accent:'#d4b896' },
   { id:'paper-elegant', styles:['paper'],          names:{fr:"Livre d'Or",         en:'Book of Gold',       de:'Goldenes Buch'},       dark:'#1a1a1a', accent:'#e8e0d0' },
   // 1 thème Simple + Paper
   { id:'dyn-bento',     styles:['paper','simple'], names:{fr:'Dashboard Bento',    en:'Bento Board',        de:'Dashboard Bento'},    dark:'#121212', accent:'#ffffff' }
@@ -4802,7 +4802,7 @@ function saveMenuTheme(themeId) {
   _db.ref('menu/menuTheme').set(themeId);
   // Déduire le style automatiquement selon la famille du thème
   const isLayout = LAYOUTS_DATA.some(l => l.variants.some(v => v.id === themeId));
-  const deduced  = isLayout ? 'simple' : 'paper';
+  const deduced  = (isLayout || themeId === 'carte-classique') ? 'simple' : 'paper';
   if (deduced !== currentMenuMode) {
     currentMenuMode = deduced;
     _db.ref('menu/menuStyle').set(deduced);
@@ -4959,9 +4959,15 @@ function selectAdminColor(colorVal, themeId, isUniversal) {
   const key = '_admclr_' + themeId;
   const tv = LAYOUTS_DATA.find(l => l.family === themeId);
   const varCfg = (_variantConfigCache || {})[themeId] || {};
+  const isCurrentFamily = tv
+    ? tv.variants.some(v => v.id === currentMenuTheme)
+    : currentMenuTheme === themeId;
   if (isUniversal) {
     localStorage.setItem(key, colorVal);
-    if (tv && !tv.variants.some(v => v.id === currentMenuTheme)) saveMenuTheme(varCfg.default || tv.variants[0].id);
+    if (!isCurrentFamily) {
+      if (tv) saveMenuTheme(varCfg.default || tv.variants[0].id);
+      else saveMenuTheme(themeId);
+    }
     saveMenuColor(colorVal);
   } else if (colorVal) {
     localStorage.setItem(key, colorVal);
@@ -4970,6 +4976,7 @@ function selectAdminColor(colorVal, themeId, isUniversal) {
     localStorage.setItem(key, 'standard');
     const dfHex = varCfg.defaultHex;
     if (tv) saveMenuTheme(varCfg.default || tv.variants[0].id);
+    else saveMenuTheme(themeId);
     saveMenuColor(dfHex || null);
   }
   closeAdminColorModal();
