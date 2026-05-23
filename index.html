@@ -974,16 +974,20 @@
       border-bottom:1px solid var(--border) !important;
     }
     .cls-row { display:flex; align-items:baseline; gap:10px; }
+    .cls-name-cell { flex:1; display:flex; flex-wrap:wrap; align-items:baseline; gap:6px; min-width:0; }
     .cls-name {
       font-family:'Cormorant',serif; font-size:1.02rem; font-weight:600;
-      color:var(--cream); flex:1; line-height:1.3;
+      color:var(--cream); line-height:1.3;
     }
+    .cls-badges-inline { display:inline-flex; gap:4px; flex-wrap:wrap; }
     .cls-price {
-      font-size:0.9rem; color:var(--gold); font-weight:600;
-      white-space:nowrap; font-variant-numeric:tabular-nums; flex-shrink:0;
+      font-family:'Cormorant',serif; font-style:italic; font-size:1rem; color:var(--gold);
+      font-weight:500; white-space:nowrap; flex-shrink:0;
     }
     .cls-desc { font-size:0.79rem; color:var(--muted); margin-top:4px; line-height:1.42; }
-    .cls-badges { margin-top:5px; }
+    /* WiFi dans cc-header */
+    .cc-wifi { margin-top:16px; display:flex; flex-direction:column; align-items:center; gap:4px; }
+    .cc-wifi-row { font-size:0.78rem; color:var(--muted); display:flex; align-items:center; gap:6px; letter-spacing:0.02em; }
 
     /* ── ÉDITORIAL: card miniature gauche + texte droite ── */
     .card-editorial { display:flex; gap:12px; align-items:flex-start; padding:12px !important; }
@@ -3869,6 +3873,10 @@
     <span class="cc-orn-star">☆</span>
     <div class="cc-orn-line"></div>
   </div>
+  <div class="cc-wifi" id="cc-wifi" style="display:none">
+    <div class="cc-wifi-row" id="cc-wifi-net"></div>
+    <div class="cc-wifi-row" id="cc-wifi-pw"></div>
+  </div>
 </div>
 
 <div id="preloader">
@@ -5873,6 +5881,23 @@ function _updateCCHeader() {
       ? fullName.slice(0, sp) + ' <em>' + fullName.slice(sp + 1) + '</em>'
       : fullName;
   }
+  // WiFi dans cc-header
+  const ccWifi = document.getElementById('cc-wifi');
+  const ccWifiNet = document.getElementById('cc-wifi-net');
+  const ccWifiPw  = document.getElementById('cc-wifi-pw');
+  if (ccWifi && ccWifiNet && ccWifiPw) {
+    const net = t.wifiN || '';
+    const pw  = t.wifiV || '';
+    if (net || pw) {
+      ccWifiNet.textContent = net ? '📶 ' + net : '';
+      ccWifiNet.style.display = net ? '' : 'none';
+      ccWifiPw.textContent  = pw  ? '🔒 ' + pw  : '';
+      ccWifiPw.style.display  = pw  ? '' : 'none';
+      ccWifi.style.display = '';
+    } else {
+      ccWifi.style.display = 'none';
+    }
+  }
 }
 
 function _startPreloader() {
@@ -6565,11 +6590,13 @@ function _cardClassique(item) {
   card.style.transitionDelay = '0s';
   card.innerHTML = `
     <div class="cls-row">
-      <div class="cls-name">${item.name[lang]||item.name.fr||''}</div>
+      <div class="cls-name-cell">
+        <span class="cls-name">${item.name[lang]||item.name.fr||''}</span>
+        ${badges ? `<span class="cls-badges-inline">${badges}</span>` : ''}
+      </div>
       <div class="cls-price">${item.price}</div>
     </div>
-    ${desc ? `<div class="cls-desc">${desc}</div>` : ''}
-    ${badges ? `<div class="cls-badges">${badges}</div>` : ''}`;
+    ${desc ? `<div class="cls-desc">${desc}</div>` : ''}`;
   _setupCardEvents(card, item);
   return card;
 }
