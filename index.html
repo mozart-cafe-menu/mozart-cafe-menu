@@ -926,17 +926,46 @@
 
     /* ── CARTE CLASSIQUE: en-tête centré style carte papier ── */
     html[data-menu-theme="carte-classique"] .cat-hd {
-      flex-direction:column; align-items:center; text-align:center; padding:28px 0 12px; gap:4px;
+      flex-direction:row; align-items:center; justify-content:center; text-align:center; padding:28px 0 10px; gap:10px;
     }
-    html[data-menu-theme="carte-classique"] .cat-ico-box { display:none; }
+    html[data-menu-theme="carte-classique"] .cat-ico-box {
+      display:flex; background:none !important; box-shadow:none !important; border:none !important;
+      padding:0; width:auto; height:auto; min-width:0; border-radius:0 !important;
+    }
+    html[data-menu-theme="carte-classique"] .cat-ico-box svg { width:22px; height:22px; color:var(--gold); }
+    html[data-menu-theme="carte-classique"] .cat-hd-txt { flex:none; }
     html[data-menu-theme="carte-classique"] .cat-name {
-      font-size:1.2rem; letter-spacing:0.14em; text-transform:uppercase; text-align:center;
+      font-family:'Cormorant',serif; font-size:1.55rem; font-weight:400;
+      font-style:italic; letter-spacing:0.01em; text-transform:none; text-align:center; color:var(--gold);
     }
     html[data-menu-theme="carte-classique"] .cat-sub { display:none; }
     html[data-menu-theme="carte-classique"] .cat-div {
-      background:none; border-bottom:1px solid var(--border2); margin-bottom:4px;
+      background:none; border-bottom:1px solid var(--border2); margin-bottom:0;
     }
     html[data-menu-theme="carte-classique"] .cards { gap:0; }
+    /* ── Compact header (carte-classique uniquement) ── */
+    #cc-header { display:none; }
+    html[data-menu-theme="carte-classique"] #preloader { display:none !important; }
+    html[data-menu-theme="carte-classique"] #hero { display:none !important; }
+    html[data-menu-theme="carte-classique"] #cc-header { display:block; text-align:center; padding:52px 24px 0; }
+    .cc-logo { max-height:72px; max-width:200px; margin:0 auto 12px; display:block; filter:url(#logo-on-dark); }
+    html.light .cc-logo { filter:url(#logo-on-light); }
+    .cc-name-wrap {
+      font-family:'Cormorant',serif; font-size:clamp(1.9rem,8vw,2.6rem);
+      font-weight:300; color:var(--cream); line-height:1.2; margin-bottom:6px;
+    }
+    .cc-name-wrap em { font-style:italic; color:var(--gold); font-weight:400; }
+    .cc-sub { font-size:0.8rem; color:var(--muted); letter-spacing:0.04em; margin-bottom:20px; }
+    .cc-ornament { display:flex; align-items:center; gap:14px; max-width:220px; margin:0 auto; }
+    .cc-orn-line { flex:1; height:1px; background:var(--border2); }
+    .cc-orn-star { color:var(--gold); font-size:0.95rem; }
+    html[data-menu-theme="carte-classique"] .nav-search-wrap { display:none; }
+    html[data-menu-theme="carte-classique"] #cat-pills { display:none; }
+    html[data-menu-theme="carte-classique"] #nav {
+      background:transparent; border:none; box-shadow:none;
+      backdrop-filter:none; -webkit-backdrop-filter:none;
+    }
+    html[data-menu-theme="carte-classique"] .nav-top { justify-content:center; padding:8px 0; }
 
     /* ── CARTE CLASSIQUE: card liste plate ── */
     .card-classique {
@@ -3828,6 +3857,20 @@
   </defs>
 </svg>
 
+<!-- ================================================
+     CC-HEADER (carte-classique uniquement)
+================================================ -->
+<div id="cc-header">
+  <img id="cc-logo-img" class="cc-logo" style="display:none" alt="">
+  <div class="cc-name-wrap" id="cc-name-wrap">Mozart Coffee Lounge</div>
+  <p class="cc-sub" id="cc-sub"></p>
+  <div class="cc-ornament">
+    <div class="cc-orn-line"></div>
+    <span class="cc-orn-star">☆</span>
+    <div class="cc-orn-line"></div>
+  </div>
+</div>
+
 <div id="preloader">
   <img id="pre-logo-img" class="pre-logo" style="display:none" alt="">
   <div class="pre-ornament">
@@ -5815,7 +5858,25 @@ function init_after_data() {
 let _logoUrl = '';
 let _preloaderStarted = false;
 
+function _updateCCHeader() {
+  const t = UI[lang];
+  const sub = document.getElementById('cc-sub');
+  if (sub) {
+    const parts = [t.tagline, ...(Array.isArray(t.sub) ? t.sub : [])].filter(Boolean);
+    sub.textContent = parts.join(' · ');
+  }
+  const nameWrap = document.getElementById('cc-name-wrap');
+  if (nameWrap && nameWrap.style.display !== 'none') {
+    const fullName = document.getElementById('hero-title-text')?.textContent || '';
+    const sp = fullName.indexOf(' ');
+    nameWrap.innerHTML = sp > 0
+      ? fullName.slice(0, sp) + ' <em>' + fullName.slice(sp + 1) + '</em>'
+      : fullName;
+  }
+}
+
 function _startPreloader() {
+  if (menuTheme === 'carte-classique') return;
   if (_preloaderStarted) return;
   _preloaderStarted = true;
   const pre = document.getElementById('preloader');
@@ -5850,6 +5911,11 @@ function applyLogoUrl(url) {
   const heroTitle = document.getElementById('hero-title-text');
   if (heroImg) { heroImg.src = _logoUrl; heroImg.style.display = hasLogo ? '' : 'none'; }
   if (heroTitle) heroTitle.style.display = hasLogo ? 'none' : '';
+  // CC Header (carte-classique)
+  const ccLogoImg  = document.getElementById('cc-logo-img');
+  const ccNameWrap = document.getElementById('cc-name-wrap');
+  if (ccLogoImg)  { ccLogoImg.src = _logoUrl; ccLogoImg.style.display = hasLogo ? '' : 'none'; }
+  if (ccNameWrap) ccNameWrap.style.display = hasLogo ? 'none' : '';
 }
 
 /* ================================================
@@ -6142,6 +6208,7 @@ function applyTranslations() {
   targets.forEach(el => {
     if (el) { el.classList.remove('lt'); void el.offsetWidth; el.classList.add('lt'); }
   });
+  _updateCCHeader();
 }
 
 /* ================================================
