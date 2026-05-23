@@ -989,27 +989,35 @@
     .cc-wifi { margin-top:16px; display:flex; flex-direction:column; align-items:center; gap:4px; }
     .cc-wifi-row { font-size:0.78rem; color:var(--muted); display:flex; align-items:center; gap:6px; letter-spacing:0.02em; }
 
-    /* ── ÉDITORIAL: card miniature gauche + texte droite ── */
-    .card-editorial { display:flex; gap:12px; align-items:flex-start; padding:12px !important; }
-    .edt-thumb {
-      width:88px; height:88px; flex-shrink:0;
-      border-radius:10px; overflow:hidden; background:var(--bg2);
-    }
+    /* ── ÉDITORIAL: grande photo pleine hauteur gauche + texte droite ── */
+    .card-editorial { display:flex; align-items:stretch; padding:0 !important; gap:0; }
+    .edt-thumb { width:130px; flex-shrink:0; overflow:hidden; background:var(--bg2); }
     .edt-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
     .edt-no-thumb {
-      width:88px; height:88px; flex-shrink:0;
-      border-radius:10px; background:var(--bg2);
+      width:130px; flex-shrink:0; background:var(--bg2);
       display:flex; align-items:center; justify-content:center; color:var(--muted);
     }
-    .edt-no-thumb svg { width:26px; height:26px; }
-    .edt-body { flex:1; min-width:0; }
-    .edt-name {
-      font-family:'Cormorant',serif; font-size:1.08rem; font-weight:600;
-      color:var(--cream); line-height:1.2; margin-bottom:4px;
+    .edt-no-thumb svg { width:32px; height:32px; }
+    .edt-body {
+      flex:1; min-width:0; padding:14px 14px 14px 16px;
+      display:flex; flex-direction:column; min-height:130px;
     }
-    .edt-price { font-size:0.9rem; font-weight:600; color:var(--gold); margin-bottom:4px; }
-    .edt-desc { font-size:0.79rem; color:var(--muted); line-height:1.4; }
-    .edt-badges { margin-top:5px; }
+    .edt-header {
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+      margin-bottom:7px;
+    }
+    .edt-name {
+      font-family:'Cormorant',serif; font-size:1.18rem; font-weight:700;
+      color:var(--cream); line-height:1.2;
+    }
+    .edt-price {
+      font-size:0.9rem; font-weight:700; color:var(--gold);
+      white-space:nowrap; flex-shrink:0; padding-top:3px;
+    }
+    .edt-desc { font-size:0.79rem; color:var(--muted); line-height:1.45; flex:1; }
+    .edt-badges { margin-top:8px; }
+    html[data-menu-theme^="editorial"] .bdg { text-transform:uppercase; font-size:0.65rem; letter-spacing:0.07em; }
+    body.option-commande-active[data-style="simple"] .card-editorial .edt-body { padding-bottom:46px; }
 
     /* ═══ OVERRIDES STRUCTURELS PAR THÈME ═══ */
     /* Simple exclusifs — Bento */
@@ -6619,8 +6627,10 @@ function _cardEditorial(item) {
   card.innerHTML = `
     ${thumbBlock}
     <div class="edt-body">
-      <div class="edt-name">${item.name[lang]||item.name.fr||''}</div>
-      <div class="edt-price">${item.price}</div>
+      <div class="edt-header">
+        <div class="edt-name">${item.name[lang]||item.name.fr||''}</div>
+        <div class="edt-price">${item.price}</div>
+      </div>
       ${desc ? `<div class="edt-desc">${desc}</div>` : ''}
       ${badges ? `<div class="edt-badges">${badges}</div>` : ''}
     </div>`;
