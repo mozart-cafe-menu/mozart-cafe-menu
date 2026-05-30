@@ -1485,177 +1485,257 @@
     html[data-menu-theme="carte-maroc"] body.option-commande-active .card-maroc.card-has-qty { padding-right:96px !important; }
 
     /* ═══════════════════════════════════════════════════════════════════
-       LIVRE-NOIR — Cinéma Noir
-       Cat header transparent · items avec barre argent gauche · sans-serif
+       LIVRE-NOIR — Programme Cinéma Muet
+       Grille 3 colonnes : numéro 01|nom-desc|prix — style pellicule
        ═══════════════════════════════════════════════════════════════════ */
     html[data-menu-theme="livre-noir"] .fp-cat-header {
-      background:transparent; border-bottom:1px solid var(--border2); padding:14px 20px 10px;
+      background:transparent; border-bottom:none; padding:22px 20px 12px;
+    }
+    html[data-menu-theme="livre-noir"] .fp-cat-header::after {
+      content:''; display:block; height:1px; margin-top:10px;
+      background:linear-gradient(to right, var(--gold) 40%, transparent);
     }
     html[data-menu-theme="livre-noir"] .fp-cat-name {
-      font-family:'Outfit',sans-serif; font-weight:700; letter-spacing:0.18em;
-      text-transform:uppercase; font-style:normal; font-size:0.78rem; color:var(--gold);
+      font-family:'Outfit',sans-serif; font-size:0.68rem; font-weight:700;
+      letter-spacing:0.42em; text-transform:uppercase; color:var(--gold);
     }
-    html[data-menu-theme="livre-noir"] .fp-cat-count { letter-spacing:0.14em; }
+    html[data-menu-theme="livre-noir"] .fp-cat-count { letter-spacing:0.2em; margin-top:3px; }
     html[data-menu-theme="livre-noir"] .fp-deco { display:none; }
+    html[data-menu-theme="livre-noir"] .fp-items-list { counter-reset:noir-n; padding:0; }
     html[data-menu-theme="livre-noir"] .fp-item {
-      border-left:3px solid var(--gold); padding-left:14px;
-      padding-top:12px; padding-bottom:12px; border-bottom:1px solid var(--border);
+      counter-increment:noir-n;
+      display:grid; grid-template-columns:44px 1fr auto;
+      align-items:stretch; gap:0;
+      border-bottom:1px solid var(--border); padding:0;
     }
+    html[data-menu-theme="livre-noir"] .fp-item::before {
+      content:counter(noir-n,decimal-leading-zero);
+      font-family:'Outfit',sans-serif; font-size:0.6rem; font-weight:700;
+      color:var(--gold); background:var(--bg2); border-right:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center; letter-spacing:0.04em;
+    }
+    html[data-menu-theme="livre-noir"] .fp-item-left { padding:13px 10px 13px 14px; min-width:0; }
+    html[data-menu-theme="livre-noir"] .fp-item-right { padding:13px 16px 13px 6px; margin-left:0; align-items:center; justify-content:center; }
     html[data-menu-theme="livre-noir"] .fp-item-name {
-      font-family:'Outfit',sans-serif; font-size:0.85rem; font-weight:400; letter-spacing:0.02em;
+      font-family:'Outfit',sans-serif; font-size:0.83rem; font-weight:400; letter-spacing:0.03em;
     }
     html[data-menu-theme="livre-noir"] .fp-item-price {
-      font-family:'Outfit',sans-serif; font-size:0.82rem; font-weight:300; letter-spacing:0.05em;
+      font-family:'Outfit',sans-serif; font-size:0.78rem; font-weight:300; letter-spacing:0.1em;
     }
 
     /* ═══════════════════════════════════════════════════════════════════
-       LIVRE-BOTANIQUE — Journal du Botaniste
-       Grand titre italic · items très espacés · noms en italic serif
+       LIVRE-BOTANIQUE — Encyclopédie Botanique
+       Grille 2 colonnes · 2 produits par rangée · format fiche compact
        ═══════════════════════════════════════════════════════════════════ */
     html[data-menu-theme="livre-botanique"] .fp-cat-header {
-      background:transparent; border-bottom:none; padding:24px 20px 4px;
+      background:transparent; border-bottom:none; text-align:center; padding:26px 20px 4px;
     }
     html[data-menu-theme="livre-botanique"] .fp-cat-name {
-      font-family:'Cormorant',serif; font-size:2.2rem; font-weight:400;
-      font-style:italic; line-height:1.1;
+      font-family:'Cormorant',serif; font-size:1.65rem; font-weight:600; font-style:italic;
     }
-    html[data-menu-theme="livre-botanique"] .fp-cat-count { font-style:italic; opacity:0.6; margin-top:5px; }
-    html[data-menu-theme="livre-botanique"] .fp-deco { padding:14px 0 0; margin:0 20px; }
-    html[data-menu-theme="livre-botanique"] .fp-deco-ico { font-size:1.1rem; }
+    html[data-menu-theme="livre-botanique"] .fp-cat-count { font-style:italic; opacity:0.55; margin-top:4px; }
+    html[data-menu-theme="livre-botanique"] .fp-deco { justify-content:center; padding:8px 0 4px; margin:0; }
+    html[data-menu-theme="livre-botanique"] .fp-deco-line { flex:0 0 36px; }
+    html[data-menu-theme="livre-botanique"] .fp-deco-ico { font-size:1.0rem; }
+    html[data-menu-theme="livre-botanique"] .fp-items-list {
+      display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:12px 14px 20px;
+    }
     html[data-menu-theme="livre-botanique"] .fp-item {
-      padding:17px 0; border-bottom:1px solid var(--border);
+      flex-direction:column; align-items:stretch; justify-content:space-between; gap:6px;
+      border:1px solid var(--border2); border-bottom:1px solid var(--border2) !important;
+      border-radius:8px; padding:12px 11px; background:rgba(255,255,255,0.03);
     }
+    html[data-menu-theme="livre-botanique"] .fp-item:last-child { border-bottom:1px solid var(--border2) !important; }
+    html[data-menu-theme="livre-botanique"] .fp-item-left { min-width:0; }
     html[data-menu-theme="livre-botanique"] .fp-item-name {
-      font-family:'Cormorant',serif; font-size:1.05rem; font-style:italic; font-weight:500;
+      font-family:'Cormorant',serif; font-size:0.95rem; font-weight:600; font-style:normal; line-height:1.3;
     }
+    html[data-menu-theme="livre-botanique"] .fp-item-right { margin-left:0; margin-top:auto; align-items:flex-start; }
     html[data-menu-theme="livre-botanique"] .fp-item-price {
-      font-family:'Cormorant',serif; font-size:0.92rem; font-style:italic;
+      font-family:'Outfit',sans-serif; font-size:0.82rem; font-weight:700; color:var(--gold); letter-spacing:0.02em;
     }
 
     /* ═══════════════════════════════════════════════════════════════════
-       LIVRE-AZURE — Carte Côtière
-       Header plein azur / texte blanc · séparateurs en HAUT des items
+       LIVRE-AZURE — Répertoire Marin
+       PRIX EN HAUT (order:-1, 1.45rem) dominant · nom en dessous discret
        ═══════════════════════════════════════════════════════════════════ */
     html[data-menu-theme="livre-azure"] .fp-cat-header {
-      background:var(--gold); border-bottom:none; padding:18px 20px 14px;
+      background:var(--gold); border-bottom:none; padding:20px 20px 16px;
     }
     html[data-menu-theme="livre-azure"] .fp-cat-name {
-      font-family:'Cormorant',serif; font-size:1.7rem; font-weight:400;
-      font-style:normal; letter-spacing:0.05em; color:#fff !important;
+      font-family:'Outfit',sans-serif; font-size:0.78rem; font-weight:800;
+      letter-spacing:0.28em; text-transform:uppercase; color:#fff !important;
     }
-    html[data-menu-theme="livre-azure"] .fp-cat-count { color:rgba(255,255,255,0.65) !important; }
-    html[data-menu-theme="livre-azure"] .fp-deco { padding:16px 0 0; margin:0 20px; }
+    html[data-menu-theme="livre-azure"] .fp-cat-count { color:rgba(255,255,255,0.65) !important; letter-spacing:0.2em; }
+    html[data-menu-theme="livre-azure"] .fp-deco { padding:14px 0 0; }
     html[data-menu-theme="livre-azure"] .fp-item {
-      border-bottom:none; border-top:1px solid var(--border); padding:13px 0;
+      flex-direction:column; align-items:stretch; gap:2px;
+      border-bottom:1px solid var(--border); padding:14px 0;
     }
-    html[data-menu-theme="livre-azure"] .fp-item:first-child { border-top:none; }
-    html[data-menu-theme="livre-azure"] .fp-item-name { font-family:'Cormorant',serif; font-size:1.0rem; }
-    html[data-menu-theme="livre-azure"] .fp-item-price { color:var(--gold); font-weight:700; }
+    html[data-menu-theme="livre-azure"] .fp-item-right {
+      order:-1; margin-left:0; margin-bottom:4px; align-items:flex-start;
+    }
+    html[data-menu-theme="livre-azure"] .fp-item-price {
+      font-family:'Outfit',sans-serif; font-size:1.45rem; font-weight:700;
+      color:var(--gold); line-height:1; letter-spacing:-0.01em;
+    }
+    html[data-menu-theme="livre-azure"] .fp-item-name {
+      font-family:'Cormorant',serif; font-size:0.92rem; font-weight:400; font-style:italic;
+      color:var(--muted);
+    }
+    html[data-menu-theme="livre-azure"] .fp-item-desc { margin-top:2px; }
 
     /* ═══════════════════════════════════════════════════════════════════
-       LIVRE-ROSE — Écrin Romantique
-       Items en CARDS arrondies avec fond rosé semi-transparent
+       LIVRE-ROSE — Parfumerie Parisienne
+       Tout CENTRÉ · prix en pill badge · séparateurs · · · entre items
        ═══════════════════════════════════════════════════════════════════ */
     html[data-menu-theme="livre-rose"] .fp-cat-header {
-      background:transparent; border-bottom:1px dashed var(--border2); padding:18px 20px 12px;
+      background:transparent; border-bottom:none; text-align:center; padding:24px 20px 0;
+    }
+    html[data-menu-theme="livre-rose"] .fp-cat-header::before {
+      content:''; display:block; height:5px;
+      border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+      margin-bottom:14px;
+    }
+    html[data-menu-theme="livre-rose"] .fp-cat-header::after {
+      content:''; display:block; height:5px;
+      border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+      margin-top:14px;
     }
     html[data-menu-theme="livre-rose"] .fp-cat-name {
-      font-family:'Cormorant',serif; font-size:1.9rem; font-weight:400;
-      font-style:italic; letter-spacing:0.02em;
+      font-family:'Cormorant',serif; font-size:2.0rem; font-weight:400; font-style:italic; letter-spacing:0.04em;
     }
+    html[data-menu-theme="livre-rose"] .fp-cat-count { text-align:center; letter-spacing:0.15em; }
     html[data-menu-theme="livre-rose"] .fp-deco { display:none; }
-    html[data-menu-theme="livre-rose"] .fp-items-list {
-      gap:6px; padding:10px 16px 16px; display:flex; flex-direction:column;
-    }
+    html[data-menu-theme="livre-rose"] .fp-items-list { padding:10px 20px 20px; }
     html[data-menu-theme="livre-rose"] .fp-item {
-      background:rgba(232,128,176,0.09); border-radius:8px;
-      border:1px solid rgba(232,128,176,0.18) !important;
-      border-bottom:1px solid rgba(232,128,176,0.18) !important;
-      padding:12px 14px;
+      flex-direction:column; align-items:center; text-align:center;
+      border-bottom:none; padding:16px 0; gap:4px;
     }
-    html[data-menu-theme="livre-rose"] .fp-item:last-child {
-      border-bottom:1px solid rgba(232,128,176,0.18) !important;
+    html[data-menu-theme="livre-rose"] .fp-item::after {
+      content:'· · ·'; font-size:0.65rem; letter-spacing:0.35em;
+      color:var(--border2); display:block; margin-top:16px; width:100%;
     }
+    html[data-menu-theme="livre-rose"] .fp-item:last-child::after { display:none; }
+    html[data-menu-theme="livre-rose"] .fp-item-left { width:100%; display:flex; flex-direction:column; align-items:center; }
     html[data-menu-theme="livre-rose"] .fp-item-name {
-      font-family:'Cormorant',serif; font-size:1.0rem; font-style:italic;
+      font-family:'Cormorant',serif; font-size:1.08rem; font-style:italic; font-weight:500; text-align:center;
+    }
+    html[data-menu-theme="livre-rose"] .fp-item-right { margin-left:0; align-items:center; margin-top:8px; }
+    html[data-menu-theme="livre-rose"] .fp-item-price {
+      font-size:0.76rem; font-weight:700; color:var(--bg);
+      background:var(--gold); padding:3px 16px; border-radius:20px;
     }
 
     /* ═══════════════════════════════════════════════════════════════════
-       LIVRE-ANTIQUE — Codex Roman
-       Numéros ROMAINS CSS (I. II. III...) avant chaque item via counter
+       LIVRE-ANTIQUE — Codex Illuminé (Manuscrit Ancien)
+       Double-bordure catégorie · ornement ✦─✦ · romains grands · ligné
        ═══════════════════════════════════════════════════════════════════ */
     html[data-menu-theme="livre-antique"] .fp-cat-header {
-      background:transparent; border-bottom:1px solid var(--border2); padding:18px 20px 12px;
+      background:transparent;
+      border-top:2px double var(--border2); border-bottom:2px double var(--border2);
+      padding:16px 20px 14px; margin:12px 0 0;
     }
     html[data-menu-theme="livre-antique"] .fp-cat-name {
-      font-family:'Cormorant',serif; font-size:1.85rem; font-weight:400;
-      font-style:italic; letter-spacing:0.02em;
+      font-family:'Cormorant',serif; font-size:1.65rem; font-weight:700;
+      font-style:italic; letter-spacing:0.04em;
     }
-    html[data-menu-theme="livre-antique"] .fp-items-list { counter-reset:antique-count; }
+    html[data-menu-theme="livre-antique"] .fp-cat-name::after {
+      content:'✦  ─────  ✦'; display:block; font-size:0.58rem; letter-spacing:0.5em;
+      color:var(--gold); opacity:0.7; margin-top:9px; font-style:normal;
+    }
+    html[data-menu-theme="livre-antique"] .fp-deco { display:none; }
+    html[data-menu-theme="livre-antique"] .fp-items-list {
+      counter-reset:antique-count;
+      background-image:repeating-linear-gradient(
+        transparent, transparent 36px, rgba(212,184,112,0.07) 37px
+      );
+      padding:0 20px;
+    }
     html[data-menu-theme="livre-antique"] .fp-item {
       counter-increment:antique-count; position:relative;
-      padding-left:34px; border-bottom:1px solid var(--border);
+      padding-left:44px; border-bottom:1px solid var(--border);
+      padding-top:13px; padding-bottom:13px;
     }
     html[data-menu-theme="livre-antique"] .fp-item::before {
       content:counter(antique-count, upper-roman) '.';
-      position:absolute; left:0; top:14px;
-      font-family:'Cormorant',serif; font-size:0.7rem; color:var(--gold);
-      font-style:italic; letter-spacing:0.04em;
+      position:absolute; left:0; top:13px;
+      font-family:'Cormorant',serif; font-size:1.05rem; color:var(--gold);
+      font-style:italic; letter-spacing:0.04em; font-weight:600;
     }
     html[data-menu-theme="livre-antique"] .fp-item-name {
-      font-family:'Cormorant',serif; font-size:1.0rem; font-style:italic;
+      font-family:'Cormorant',serif; font-size:1.02rem; font-style:italic; font-weight:500;
     }
     html[data-menu-theme="livre-antique"] .fp-item-price {
-      font-family:'Cormorant',serif; font-style:italic;
+      font-family:'Cormorant',serif; font-style:italic; color:var(--gold);
     }
 
     /* ═══════════════════════════════════════════════════════════════════
-       LIVRE-EPURE — Édition de Prix
-       Prix ÉNORME (1.5rem dominant) · nom petit et discret · hiérarchie inversée
+       LIVRE-EPURE — Swiss Design Typographique
+       PRIX À GAUCHE (order:-1) très grand · nom UPPERCASE droit à droite
        ═══════════════════════════════════════════════════════════════════ */
     html[data-menu-theme="livre-epure"] .fp-cat-header {
-      background:transparent; border-bottom:1px solid var(--border); padding:12px 20px 8px;
+      background:transparent; border-bottom:2px solid var(--gold); padding:14px 20px 10px;
     }
     html[data-menu-theme="livre-epure"] .fp-cat-name {
-      font-family:'Outfit',sans-serif; font-size:0.7rem; font-weight:700;
-      letter-spacing:0.26em; text-transform:uppercase; font-style:normal;
+      font-family:'Outfit',sans-serif; font-size:0.68rem; font-weight:700;
+      letter-spacing:0.32em; text-transform:uppercase; font-style:normal;
     }
     html[data-menu-theme="livre-epure"] .fp-cat-count { display:none; }
     html[data-menu-theme="livre-epure"] .fp-deco { display:none; }
     html[data-menu-theme="livre-epure"] .fp-item {
       padding:10px 0; border-bottom:1px solid var(--border); align-items:center;
     }
+    html[data-menu-theme="livre-epure"] .fp-item-right {
+      order:-1; margin-left:0; margin-right:18px;
+      align-items:flex-start; flex-shrink:0; min-width:64px;
+    }
+    html[data-menu-theme="livre-epure"] .fp-item-price {
+      font-size:1.55rem; font-weight:200; color:var(--gold);
+      letter-spacing:-0.02em; line-height:1; font-variant-numeric:tabular-nums;
+    }
     html[data-menu-theme="livre-epure"] .fp-item-name {
-      font-size:0.74rem; font-weight:400; letter-spacing:0.02em; color:var(--muted);
+      font-size:0.74rem; font-weight:700; letter-spacing:0.14em;
+      text-transform:uppercase; color:var(--cream);
     }
     html[data-menu-theme="livre-epure"] .fp-item-desc { font-size:0.66rem; }
-    html[data-menu-theme="livre-epure"] .fp-item-price {
-      font-size:1.55rem; font-weight:300; color:var(--gold); letter-spacing:-0.02em;
-    }
 
     /* ═══════════════════════════════════════════════════════════════════
-       LIVRE-CERISE — Festif Ardent
-       Header ROUGE PLEIN · items avec bordure gauche cerise
+       LIVRE-CERISE — Palmarès Festif
+       Cards · grand numéro fantôme en fond · badge prix coloré
        ═══════════════════════════════════════════════════════════════════ */
     html[data-menu-theme="livre-cerise"] .fp-cat-header {
-      background:var(--gold); border-bottom:none; padding:18px 20px 14px;
+      background:var(--gold); border-bottom:none; padding:20px 20px 16px;
     }
     html[data-menu-theme="livre-cerise"] .fp-cat-name {
-      font-family:'Outfit',sans-serif; font-size:1.3rem; font-weight:800;
-      letter-spacing:0.05em; text-transform:uppercase; font-style:normal;
-      color:#fff8f8 !important;
+      font-family:'Outfit',sans-serif; font-size:1.25rem; font-weight:900;
+      letter-spacing:0.06em; text-transform:uppercase; color:#fff8f8 !important;
     }
     html[data-menu-theme="livre-cerise"] .fp-cat-count { color:rgba(255,248,248,0.65) !important; }
-    html[data-menu-theme="livre-cerise"] .fp-deco { padding:14px 0 2px; margin:0 20px; }
-    html[data-menu-theme="livre-cerise"] .fp-item {
-      border-bottom:1px solid var(--border); border-left:3px solid var(--gold);
-      padding:12px 0 12px 12px;
+    html[data-menu-theme="livre-cerise"] .fp-deco { display:none; }
+    html[data-menu-theme="livre-cerise"] .fp-items-list {
+      counter-reset:cerise-n; padding:10px 14px 18px; gap:8px; display:flex; flex-direction:column;
     }
+    html[data-menu-theme="livre-cerise"] .fp-item {
+      counter-increment:cerise-n;
+      background:rgba(232,48,64,0.09); border-radius:7px;
+      border:none !important; border-bottom:none !important;
+      padding:13px 14px 13px 52px; position:relative; overflow:hidden;
+    }
+    html[data-menu-theme="livre-cerise"] .fp-item::before {
+      content:counter(cerise-n);
+      position:absolute; left:6px; top:50%; transform:translateY(-50%);
+      font-family:'Outfit',sans-serif; font-size:2.8rem; font-weight:900;
+      color:var(--gold); opacity:0.16; line-height:1; pointer-events:none;
+      letter-spacing:-0.03em;
+    }
+    html[data-menu-theme="livre-cerise"] .fp-item:last-child { border-bottom:none !important; }
     html[data-menu-theme="livre-cerise"] .fp-item-name {
-      font-family:'Outfit',sans-serif; font-size:0.88rem; font-weight:600;
+      font-family:'Outfit',sans-serif; font-size:0.88rem; font-weight:700; letter-spacing:0.02em;
     }
     html[data-menu-theme="livre-cerise"] .fp-item-price {
-      font-family:'Outfit',sans-serif; font-size:0.84rem; font-weight:700;
+      font-family:'Outfit',sans-serif; font-size:0.8rem; font-weight:800; color:var(--gold);
+      border:1.5px solid rgba(232,48,64,0.38); padding:2px 10px; border-radius:4px;
     }
 
     /* ═══════════════════════════════════════════════════════════════════
@@ -1686,27 +1766,43 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════════
-       LIVRE-FORET — Almanach des Forêts
-       Header avec BORDURE GAUCHE OR · items séparés en POINTILLÉS en haut
+       LIVRE-FORET — Carnet de Terrain (Field Notes Typewriter)
+       Police monospace · fond ligné · prix dans tag rectangulaire
        ═══════════════════════════════════════════════════════════════════ */
     html[data-menu-theme="livre-foret"] .fp-cat-header {
-      background:transparent; border-bottom:none;
-      border-left:4px solid var(--gold); padding:12px 20px 10px 16px; margin-bottom:6px;
+      background:transparent; border-bottom:1px dashed var(--border2);
+      padding:18px 20px 14px;
     }
     html[data-menu-theme="livre-foret"] .fp-cat-name {
-      font-family:'Cormorant',serif; font-size:1.8rem; font-weight:400; font-style:italic;
+      font-family:'Courier New',monospace; font-size:0.88rem; font-weight:700;
+      text-transform:uppercase; letter-spacing:0.1em; color:var(--gold); font-style:normal;
     }
-    html[data-menu-theme="livre-foret"] .fp-cat-count { margin-top:2px; opacity:0.65; }
+    html[data-menu-theme="livre-foret"] .fp-cat-count {
+      font-family:'Courier New',monospace; font-size:0.65rem; letter-spacing:0.08em;
+      opacity:0.55; margin-top:3px; text-transform:none;
+    }
     html[data-menu-theme="livre-foret"] .fp-deco { display:none; }
+    html[data-menu-theme="livre-foret"] .fp-items-list {
+      padding:0 20px;
+      background-image:repeating-linear-gradient(
+        transparent, transparent 37px, rgba(192,176,96,0.07) 38px
+      );
+    }
     html[data-menu-theme="livre-foret"] .fp-item {
-      border-bottom:none; border-top:1px dotted var(--border2); padding:14px 0;
+      border-bottom:none; border-top:1px dotted var(--border2); padding:13px 0; align-items:baseline;
     }
     html[data-menu-theme="livre-foret"] .fp-item:first-child { border-top:none; }
     html[data-menu-theme="livre-foret"] .fp-item-name {
-      font-family:'Cormorant',serif; font-size:1.05rem; font-weight:500; font-style:italic;
+      font-family:'Courier New',monospace; font-size:0.8rem; font-weight:400;
+      letter-spacing:0.02em; color:var(--cream);
+    }
+    html[data-menu-theme="livre-foret"] .fp-item-desc {
+      font-family:'Courier New',monospace; font-size:0.68rem;
     }
     html[data-menu-theme="livre-foret"] .fp-item-price {
-      font-family:'Cormorant',serif; font-size:0.92rem; font-style:italic; color:var(--gold);
+      font-family:'Courier New',monospace; font-size:0.76rem; font-weight:400;
+      color:var(--gold); border:1px solid var(--border2); padding:1px 8px; border-radius:2px;
+      white-space:nowrap; flex-shrink:0;
     }
 
     
