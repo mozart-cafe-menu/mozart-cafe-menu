@@ -1432,15 +1432,41 @@
     html[data-menu-theme="carte-artisan"] body.option-commande-active .card-artisan.card-has-qty { padding-right:96px !important; }
 
     /* — Ardoise (pointillés + Courier) — */
-    html[data-menu-theme="carte-ardoise"] .cat-name { font-family:'Cormorant',serif; font-size:1.1rem; font-weight:500; letter-spacing:0.14em; text-transform:uppercase; font-style:normal; color:var(--cream); }
-    html[data-menu-theme="carte-ardoise"] .cat-div { background:none; border-bottom:2px solid var(--border2); margin-bottom:0; }
-    .card-ardoise { background:transparent !important; border:none !important; border-radius:0 !important; box-shadow:none !important; padding:12px 0 !important; border-bottom:1px dashed var(--border2) !important; }
-    .ard-row { display:flex; align-items:baseline; justify-content:space-between; gap:10px; }
-    .ard-left { flex:1; min-width:0; display:flex; flex-wrap:wrap; align-items:baseline; gap:5px; }
-    .ard-name { font-family:'Cormorant',serif; font-size:1.04rem; font-weight:500; color:var(--cream); letter-spacing:0.02em; }
-    .ard-badges { display:inline-flex; gap:4px; flex-wrap:wrap; }
-    .ard-price { font-family:'Courier New',monospace; font-size:0.92rem; color:var(--gold); font-weight:700; white-space:nowrap; flex-shrink:0; letter-spacing:-0.01em; }
-    .ard-desc { font-size:0.78rem; color:var(--muted); margin-top:3px; line-height:1.4; font-style:italic; }
+    /* — Ardoise Bistrot : prix-pill en haut + nom grand en dessous — */
+    html[data-menu-theme="carte-ardoise"] .cat-name {
+      font-family:'Courier New',monospace; font-size:0.76rem; font-weight:700;
+      letter-spacing:0.18em; text-transform:uppercase; font-style:normal; color:var(--cream);
+    }
+    html[data-menu-theme="carte-ardoise"] .cat-div { background:none; border-bottom:1px dashed var(--border2); margin-bottom:4px; }
+    html[data-menu-theme="carte-ardoise"] .cat-ico-box { display:none !important; }
+    /* Carte */
+    .card-ardoise {
+      background:transparent !important; border:none !important; border-radius:0 !important;
+      box-shadow:none !important; padding:11px 0 !important;
+      border-bottom:1px dashed var(--border2) !important;
+    }
+    /* Ligne du haut : badge-prix à gauche + badges à droite */
+    .ard-top {
+      display:flex; align-items:center; justify-content:space-between;
+      gap:8px; margin-bottom:6px;
+    }
+    /* Badge prix : pill Courier avec fond craie */
+    .ard-prix-pill {
+      font-family:'Courier New',monospace; font-size:0.84rem; font-weight:700;
+      color:var(--bg); background:var(--gold);
+      padding:2px 11px; border-radius:20px; letter-spacing:0.02em;
+      flex-shrink:0; display:inline-block;
+    }
+    .ard-badges { display:flex; gap:4px; flex-wrap:wrap; }
+    /* Nom : plus grand que le prix — lecture inversée (prix d'abord) */
+    .ard-name {
+      font-family:'Cormorant',serif; font-size:1.18rem; font-weight:600;
+      color:var(--cream); line-height:1.25; letter-spacing:0.01em;
+    }
+    .ard-desc { font-size:0.76rem; color:var(--muted); margin-top:4px; line-height:1.42; font-style:italic; }
+    /* Mode light : pill en sombre sur fond clair */
+    html.light .ard-prix-pill { color:var(--bg2); }
+    /* Commande : padding-right pour que la desc n'aille pas sous le bouton +/- */
     html[data-menu-theme="carte-ardoise"] body.option-commande-active .card-ardoise { padding-right:52px !important; }
     html[data-menu-theme="carte-ardoise"] body.option-commande-active .card-ardoise.card-has-qty { padding-right:96px !important; }
 
@@ -7245,6 +7271,7 @@ function _cardArtisan(item) {
   return card;
 }
 
+/* ── Ardoise Bistrot : prix-pill en haut, nom en dessous ── */
 function _cardArdoise(item) {
   const card = document.createElement('div');
   const badges = _getBadges(item);
@@ -7253,13 +7280,11 @@ function _cardArdoise(item) {
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   card.innerHTML =
-    '<div class="ard-row">' +
-      '<div class="ard-left">' +
-        '<span class="ard-name">' + (item.name[lang]||item.name.fr||'') + '</span>' +
-        (badges ? '<span class="ard-badges">' + badges + '</span>' : '') +
-      '</div>' +
-      '<div class="ard-price">' + item.price + '</div>' +
+    '<div class="ard-top">' +
+      '<span class="ard-prix-pill">' + (item.price||'') + '</span>' +
+      (badges ? '<span class="ard-badges">' + badges + '</span>' : '<span></span>') +
     '</div>' +
+    '<div class="ard-name">' + (item.name[lang]||item.name.fr||'') + '</div>' +
     (desc ? '<div class="ard-desc">' + desc + '</div>' : '');
   _setupCardEvents(card, item);
   return card;
