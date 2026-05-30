@@ -1068,18 +1068,19 @@
     }
 
     /* ── CARTE-JOURNAL (Presse / headline editorial) ── */
+    /* ── CARTE-JOURNAL → Devanture (prix-bloc gauche, ambre vitrine) ── */
     html[data-menu-theme="carte-journal"] {
-      --bg:#0c0c0a; --bg2:#161614; --bg-card:rgba(255,255,255,0.04); --bg-nav:rgba(12,12,10,0.96);
-      --gold:#c0baa8; --gold-lt:#d8d4c4; --gold-dk:#908a78; --cream:#f0ece0;
-      --muted:rgba(240,236,224,0.46); --border:rgba(192,186,168,0.12); --border2:rgba(192,186,168,0.22);
-      --shadow:0 4px 24px rgba(0,0,0,0.78); --shadow-h:0 12px 40px rgba(192,186,168,0.10),0 4px 20px rgba(0,0,0,0.88);
-      --badge-new:#c0baa8; --badge-pop:#d87858; --badge-veg:#78aa60;
+      --bg:#0a0806; --bg2:#160e08; --bg-card:rgba(255,255,255,0.04); --bg-nav:rgba(10,8,6,0.96);
+      --gold:#e8a030; --gold-lt:#f8b848; --gold-dk:#c07820; --cream:#f8ecd0;
+      --muted:rgba(248,236,208,0.48); --border:rgba(232,160,48,0.14); --border2:rgba(232,160,48,0.26);
+      --shadow:0 4px 24px rgba(0,0,0,0.76); --shadow-h:0 12px 40px rgba(232,160,48,0.16),0 4px 20px rgba(0,0,0,0.86);
+      --badge-new:#e8a030; --badge-pop:#e06030; --badge-veg:#60aa40;
     }
     html[data-menu-theme="carte-journal"].light {
-      --bg:#f8f4ec; --bg2:#f0ead8; --bg-card:rgba(0,0,0,0.03); --bg-nav:rgba(248,244,236,0.97);
-      --gold:#2a2818; --gold-lt:#3e3c28; --gold-dk:#14120a; --cream:#0a0804;
-      --muted:rgba(10,8,4,0.46); --border:rgba(42,40,24,0.14); --border2:rgba(42,40,24,0.24);
-      --shadow:0 4px 16px rgba(0,0,0,0.07); --shadow-h:0 8px 28px rgba(42,40,24,0.10),0 4px 14px rgba(0,0,0,0.07);
+      --bg:#fdf4e4; --bg2:#f8e8c8; --bg-card:rgba(0,0,0,0.03); --bg-nav:rgba(253,244,228,0.97);
+      --gold:#8a5810; --gold-lt:#a87018; --gold-dk:#583808; --cream:#1c0c00;
+      --muted:rgba(28,12,0,0.50); --border:rgba(138,88,16,0.16); --border2:rgba(138,88,16,0.28);
+      --shadow:0 4px 16px rgba(0,0,0,0.07); --shadow-h:0 8px 28px rgba(138,88,16,0.12),0 4px 14px rgba(0,0,0,0.07);
     }
 
     /* ── CARTE-VOYAGE (Carnet / étiquette prix circulaire) ── */
@@ -1387,18 +1388,20 @@
     html[data-menu-theme="carte-couture"] body.option-commande-active .card-couture.card-has-qty { padding-right:96px !important; }
 
     /* — Journal (headline + chapeau) — */
-    html[data-menu-theme="carte-journal"] .cat-name { font-family:'Cormorant',serif; font-size:1.8rem; font-weight:700; font-style:normal; letter-spacing:0.01em; color:var(--cream); text-transform:uppercase; }
-    html[data-menu-theme="carte-journal"] .cat-div { background:none; border-bottom:3px solid var(--border2); margin-bottom:0; }
+    /* — Devanture (prix-bloc gauche) — */
+    html[data-menu-theme="carte-journal"] .cat-name { font-family:'Outfit',sans-serif; font-size:0.76rem; font-weight:800; letter-spacing:0.18em; text-transform:uppercase; font-style:normal; color:var(--cream); }
+    html[data-menu-theme="carte-journal"] .cat-div { background:none; border-bottom:2px solid var(--border2); margin-bottom:0; }
     html[data-menu-theme="carte-journal"] .cat-ico-box { display:none !important; }
-    .card-journal { background:transparent !important; border:none !important; border-radius:0 !important; box-shadow:none !important; padding:13px 0 !important; border-bottom:1px solid var(--border) !important; }
-    .jrn-headline { font-family:'Cormorant',serif; font-size:1.12rem; font-weight:700; color:var(--cream); line-height:1.2; margin-bottom:2px; }
-    .jrn-badges { display:flex; gap:4px; flex-wrap:wrap; margin-bottom:4px; }
-    .jrn-lead { font-size:0.77rem; color:var(--muted); line-height:1.5; margin-bottom:5px; }
-    .jrn-meta { display:flex; align-items:center; gap:8px; }
-    .jrn-rule { flex:1; height:1px; background:var(--border); }
-    .jrn-price { font-family:'Cormorant',serif; font-size:0.92rem; font-style:italic; color:var(--gold); font-weight:500; white-space:nowrap; }
-    html[data-menu-theme="carte-journal"] body.option-commande-active .card-journal { padding-right:52px !important; }
-    html[data-menu-theme="carte-journal"] body.option-commande-active .card-journal.card-has-qty { padding-right:96px !important; }
+    .card-dva { display:flex !important; align-items:stretch !important; background:transparent !important; border:none !important; border-radius:0 !important; box-shadow:none !important; padding:5px 0 !important; border-bottom:1px solid var(--border) !important; }
+    .dva-price-block { width:58px; flex-shrink:0; background:var(--gold); display:flex; align-items:center; justify-content:center; border-radius:4px; margin:2px 0; padding:8px 4px; }
+    .dva-price { font-family:'Cormorant',serif; font-size:0.82rem; font-weight:700; color:var(--bg); text-align:center; line-height:1.25; word-break:break-all; }
+    .dva-body { flex:1; min-width:0; padding:10px 10px 10px 12px; }
+    .dva-name { font-family:'Cormorant',serif; font-size:1.04rem; font-weight:600; color:var(--cream); line-height:1.3; }
+    .dva-desc { font-size:0.76rem; color:var(--muted); margin-top:3px; line-height:1.42; }
+    .dva-badges { display:flex; gap:4px; flex-wrap:wrap; margin-top:3px; }
+    html[data-menu-theme="carte-journal"] .card-dva .card-qty-ctrl { top:50%; bottom:auto; transform:translateY(-50%); right:0; }
+    html[data-menu-theme="carte-journal"] body.option-commande-active .card-dva { padding-right:52px !important; }
+    html[data-menu-theme="carte-journal"] body.option-commande-active .card-dva.card-has-qty { padding-right:96px !important; }
 
     /* — Voyage (badge circulaire prix) — */
     html[data-menu-theme="carte-voyage"] .cat-name { font-family:'Cormorant',serif; font-size:1.4rem; font-weight:400; font-style:italic; color:var(--gold); letter-spacing:0.03em; }
@@ -7184,18 +7187,21 @@ function _cardCouture(item, idx) {
   return card;
 }
 
+/* ── Thème : Devanture — prix-bloc gauche ── */
 function _cardJournal(item) {
   const card = document.createElement('div');
   const badges = _getBadges(item);
   const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
-  card.className = 'card card-journal';
+  card.className = 'card card-dva';
   card.dataset.item = item.id;
   card.style.transitionDelay = '0s';
   card.innerHTML =
-    '<div class="jrn-headline">' + (item.name[lang]||item.name.fr||'') + '</div>' +
-    (badges ? '<div class="jrn-badges">' + badges + '</div>' : '') +
-    (desc ? '<div class="jrn-lead">' + desc + '</div>' : '') +
-    '<div class="jrn-meta"><div class="jrn-rule"></div><span class="jrn-price">' + item.price + '</span></div>';
+    '<div class="dva-price-block"><div class="dva-price">' + (item.price||'') + '</div></div>' +
+    '<div class="dva-body">' +
+      '<div class="dva-name">' + (item.name[lang]||item.name.fr||'') + '</div>' +
+      (desc ? '<div class="dva-desc">' + desc + '</div>' : '') +
+      (badges ? '<div class="dva-badges">' + badges + '</div>' : '') +
+    '</div>';
   _setupCardEvents(card, item);
   return card;
 }
