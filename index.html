@@ -989,6 +989,490 @@
     .cc-wifi { margin-top:16px; display:flex; flex-direction:column; align-items:center; gap:4px; }
     .cc-wifi-row { font-size:0.78rem; color:var(--muted); display:flex; align-items:center; gap:6px; letter-spacing:0.02em; }
 
+
+    /* ═══════════════════════════════════════════════════════
+       FIX CARTE-CLASSIQUE — qty ctrl ne cache plus le contenu
+       ═══════════════════════════════════════════════════════ */
+    html[data-menu-theme="carte-classique"] body.option-commande-active .card-classique {
+      padding-right:52px !important;
+    }
+    html[data-menu-theme="carte-classique"] body.option-commande-active .card-classique.card-has-qty {
+      padding-right:96px !important;
+    }
+    html[data-menu-theme="carte-classique"] .card-classique .card-qty-ctrl {
+      top:50%; bottom:auto; transform:translateY(-50%); right:0;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       NOUVEAUX THÈMES 2026 — 9 CARTE + 9 LIVRE
+       ═══════════════════════════════════════════════════════ */
+
+    /* ── CARTE-SOMMELIER (Bordeaux / liste des vins) ── */
+    html[data-menu-theme="carte-sommelier"] {
+      --bg:#120816; --bg2:#1c1024; --bg-card:rgba(255,255,255,0.05); --bg-nav:rgba(18,8,22,0.95);
+      --gold:#b8a8c8; --gold-lt:#d0c0e0; --gold-dk:#887898; --cream:#ece4f4;
+      --muted:rgba(236,228,244,0.48); --border:rgba(184,168,200,0.14); --border2:rgba(184,168,200,0.26);
+      --shadow:0 4px 24px rgba(0,0,0,0.72); --shadow-h:0 12px 40px rgba(184,168,200,0.14),0 4px 20px rgba(0,0,0,0.82);
+      --badge-new:#b8a8c8; --badge-pop:#e07858; --badge-veg:#7ebd6a;
+    }
+    html[data-menu-theme="carte-sommelier"].light {
+      --bg:#f4eef8; --bg2:#e8def4; --bg-card:rgba(0,0,0,0.04); --bg-nav:rgba(244,238,248,0.96);
+      --gold:#4a2868; --gold-lt:#663a88; --gold-dk:#2e1048; --cream:#1a0828;
+      --muted:rgba(26,8,40,0.50); --border:rgba(74,40,104,0.16); --border2:rgba(74,40,104,0.28);
+      --shadow:0 4px 16px rgba(0,0,0,0.08); --shadow-h:0 8px 28px rgba(74,40,104,0.12),0 4px 14px rgba(0,0,0,0.08);
+    }
+
+    /* ── CARTE-BENTO (Japonais / grille 2 colonnes) ── */
+    html[data-menu-theme="carte-bento"] {
+      --bg:#050d14; --bg2:#0c1820; --bg-card:rgba(0,200,216,0.06); --bg-nav:rgba(5,13,20,0.96);
+      --gold:#00c8d8; --gold-lt:#30e0f0; --gold-dk:#0098a8; --cream:#d0f4f8;
+      --muted:rgba(208,244,248,0.46); --border:rgba(0,200,216,0.14); --border2:rgba(0,200,216,0.26);
+      --shadow:0 4px 24px rgba(0,0,0,0.75); --shadow-h:0 12px 40px rgba(0,200,216,0.16),0 4px 20px rgba(0,0,0,0.85);
+      --badge-new:#00c8d8; --badge-pop:#e87840; --badge-veg:#7ebd6a;
+    }
+    html[data-menu-theme="carte-bento"].light {
+      --bg:#e8f8fc; --bg2:#d0eef8; --bg-card:rgba(0,0,0,0.04); --bg-nav:rgba(232,248,252,0.96);
+      --gold:#006878; --gold-lt:#008898; --gold-dk:#004050; --cream:#001c24;
+      --muted:rgba(0,28,36,0.50); --border:rgba(0,104,120,0.16); --border2:rgba(0,104,120,0.28);
+      --shadow:0 4px 16px rgba(0,0,0,0.08); --shadow-h:0 8px 28px rgba(0,104,120,0.14),0 4px 14px rgba(0,0,0,0.08);
+    }
+
+    /* ── CARTE-TELEGRAPHE (Sépia / points de conduite) ── */
+    html[data-menu-theme="carte-telegraphe"] {
+      --bg:#100e08; --bg2:#1c1808; --bg-card:rgba(255,255,255,0.04); --bg-nav:rgba(16,14,8,0.95);
+      --gold:#c8a070; --gold-lt:#e0b888; --gold-dk:#9a7848; --cream:#f4e8cc;
+      --muted:rgba(244,232,204,0.48); --border:rgba(200,160,112,0.14); --border2:rgba(200,160,112,0.24);
+      --shadow:0 4px 24px rgba(0,0,0,0.72); --shadow-h:0 12px 40px rgba(200,160,112,0.14),0 4px 20px rgba(0,0,0,0.82);
+      --badge-new:#c8a070; --badge-pop:#d06830; --badge-veg:#60a840;
+    }
+    html[data-menu-theme="carte-telegraphe"].light {
+      --bg:#f8f0dc; --bg2:#f0e4c4; --bg-card:rgba(0,0,0,0.03); --bg-nav:rgba(248,240,220,0.97);
+      --gold:#6a4010; --gold-lt:#8a5818; --gold-dk:#3e2008; --cream:#1c0c00;
+      --muted:rgba(28,12,0,0.48); --border:rgba(106,64,16,0.16); --border2:rgba(106,64,16,0.28);
+      --shadow:0 4px 16px rgba(0,0,0,0.07); --shadow-h:0 8px 28px rgba(106,64,16,0.10),0 4px 14px rgba(0,0,0,0.07);
+    }
+
+    /* ── CARTE-COUTURE (Mode / numéroté 3 niveaux) ── */
+    html[data-menu-theme="carte-couture"] {
+      --bg:#040404; --bg2:#0c0c0c; --bg-card:rgba(255,255,255,0.04); --bg-nav:rgba(4,4,4,0.97);
+      --gold:#d8d8d8; --gold-lt:#f0f0f0; --gold-dk:#a8a8a8; --cream:#f8f8f8;
+      --muted:rgba(248,248,248,0.42); --border:rgba(216,216,216,0.10); --border2:rgba(216,216,216,0.18);
+      --shadow:0 4px 24px rgba(0,0,0,0.85); --shadow-h:0 12px 40px rgba(216,216,216,0.06),0 4px 20px rgba(0,0,0,0.92);
+      --badge-new:#d8d8d8; --badge-pop:#e84848; --badge-veg:#48c848;
+    }
+    html[data-menu-theme="carte-couture"].light {
+      --bg:#f8f8f8; --bg2:#f0f0f0; --bg-card:rgba(0,0,0,0.04); --bg-nav:rgba(248,248,248,0.97);
+      --gold:#0c0c0c; --gold-lt:#242424; --gold-dk:#000000; --cream:#040404;
+      --muted:rgba(4,4,4,0.46); --border:rgba(12,12,12,0.11); --border2:rgba(12,12,12,0.20);
+      --shadow:0 4px 16px rgba(0,0,0,0.08); --shadow-h:0 8px 28px rgba(12,12,12,0.10),0 4px 14px rgba(0,0,0,0.08);
+    }
+
+    /* ── CARTE-JOURNAL (Presse / headline editorial) ── */
+    html[data-menu-theme="carte-journal"] {
+      --bg:#0c0c0a; --bg2:#161614; --bg-card:rgba(255,255,255,0.04); --bg-nav:rgba(12,12,10,0.96);
+      --gold:#c0baa8; --gold-lt:#d8d4c4; --gold-dk:#908a78; --cream:#f0ece0;
+      --muted:rgba(240,236,224,0.46); --border:rgba(192,186,168,0.12); --border2:rgba(192,186,168,0.22);
+      --shadow:0 4px 24px rgba(0,0,0,0.78); --shadow-h:0 12px 40px rgba(192,186,168,0.10),0 4px 20px rgba(0,0,0,0.88);
+      --badge-new:#c0baa8; --badge-pop:#d87858; --badge-veg:#78aa60;
+    }
+    html[data-menu-theme="carte-journal"].light {
+      --bg:#f8f4ec; --bg2:#f0ead8; --bg-card:rgba(0,0,0,0.03); --bg-nav:rgba(248,244,236,0.97);
+      --gold:#2a2818; --gold-lt:#3e3c28; --gold-dk:#14120a; --cream:#0a0804;
+      --muted:rgba(10,8,4,0.46); --border:rgba(42,40,24,0.14); --border2:rgba(42,40,24,0.24);
+      --shadow:0 4px 16px rgba(0,0,0,0.07); --shadow-h:0 8px 28px rgba(42,40,24,0.10),0 4px 14px rgba(0,0,0,0.07);
+    }
+
+    /* ── CARTE-VOYAGE (Carnet / étiquette prix circulaire) ── */
+    html[data-menu-theme="carte-voyage"] {
+      --bg:#100c04; --bg2:#1c1408; --bg-card:rgba(255,255,255,0.04); --bg-nav:rgba(16,12,4,0.95);
+      --gold:#d44040; --gold-lt:#e86060; --gold-dk:#aa2020; --cream:#fce8e8;
+      --muted:rgba(252,232,232,0.48); --border:rgba(212,64,64,0.14); --border2:rgba(212,64,64,0.24);
+      --shadow:0 4px 24px rgba(0,0,0,0.72); --shadow-h:0 12px 40px rgba(212,64,64,0.16),0 4px 20px rgba(0,0,0,0.82);
+      --badge-new:#d44040; --badge-pop:#d4a040; --badge-veg:#50b840;
+    }
+    html[data-menu-theme="carte-voyage"].light {
+      --bg:#fdf2ec; --bg2:#f8e4d8; --bg-card:rgba(0,0,0,0.03); --bg-nav:rgba(253,242,236,0.96);
+      --gold:#b82020; --gold-lt:#d03030; --gold-dk:#800c0c; --cream:#1c0404;
+      --muted:rgba(28,4,4,0.50); --border:rgba(184,32,32,0.14); --border2:rgba(184,32,32,0.26);
+      --shadow:0 4px 16px rgba(0,0,0,0.08); --shadow-h:0 8px 28px rgba(184,32,32,0.12),0 4px 14px rgba(0,0,0,0.08);
+    }
+
+    /* ── CARTE-ARTISAN (Atelier / nom + tirets + prix) ── */
+    html[data-menu-theme="carte-artisan"] {
+      --bg:#080a06; --bg2:#121408; --bg-card:rgba(255,255,255,0.04); --bg-nav:rgba(8,10,6,0.95);
+      --gold:#c08040; --gold-lt:#d89858; --gold-dk:#986020; --cream:#f4e8d4;
+      --muted:rgba(244,232,212,0.48); --border:rgba(192,128,64,0.14); --border2:rgba(192,128,64,0.24);
+      --shadow:0 4px 24px rgba(0,0,0,0.75); --shadow-h:0 12px 40px rgba(192,128,64,0.14),0 4px 20px rgba(0,0,0,0.85);
+      --badge-new:#c08040; --badge-pop:#c04030; --badge-veg:#60a840;
+    }
+    html[data-menu-theme="carte-artisan"].light {
+      --bg:#f8f0e4; --bg2:#f0e4d0; --bg-card:rgba(0,0,0,0.03); --bg-nav:rgba(248,240,228,0.96);
+      --gold:#6a3c10; --gold-lt:#885018; --gold-dk:#3e2008; --cream:#200c00;
+      --muted:rgba(32,12,0,0.50); --border:rgba(106,60,16,0.16); --border2:rgba(106,60,16,0.28);
+      --shadow:0 4px 16px rgba(0,0,0,0.08); --shadow-h:0 8px 28px rgba(106,60,16,0.12),0 4px 14px rgba(0,0,0,0.08);
+    }
+
+    /* ── CARTE-ARDOISE (Bistrot / pointillés + Courier) ── */
+    html[data-menu-theme="carte-ardoise"] {
+      --bg:#111010; --bg2:#1c1b1a; --bg-card:rgba(255,255,255,0.04); --bg-nav:rgba(17,16,16,0.95);
+      --gold:#e8e4dc; --gold-lt:#f4f2ec; --gold-dk:#b0a898; --cream:#f5f3ee;
+      --muted:rgba(245,243,238,0.50); --border:rgba(232,228,220,0.12); --border2:rgba(232,228,220,0.22);
+      --shadow:0 4px 24px rgba(0,0,0,0.70); --shadow-h:0 12px 40px rgba(232,228,220,0.10),0 4px 20px rgba(0,0,0,0.80);
+      --badge-new:#e8e4dc; --badge-pop:#e07858; --badge-veg:#7ebd6a;
+    }
+    html[data-menu-theme="carte-ardoise"].light {
+      --bg:#f2f0ec; --bg2:#e8e4dc; --bg-card:rgba(0,0,0,0.04); --bg-nav:rgba(242,240,236,0.96);
+      --gold:#2a2826; --gold-lt:#3e3c38; --gold-dk:#161412; --cream:#0e0c0a;
+      --muted:rgba(14,12,10,0.52); --border:rgba(42,40,38,0.18); --border2:rgba(42,40,38,0.32);
+      --shadow:0 4px 16px rgba(0,0,0,0.08); --shadow-h:0 8px 28px rgba(42,40,38,0.12),0 4px 14px rgba(0,0,0,0.08);
+    }
+
+    /* ── CARTE-MAROC (Souk / étiquette prix encadrée) ── */
+    html[data-menu-theme="carte-maroc"] {
+      --bg:#0e0a04; --bg2:#1a1208; --bg-card:rgba(255,255,255,0.04); --bg-nav:rgba(14,10,4,0.95);
+      --gold:#d4902c; --gold-lt:#e8aa44; --gold-dk:#a86c14; --cream:#f8e4c0;
+      --muted:rgba(248,228,192,0.50); --border:rgba(212,144,44,0.16); --border2:rgba(212,144,44,0.28);
+      --shadow:0 4px 24px rgba(0,0,0,0.70); --shadow-h:0 12px 40px rgba(212,144,44,0.20),0 4px 20px rgba(0,0,0,0.80);
+      --badge-new:#d4902c; --badge-pop:#c04020; --badge-veg:#68aa50;
+    }
+    html[data-menu-theme="carte-maroc"].light {
+      --bg:#faf0dc; --bg2:#f0e0c0; --bg-card:rgba(0,0,0,0.03); --bg-nav:rgba(250,240,220,0.96);
+      --gold:#7a4c08; --gold-lt:#9c6410; --gold-dk:#4e2e04; --cream:#2e1604;
+      --muted:rgba(46,22,4,0.52); --border:rgba(122,76,8,0.18); --border2:rgba(122,76,8,0.30);
+      --shadow:0 4px 16px rgba(0,0,0,0.08); --shadow-h:0 8px 28px rgba(122,76,8,0.14),0 4px 14px rgba(0,0,0,0.08);
+    }
+
+    /* ─── LIVRE THEMES — VARIABLES ─── */
+
+    html[data-menu-theme="livre-noir"] {
+      --bg:#080808; --bg2:#111111; --bg-card:rgba(255,255,255,0.05); --bg-nav:rgba(8,8,8,0.95);
+      --gold:#c0c0cc; --gold-lt:#d8d8e4; --gold-dk:#909098; --cream:#f0f0f4;
+      --muted:rgba(240,240,244,0.48); --border:rgba(192,192,204,0.13); --border2:rgba(192,192,204,0.22);
+      --shadow:0 4px 24px rgba(0,0,0,0.80); --shadow-h:0 12px 40px rgba(192,192,204,0.10),0 4px 20px rgba(0,0,0,0.90);
+      --badge-new:#c0c0cc; --badge-pop:#e84a60; --badge-veg:#7ebd6a;
+    }
+    html[data-menu-theme="livre-noir"].light {
+      --bg:#f0f0f4; --bg2:#e4e4ec; --bg-card:rgba(0,0,0,0.04); --bg-nav:rgba(240,240,244,0.96);
+      --gold:#2a2a38; --gold-lt:#3e3e50; --gold-dk:#141420; --cream:#0a0a14;
+      --muted:rgba(10,10,20,0.50); --border:rgba(42,42,56,0.14); --border2:rgba(42,42,56,0.24);
+      --shadow:0 4px 16px rgba(0,0,0,0.08); --shadow-h:0 8px 28px rgba(42,42,56,0.12),0 4px 14px rgba(0,0,0,0.08);
+    }
+    html[data-menu-theme="livre-botanique"] {
+      --bg:#060c06; --bg2:#0c1a0c; --bg-card:rgba(255,255,255,0.05); --bg-nav:rgba(6,12,6,0.95);
+      --gold:#7ec878; --gold-lt:#9ee090; --gold-dk:#5aa050; --cream:#d8f0d8;
+      --muted:rgba(216,240,216,0.48); --border:rgba(126,200,120,0.15); --border2:rgba(126,200,120,0.26);
+      --shadow:0 4px 24px rgba(0,0,0,0.70); --shadow-h:0 12px 40px rgba(126,200,120,0.16),0 4px 20px rgba(0,0,0,0.80);
+      --badge-new:#7ec878; --badge-pop:#e87840; --badge-veg:#5ebd85;
+    }
+    html[data-menu-theme="livre-botanique"].light {
+      --bg:#eef6ec; --bg2:#dcecd8; --bg-card:rgba(0,0,0,0.04); --bg-nav:rgba(238,246,236,0.96);
+      --gold:#1e5018; --gold-lt:#2c6824; --gold-dk:#103010; --cream:#08200a;
+      --muted:rgba(8,32,10,0.50); --border:rgba(30,80,24,0.16); --border2:rgba(30,80,24,0.28);
+      --shadow:0 4px 16px rgba(0,0,0,0.08); --shadow-h:0 8px 28px rgba(30,80,24,0.12),0 4px 14px rgba(0,0,0,0.08);
+    }
+    html[data-menu-theme="livre-azure"] {
+      --bg:#040c18; --bg2:#081628; --bg-card:rgba(255,255,255,0.05); --bg-nav:rgba(4,12,24,0.95);
+      --gold:#40a8d8; --gold-lt:#60c0ec; --gold-dk:#2080b0; --cream:#d0eaf8;
+      --muted:rgba(208,234,248,0.50); --border:rgba(64,168,216,0.16); --border2:rgba(64,168,216,0.28);
+      --shadow:0 4px 24px rgba(0,0,0,0.70); --shadow-h:0 12px 40px rgba(64,168,216,0.20),0 4px 20px rgba(0,0,0,0.80);
+      --badge-new:#40a8d8; --badge-pop:#e87040; --badge-veg:#7ebd6a;
+    }
+    html[data-menu-theme="livre-azure"].light {
+      --bg:#eef6fc; --bg2:#dceef8; --bg-card:rgba(0,0,0,0.04); --bg-nav:rgba(238,246,252,0.96);
+      --gold:#0c508a; --gold-lt:#1a68a8; --gold-dk:#063060; --cream:#042040;
+      --muted:rgba(4,32,64,0.50); --border:rgba(12,80,138,0.16); --border2:rgba(12,80,138,0.28);
+      --shadow:0 4px 16px rgba(0,0,0,0.08); --shadow-h:0 8px 28px rgba(12,80,138,0.14),0 4px 14px rgba(0,0,0,0.08);
+    }
+    html[data-menu-theme="livre-rose"] {
+      --bg:#180810; --bg2:#241018; --bg-card:rgba(255,255,255,0.05); --bg-nav:rgba(24,8,16,0.95);
+      --gold:#e880b0; --gold-lt:#f8a0c8; --gold-dk:#c05888; --cream:#fce8f4;
+      --muted:rgba(252,232,244,0.50); --border:rgba(232,128,176,0.16); --border2:rgba(232,128,176,0.28);
+      --shadow:0 4px 24px rgba(0,0,0,0.70); --shadow-h:0 12px 40px rgba(232,128,176,0.20),0 4px 20px rgba(0,0,0,0.80);
+      --badge-new:#e880b0; --badge-pop:#e87040; --badge-veg:#7ebd6a;
+    }
+    html[data-menu-theme="livre-rose"].light {
+      --bg:#fce8f4; --bg2:#f8d8ec; --bg-card:rgba(0,0,0,0.04); --bg-nav:rgba(252,232,244,0.96);
+      --gold:#8c1858; --gold-lt:#aa2870; --gold-dk:#5e0838; --cream:#280818;
+      --muted:rgba(40,8,24,0.50); --border:rgba(140,24,88,0.16); --border2:rgba(140,24,88,0.28);
+      --shadow:0 4px 16px rgba(0,0,0,0.08); --shadow-h:0 8px 28px rgba(140,24,88,0.14),0 4px 14px rgba(0,0,0,0.08);
+    }
+    html[data-menu-theme="livre-antique"] {
+      --bg:#140e06; --bg2:#1e1608; --bg-card:rgba(255,255,255,0.04); --bg-nav:rgba(20,14,6,0.95);
+      --gold:#d4b870; --gold-lt:#ecca88; --gold-dk:#aa9048; --cream:#f4e8c8;
+      --muted:rgba(244,232,200,0.50); --border:rgba(212,184,112,0.14); --border2:rgba(212,184,112,0.24);
+      --shadow:0 4px 24px rgba(0,0,0,0.70); --shadow-h:0 12px 40px rgba(212,184,112,0.16),0 4px 20px rgba(0,0,0,0.80);
+      --badge-new:#d4b870; --badge-pop:#c8602a; --badge-veg:#7ebd6a;
+    }
+    html[data-menu-theme="livre-antique"].light {
+      --bg:#f4e8c8; --bg2:#ead8b0; --bg-card:rgba(0,0,0,0.04); --bg-nav:rgba(244,232,200,0.96);
+      --gold:#5a3c10; --gold-lt:#785018; --gold-dk:#382208; --cream:#200c00;
+      --muted:rgba(32,12,0,0.50); --border:rgba(90,60,16,0.16); --border2:rgba(90,60,16,0.28);
+      --shadow:0 4px 16px rgba(0,0,0,0.08); --shadow-h:0 8px 28px rgba(90,60,16,0.12),0 4px 14px rgba(0,0,0,0.08);
+    }
+    html[data-menu-theme="livre-epure"] {
+      --bg:#0c0c0e; --bg2:#141416; --bg-card:rgba(255,255,255,0.05); --bg-nav:rgba(12,12,14,0.96);
+      --gold:#d0d0d8; --gold-lt:#e8e8f0; --gold-dk:#a0a0a8; --cream:#f0f0f2;
+      --muted:rgba(240,240,242,0.46); --border:rgba(208,208,216,0.11); --border2:rgba(208,208,216,0.20);
+      --shadow:0 4px 24px rgba(0,0,0,0.80); --shadow-h:0 12px 40px rgba(208,208,216,0.08),0 4px 20px rgba(0,0,0,0.90);
+      --badge-new:#d0d0d8; --badge-pop:#f04060; --badge-veg:#40c040;
+    }
+    html[data-menu-theme="livre-epure"].light {
+      --bg:#f8f8fa; --bg2:#f0f0f2; --bg-card:rgba(0,0,0,0.04); --bg-nav:rgba(248,248,250,0.97);
+      --gold:#1c1c20; --gold-lt:#2c2c30; --gold-dk:#0c0c10; --cream:#080808;
+      --muted:rgba(8,8,8,0.46); --border:rgba(28,28,32,0.11); --border2:rgba(28,28,32,0.20);
+      --shadow:0 4px 16px rgba(0,0,0,0.07); --shadow-h:0 8px 28px rgba(28,28,32,0.10),0 4px 14px rgba(0,0,0,0.07);
+    }
+    html[data-menu-theme="livre-cerise"] {
+      --bg:#150404; --bg2:#200808; --bg-card:rgba(255,255,255,0.05); --bg-nav:rgba(21,4,4,0.95);
+      --gold:#e83040; --gold-lt:#f85060; --gold-dk:#c01828; --cream:#fde8e8;
+      --muted:rgba(253,232,232,0.50); --border:rgba(232,48,64,0.14); --border2:rgba(232,48,64,0.24);
+      --shadow:0 4px 24px rgba(0,0,0,0.70); --shadow-h:0 12px 40px rgba(232,48,64,0.18),0 4px 20px rgba(0,0,0,0.80);
+      --badge-new:#e83040; --badge-pop:#e8a020; --badge-veg:#50b840;
+    }
+    html[data-menu-theme="livre-cerise"].light {
+      --bg:#fdf4f4; --bg2:#f8e4e4; --bg-card:rgba(0,0,0,0.04); --bg-nav:rgba(253,244,244,0.96);
+      --gold:#c01828; --gold-lt:#d82838; --gold-dk:#880c18; --cream:#1c0404;
+      --muted:rgba(28,4,4,0.50); --border:rgba(192,24,40,0.14); --border2:rgba(192,24,40,0.24);
+      --shadow:0 4px 16px rgba(0,0,0,0.08); --shadow-h:0 8px 28px rgba(192,24,40,0.14),0 4px 14px rgba(0,0,0,0.08);
+    }
+    html[data-menu-theme="livre-indigo"] {
+      --bg:#080818; --bg2:#101028; --bg-card:rgba(255,255,255,0.05); --bg-nav:rgba(8,8,24,0.95);
+      --gold:#8080e8; --gold-lt:#a0a0f8; --gold-dk:#5858c8; --cream:#e0e0fc;
+      --muted:rgba(224,224,252,0.48); --border:rgba(128,128,232,0.15); --border2:rgba(128,128,232,0.26);
+      --shadow:0 4px 24px rgba(0,0,0,0.70); --shadow-h:0 12px 40px rgba(128,128,232,0.20),0 4px 20px rgba(0,0,0,0.80);
+      --badge-new:#8080e8; --badge-pop:#e87840; --badge-veg:#7ebd6a;
+    }
+    html[data-menu-theme="livre-indigo"].light {
+      --bg:#e8e8f8; --bg2:#d8d8f0; --bg-card:rgba(0,0,0,0.04); --bg-nav:rgba(232,232,248,0.96);
+      --gold:#2828a0; --gold-lt:#3838b8; --gold-dk:#141478; --cream:#0c0c38;
+      --muted:rgba(12,12,56,0.50); --border:rgba(40,40,160,0.15); --border2:rgba(40,40,160,0.26);
+      --shadow:0 4px 16px rgba(0,0,0,0.08); --shadow-h:0 8px 28px rgba(40,40,160,0.12),0 4px 14px rgba(0,0,0,0.08);
+    }
+    html[data-menu-theme="livre-foret"] {
+      --bg:#060e08; --bg2:#0e1810; --bg-card:rgba(255,255,255,0.05); --bg-nav:rgba(6,14,8,0.95);
+      --gold:#c0b060; --gold-lt:#d8c878; --gold-dk:#988840; --cream:#f0ecd4;
+      --muted:rgba(240,236,212,0.48); --border:rgba(192,176,96,0.14); --border2:rgba(192,176,96,0.24);
+      --shadow:0 4px 24px rgba(0,0,0,0.70); --shadow-h:0 12px 40px rgba(192,176,96,0.16),0 4px 20px rgba(0,0,0,0.80);
+      --badge-new:#c0b060; --badge-pop:#d06838; --badge-veg:#5ebd85;
+    }
+    html[data-menu-theme="livre-foret"].light {
+      --bg:#f0ecd4; --bg2:#e4e0c0; --bg-card:rgba(0,0,0,0.04); --bg-nav:rgba(240,236,212,0.96);
+      --gold:#304820; --gold-lt:#445e30; --gold-dk:#1c2e10; --cream:#101c08;
+      --muted:rgba(16,28,8,0.50); --border:rgba(48,72,32,0.14); --border2:rgba(48,72,32,0.24);
+      --shadow:0 4px 16px rgba(0,0,0,0.08); --shadow-h:0 8px 28px rgba(48,72,32,0.12),0 4px 14px rgba(0,0,0,0.08);
+    }
+
+    /* ══ STRUCTURE PARTAGÉE — 9 NOUVEAUX THÈMES CARTE ══ */
+    html[data-menu-theme="carte-sommelier"] #preloader,html[data-menu-theme="carte-bento"] #preloader,
+    html[data-menu-theme="carte-telegraphe"] #preloader,html[data-menu-theme="carte-couture"] #preloader,
+    html[data-menu-theme="carte-journal"] #preloader,html[data-menu-theme="carte-voyage"] #preloader,
+    html[data-menu-theme="carte-artisan"] #preloader,html[data-menu-theme="carte-ardoise"] #preloader,
+    html[data-menu-theme="carte-maroc"] #preloader { display:none !important; }
+    html[data-menu-theme="carte-sommelier"] #hero,html[data-menu-theme="carte-bento"] #hero,
+    html[data-menu-theme="carte-telegraphe"] #hero,html[data-menu-theme="carte-couture"] #hero,
+    html[data-menu-theme="carte-journal"] #hero,html[data-menu-theme="carte-voyage"] #hero,
+    html[data-menu-theme="carte-artisan"] #hero,html[data-menu-theme="carte-ardoise"] #hero,
+    html[data-menu-theme="carte-maroc"] #hero { display:none !important; }
+    html[data-menu-theme="carte-sommelier"] #cc-header,html[data-menu-theme="carte-bento"] #cc-header,
+    html[data-menu-theme="carte-telegraphe"] #cc-header,html[data-menu-theme="carte-couture"] #cc-header,
+    html[data-menu-theme="carte-journal"] #cc-header,html[data-menu-theme="carte-voyage"] #cc-header,
+    html[data-menu-theme="carte-artisan"] #cc-header,html[data-menu-theme="carte-ardoise"] #cc-header,
+    html[data-menu-theme="carte-maroc"] #cc-header { display:block; text-align:center; padding:52px 24px 0; }
+    html[data-menu-theme="carte-sommelier"] .nav-search-wrap,html[data-menu-theme="carte-bento"] .nav-search-wrap,
+    html[data-menu-theme="carte-telegraphe"] .nav-search-wrap,html[data-menu-theme="carte-couture"] .nav-search-wrap,
+    html[data-menu-theme="carte-journal"] .nav-search-wrap,html[data-menu-theme="carte-voyage"] .nav-search-wrap,
+    html[data-menu-theme="carte-artisan"] .nav-search-wrap,html[data-menu-theme="carte-ardoise"] .nav-search-wrap,
+    html[data-menu-theme="carte-maroc"] .nav-search-wrap { display:none; }
+    html[data-menu-theme="carte-sommelier"] #cat-pills,html[data-menu-theme="carte-bento"] #cat-pills,
+    html[data-menu-theme="carte-telegraphe"] #cat-pills,html[data-menu-theme="carte-couture"] #cat-pills,
+    html[data-menu-theme="carte-journal"] #cat-pills,html[data-menu-theme="carte-voyage"] #cat-pills,
+    html[data-menu-theme="carte-artisan"] #cat-pills,html[data-menu-theme="carte-ardoise"] #cat-pills,
+    html[data-menu-theme="carte-maroc"] #cat-pills { display:none; }
+    html[data-menu-theme="carte-sommelier"] #nav,html[data-menu-theme="carte-bento"] #nav,
+    html[data-menu-theme="carte-telegraphe"] #nav,html[data-menu-theme="carte-couture"] #nav,
+    html[data-menu-theme="carte-journal"] #nav,html[data-menu-theme="carte-voyage"] #nav,
+    html[data-menu-theme="carte-artisan"] #nav,html[data-menu-theme="carte-ardoise"] #nav,
+    html[data-menu-theme="carte-maroc"] #nav { background:transparent; border:none; box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none; }
+    html[data-menu-theme="carte-sommelier"] .nav-top,html[data-menu-theme="carte-bento"] .nav-top,
+    html[data-menu-theme="carte-telegraphe"] .nav-top,html[data-menu-theme="carte-couture"] .nav-top,
+    html[data-menu-theme="carte-journal"] .nav-top,html[data-menu-theme="carte-voyage"] .nav-top,
+    html[data-menu-theme="carte-artisan"] .nav-top,html[data-menu-theme="carte-ardoise"] .nav-top,
+    html[data-menu-theme="carte-maroc"] .nav-top { justify-content:center; padding:8px 0; }
+    html[data-menu-theme="carte-sommelier"] .cat-sub,html[data-menu-theme="carte-bento"] .cat-sub,
+    html[data-menu-theme="carte-telegraphe"] .cat-sub,html[data-menu-theme="carte-couture"] .cat-sub,
+    html[data-menu-theme="carte-journal"] .cat-sub,html[data-menu-theme="carte-voyage"] .cat-sub,
+    html[data-menu-theme="carte-artisan"] .cat-sub,html[data-menu-theme="carte-ardoise"] .cat-sub,
+    html[data-menu-theme="carte-maroc"] .cat-sub { display:none; }
+    html[data-menu-theme="carte-sommelier"] .cards,html[data-menu-theme="carte-bento"] .cards,
+    html[data-menu-theme="carte-telegraphe"] .cards,html[data-menu-theme="carte-couture"] .cards,
+    html[data-menu-theme="carte-journal"] .cards,html[data-menu-theme="carte-voyage"] .cards,
+    html[data-menu-theme="carte-artisan"] .cards,html[data-menu-theme="carte-ardoise"] .cards,
+    html[data-menu-theme="carte-maroc"] .cards { gap:0; }
+    html[data-menu-theme="carte-sommelier"] .cat-hd,html[data-menu-theme="carte-bento"] .cat-hd,
+    html[data-menu-theme="carte-telegraphe"] .cat-hd,html[data-menu-theme="carte-couture"] .cat-hd,
+    html[data-menu-theme="carte-journal"] .cat-hd,html[data-menu-theme="carte-voyage"] .cat-hd,
+    html[data-menu-theme="carte-artisan"] .cat-hd,html[data-menu-theme="carte-ardoise"] .cat-hd,
+    html[data-menu-theme="carte-maroc"] .cat-hd { flex-direction:row; align-items:center; justify-content:center; text-align:center; padding:28px 0 10px; gap:10px; }
+    html[data-menu-theme="carte-sommelier"] .cat-ico-box,html[data-menu-theme="carte-bento"] .cat-ico-box,
+    html[data-menu-theme="carte-telegraphe"] .cat-ico-box,html[data-menu-theme="carte-couture"] .cat-ico-box,
+    html[data-menu-theme="carte-journal"] .cat-ico-box,html[data-menu-theme="carte-voyage"] .cat-ico-box,
+    html[data-menu-theme="carte-artisan"] .cat-ico-box,html[data-menu-theme="carte-ardoise"] .cat-ico-box,
+    html[data-menu-theme="carte-maroc"] .cat-ico-box { display:flex; background:none !important; box-shadow:none !important; border:none !important; padding:0; width:auto; height:auto; min-width:0; border-radius:0 !important; }
+    html[data-menu-theme="carte-sommelier"] .cat-ico-box svg,html[data-menu-theme="carte-bento"] .cat-ico-box svg,
+    html[data-menu-theme="carte-telegraphe"] .cat-ico-box svg,html[data-menu-theme="carte-couture"] .cat-ico-box svg,
+    html[data-menu-theme="carte-journal"] .cat-ico-box svg,html[data-menu-theme="carte-voyage"] .cat-ico-box svg,
+    html[data-menu-theme="carte-artisan"] .cat-ico-box svg,html[data-menu-theme="carte-ardoise"] .cat-ico-box svg,
+    html[data-menu-theme="carte-maroc"] .cat-ico-box svg { width:22px; height:22px; color:var(--gold); }
+    html[data-menu-theme="carte-sommelier"] .cat-hd-txt,html[data-menu-theme="carte-bento"] .cat-hd-txt,
+    html[data-menu-theme="carte-telegraphe"] .cat-hd-txt,html[data-menu-theme="carte-couture"] .cat-hd-txt,
+    html[data-menu-theme="carte-journal"] .cat-hd-txt,html[data-menu-theme="carte-voyage"] .cat-hd-txt,
+    html[data-menu-theme="carte-artisan"] .cat-hd-txt,html[data-menu-theme="carte-ardoise"] .cat-hd-txt,
+    html[data-menu-theme="carte-maroc"] .cat-hd-txt { flex:none; }
+
+    /* ══ STYLES INDIVIDUELS PAR THÈME CARTE ══ */
+
+    /* — Sommelier (colonne prix droite) — */
+    html[data-menu-theme="carte-sommelier"] .cat-name { font-family:'Cormorant',serif; font-size:1.5rem; font-weight:300; font-style:italic; color:var(--gold); letter-spacing:0.03em; }
+    html[data-menu-theme="carte-sommelier"] .cat-div { background:none; border-bottom:1px solid var(--border2); margin-bottom:0; }
+    .card-sommelier { display:flex !important; align-items:stretch !important; background:transparent !important; border:none !important; border-radius:0 !important; box-shadow:none !important; padding:10px 0 !important; border-bottom:1px solid var(--border) !important; position:relative !important; }
+    .som-main { flex:1; min-width:0; padding-right:8px; }
+    .som-name { font-family:'Cormorant',serif; font-size:1.04rem; font-weight:600; color:var(--cream); line-height:1.3; }
+    .som-desc { font-size:0.77rem; color:var(--muted); margin-top:3px; line-height:1.4; }
+    .som-badges { display:flex; gap:4px; flex-wrap:wrap; margin-top:3px; }
+    .som-price-col { width:72px; flex-shrink:0; border-left:1px solid var(--border2); padding:0 0 0 14px; display:flex; align-items:center; justify-content:flex-end; }
+    .som-price { font-family:'Cormorant',serif; font-size:0.98rem; font-weight:500; color:var(--gold); white-space:nowrap; }
+    html[data-menu-theme="carte-sommelier"] .card-sommelier .card-qty-ctrl { top:50%; bottom:auto; transform:translateY(-50%); right:0; }
+    html[data-menu-theme="carte-sommelier"] body.option-commande-active .card-sommelier { padding-right:54px !important; }
+    html[data-menu-theme="carte-sommelier"] body.option-commande-active .card-sommelier.card-has-qty { padding-right:98px !important; }
+
+    /* — Bento (grille 2 colonnes) — */
+    html[data-menu-theme="carte-bento"] .cat-name { font-family:'Outfit',sans-serif; font-size:0.72rem; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; font-style:normal; color:var(--gold); }
+    html[data-menu-theme="carte-bento"] .cat-div { background:none; border-bottom:2px solid var(--border2); margin-bottom:4px; }
+    html[data-menu-theme="carte-bento"] .cat-ico-box { display:none !important; }
+    html[data-menu-theme="carte-bento"] .cards { display:grid !important; grid-template-columns:1fr 1fr; gap:8px !important; }
+    .card-bento { background:var(--bg-card) !important; border:1px solid var(--border) !important; border-radius:10px !important; box-shadow:none !important; padding:14px 12px 44px !important; position:relative !important; display:flex !important; flex-direction:column !important; min-height:90px !important; }
+    .ben-name { font-family:'Cormorant',serif; font-size:1.0rem; font-weight:600; color:var(--cream); line-height:1.3; }
+    .ben-desc { font-size:0.72rem; color:var(--muted); margin-top:4px; line-height:1.4; flex:1; }
+    .ben-bottom { display:flex; justify-content:space-between; align-items:center; margin-top:auto; padding-top:6px; }
+    .ben-badges { display:flex; gap:3px; flex-wrap:wrap; }
+    .ben-price { font-size:0.88rem; color:var(--gold); font-weight:700; white-space:nowrap; }
+
+    /* — Télégraphe (points de conduite) — */
+    html[data-menu-theme="carte-telegraphe"] .cat-name { font-family:'Courier New',monospace; font-size:0.85rem; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; font-style:normal; color:var(--gold); }
+    html[data-menu-theme="carte-telegraphe"] .cat-div { background:none; border-bottom:1px dotted var(--border2); margin-bottom:0; }
+    html[data-menu-theme="carte-telegraphe"] .cat-ico-box { display:none !important; }
+    .card-telegraphe { background:transparent !important; border:none !important; border-radius:0 !important; box-shadow:none !important; padding:10px 0 !important; border-bottom:1px dotted var(--border2) !important; }
+    .tel-row { display:flex; align-items:baseline; gap:0; overflow:hidden; }
+    .tel-name { font-family:'Courier New',monospace; font-size:0.88rem; font-weight:700; text-transform:uppercase; color:var(--cream); letter-spacing:0.04em; flex-shrink:0; }
+    .tel-dots { flex:1; border-bottom:2px dotted var(--muted); height:0; margin:0 5px 4px 5px; min-width:12px; }
+    .tel-price { font-family:'Courier New',monospace; font-size:0.88rem; color:var(--gold); font-weight:400; flex-shrink:0; letter-spacing:0.02em; }
+    .tel-desc { font-size:0.75rem; color:var(--muted); margin-top:3px; line-height:1.4; font-family:'Courier New',monospace; }
+    .tel-badges { display:flex; gap:4px; flex-wrap:wrap; margin-top:3px; }
+    html[data-menu-theme="carte-telegraphe"] body.option-commande-active .card-telegraphe { padding-right:52px !important; }
+    html[data-menu-theme="carte-telegraphe"] body.option-commande-active .card-telegraphe.card-has-qty { padding-right:96px !important; }
+
+    /* — Couture (numéroté 3 niveaux) — */
+    html[data-menu-theme="carte-couture"] .cat-name { font-family:'Outfit',sans-serif; font-size:0.68rem; font-weight:300; letter-spacing:0.30em; text-transform:uppercase; font-style:normal; color:var(--muted); }
+    html[data-menu-theme="carte-couture"] .cat-div { background:none; border-bottom:1px solid var(--border2); margin-bottom:0; }
+    html[data-menu-theme="carte-couture"] .cat-ico-box { display:none !important; }
+    .card-couture { background:transparent !important; border:none !important; border-radius:0 !important; box-shadow:none !important; padding:16px 0 !important; border-bottom:1px solid var(--border) !important; }
+    .cou-header { display:flex; align-items:baseline; gap:14px; margin-bottom:5px; }
+    .cou-num { font-family:'Outfit',sans-serif; font-size:0.65rem; color:var(--gold); font-weight:300; letter-spacing:0.12em; flex-shrink:0; opacity:0.7; }
+    .cou-name { font-family:'Outfit',sans-serif; font-size:0.9rem; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; color:var(--cream); }
+    .cou-desc { font-size:0.74rem; color:var(--muted); line-height:1.55; margin-bottom:8px; }
+    .cou-footer { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .cou-badges { display:flex; gap:4px; flex-wrap:wrap; flex:1; }
+    .cou-price { font-family:'Outfit',sans-serif; font-size:0.78rem; color:var(--gold); font-weight:300; letter-spacing:0.10em; white-space:nowrap; }
+    html[data-menu-theme="carte-couture"] body.option-commande-active .card-couture { padding-right:52px !important; }
+    html[data-menu-theme="carte-couture"] body.option-commande-active .card-couture.card-has-qty { padding-right:96px !important; }
+
+    /* — Journal (headline + chapeau) — */
+    html[data-menu-theme="carte-journal"] .cat-name { font-family:'Cormorant',serif; font-size:1.8rem; font-weight:700; font-style:normal; letter-spacing:0.01em; color:var(--cream); text-transform:uppercase; }
+    html[data-menu-theme="carte-journal"] .cat-div { background:none; border-bottom:3px solid var(--border2); margin-bottom:0; }
+    html[data-menu-theme="carte-journal"] .cat-ico-box { display:none !important; }
+    .card-journal { background:transparent !important; border:none !important; border-radius:0 !important; box-shadow:none !important; padding:13px 0 !important; border-bottom:1px solid var(--border) !important; }
+    .jrn-headline { font-family:'Cormorant',serif; font-size:1.12rem; font-weight:700; color:var(--cream); line-height:1.2; margin-bottom:2px; }
+    .jrn-badges { display:flex; gap:4px; flex-wrap:wrap; margin-bottom:4px; }
+    .jrn-lead { font-size:0.77rem; color:var(--muted); line-height:1.5; margin-bottom:5px; }
+    .jrn-meta { display:flex; align-items:center; gap:8px; }
+    .jrn-rule { flex:1; height:1px; background:var(--border); }
+    .jrn-price { font-family:'Cormorant',serif; font-size:0.92rem; font-style:italic; color:var(--gold); font-weight:500; white-space:nowrap; }
+    html[data-menu-theme="carte-journal"] body.option-commande-active .card-journal { padding-right:52px !important; }
+    html[data-menu-theme="carte-journal"] body.option-commande-active .card-journal.card-has-qty { padding-right:96px !important; }
+
+    /* — Voyage (badge circulaire prix) — */
+    html[data-menu-theme="carte-voyage"] .cat-name { font-family:'Cormorant',serif; font-size:1.4rem; font-weight:400; font-style:italic; color:var(--gold); letter-spacing:0.03em; }
+    html[data-menu-theme="carte-voyage"] .cat-div { background:none; border-bottom:1px dashed var(--border2); margin-bottom:0; }
+    .card-voyage { display:flex !important; align-items:center !important; background:transparent !important; border:none !important; border-radius:0 !important; box-shadow:none !important; padding:12px 0 !important; border-bottom:1px dashed var(--border2) !important; position:relative !important; }
+    .voy-main { flex:1; min-width:0; padding-right:10px; }
+    .voy-name { font-family:'Cormorant',serif; font-size:1.05rem; font-weight:600; color:var(--cream); }
+    .voy-desc { font-size:0.77rem; color:var(--muted); margin-top:3px; line-height:1.4; }
+    .voy-badges { display:flex; gap:4px; flex-wrap:wrap; margin-top:3px; }
+    .voy-tag { width:54px; height:54px; border-radius:50%; flex-shrink:0; border:2px solid var(--gold); display:flex; flex-direction:column; align-items:center; justify-content:center; }
+    .voy-price { font-family:'Cormorant',serif; font-size:1.0rem; font-weight:700; color:var(--gold); line-height:1.1; }
+    .voy-currency { font-size:0.65rem; color:var(--gold); line-height:1; opacity:0.8; }
+    html[data-menu-theme="carte-voyage"] body.option-commande-active .card-voyage { padding-right:54px !important; }
+    html[data-menu-theme="carte-voyage"] body.option-commande-active .card-voyage.card-has-qty { padding-right:98px !important; }
+
+    /* — Artisan (nom + tirets + prix) — */
+    html[data-menu-theme="carte-artisan"] .cat-name { font-family:'Outfit',sans-serif; font-size:1.0rem; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; font-style:normal; color:var(--gold); }
+    html[data-menu-theme="carte-artisan"] .cat-div { background:none; border-bottom:2px solid var(--border2); margin-bottom:0; }
+    .card-artisan { background:transparent !important; border:none !important; border-radius:0 !important; box-shadow:none !important; padding:11px 0 !important; border-bottom:1px solid var(--border) !important; }
+    .art-top { display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; }
+    .art-name { font-family:'Outfit',sans-serif; font-size:1.0rem; font-weight:700; color:var(--cream); letter-spacing:0.01em; }
+    .art-badges { display:inline-flex; gap:4px; flex-wrap:wrap; }
+    .art-desc { font-size:0.77rem; color:var(--muted); margin:3px 0 6px; line-height:1.42; }
+    .art-bottom { display:flex; align-items:center; gap:8px; }
+    .art-dash { flex:1; height:1px; background:var(--border2); }
+    .art-price { font-family:'Outfit',sans-serif; font-size:0.92rem; color:var(--gold); font-weight:600; white-space:nowrap; flex-shrink:0; }
+    html[data-menu-theme="carte-artisan"] body.option-commande-active .card-artisan { padding-right:52px !important; }
+    html[data-menu-theme="carte-artisan"] body.option-commande-active .card-artisan.card-has-qty { padding-right:96px !important; }
+
+    /* — Ardoise (pointillés + Courier) — */
+    html[data-menu-theme="carte-ardoise"] .cat-name { font-family:'Cormorant',serif; font-size:1.1rem; font-weight:500; letter-spacing:0.14em; text-transform:uppercase; font-style:normal; color:var(--cream); }
+    html[data-menu-theme="carte-ardoise"] .cat-div { background:none; border-bottom:2px solid var(--border2); margin-bottom:0; }
+    .card-ardoise { background:transparent !important; border:none !important; border-radius:0 !important; box-shadow:none !important; padding:12px 0 !important; border-bottom:1px dashed var(--border2) !important; }
+    .ard-row { display:flex; align-items:baseline; justify-content:space-between; gap:10px; }
+    .ard-left { flex:1; min-width:0; display:flex; flex-wrap:wrap; align-items:baseline; gap:5px; }
+    .ard-name { font-family:'Cormorant',serif; font-size:1.04rem; font-weight:500; color:var(--cream); letter-spacing:0.02em; }
+    .ard-badges { display:inline-flex; gap:4px; flex-wrap:wrap; }
+    .ard-price { font-family:'Courier New',monospace; font-size:0.92rem; color:var(--gold); font-weight:700; white-space:nowrap; flex-shrink:0; letter-spacing:-0.01em; }
+    .ard-desc { font-size:0.78rem; color:var(--muted); margin-top:3px; line-height:1.4; font-style:italic; }
+    html[data-menu-theme="carte-ardoise"] body.option-commande-active .card-ardoise { padding-right:52px !important; }
+    html[data-menu-theme="carte-ardoise"] body.option-commande-active .card-ardoise.card-has-qty { padding-right:96px !important; }
+
+    /* — Maroc (étiquette prix encadrée) — */
+    html[data-menu-theme="carte-maroc"] .cat-name { font-family:'Cormorant',serif; font-size:1.5rem; font-weight:400; font-style:normal; letter-spacing:0.05em; color:var(--gold); }
+    html[data-menu-theme="carte-maroc"] .cat-div { background:none; border-bottom:none; margin:0; }
+    html[data-menu-theme="carte-maroc"] .cat-hd { padding:28px 0 12px; }
+    .card-maroc { background:transparent !important; border:none !important; border-radius:0 !important; box-shadow:none !important; padding:12px 0 !important; border-bottom:1px solid var(--border) !important; }
+    .marc-row { display:flex; align-items:baseline; justify-content:space-between; gap:8px; }
+    .marc-left { flex:1; min-width:0; }
+    .marc-name { font-family:'Cormorant',serif; font-size:1.08rem; font-weight:500; color:var(--cream); }
+    .marc-badges { display:flex; gap:4px; flex-wrap:wrap; margin-top:3px; }
+    .marc-price { font-size:0.92rem; color:var(--gold); font-weight:700; white-space:nowrap; flex-shrink:0; padding:1px 8px; border:1px solid var(--border2); border-radius:3px; }
+    .marc-desc { font-size:0.78rem; color:var(--muted); margin-top:4px; line-height:1.44; }
+    html[data-menu-theme="carte-maroc"] body.option-commande-active .card-maroc { padding-right:52px !important; }
+    html[data-menu-theme="carte-maroc"] body.option-commande-active .card-maroc.card-has-qty { padding-right:96px !important; }
+
+    /* ══ TOUCHES VISUELLES — 9 THÈMES LIVRE ══ */
+    html[data-menu-theme="livre-noir"] .fp-cat-name { font-family:'Outfit',sans-serif; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; font-style:normal; font-size:0.85rem; }
+    html[data-menu-theme="livre-noir"] .fp-item { border-left:2px solid var(--border2); padding-left:12px; }
+    html[data-menu-theme="livre-botanique"] .fp-cat-name { font-family:'Cormorant',serif; font-size:1.9rem; font-weight:400; font-style:italic; }
+    html[data-menu-theme="livre-azure"] .fp-cat-name { font-family:'Cormorant',serif; font-size:1.65rem; font-weight:400; font-style:normal; letter-spacing:0.05em; }
+    html[data-menu-theme="livre-azure"] .fp-cat-header { border-bottom:2px solid var(--border2); }
+    html[data-menu-theme="livre-rose"] .fp-cat-name { font-family:'Cormorant',serif; font-size:1.8rem; font-weight:400; font-style:italic; letter-spacing:0.02em; }
+    html[data-menu-theme="livre-antique"] .fp-cat-name { font-family:'Cormorant',serif; font-size:1.85rem; font-weight:400; font-style:italic; letter-spacing:0.02em; }
+    html[data-menu-theme="livre-antique"] .fp-item-name { font-style:italic; }
+    html[data-menu-theme="livre-epure"] .fp-cat-name { font-family:'Outfit',sans-serif; font-size:0.75rem; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; font-style:normal; }
+    html[data-menu-theme="livre-epure"] .fp-cat-header { border-bottom:1px solid var(--border2); }
+    html[data-menu-theme="livre-cerise"] .fp-cat-name { font-family:'Outfit',sans-serif; font-size:1.45rem; font-weight:800; letter-spacing:0.05em; text-transform:uppercase; font-style:normal; }
+    html[data-menu-theme="livre-cerise"] .fp-cat-header { border-bottom:2px solid var(--border2); }
+    html[data-menu-theme="livre-indigo"] .fp-cat-name { font-family:'Cormorant',serif; font-size:1.8rem; font-weight:400; font-style:italic; letter-spacing:0.02em; }
+    html[data-menu-theme="livre-foret"] .fp-cat-name { font-family:'Cormorant',serif; font-size:1.7rem; font-weight:400; font-style:italic; }
+    html[data-menu-theme="livre-foret"] .fp-item { border-left:3px solid var(--border2); padding-left:12px; }
+
+    
     /* ── ÉDITORIAL: grande photo pleine hauteur gauche + texte droite ── */
     .card-editorial { display:flex; align-items:stretch; padding:0 !important; gap:0; }
     .edt-thumb { width:130px; flex-shrink:0; overflow:hidden; background:var(--bg2); }
@@ -5921,7 +6405,7 @@ function _updateCCHeader() {
 }
 
 function _startPreloader() {
-  if (menuTheme === 'carte-classique') return;
+  if (['carte-classique','carte-sommelier','carte-bento','carte-telegraphe','carte-couture','carte-journal','carte-voyage','carte-artisan','carte-ardoise','carte-maroc'].includes(menuTheme)) return;
   if (_preloaderStarted) return;
   _preloaderStarted = true;
   const pre = document.getElementById('preloader');
@@ -6617,6 +7101,180 @@ function _cardClassique(item) {
       <div class="cls-price">${item.price}</div>
     </div>
     ${desc ? `<div class="cls-desc">${desc}</div>` : ''}`;
+  _setupCardEvents(card, item);
+  return card;
+}
+
+/* ── Thèmes : 9 nouveaux Carte ── */
+
+function _cardSommelier(item) {
+  const card = document.createElement('div');
+  const badges = _getBadges(item);
+  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  card.className = 'card card-sommelier';
+  card.dataset.item = item.id;
+  card.style.transitionDelay = '0s';
+  card.innerHTML =
+    '<div class="som-main">' +
+      '<div class="som-name">' + (item.name[lang]||item.name.fr||'') + '</div>' +
+      (desc ? '<div class="som-desc">' + desc + '</div>' : '') +
+      (badges ? '<div class="som-badges">' + badges + '</div>' : '') +
+    '</div>' +
+    '<div class="som-price-col"><span class="som-price">' + item.price + '</span></div>';
+  _setupCardEvents(card, item);
+  return card;
+}
+
+function _cardBento(item) {
+  const card = document.createElement('div');
+  const badges = _getBadges(item);
+  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  card.className = 'card card-bento';
+  card.dataset.item = item.id;
+  card.style.transitionDelay = '0s';
+  card.innerHTML =
+    '<div class="ben-name">' + (item.name[lang]||item.name.fr||'') + '</div>' +
+    (desc ? '<div class="ben-desc">' + desc + '</div>' : '<div class="ben-desc"></div>') +
+    '<div class="ben-bottom">' +
+      (badges ? '<div class="ben-badges">' + badges + '</div>' : '<div class="ben-badges"></div>') +
+      '<div class="ben-price">' + item.price + '</div>' +
+    '</div>';
+  _setupCardEvents(card, item);
+  return card;
+}
+
+function _cardTelegraphe(item) {
+  const card = document.createElement('div');
+  const badges = _getBadges(item);
+  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  card.className = 'card card-telegraphe';
+  card.dataset.item = item.id;
+  card.style.transitionDelay = '0s';
+  card.innerHTML =
+    '<div class="tel-row">' +
+      '<span class="tel-name">' + (item.name[lang]||item.name.fr||'') + '</span>' +
+      '<span class="tel-dots"></span>' +
+      '<span class="tel-price">' + item.price + '</span>' +
+    '</div>' +
+    (desc ? '<div class="tel-desc">' + desc + '</div>' : '') +
+    (badges ? '<div class="tel-badges">' + badges + '</div>' : '');
+  _setupCardEvents(card, item);
+  return card;
+}
+
+function _cardCouture(item, idx) {
+  const card = document.createElement('div');
+  const badges = _getBadges(item);
+  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  const num = String((idx||0) + 1).padStart(2, '0');
+  card.className = 'card card-couture';
+  card.dataset.item = item.id;
+  card.style.transitionDelay = '0s';
+  card.innerHTML =
+    '<div class="cou-header">' +
+      '<span class="cou-num">' + num + '</span>' +
+      '<span class="cou-name">' + (item.name[lang]||item.name.fr||'') + '</span>' +
+    '</div>' +
+    (desc ? '<div class="cou-desc">' + desc + '</div>' : '') +
+    '<div class="cou-footer">' +
+      (badges ? '<div class="cou-badges">' + badges + '</div>' : '<div class="cou-badges"></div>') +
+      '<div class="cou-price">' + item.price + '</div>' +
+    '</div>';
+  _setupCardEvents(card, item);
+  return card;
+}
+
+function _cardJournal(item) {
+  const card = document.createElement('div');
+  const badges = _getBadges(item);
+  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  card.className = 'card card-journal';
+  card.dataset.item = item.id;
+  card.style.transitionDelay = '0s';
+  card.innerHTML =
+    '<div class="jrn-headline">' + (item.name[lang]||item.name.fr||'') + '</div>' +
+    (badges ? '<div class="jrn-badges">' + badges + '</div>' : '') +
+    (desc ? '<div class="jrn-lead">' + desc + '</div>' : '') +
+    '<div class="jrn-meta"><div class="jrn-rule"></div><span class="jrn-price">' + item.price + '</span></div>';
+  _setupCardEvents(card, item);
+  return card;
+}
+
+function _cardVoyage(item) {
+  const card = document.createElement('div');
+  const badges = _getBadges(item);
+  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  const priceParts = item.price.replace(/[€$£]/g,'').trim().split(/[.,]/);
+  const priceInt = priceParts[0] || item.price;
+  const currency = (item.price.match(/[€$£]/)||['€'])[0];
+  card.className = 'card card-voyage';
+  card.dataset.item = item.id;
+  card.style.transitionDelay = '0s';
+  card.innerHTML =
+    '<div class="voy-main">' +
+      '<div class="voy-name">' + (item.name[lang]||item.name.fr||'') + '</div>' +
+      (desc ? '<div class="voy-desc">' + desc + '</div>' : '') +
+      (badges ? '<div class="voy-badges">' + badges + '</div>' : '') +
+    '</div>' +
+    '<div class="voy-tag"><div class="voy-price">' + item.price + '</div></div>';
+  _setupCardEvents(card, item);
+  return card;
+}
+
+function _cardArtisan(item) {
+  const card = document.createElement('div');
+  const badges = _getBadges(item);
+  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  card.className = 'card card-artisan';
+  card.dataset.item = item.id;
+  card.style.transitionDelay = '0s';
+  card.innerHTML =
+    '<div class="art-top">' +
+      '<span class="art-name">' + (item.name[lang]||item.name.fr||'') + '</span>' +
+      (badges ? '<span class="art-badges">' + badges + '</span>' : '') +
+    '</div>' +
+    (desc ? '<div class="art-desc">' + desc + '</div>' : '') +
+    '<div class="art-bottom"><div class="art-dash"></div><div class="art-price">' + item.price + '</div></div>';
+  _setupCardEvents(card, item);
+  return card;
+}
+
+function _cardArdoise(item) {
+  const card = document.createElement('div');
+  const badges = _getBadges(item);
+  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  card.className = 'card card-ardoise';
+  card.dataset.item = item.id;
+  card.style.transitionDelay = '0s';
+  card.innerHTML =
+    '<div class="ard-row">' +
+      '<div class="ard-left">' +
+        '<span class="ard-name">' + (item.name[lang]||item.name.fr||'') + '</span>' +
+        (badges ? '<span class="ard-badges">' + badges + '</span>' : '') +
+      '</div>' +
+      '<div class="ard-price">' + item.price + '</div>' +
+    '</div>' +
+    (desc ? '<div class="ard-desc">' + desc + '</div>' : '');
+  _setupCardEvents(card, item);
+  return card;
+}
+
+function _cardMaroc(item) {
+  const card = document.createElement('div');
+  const badges = _getBadges(item);
+  const desc = (item.desc && item.desc[lang]) || item.desc?.fr || '';
+  card.className = 'card card-maroc';
+  card.dataset.item = item.id;
+  card.style.transitionDelay = '0s';
+  card.innerHTML =
+    '<div class="marc-row">' +
+      '<div class="marc-left">' +
+        '<div class="marc-name">' + (item.name[lang]||item.name.fr||'') + '</div>' +
+        (badges ? '<div class="marc-badges">' + badges + '</div>' : '') +
+      '</div>' +
+      '<div class="marc-price">' + item.price + '</div>' +
+    '</div>' +
+    (desc ? '<div class="marc-desc">' + desc + '</div>' : '');
   _setupCardEvents(card, item);
   return card;
 }
